@@ -1,0 +1,10 @@
+#testOne {
+	background-image: url("images/background.jpg");
+	max-width: 100%;
+	height: auto;
+}
+
+p, h1, address {
+	color: white;
+
+}
