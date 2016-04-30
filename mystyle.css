@@ -1,21 +1,45 @@
 #testOne {
+	position: relative;
 	background-image: url("images/background.jpg");
-	max-width: 100%;
-	height: auto;
 	color: white;
 }
 
-.introduction {
+.top-margin {
 	margin-top: 2em;
-	margin-left: 2em;
-	margin-right: 2em;
-	text-align: justify;;
 }
 
-.center {
+.bottom-margin {
+	margin-bottom: 2em;
+}
+
+.center-text {
 	text-align: center;
 }
 
-.spacing {
-	margin-top: 1em;
+
+/* Banner FOR REFERENCE*/
+#banner {
+	position: relative;
+	background-color: white;
+	background-image: url("images/overlay.png"), url("images/highlight.png");
+	vertical-align: bottom;
+	background-size: auto, auto;
+	background-repeat: repeat, no-repeat;
+	text-align: center;
+	margin: 0;
+}
+
+.stars {
+	position: relative;
+	background-color: white;
+	background-image: url("images/stars.jpg");
+	background-repeat: repeat;
+	border-radius: 30px;
+	max-width: 100%;
+	height: auto;
+	color: black;
+}
+
+.jumbotron {
+	opacity: .9
 }
