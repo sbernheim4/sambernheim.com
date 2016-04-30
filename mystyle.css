@@ -2,9 +2,20 @@
 	background-image: url("images/background.jpg");
 	max-width: 100%;
 	height: auto;
+	color: white;
 }
 
-p, h1, address {
-	color: white;
+.introduction {
+	margin-top: 2em;
+	margin-left: 2em;
+	margin-right: 2em;
+	text-align: justify;;
+}
 
+.center {
+	text-align: center;
+}
+
+.spacing {
+	margin-top: 1em;
 }
