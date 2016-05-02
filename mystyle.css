@@ -1,3 +1,7 @@
+a:hover{
+	text-decoration: none;
+}
+
 #testOne {
 	position: relative;
 	background-image: url("images/background.jpg");
@@ -14,6 +18,17 @@
 
 .center-text {
 	text-align: center;
+}
+
+.fa {
+	color: orange;
+	display: block;
+	margin-top: 5em;
+}
+
+.custom-nav {
+		opacity: 1;
+		text-transform: uppercase;
 }
 
 
@@ -59,7 +74,8 @@
 
 .demo-1 .large-header {
 	/*background-image: linear-gradient(-45deg, blue, red);*/
-	background-image: url("images/demo-1-bg.jpg");
+	background-image: url("images/demo-2-bg.jpg");
+	opacity: .9
 }
 
 
