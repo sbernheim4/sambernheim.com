@@ -25,6 +25,7 @@
 
 
 
+
 	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
 	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
 	<!--[if lt IE 9]>
@@ -34,19 +35,60 @@
 </head>
 
 <body>
+
+
+
+
 	<div class="demo-1">
 		<div class="content">
 			<div id="large-header" class="large-header">
 
-				<nav class="navbar navbar-default navbar-static-top custom-nav">
+
+				<!-- Navigation -->
+				<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
 					<div class="container">
-							<ul class="nav navbar-nav">
-								<li><a class="smoothScroll" href="#about">About</a></li>
-								<li><a class="smoothScroll" href="#">Education</a></li>
-								<li><a class="smoothScroll" href="#">Interests</a></li>
+						<!-- Brand and toggle get grouped for better mobile display -->
+						<div class="navbar-header page-scroll">
+							<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+								<span class="sr-only">Toggle navigation</span>
+								<span class="icon-bar"></span>
+								<span class="icon-bar"></span>
+								<span class="icon-bar"></span>
+							</button>
+
+						</div>
+						<!-- Collect the nav links, forms, and other content for toggling -->
+						<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+							<ul class="nav navbar-nav navbar-right">
+								<li>
+									<a class="smoothScroll" href="#about">About</a>
+								</li>
+								<li>
+									<a class="smoothScroll" href="#">Education</a>
+								</li>
+								<li>
+									<a class="smoothScroll" href="#">Experience</a>
+								</li>
+								<li>
+									<a class="smoothScroll" href="#">Interests</a>
+								</li>
+								<li>
+									<a class="page-scroll smoothScroll" href="#">Contact</a>
+								</li>
 							</ul>
+						</div>
+						<!-- /.navbar-collapse -->
 					</div>
+					<!-- /.container -->
 				</nav>
+
+
+
+				<!-- <div id="nav-bar"> -->
+					<!-- THIS IS FILLED IN BY THE JS FILE myjs.js -->
+				<!-- </div> -->
+
+
 
 				<h1 class="main-title">Samuel <span class="thin">Bernheim</span></h1>
 				<div class="main-title">
@@ -58,6 +100,7 @@
 		</div>
 	</div>
 
+	<script src="js/myjs.js"></script>
 	<script src="js/TweenLite.min.js"></script>
 	<script src="js/EasePack.min.js"></script>
 	<script src="js/rAF.js"></script>
@@ -65,28 +108,28 @@
 	<script src="//cdn.jsdelivr.net/mojs/latest/mo.min.js"></script>
 
 
-<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-<!-- Include all compiled plugins (below), or include individual files as needed -->
-<script src="js/bootstrap.min.js"></script>
+	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+	<!-- Include all compiled plugins (below), or include individual files as needed -->
+	<script src="js/bootstrap.min.js"></script>
 
-<section class="col-md-12 top-margin bottom-margin">
-	<div class="container stars" id="about">
-		<div class="top-margin jumbotron">
-			<p class="center-text"> Since my childhood, I have always been fascinated with computers and how they work.
-				In 9th grade I had my first opportunity to start programming in Processing and
-				immidiately I was hooked. This is what I had been waiting for. I pursued computer
-				science spending two summers at ID Tech Camps where I was taught the basics
-				of C++. In college I learned Java and taught myself Python and took summer courses
-				in web development.
-			</p>
-			<h2 class="center-text"> Here is what I have learned </h2>
+	<section class="col-md-12 top-margin bottom-margin">
+		<div class="container stars" id="about">
+			<div class="top-margin jumbotron">
+				<p class="center-text"> Since my childhood, I have always been fascinated with computers and how they work.
+					In 9th grade I had my first opportunity to start programming in Processing and
+					immidiately I was hooked. This is what I had been waiting for. I pursued computer
+					science spending two summers at ID Tech Camps where I was taught the basics
+					of C++. In college I learned Java and taught myself Python and took summer courses
+					in web development.
+				</p>
+				<h2 class="center-text"> Here is what I have learned </h2>
+			</div>
 		</div>
-	</div>
-</section>
+	</section>
 
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-<script type="text/javascript" src="js/smoothscroll.js"></script>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+	<script type="text/javascript" src="js/smoothscroll.js"></script>
 
 </body>
 </html>

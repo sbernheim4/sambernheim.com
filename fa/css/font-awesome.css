@@ -45,6 +45,7 @@
   padding-left: 0;
   margin-left: 2.14285714em;
   list-style-type: none;
+  text-align: center;
 }
 .fa-ul > li {
   position: relative;

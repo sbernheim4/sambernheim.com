@@ -21,11 +21,12 @@
         ctx = canvas.getContext('2d');
 
         // create points
+        var numPoints = 15;
         points = [];
-        for(var x = 0; x < width; x = x + width/30) {
-            for(var y = 0; y < height; y = y + height/30) {
-                var px = x + Math.random()*width/30;
-                var py = y + Math.random()*height/30;
+        for(var x = 0; x < width; x = x + width/numPoints) {
+            for(var y = 0; y < height; y = y + height/numPoints) {
+                var px = x + Math.random()*width/numPoints;
+                var py = y + Math.random()*height/numPoints;
                 var p = {x: px, originX: px, y: py, originY: py };
                 points.push(p);
             }
