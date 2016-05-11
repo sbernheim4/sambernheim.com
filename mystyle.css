@@ -1,5 +1,3 @@
-
-
 a:hover{
 	text-decoration: none;
 }
@@ -22,11 +20,12 @@ ul {
 }
 
 .larger {
-	font-size: 13pt; 
+	font-size: 13pt;
 }
 
 .baron-neue {
 	font-family: myFirstFont;
+
 }
 
 .opacity {
