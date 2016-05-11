@@ -19,12 +19,8 @@
 	<!-- Font Awessome CSS -->
 	<link rel="stylesheet" href="fa/css/font-awesome.min.css">
 
-
 	<link rel="stylesheet" href="mystyle.css">
 	<link rel="icon" href="images/icon.png">
-
-
-
 
 	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
 	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -36,18 +32,11 @@
 
 <body>
 
-
-
-
 	<div class="demo-1">
 		<div class="content">
 			<div id="large-header" class="large-header">
-
-
-				<!-- Navigation -->
-				<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+				<nav id="navbar" class="navbar navbar-default navbar-fixed-top" role="navigation">
 					<div class="container">
-						<!-- Brand and toggle get grouped for better mobile display -->
 						<div class="navbar-header page-scroll">
 							<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
 								<span class="sr-only">Toggle navigation</span>
@@ -57,79 +46,57 @@
 							</button>
 
 						</div>
-						<!-- Collect the nav links, forms, and other content for toggling -->
 						<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 							<ul class="nav navbar-nav navbar-right">
-								<li>
-									<a class="smoothScroll" href="#about">About</a>
-								</li>
-								<li>
-									<a class="smoothScroll" href="#">Education</a>
-								</li>
-								<li>
-									<a class="smoothScroll" href="#">Experience</a>
-								</li>
-								<li>
-									<a class="smoothScroll" href="#">Interests</a>
-								</li>
-								<li>
-									<a class="page-scroll smoothScroll" href="#">Contact</a>
-								</li>
+								<li> <a class="smoothScroll" href="#about">About</a> </li>
+								<li> <a class="smoothScroll" href="#education">Education</a> </li>
+								<li> <a class="smoothScroll" href="#">Experience</a> </li>
+								<li> <a class="smoothScroll" href="#">Interests</a> </li>
+								<li> <a class="page-scroll smoothScroll" href="#">Contact</a> </li>
 							</ul>
 						</div>
-						<!-- /.navbar-collapse -->
 					</div>
-					<!-- /.container -->
 				</nav>
-
-
-
-				<!-- <div id="nav-bar"> -->
-					<!-- THIS IS FILLED IN BY THE JS FILE myjs.js -->
-				<!-- </div> -->
-
-
 
 				<h1 class="main-title">Samuel <span class="thin">Bernheim</span></h1>
 				<div class="main-title">
 					<a class="smoothScroll" href="https://github.com/sbernheim4"  target="_blank"> <i class="fa fa-github" aria-hidden="true"></i> </a>
 				</div>
 				<canvas id="demo-canvas"></canvas>
-
 			</div>
 		</div>
 	</div>
 
-	<script src="js/myjs.js"></script>
 	<script src="js/TweenLite.min.js"></script>
 	<script src="js/EasePack.min.js"></script>
 	<script src="js/rAF.js"></script>
 	<script src="js/demo-1.js"></script>
-	<script src="//cdn.jsdelivr.net/mojs/latest/mo.min.js"></script>
-
-
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+	<script type="text/javascript" src="js/smoothscroll.js"></script>
 	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 	<!-- Include all compiled plugins (below), or include individual files as needed -->
 	<script src="js/bootstrap.min.js"></script>
+	<script src="js/myjs.js"></script>
 
-	<section class="col-md-12 top-margin bottom-margin">
-		<div class="container stars" id="about">
-			<div class="top-margin jumbotron">
-				<p class="center-text"> Since my childhood, I have always been fascinated with computers and how they work.
-					In 9th grade I had my first opportunity to start programming in Processing and
-					immidiately I was hooked. This is what I had been waiting for. I pursued computer
-					science spending two summers at ID Tech Camps where I was taught the basics
-					of C++. In college I learned Java and taught myself Python and took summer courses
-					in web development.
-				</p>
-				<h2 class="center-text"> Here is what I have learned </h2>
+	<section class="top-margin bottom-margin">
+		<br id="about">
+		<h2 class="center-text underline baron-neue">About</h2>
+		<div class="row">
+			<div class="col-md-3 photo-margin">
+				<img src="images/Profile.jpg" alt="Samuel Bernheim" class="img-responsive">
+			</div>
+
+			<div class="col-md-7 baron-neue opacity larger">
+				<p> Since my childhood, I have always been fascinated with computers and how they work.</p>
+				<p> In 9th grade I had my first opportunity to start programming in Processing and immidiately I was hooked. This is what I had been waiting for. </p>
+				<p> I pursued computer science spending two summers at ID Tech Camps where I was taught the basics of C++. </p>
+				<p>At Brandeis University I am studying Java and Scheme and have taught myself Python. I took summer courses in web development. and continue to learn these languages and more.</p>
+				<p> In addition to pursuing a BS in Computer Science I am minoring in Economics taking additional classes in Math, Politics and History. </p>
 			</div>
 		</div>
+		<br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br>
 	</section>
-
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-	<script type="text/javascript" src="js/smoothscroll.js"></script>
 
 </body>
 </html>

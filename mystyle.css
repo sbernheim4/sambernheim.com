@@ -1,11 +1,36 @@
+
+
 a:hover{
 	text-decoration: none;
 }
 
-#testOne {
-	position: relative;
-	background-image: url("images/background.jpg");
-	color: white;
+ul {
+	text-align:center;
+}
+
+@font-face {
+    font-family: myFirstFont;
+    src: url(fonts/baron_neue-webfont.woff);
+}
+
+.underline{
+	border-bottom: 4px solid #edc27b;
+    padding-bottom: 4px;
+	margin-left: 590px;
+	margin-right: 590px;
+
+}
+
+.larger {
+	font-size: 13pt; 
+}
+
+.baron-neue {
+	font-family: myFirstFont;
+}
+
+.opacity {
+	opacity: .6;
 }
 
 .top-margin {
@@ -16,8 +41,28 @@ a:hover{
 	margin-bottom: 2em;
 }
 
+.left-margin {
+	margin-left: 2em;
+}
+
+.photo-margin {
+	margin-left: 6em;
+}
+
+.edu-div-margins {
+	margin-top: 2em;
+	margin-left: 2em;
+	margin-right: 2em;
+}
+
 .center-text {
 	text-align: center;
+}
+
+.education-background {
+	background-image: url("images/background-2.png");
+	background-size: cover;
+	background-repeat: no-repeat;
 }
 
 .fa {
@@ -27,25 +72,8 @@ a:hover{
 }
 
 .custom-nav {
-		opacity: 1;
-		text-transform: uppercase;
-}
-
-ul {
-    text-align:center;
-}
-
-
-/* Banner FOR REFERENCE*/
-#banner {
-	position: relative;
-	background-color: white;
-	background-image: url("images/overlay.png"), url("images/highlight.png");
-	vertical-align: bottom;
-	background-size: auto, auto;
-	background-repeat: repeat, no-repeat;
-	text-align: center;
-	margin: 0;
+	opacity: 1;
+	text-transform: uppercase;
 }
 
 .stars {
@@ -62,6 +90,17 @@ ul {
 	opacity: .9
 }
 
+/* Banner FOR REFERENCE*/
+#banner {
+	position: relative;
+	background-color: white;
+	background-image: url("images/overlay.png"), url("images/highlight.png");
+	vertical-align: bottom;
+	background-size: auto, auto;
+	background-repeat: repeat, no-repeat;
+	text-align: center;
+	margin: 0;
+}
 
 /*FOR DYNAMIC BACKGROUND*/
 
@@ -77,7 +116,6 @@ ul {
 }
 
 .demo-1 .large-header {
-	/*background-image: linear-gradient(-45deg, blue, red);*/
 	background-image: url("images/demo-2-bg.jpg");
 	opacity: .9
 }
