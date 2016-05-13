@@ -7,16 +7,14 @@ ul {
 }
 
 @font-face {
-    font-family: myFirstFont;
-    src: url(fonts/baron_neue-webfont.woff);
+	font-family: baron-neue;
+	src: url(fonts/baron_neue-webfont.woff);
 }
 
 .underline{
 	border-bottom: 4px solid #edc27b;
-    padding-bottom: 4px;
-	margin-left: 590px;
-	margin-right: 590px;
-
+	margin: auto; /* this  keeps the yellow line under About centered */
+	width: 90px;
 }
 
 .larger {
@@ -24,12 +22,17 @@ ul {
 }
 
 .baron-neue {
-	font-family: myFirstFont;
-
+	font-family: baron-neue;
 }
 
 .opacity {
 	opacity: .6;
+}
+
+
+.easy-border {
+	padding-left: 3%;
+	padding-right: 3%;
 }
 
 .top-margin {
@@ -44,24 +47,8 @@ ul {
 	margin-left: 2em;
 }
 
-.photo-margin {
-	margin-left: 6em;
-}
-
-.edu-div-margins {
-	margin-top: 2em;
-	margin-left: 2em;
-	margin-right: 2em;
-}
-
 .center-text {
 	text-align: center;
-}
-
-.education-background {
-	background-image: url("images/background-2.png");
-	background-size: cover;
-	background-repeat: no-repeat;
 }
 
 .fa {
@@ -70,35 +57,8 @@ ul {
 	margin-top: 5em;
 }
 
-.custom-nav {
-	opacity: 1;
-	text-transform: uppercase;
-}
-
-.stars {
-	position: relative;
-	background-image: url("images/stars.jpg");
-	background-repeat: repeat;
-	border-radius: 30px;
-	max-width: 100%;
-	height: auto;
-	color: black;
-}
-
 .jumbotron {
 	opacity: .9
-}
-
-/* Banner FOR REFERENCE*/
-#banner {
-	position: relative;
-	background-color: white;
-	background-image: url("images/overlay.png"), url("images/highlight.png");
-	vertical-align: bottom;
-	background-size: auto, auto;
-	background-repeat: repeat, no-repeat;
-	text-align: center;
-	margin: 0;
 }
 
 /*FOR DYNAMIC BACKGROUND*/
