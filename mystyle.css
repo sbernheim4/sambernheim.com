@@ -11,10 +11,16 @@ ul {
 	src: url(fonts/baron_neue-webfont.woff);
 }
 
-.underline{
+.about-underline{
 	border-bottom: 4px solid #edc27b;
 	margin: auto; /* this  keeps the yellow line under About centered */
 	width: 90px;
+}
+
+.edu-exp-underline {
+	border-bottom: 4px solid #edc27b;
+	margin: 0px auto; /* this  keeps the yellow line under About centered */
+	width: 420px;
 }
 
 .larger {

@@ -49,10 +49,10 @@
 						<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 							<ul class="nav navbar-nav navbar-right">
 								<li> <a class="smoothScroll" href="#about">About</a> </li>
-								<li> <a class="smoothScroll" href="#edu">Education</a> </li>
-								<li> <a class="smoothScroll" href="#">Experience</a> </li>
-								<li> <a class="smoothScroll" href="#">Interests</a> </li>
-								<li> <a class="page-scroll smoothScroll" href="#">Contact</a> </li>
+								<li> <a class="smoothScroll" href="#edu/exp">Education and Experience</a> </li>
+								<li> <a class="smoothScroll" href="#interests">Interests</a> </li>
+								<li> <a class="smoothScroll" href="contact.html">Contact</a> </li>  <!-- class did have page-scroll in case it did something-->
+
 							</ul>
 						</div>
 					</div>
@@ -65,6 +65,7 @@
 				<canvas id="demo-canvas"></canvas>
 			</div>
 		</div>
+		<br>
 	</div>
 
 	<script src="js/TweenLite.min.js"></script>
@@ -79,57 +80,50 @@
 	<script src="js/bootstrap.min.js"></script>
 	<script src="js/myjs.js"></script>
 
-	<div id="about">
-		<br>
-		<br>
-		<h2 class="center-text baron-neue underline">About</h2>
-		<div class="easy-border">
+	<section id="about" name="about">
+		<div class="container easy-border">
+			<br>
+			<h2 class="center-text baron-neue about-underline">About</h2>
 			<br>
 			<img src="images/profile.jpg" alt="Samuel Bernheim" class="col-sm-5 col-md-5 col-lg-4 img-responsive">
-
 			<div class="col-xs-12 col-sm-7 col-md-7 col-lg-8 baron-neue opacity larger">
 				<br>
 				<p>Hi. <br> I'm Sam</p>
 				<p>I'm from New York City attending Brandeis university in Waltham, MA just outside of Boston.</p>
 				<p>I've been interested in computers and programming for as long as I can remember and love learning new technologies.</p>
-				<p>outside of my academics, I play ultimate Frisbee, am the Treasurer for Deis3D (the 3D Printing Club at Brandeis) and an active member of the French Buisness and Lifestyle Club</p>
+				<p>outside of my academics, I play ultimate Frisbee, am the Treasurer for Deis3D (the 3D Printing Club at Brandeis) and an active member of the French Buisness and Lifestyle Club </p>
 				<p>I'm a big fan of science fiction TV shows, reading Historical Fiction and Biographies and following current Political and Economic events. </p>
 				<p>Please feel free to <a href="mailto:bernheim@brandeis.edu" target="_top">Contact Me</a></p>
-
-				<!-- <br> <br> <br> <br> <br> <br><br> <br> <br> -->
 			</div>
-
 		</div>
-	</div>
+		<br> <br> <br> <br> <br>
+	</section>
 
-	<div id="edu">
-		<br>
-		<br>
-		<h2 class="center-text baron-neue underline">Education</h2>
-		<div class="easy-border">
+
+	<section id="edu/exp" name="edu/exp">
+		<div class="container easy-border">
+			<h2 class="edu-exp-underline center-text baron-neue">Education and Experience</h2>
 			<br>
-			<img src="images/brandeis-logo.jpg" alt="Brandeis University Logo" class="col-sm-5 col-md-5 col-lg-4 img-responsive" style="float:right;">
-
+			<!-- TODO: Get Logos for all of the companies mentioned here and make them into a collage  -->
+			<img src="images/brandeis-logo.jpg" alt="Brandeis University Logo" class="col-sm-5 col-md-5 col-lg-4 img-responsive" style="float:right">
 			<div class="col-xs-12 col-sm-7 col-md-7 col-lg-8 baron-neue opacity larger">
-				<br>
-				<p>I am currently attending Brandeis University</p>
-
-				<br> <br> <br> <br> <br> <br> <br> <br> <br> <br>
+				<p>I am currently attending Brandeis University majoring in Computer Science with minors in
+					Economics. I focus on Java and have taken courses using Scheme and have taught myself Python.
+					I took a summer program in web development and continue to learn these languages and more.
+				</p>
+				<p> My courses have ranged from traditional Data Structures and Algorithms classes to writing
+					simplfied compilers and evaluators as well as Theory of Computation.
+				</p>
+				<p>Last summer I worked for MLB Advanced Media where I was taksed with ...</p>
+				<p>Additionally, I have worked at oMB Labs where I was responsible for writing the WayWay API,
+					their two websites using Strikingly, and for conducting research on potential clients.
+				</p>
 			</div>
-
 		</div>
+<br> <br> <br> <br> <br><br> <br> <br> <br> <br><br> <br> <br> <br> <br>
+	</section>
 
-	</div>
 
-
-
-	<!-- <div class="col-md-7 baron-neue opacity larger">
-	<p> Since my childhood, I have always been fascinated with computers and how they work.</p>
-	<p> In 9th grade I had my first opportunity to start programming in Processing and immidiately I was hooked. This is what I had been waiting for. </p>
-	<p> I pursued computer science spending two summers at ID Tech Camps where I was taught the basics of C++. </p>
-	<p>At Brandeis University I am studying Java and Scheme and have taught myself Python. I took summer courses in web development. and continue to learn these languages and more.</p>
-	<p> In addition to pursuing a BS in Computer Science I am minoring in Economics taking additional classes in Math, Politics and History. </p>
-</div> -->
 
 </body>
 </html>
