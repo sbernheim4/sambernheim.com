@@ -14,13 +14,19 @@ ul {
 .about-underline{
 	border-bottom: 4px solid #edc27b;
 	margin: auto; /* this  keeps the yellow line under About centered */
-	width: 90px;
+	width: 4em; /*using em since it keeps the width fixed regardless of screen size */
 }
 
 .edu-exp-underline {
 	border-bottom: 4px solid #edc27b;
 	margin: 0px auto; /* this  keeps the yellow line under About centered */
-	width: 420px;
+	width: 9em; /*using em since it keeps the width fixed regardless of screen size*/
+}
+
+.interests-underline {
+	border-bottom: 4px solid #edc27b;
+	margin: 0px auto; /* this  keeps the yellow line under About centered */
+	width: 6em; /*using em since it keeps the width fixed regardless of screen size*/
 }
 
 .larger {
@@ -57,10 +63,14 @@ ul {
 	text-align: center;
 }
 
-.fa {
+.fa-github {
 	color: orange;
 	display: block;
 	margin-top: 5em;
+}
+
+.fa-center {
+	text-align: center;
 }
 
 .jumbotron {
