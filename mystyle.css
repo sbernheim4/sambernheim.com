@@ -20,7 +20,15 @@ ul {
 .edu-exp-underline {
 	border-bottom: 4px solid #edc27b;
 	margin: 0px auto; /* this  keeps the yellow line under About centered */
-	width: 9em; /*using em since it keeps the width fixed regardless of screen size*/
+	width: 15em; /*using em since it keeps the width fixed regardless of screen size*/
+}
+
+@media screen and (max-width: 767px) {
+	.edu-exp-underline {
+		border-bottom: 4px solid #edc27b;
+		margin: 0px auto; /* this  keeps the yellow line under About centered */
+		width: 9em; /*using em since it keeps the width fixed regardless of screen size*/
+	}
 }
 
 .interests-underline {
