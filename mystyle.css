@@ -1,15 +1,11 @@
-a:hover{
+.main-title a {
+	color: #FFFFFF;
 	text-decoration: none;
 }
 
-ul {
-	text-align:center;
-}
+/*------------------------------------------------------------------------------*/
 
-@font-face {
-	font-family: baron-neue;
-	src: url(fonts/baron_neue-webfont.woff);
-}
+/*CODE FOR YELLOW UNDERLINES*/
 
 .about-underline{
 	border-bottom: 4px solid #edc27b;
@@ -17,12 +13,15 @@ ul {
 	width: 4em; /*using em since it keeps the width fixed regardless of screen size */
 }
 
+
 .edu-exp-underline {
 	border-bottom: 4px solid #edc27b;
 	margin: 0px auto; /* this  keeps the yellow line under About centered */
 	width: 15em; /*using em since it keeps the width fixed regardless of screen size*/
 }
 
+/* When the screen is smaller than 767px, education and experience changes from one line to
+two with just "Experience" underlined */
 @media screen and (max-width: 767px) {
 	.edu-exp-underline {
 		border-bottom: 4px solid #edc27b;
@@ -37,6 +36,15 @@ ul {
 	width: 6em; /*using em since it keeps the width fixed regardless of screen size*/
 }
 
+/*------------------------------------------------------------------------------*/
+
+/*FONT AND TEXT STYLING*/
+
+@font-face {
+	font-family: baron-neue;
+	src: url(fonts/baron_neue-webfont.woff);
+}
+
 .larger {
 	font-size: 13pt;
 }
@@ -45,11 +53,19 @@ ul {
 	font-family: baron-neue;
 }
 
+.center-text {
+	text-align: center;
+}
+
+/*------------------------------------------------------------------------------*/
+
 .opacity {
 	opacity: .6;
 }
 
+/*------------------------------------------------------------------------------*/
 
+/*BORDERS AND MARGINS*/
 .easy-border {
 	padding-left: 3%;
 	padding-right: 3%;
@@ -67,9 +83,9 @@ ul {
 	margin-left: 2em;
 }
 
-.center-text {
-	text-align: center;
-}
+/*------------------------------------------------------------------------------*/
+
+/*RANDOM STUFF */
 
 .fa-github {
 	color: orange;
@@ -84,6 +100,8 @@ ul {
 .jumbotron {
 	opacity: .9
 }
+
+/*------------------------------------------------------------------------------*/
 
 /*FOR DYNAMIC BACKGROUND*/
 
