@@ -1,9 +1,17 @@
+/*Easily view div sections*/
+
+/*div {
+	border: 2px solid #73AD21;
+}
+
+section {border: 2px solid blue;}*/
+
 .main-title a {
 	color: #FFFFFF;
 	text-decoration: none;
 }
 
-/*------------------------------------------------------------------------------*/
+/******************************************************************************/
 
 /*CODE FOR YELLOW UNDERLINES*/
 
@@ -36,7 +44,34 @@ two with just "Experience" underlined */
 	width: 6em; /*using em since it keeps the width fixed regardless of screen size*/
 }
 
-/*------------------------------------------------------------------------------*/
+/******************************************************************************/
+
+/*Styling for Frisbee Image*/
+
+@media screen and (max-width: 1280px){
+	.positioning {
+		float: right;
+		width: 6em;
+		padding-top: 5px;
+	}
+}
+
+@media screen and (max-width: 991px){
+	.positioning {
+		float: right;
+		padding-top: 10px;
+
+	}
+}
+
+@media screen and (max-width: 645px){
+	.positioning {
+		width: 0em;
+	}
+}
+
+
+/******************************************************************************/
 
 /*FONT AND TEXT STYLING*/
 
@@ -57,13 +92,13 @@ two with just "Experience" underlined */
 	text-align: center;
 }
 
-/*------------------------------------------------------------------------------*/
+/******************************************************************************/
 
 .opacity {
 	opacity: .6;
 }
 
-/*------------------------------------------------------------------------------*/
+/******************************************************************************/
 
 /*BORDERS AND MARGINS*/
 .easy-border {
@@ -83,7 +118,7 @@ two with just "Experience" underlined */
 	margin-left: 2em;
 }
 
-/*------------------------------------------------------------------------------*/
+/******************************************************************************/
 
 /*RANDOM STUFF */
 
@@ -101,7 +136,7 @@ two with just "Experience" underlined */
 	opacity: .9
 }
 
-/*------------------------------------------------------------------------------*/
+/******************************************************************************/
 
 /*FOR DYNAMIC BACKGROUND*/
 
