@@ -1,7 +1,7 @@
 /*Easily view div sections*/
 
 /*div {
-	border: 2px solid #73AD21;
+border: 2px solid #73AD21;
 }
 
 section {border: 2px solid blue;}*/
@@ -42,6 +42,23 @@ two with just "Experience" underlined */
 	border-bottom: 4px solid #edc27b;
 	margin: 0px auto; /* this  keeps the yellow line under About centered */
 	width: 6em; /*using em since it keeps the width fixed regardless of screen size*/
+}
+
+/******************************************************************************/
+
+/*Styling for the Brandeis Logo*/
+
+@media screen and (min-width: 767px){
+	.brandeis-logo {
+		float: right;
+	}
+}
+
+@media screen and (max-width: 768px){
+	.brandeis-logo {
+		display: block;
+		margin-left: 18%;
+	}
 }
 
 /******************************************************************************/
