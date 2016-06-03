@@ -63,33 +63,6 @@ two with just "Experience" underlined */
 
 /******************************************************************************/
 
-/*Styling for Frisbee Image*/
-
-@media screen and (max-width: 1280px){
-	.positioning {
-		float: right;
-		width: 6em;
-		padding-top: 5px;
-	}
-}
-
-@media screen and (max-width: 991px){
-	.positioning {
-		float: right;
-		padding-top: 10px;
-
-	}
-}
-
-@media screen and (max-width: 645px){
-	.positioning {
-		width: 0em;
-	}
-}
-
-
-/******************************************************************************/
-
 /*FONT AND TEXT STYLING*/
 
 @font-face {
@@ -109,10 +82,20 @@ two with just "Experience" underlined */
 	text-align: center;
 }
 
+.center-image, img{
+	display: block;
+	margin: 0 auto;
+}
+
+.frisbee {
+	height: 50%;
+	width: 50%;
+}
+
 /******************************************************************************/
 
 .opacity {
-	opacity: .6;
+	opacity: .7;
 }
 
 /******************************************************************************/
@@ -133,6 +116,10 @@ two with just "Experience" underlined */
 
 .left-margin {
 	margin-left: 2em;
+}
+
+.top {
+	padding-top: 2em;
 }
 
 /******************************************************************************/
