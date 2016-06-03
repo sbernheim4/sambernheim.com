@@ -88,8 +88,9 @@ two with just "Experience" underlined */
 }
 
 .frisbee {
-	height: 50%;
-	width: 50%;
+	height: 90%;
+	width: 90%;
+	margin-top: -2.3em;
 }
 
 /******************************************************************************/
