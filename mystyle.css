@@ -93,10 +93,12 @@ two with just "Experience" underlined */
 	margin-top: -8%;
 }
 
+/*Mobile view for Interests section*/
 @media only screen and (max-width: 767px){
 	.mobile-text {
 		font-size: 11pt;
 	}
+
 	.frisbee {
 		height: 100%;
 		width: 100%;
