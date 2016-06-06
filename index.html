@@ -36,7 +36,7 @@
 		<div class="content">
 			<div id="large-header" class="large-header">
 
-				<nav id="navbar" class="navbar navbar-default navbar-fixed-top" role="navigation">
+				<nav id="navbar" class="navbar navbar-default navbar-static-top" role="navigation">
 					<div class="container">
 						<div class="navbar-header">
 							<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#collapsed-navbar-info">
@@ -67,7 +67,6 @@
 				<canvas id="demo-canvas"></canvas>
 			</div>
 		</div>
-		<br>
 	</div>
 
 	<script src="js/TweenLite.min.js"></script>
@@ -82,10 +81,11 @@
 	<script src="js/bootstrap.min.js"></script>
 	<script src="js/myjs.js"></script>
 
-	<section id="about" name="about">
+	<section id="about" name="about" class="full-screen">
+		<!-- <img src="images/about-background.jpg" alt="New York City" class="back img-responsive">  -->
 		<div class="container easy-border">
 			<br>
-			<h2 class="center-text baron-neue about-underline">About</h2>
+			<h2 class="center-text baron-neue about-underline about">About</h2>
 			<br>
 			<img src="images/profile.jpg" alt="Samuel Bernheim" class="col-xs-12 col-sm-5 col-md-5 col-lg-4 img-responsive">
 			<div class="col-xs-12 col-sm-7 col-md-7 col-lg-8 baron-neue opacity larger">
@@ -105,10 +105,9 @@
 				<p>Please feel free to <a href="mailto:bernheim@brandeis.edu" target="_top">Contact Me</a></p>
 			</div>
 		</div>
-		<br> <br> <br>
-	</section>
 
-	<section>
+		<br> <br> <br>
+
 		<div class="container">
 			<table class="center-text" align="center">
 				<tr>
@@ -122,9 +121,7 @@
 					<td class="baron-neue col-xs-4 col-sm-4 col-md-4 col-lg-4"> <br> Born and raised in NYC, I'm ready for anything</td>
 				</tr>
 			</table>
-
 		</div>
-		<br> <br> <br> <br> <br> <br> <br> <br>
 	</section>
 
 	<!-- TODO: Get Logos for all of the companies mentioned here and make them into a collage  -->
@@ -201,29 +198,31 @@
 	<!-- TODO: add in contact form to replace mailto link and make mailto link drop down to this contact form  -->
 	<section class="col-xs-12 col-sm-12 col-md-12 col-lg-12 body" id="contact" name="contact">
 
-		<h2 class=center-text> Feel freee to contact me below </h2>
-		<br> 
-		<form method="post" action="index.php">
-		<label>Name</label>
-		<input name="name" type="text" placeholder="John Smith">
+		<h2 class="contact-underline baron-neue center-text"> Get in Touch </h2>
+		<br>
+			<form method="post" action="index.php">
+				<label>Name</label>
+				<input name="name" type="text" placeholder="John Smith">
+				<br> <br>
 
-		<label>Email</label>
-		<input name="email" placeholder="you@domain.com">
+				<label>Email</label>
+				<input name="email" placeholder="johnsmith@google.com">
+				<br> <br>
 
-		<label>Subject</label>
-		<input name="subject" placeholder="Subject">
+				<label>Subject</label>
+				<input name="subject" placeholder="">
+				<br> <br>
 
-		<label>Message</label>
-		<textarea name="message" placeholder="Message"> </textarea>
+				<label>Message</label>
+				<textarea name="message" placeholder="Message"> </textarea>
 
-		<br> <br>
-		<input id="submit" name="submit" type="submit" value="Submit">
-	</form>
+				<br> <br>
+				<input id="submit" name="submit" type="submit" value="Submit">
+			</form>
 
 
-
-	<br> <br> <br> <br> <br> <br> <br> <br>
-</section>
+		<br> <br> <br> <br> <br> <br> <br> <br>
+	</section>
 
 </body>
 </html>
