@@ -63,7 +63,7 @@ two with just "Experience" underlined */
 
 /******************************************************************************/
 
-/*FONT AND TEXT STYLING*/
+/*FONT, TEXT AND IMAGE STYLING*/
 
 @font-face {
 	font-family: baron-neue;
@@ -88,16 +88,92 @@ two with just "Experience" underlined */
 }
 
 .frisbee {
-	height: 90%;
-	width: 90%;
-	margin-top: -2.3em;
+	height: 70%;
+	width: 70%;
+	margin-top: -8%;
+}
+
+@media only screen and (max-width: 767px){
+	.mobile-text {
+		font-size: 11pt;
+	}
+	.frisbee {
+		height: 100%;
+		width: 100%;
+		margin-top: -15%;
+	}
 }
 
 /******************************************************************************/
 
-.opacity {
+/*CONTACT FORM STYLING*/
+
+label {
+	display: block;
+}
+
+
+.body {
+	display: block;
+	margin: 0 auto;
+	/*width: 576px;*/
+}
+
+
+form {
+	margin: 0 auto;
+}
+
+input, textarea{
+	background: #fbf2e4;
+	border: 3px dashed #dedede;
+	text-align: center;
+	-moz-border-radius:5px;
+	-webkit-border-radius:5px;
+	border-radius:5px;
+}
+
+/*Desktop*/
+@media only screen and (min-width : 768px) {
+	input, textarea {
+		width: 500px;
+		height: 35px;
+	}
+
+	form {
+		width: 25%
+	}
+}
+
+/*Mobile*/
+@media only screen and (max-width : 767px) {
+	input, textarea {
+		width: 95%;
+		height: 35px;
+	}
+}
+
+input:focus, textarea:focus{
+	outline-width: 0;
+	border:3px solid #edc27b;
+}
+
+textarea{
+	height:200px; ;
+}
+
+#submit{
+	width: 127px;
+	height: 38px;
+	border: none;
+	margin-top: 20px;
+	cursor:pointer;
+}
+
+#submit:hover{
 	opacity: .7;
 }
+
 
 /******************************************************************************/
 
@@ -121,6 +197,10 @@ two with just "Experience" underlined */
 
 .top {
 	padding-top: 2em;
+}
+
+.opacity {
+	opacity: .7;
 }
 
 /******************************************************************************/
