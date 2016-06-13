@@ -1,11 +1,11 @@
 /*Easily view div sections*/
-
-/*div {
-border: 2px solid #73AD21;
+/*
+div {
+	border: 2px solid #73AD21;
 }
 
 section {
-border: 2px solid blue;
+	border: 2px solid blue;
 }*/
 
 .main-title a {
@@ -13,23 +13,50 @@ border: 2px solid blue;
 	text-decoration: none;
 }
 
-.full-screen {
+/******************************************************************************/
+
+/*ABOUT SECTION */
+
+.about {
+	font-size: 14pt;
+	color: black;
 	height: 100vh;
 }
 
-/******************************************************************************/
-
-/*CODE FOR YELLOW UNDERLINES*/
-
-.about {
-	padding-top: 20px;
+.bg-photo {
+	margin: 0 auto;
+	background-image: url("images/background.jpg");
+	background-repeat: round;
+	opacity: .8;
 }
+
 .about-underline{
+	padding-top: 20px;
 	border-bottom: 4px solid #edc27b;
 	margin: auto; /* this  keeps the yellow line under About centered */
 	width: 4em; /*using em since it keeps the width fixed regardless of screen size */
 }
 
+.items #image {
+	float: left;
+	margin: 0 20px 20px 20px;
+	max-width: 25vw;
+}
+
+.icons {
+	padding-top: 70px;
+	text-align: center;
+	display: flex;
+	flex-wrap: nowrap;
+	justify-content: center;
+}
+
+.icon {
+	width: 33%;
+}
+
+
+/******************************************************************************/
 
 .edu-exp-underline {
 	border-bottom: 4px solid #edc27b;
@@ -85,6 +112,10 @@ two with just "Experience" underlined */
 	src: url(fonts/baron_neue-webfont.woff);
 }
 
+.full-screen {
+	height: 100vh;
+}
+
 .larger {
 	font-size: 13pt;
 }
@@ -95,6 +126,11 @@ two with just "Experience" underlined */
 
 .center-text {
 	text-align: center;
+}
+
+.white {
+	color: #6e0f00;
+	font-size: 15pt;
 }
 
 .center-image, img{
@@ -211,7 +247,7 @@ textarea{
 }
 
 .opacity {
-	opacity: .7;
+	opacity: .8;
 }
 
 /******************************************************************************/
@@ -275,7 +311,7 @@ textarea{
 	font-weight: 200;
 }
 
-@media only screen and (max-width : 768px) {
+@media only screen and (max-width : 767px) {
 	.demo-1 .main-title{
 		font-size: 3em;
 	}
