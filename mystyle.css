@@ -1,11 +1,11 @@
 /*Easily view div sections*/
-div {
+/* div {
 	border: 1px solid #73AD21;
 }
 section {
 	border: 1px solid blue;
 }
-
+*/
 .main-title a {
 	color: #FFFFFF;
 	text-decoration: none;
@@ -65,7 +65,7 @@ section {
 	display: flex;
 	flex-wrap: nowrap;
 	justify-content: center;
-	margin-top: 15px;
+	margin-top: 1px;
 }
 
 .icon {
