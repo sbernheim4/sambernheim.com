@@ -1,18 +1,36 @@
 /*Easily view div sections*/
-/*
 div {
-	border: 2px solid #73AD21;
+	border: 1px solid #73AD21;
 }
-
 section {
-	border: 2px solid blue;
-}*/
+	border: 1px solid blue;
+}
 
 .main-title a {
 	color: #FFFFFF;
 	text-decoration: none;
 }
 
+.separator {
+	width: 100vw;
+	height: 10vh; 
+	display: flex;
+	justify-content: center; 
+	background-image: url("images/diagonal-lines.gif");
+	padding-top: 3px; 	
+}
+
+.circle {
+	width: 60px; 
+	height: 60px; 
+	border-radius: 100%; 
+	background-color: rgb(228,228,228);
+}
+
+.fa-center-icon {
+	padding-top: 17px; 
+	padding-left: 17px; 		
+}
 /******************************************************************************/
 
 /*ABOUT SECTION */
@@ -20,12 +38,11 @@ section {
 .about {
 	font-size: 14pt;
 	color: black;
-	height: 100vh;
+	height: 90vh; 
 }
 
 .bg-photo {
 	margin: 0 auto;
-	background-image: url("images/background.jpg");
 	background-repeat: round;
 	opacity: .8;
 }
@@ -34,7 +51,7 @@ section {
 	padding-top: 20px;
 	border-bottom: 4px solid #edc27b;
 	margin: auto; /* this  keeps the yellow line under About centered */
-	width: 4em; /*using em since it keeps the width fixed regardless of screen size */
+	width: 92.55px; /*using em since it keeps the width fixed regardless of screen size */
 }
 
 .items #image {
@@ -44,24 +61,26 @@ section {
 }
 
 .icons {
-	padding-top: 70px;
 	text-align: center;
 	display: flex;
 	flex-wrap: nowrap;
 	justify-content: center;
+	margin-top: 15px;
 }
 
 .icon {
-	width: 33%;
+	width: 33vw;
 }
 
 
 /******************************************************************************/
-
+.edu-exp {
+	height: 100vh; 
+}
 .edu-exp-underline {
 	border-bottom: 4px solid #edc27b;
 	margin: 0px auto; /* this  keeps the yellow line under About centered */
-	width: 15em; /*using em since it keeps the width fixed regardless of screen size*/
+	width: 420px; /*using em since it keeps the width fixed regardless of screen size*/
 }
 
 /* When the screen is smaller than 767px, education and experience changes from one line to
@@ -77,16 +96,8 @@ two with just "Experience" underlined */
 .interests-underline {
 	border-bottom: 4px solid #edc27b;
 	margin: 0px auto; /* this  keeps the yellow line under About centered */
-	width: 6em; /*using em since it keeps the width fixed regardless of screen size*/
+	width: 145px; /*using em since it keeps the width fixed regardless of screen size*/
 }
-
-.contact-underline {
-	border-bottom: 4px solid #edc27b;
-	margin: 0px auto;
-	width: 7.4em;
-}
-
-/******************************************************************************/
 
 /*Styling for the Brandeis Logo*/
 
@@ -124,7 +135,7 @@ two with just "Experience" underlined */
 	font-family: baron-neue;
 }
 
-.center-text {
+center-text {
 	text-align: center;
 }
 
@@ -160,6 +171,12 @@ two with just "Experience" underlined */
 /******************************************************************************/
 
 /*CONTACT FORM STYLING*/
+
+.contact-underline {
+	border-bottom: 4px solid #edc27b;
+	margin: 0px auto;
+	width: 205px;
+}
 
 label {
 	display: block;
