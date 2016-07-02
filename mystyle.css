@@ -1,36 +1,20 @@
 /*Easily view div sections*/
-/* div {
+/*
+div {
 	border: 1px solid #73AD21;
 }
+*/
+/*
 section {
 	border: 1px solid blue;
-}
-*/
+contact } 
+*/ 
+
 .main-title a {
 	color: #FFFFFF;
 	text-decoration: none;
 }
 
-.separator {
-	width: 100vw;
-	height: 10vh; 
-	display: flex;
-	justify-content: center; 
-	background-image: url("images/diagonal-lines.gif");
-	padding-top: 3px; 	
-}
-
-.circle {
-	width: 60px; 
-	height: 60px; 
-	border-radius: 100%; 
-	background-color: rgb(228,228,228);
-}
-
-.fa-center-icon {
-	padding-top: 17px; 
-	padding-left: 17px; 		
-}
 /******************************************************************************/
 
 /*ABOUT SECTION */
@@ -51,7 +35,7 @@ section {
 	padding-top: 20px;
 	border-bottom: 4px solid #edc27b;
 	margin: auto; /* this  keeps the yellow line under About centered */
-	width: 92.55px; /*using em since it keeps the width fixed regardless of screen size */
+	width: 92.5px; /*using em since it keeps the width fixed regardless of screen size */
 }
 
 .items #image {
@@ -65,17 +49,41 @@ section {
 	display: flex;
 	flex-wrap: nowrap;
 	justify-content: center;
-	margin-top: 1px;
+	padding-top: 15px; 
 }
 
 .icon {
 	width: 33vw;
 }
-
-
 /******************************************************************************/
+/* Separator Styling */
+
+.separator {
+	width: 100vw;
+	height: 10vh; 
+	display: flex;
+	justify-content: center; 
+	padding-top: 3px; 	
+}
+
+.circle {
+	width: 60px; 
+	height: 60px; 
+	border-radius: 100%; 
+	background-color: rgb(228,228,228);
+}
+
+.fa-center-icon {
+	padding-top: 17px; 
+	padding-left: 17px; 		
+}
+
+/*****************************************************************************/
+/* Education and Experience Styling */
+
 .edu-exp {
-	height: 100vh; 
+	height: 90vh; 
+	margin-top: 50px; 
 }
 .edu-exp-underline {
 	border-bottom: 4px solid #edc27b;
@@ -92,7 +100,12 @@ two with just "Experience" underlined */
 		width: 9em; /*using em since it keeps the width fixed regardless of screen size*/
 	}
 }
+/*****************************************************************************/
 
+.interests {
+	/* height: 90vh; */  
+	margin-top: 50px; 
+}
 .interests-underline {
 	border-bottom: 4px solid #edc27b;
 	margin: 0px auto; /* this  keeps the yellow line under About centered */
@@ -171,7 +184,9 @@ center-text {
 /******************************************************************************/
 
 /*CONTACT FORM STYLING*/
-
+.contact {
+	margin-top: 50px; 
+}
 .contact-underline {
 	border-bottom: 4px solid #edc27b;
 	margin: 0px auto;
@@ -227,9 +242,11 @@ textarea{
 }
 
 #submit{
-	background-color: #93DB70;
+	background-color: rgb(1, 94, 36);
 	width: 127px;
 	height: 38px;
+	color: white;
+	text-align: center; 
 	border: 0px;
 	cursor:pointer;
 }
