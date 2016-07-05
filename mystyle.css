@@ -55,6 +55,7 @@ contact }
 .icon {
 	width: 33vw;
 }
+
 /******************************************************************************/
 /* Separator Styling */
 
@@ -194,41 +195,32 @@ center-text {
 	width: 205px;
 }
 
+
+form {
+	margin: 0px calc(50% - 250px);
+}
+
 label {
 	display: block;
 }
 
+input{
+	height: 35px;
+}
+
+textarea{
+	height: 500px; 
+	max-height:200px;
+	resize: none; 
+}
+
 input, textarea{
+	width: 500px; 
+	max-width: 500px; 
 	background: #fbf2e4;
 	border: 3px dashed #dedede;
 	border-radius:5px;
 	text-align: left;
-}
-
-/*Desktop*/
-@media only screen and (min-width : 768px) {
-	input, textarea {
-		width: 500px;
-		height: 35px;
-	}
-
-
-	form {
-		margin: 0px calc(50% - 250px);
-	}
-}
-
-/*Mobile*/
-@media only screen and (max-width : 767px) {
-	input, textarea {
-		width: 95%;
-		height: 35px;
-	}
-
-	form {
-		/*this centering works since width is defined as a percentage of the screen */
-		margin: 0px auto;
-	}
 }
 
 input:focus, textarea:focus{
@@ -236,12 +228,20 @@ input:focus, textarea:focus{
 	border:3px solid #edc27b;
 }
 
-textarea{
-	width: 500px; 
-	max-width: 500px; 
-	height: 200px; 
-	max-height:200px;
-	resize: none; 
+/*Mobile*/
+@media only screen and (max-width : 767px) {
+	input, textarea {
+		width: 95%;
+		max-width: 95%; 
+	}
+
+	input{
+		height: 35px;
+	}
+
+	form {
+		margin: 0px auto;
+	}
 }
 
 #submit{
@@ -257,7 +257,6 @@ textarea{
 #submit:hover{
 	opacity: .7;
 }
-
 
 /******************************************************************************/
 
