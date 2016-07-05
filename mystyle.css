@@ -103,7 +103,7 @@ two with just "Experience" underlined */
 /*****************************************************************************/
 
 .interests {
-	/* height: 90vh; */  
+	height: 90vh; 
 	margin-top: 50px; 
 }
 .interests-underline {
@@ -185,6 +185,7 @@ center-text {
 
 /*CONTACT FORM STYLING*/
 .contact {
+	height: 100vh; 
 	margin-top: 50px; 
 }
 .contact-underline {
@@ -200,10 +201,8 @@ label {
 input, textarea{
 	background: #fbf2e4;
 	border: 3px dashed #dedede;
-	text-align: left;
-	-moz-border-radius:5px;
-	-webkit-border-radius:5px;
 	border-radius:5px;
+	text-align: left;
 }
 
 /*Desktop*/
@@ -238,11 +237,15 @@ input:focus, textarea:focus{
 }
 
 textarea{
-	height:200px; ;
+	width: 500px; 
+	max-width: 500px; 
+	height: 200px; 
+	max-height:200px;
+	resize: none; 
 }
 
 #submit{
-	background-color: rgb(1, 94, 36);
+	background-color: #edc27b;
 	width: 127px;
 	height: 38px;
 	color: white;
