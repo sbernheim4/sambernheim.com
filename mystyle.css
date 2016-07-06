@@ -45,11 +45,20 @@ contact }
 }
 
 .icons {
+	padding-left: 20px; 
+	padding-right: 20px; 
 	text-align: center;
 	display: flex;
 	flex-wrap: nowrap;
 	justify-content: center;
 	padding-top: 15px; 
+}
+
+@media screen and (min-width: 1281px) {
+	.icons {
+		margin-left: 100px; 
+		margin-right: 100px; 
+	}
 }
 
 .icon {
@@ -229,7 +238,7 @@ input:focus, textarea:focus{
 }
 
 /*Mobile*/
-@media only screen and (max-width : 767px) {
+@media screen and (max-width : 767px) {
 	input, textarea {
 		width: 95%;
 		max-width: 95%; 
@@ -347,7 +356,7 @@ input:focus, textarea:focus{
 	font-weight: 200;
 }
 
-@media only screen and (max-width : 767px) {
+@media screen and (max-width : 767px) {
 	.demo-1 .main-title{
 		font-size: 3em;
 	}
