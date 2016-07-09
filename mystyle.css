@@ -4,6 +4,7 @@ div {
 	border: 1px solid #73AD21;
 }
 */
+
 /*
 section {
 	border: 1px solid blue;
@@ -15,8 +16,41 @@ contact }
 	text-decoration: none;
 }
 
-/******************************************************************************/
+/*************************************************************************/
+/*FONT, TEXT AND IMAGE STYLING*/
 
+@font-face {
+	font-family: baron-neue;
+	src: url(fonts/baron_neue-webfont.woff);
+}
+
+.full-screen {
+	height: 100vh;
+}
+
+.larger {
+	font-size: 13pt;
+}
+
+.baron-neue {
+	font-family: baron-neue;
+}
+
+.center-text {
+	text-align: center;
+}
+
+.white {
+	color: #6e0f00;
+	font-size: 15pt;
+}
+
+.center-image, img{
+	display: block;
+	margin: 0 auto;
+}
+
+/******************************************************************************/
 /*ABOUT SECTION */
 
 .about {
@@ -25,10 +59,10 @@ contact }
 	height: 100vh; 
 }
 
-.bg-photo {
+.profile-image {
 	margin: 0 auto;
 	background-repeat: round;
-	opacity: .8;
+	opacity: .9;
 }
 
 .about-underline{
@@ -69,59 +103,57 @@ contact }
 /* Separator Styling */
 
 .separator {
-	width: 100vw;
 	display: flex;
 	justify-content: center; 
-	padding-top: 3px; 	
 }
 
 .circle {
-	width: 60px; 
-	height: 60px; 
-	border-radius: 100%; 
+	width: 60px;
+	height: 60px;
+	border-radius: 100%;
 	background-color: rgb(228,228,228);
 }
 
-.fa-center-icon {
-	padding-top: 17px; 
-	padding-left: 17px; 		
+.center-down-arrow {
+	padding-top: 13px;
+	padding-left: 13px;
 }
 
 /*****************************************************************************/
 /* Education and Experience Styling */
 
-.edu-exp {
+/*.edu-exp {
 	height: 100vh; 
 	margin-top: 50px; 
 }
 .edu-exp-underline {
 	border-bottom: 4px solid #edc27b;
-	margin: 0px auto; /* this  keeps the yellow line under About centered */
+	margin: 0px auto; [> this  keeps the yellow line under About centered <]
 	width: 421px;
 }
 
-/* When the screen is smaller than 767px, education and experience changes from one line to
-two with just "Experience" underlined */
+[> When the screen is smaller than 767px, education and experience changes from one line to
+two with just "Experience" underlined <]
 @media screen and (max-width: 767px) {
 	.edu-exp-underline {
 		border-bottom: 4px solid #edc27b;
-		margin: 0px auto; /* this  keeps the yellow line under About centered */
+		margin: 0px auto; [> this  keeps the yellow line under About centered <]
 		width: 9em;
 	}
-}
+}*/
 /*****************************************************************************/
 
-.interests {
+/*.interests {
 	height: 100vh; 
 	margin-top: 50px; 
 }
 .interests-underline {
 	border-bottom: 4px solid #edc27b;
-	margin: 0px auto; /* this  keeps the yellow line under About centered */
+	margin: 0px auto; [> this  keeps the yellow line under About centered <]
 	width: 145px;
 }
 
-/*Styling for the Brandeis Logo*/
+[>Styling for the Brandeis Logo<]
 
 @media screen and (min-width: 767px){
 	.brandeis-loo {
@@ -134,50 +166,16 @@ two with just "Experience" underlined */
 		display: block;
 		margin-left: 18%;
 	}
-}
+}*/
 
 /******************************************************************************/
-
-/*FONT, TEXT AND IMAGE STYLING*/
-
-@font-face {
-	font-family: baron-neue;
-	src: url(fonts/baron_neue-webfont.woff);
-}
-
-.full-screen {
-	height: 100vh;
-}
-
-.larger {
-	font-size: 13pt;
-}
-
-.baron-neue {
-	font-family: baron-neue;
-}
-
-center-text {
-	text-align: center;
-}
-
-.white {
-	color: #6e0f00;
-	font-size: 15pt;
-}
-
-.center-image, img{
-	display: block;
-	margin: 0 auto;
-}
-
-.frisbee {
+/*.frisbee {
 	height: 70%;
 	width: 70%;
 	margin-top: -8%;
 }
 
-/*Mobile view for Interests section*/
+[>Mobile view for Interests section<]
 @media screen and (max-width: 767px){
 	.mobile-text {
 		font-size: 11pt;
@@ -188,12 +186,12 @@ center-text {
 		width: 100%;
 		margin-top: -15%;
 	}
-}
+}*/
 
 /******************************************************************************/
-
 /*CONTACT FORM STYLING*/
-.contact {
+
+/*.contact {
 	height: 100vh; 
 	margin-top: 50px; 
 }
@@ -236,7 +234,7 @@ input:focus, textarea:focus{
 	border:3px solid #edc27b;
 }
 
-/*Mobile*/
+[>Mobile<]
 @media screen and (max-width : 767px) {
 	input, textarea {
 		width: 95%;
@@ -264,11 +262,11 @@ input:focus, textarea:focus{
 
 #submit:hover{
 	opacity: .7;
-}
+}*/
 
 /******************************************************************************/
-
 /*BORDERS AND MARGINS*/
+
 .easy-border {
 	padding-left: 3%;
 	padding-right: 3%;
@@ -302,10 +300,6 @@ input:focus, textarea:focus{
 	color: orange;
 	display: block;
 	margin-top: 5em;
-}
-
-.fa-center {
-	text-align: center;
 }
 
 .jumbotron {
