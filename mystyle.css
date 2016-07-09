@@ -30,14 +30,6 @@ contact }
 	src: url(fonts/baron_neue-webfont.woff);
 }
 
-.full-screen {
-	height: 100vh;
-}
-
-.larger {
-	font-size: 13pt;
-}
-
 .baron-neue {
 	font-family: baron-neue;
 }
@@ -46,14 +38,25 @@ contact }
 	text-align: center;
 }
 
-.white {
-	color: #6e0f00;
-	font-size: 15pt;
+/******************************************************************************/
+/* Separator Styling */
+
+.separator {
+	display: flex;
+	justify-content: center; 
 }
 
-.center-image, img{
-	display: block;
-	margin: 0 auto;
+.circle {
+	width: 60px;
+	height: 60px;
+	border-radius: 100%;
+	background-color: rgb(228,228,228);
+}
+
+.center-down-arrow {
+	display: flex;
+	justify-content: center;
+	padding-top: 13px;
 }
 
 /******************************************************************************/
@@ -62,7 +65,6 @@ contact }
 .about {
 	font-size: 14pt;
 	color: black;
-	height: 100vh;	
 }
 
 .about-underline{
@@ -103,7 +105,7 @@ contact }
 		margin: 0 auto;
 		float: none;
 		min-width: 95%;
-	}
+}
 	
 	.description {
 		padding-top: 10px;
@@ -117,50 +119,35 @@ contact }
 		width:100vw; 	
 	}
 }
-
-/******************************************************************************/
-/* Separator Styling */
-
-.separator {
-	display: flex;
-	justify-content: center; 
-}
-
-.circle {
-	width: 60px;
-	height: 60px;
-	border-radius: 100%;
-	background-color: rgb(228,228,228);
-}
-
-.center-down-arrow {
-	display: flex;
-	justify-content: center;
-	padding-top: 13px;
-}
-
 /*****************************************************************************/
 /* Education and Experience Styling */
-
-/*.edu-exp {
-	height: 100vh; 
-	margin-top: 50px; 
+.edu-exp {
+	font-size: 14pt; 
 }
-.edu-exp-underline {
+
+.edu-exp-underline{
+	padding-top: 20px;
 	border-bottom: 4px solid #edc27b;
-	margin: 0px auto; [> this  keeps the yellow line under About centered <]
-	width: 421px;
+	margin: auto; /* this  keeps the yellow line under About centered */
+	width: 420px;
 }
 
-[> When the screen is smaller than 767px, education and experience changes from one line to
-two with just "Experience" underlined <]
+.brandeis-logo {
+	float: right; 
+}
+
 @media screen and (max-width: 767px) {
 	.edu-exp-underline {
-		border-bottom: 4px solid #edc27b;
-		margin: 0px auto; [> this  keeps the yellow line under About centered <]
-		width: 9em;
+		width: 232px; 	
 	}
-}*/
+
+	.brandeis-logo {
+		margin: 0 auto; 
+		float: none;
+		width: 300px; 
+	}
+}
+
 /*****************************************************************************/
 
 /*.interests {
