@@ -68,13 +68,11 @@ contact }
 
 .profile-image {
 	float: left;
-	margin: 0 10px 20px 20px;
+	margin: 0 10px 0px 20px;
 	max-width: 25vw;
 }
 
 .description {
-	margin-top: 12px;
-	margin-left: 7px;
 }
 
 .icons {
@@ -99,9 +97,10 @@ contact }
 	}
 	
 	.description {
+		padding-top: 10px;
+		padding-left: 15px;
+	}	
 	
-	}
-
 	.icons {
 		flex-wrap: wrap;	
 	}
@@ -279,9 +278,9 @@ input:focus, textarea:focus{
 /******************************************************************************/
 /*BORDERS AND MARGINS*/
 
-.easy-border {
-	padding-left: 20px; 
-	padding-right: 20px;
+.easy-margin {
+	margin-left: 20px; 
+	margin-right: 20px;
 }
 
 .top-margin {
