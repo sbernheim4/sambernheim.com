@@ -102,6 +102,7 @@ contact }
 
 @media screen and (max-width: 767px){
 	.profile-image {
+		display: block;
 		margin: 0 auto;
 		float: none;
 		min-width: 95%;
@@ -129,7 +130,7 @@ contact }
 	padding-top: 20px;
 	border-bottom: 4px solid #edc27b;
 	margin: auto; /* this  keeps the yellow line under About centered */
-	width: 420px;
+	width: 421px;
 }
 
 .brandeis-logo {
