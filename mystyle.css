@@ -62,7 +62,7 @@ contact }
 .about {
 	font-size: 14pt;
 	color: black;
-	height: 100vh; 
+	height: 100vh;	
 }
 
 .about-underline{
@@ -79,7 +79,9 @@ contact }
 }
 
 .description {
-	padding-left: 15px; 
+	padding-left: 15px;
+   	padding-right: 15px; 	
+	text-align: justify; 
 }
 
 .icons {
