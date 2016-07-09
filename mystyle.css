@@ -16,6 +16,12 @@ contact }
 	text-decoration: none;
 }
 
+@media screen and (max-width: 767px){
+	* {
+		font-size: 12pt; 
+	}
+}
+
 /*************************************************************************/
 /*FONT, TEXT AND IMAGE STYLING*/
 
@@ -73,6 +79,7 @@ contact }
 }
 
 .description {
+	padding-left: 15px; 
 }
 
 .icons {
@@ -98,7 +105,6 @@ contact }
 	
 	.description {
 		padding-top: 10px;
-		padding-left: 15px;
 	}	
 	
 	.icons {
