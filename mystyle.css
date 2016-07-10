@@ -25,13 +25,8 @@ contact }
 /*************************************************************************/
 /*FONT, TEXT AND IMAGE STYLING*/
 
-@font-face {
-	font-family: baron-neue;
-	src: url(fonts/baron_neue-webfont.woff);
-}
-
 .baron-neue {
-	font-family: baron-neue;
+	font-family: monaco;
 }
 
 .center-text {
