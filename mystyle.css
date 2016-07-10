@@ -43,7 +43,7 @@ contact }
 
 .separator {
 	display: flex;
-	justify-content: center; 
+	justify-content: center;
 }
 
 .circle {
@@ -82,14 +82,14 @@ contact }
 
 .description {
 	padding-left: 20px;
-   	padding-right: 20px; 	
-	text-align: justify; 
+   	padding-right: 20px;
+	text-align: justify;
 }
 
 .icons {
-	padding-top: 15px; 
-	padding-left: 20px; 
-	padding-right: 20px; 
+	padding-top: 15px;
+	padding-left: 20px;
+	padding-right: 20px;
 	text-align: center;
 	display: flex;
 	flex-wrap: nowrap;
@@ -113,11 +113,11 @@ contact }
 	}	
 	
 	.icons {
-		flex-wrap: wrap;	
+		flex-wrap: wrap;
 	}
 
 	.icon {
-		width:100vw; 	
+		width:100vw;
 	}
 }
 /*****************************************************************************/
@@ -134,26 +134,26 @@ contact }
 }
 
 .brandeis-logo {
-	float: right; 
+	float: right;
 }
 
 @media screen and (max-width: 767px) {
 	.edu-exp-underline {
-		width: 232px; 	
+		width: 232px;
 	}
 
 	.brandeis-logo {
-		margin: 0 auto; 
+		margin: 0 auto;
 		float: none;
-		width: 300px; 
+		width: 300px;
 	}
 }
 
 /*****************************************************************************/
 
 /*.interests {
-	height: 100vh; 
-	margin-top: 50px; 
+	height: 100vh;
+	margin-top: 50px;
 }
 .interests-underline {
 	border-bottom: 4px solid #edc27b;
@@ -200,8 +200,8 @@ contact }
 /*CONTACT FORM STYLING*/
 
 /*.contact {
-	height: 100vh; 
-	margin-top: 50px; 
+	height: 100vh;
+	margin-top: 50px;
 }
 .contact-underline {
 	border-bottom: 4px solid #edc27b;
@@ -223,14 +223,14 @@ input{
 }
 
 textarea{
-	height: 500px; 
+	height: 500px;
 	max-height:200px;
-	resize: none; 
+	resize: none;
 }
 
 input, textarea{
-	width: 500px; 
-	max-width: 500px; 
+	width: 500px;
+	max-width: 500px;
 	background: #fbf2e4;
 	border: 3px dashed #dedede;
 	border-radius:5px;
@@ -246,7 +246,7 @@ input:focus, textarea:focus{
 @media screen and (max-width : 767px) {
 	input, textarea {
 		width: 95%;
-		max-width: 95%; 
+		max-width: 95%;
 	}
 
 	input{
@@ -263,7 +263,7 @@ input:focus, textarea:focus{
 	width: 127px;
 	height: 38px;
 	color: white;
-	text-align: center; 
+	text-align: center;
 	border: 0px;
 	cursor:pointer;
 }
@@ -276,7 +276,7 @@ input:focus, textarea:focus{
 /*BORDERS AND MARGINS*/
 
 .easy-margin {
-	margin-left: 20px; 
+	margin-left: 20px;
 	margin-right: 20px;
 }
 
