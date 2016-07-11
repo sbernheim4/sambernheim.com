@@ -146,50 +146,16 @@ contact }
 
 /*****************************************************************************/
 
-/*.interests {
+.interests {
 	height: 100vh;
 	margin-top: 50px;
 }
+
 .interests-underline {
 	border-bottom: 4px solid #edc27b;
 	margin: 0px auto; [> this  keeps the yellow line under About centered <]
-	width: 145px;
+	width: 146px;
 }
-
-[>Styling for the Brandeis Logo<]
-
-@media screen and (min-width: 767px){
-	.brandeis-loo {
-		float: right;
-	}
-}
-
-@media screen and (max-width: 768px){
-	.brandeis-logo {
-		display: block;
-		margin-left: 18%;
-	}
-}*/
-
-/******************************************************************************/
-/*.frisbee {
-	height: 70%;
-	width: 70%;
-	margin-top: -8%;
-}
-
-[>Mobile view for Interests section<]
-@media screen and (max-width: 767px){
-	.mobile-text {
-		font-size: 11pt;
-	}
-
-	.frisbee {
-		height: 100%;
-		width: 100%;
-		margin-top: -15%;
-	}
-}*/
 
 /******************************************************************************/
 /*CONTACT FORM STYLING*/
