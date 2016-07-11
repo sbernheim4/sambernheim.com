@@ -61,8 +61,8 @@ contact }
 /*ABOUT SECTION */
 
 .about-container {
-	margin-left: 20px;
-	margin-right: 20px;
+	max-width: 1300px; 
+	margin: 0 auto;
 	font-size: 14pt;
 	color: black;
 }
@@ -80,20 +80,18 @@ contact }
 
 .bio-image {
 	float: left;
-	margin: 0 10px 0px 20px;
+	margin: 0 20px 0px 20px;
 	max-width: 25vw;
 }
 
 .bio-description {
-	padding-left: 20px;
-   	padding-right: 20px;
 	text-align: justify;
+	padding-left: 20px; 
+	padding-right: 20px;
 }
 
 .icons {
 	padding-top: 15px;
-	padding-left: 20px;
-	padding-right: 20px;
 	clear:left;
 	text-align: center;
 	display: flex;
@@ -115,6 +113,8 @@ contact }
 	
 	.bio-description {
 		padding-top: 10px;
+		padding-left: 20px;
+		padding-right: 20px;
 	}	
 	
 	.icons {
