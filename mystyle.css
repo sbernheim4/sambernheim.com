@@ -33,6 +33,9 @@ contact }
 	text-align: center;
 }
 
+.center-image {
+	margin: 0 auto;
+}
 /******************************************************************************/
 /* Separator Styling */
 
@@ -153,9 +156,10 @@ contact }
 
 .interests-underline {
 	border-bottom: 4px solid #edc27b;
-	margin: 0px auto; [> this  keeps the yellow line under About centered <]
-	width: 146px;
+	margin: 0px auto;
+	width: 162px
 }
+
 
 /******************************************************************************/
 /*CONTACT FORM STYLING*/
