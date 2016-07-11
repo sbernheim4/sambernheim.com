@@ -68,10 +68,11 @@ contact }
 }
 
 .about-underline{
+	margin: auto; /* this  keeps the yellow line under About centered */
 	padding-top: 20px;
 	border-bottom: 4px solid #edc27b;
-	margin: auto; /* this  keeps the yellow line under About centered */
-	width: 92.5px; 
+	width: 92.5px;
+	text-align: center;
 }
 
 .bio {
@@ -132,10 +133,11 @@ contact }
 }
 
 .edu-exp-underline{
+	margin: auto; /* this  keeps the yellow line under About centered */
 	padding-top: 20px;
 	border-bottom: 4px solid #edc27b;
-	margin: auto; /* this  keeps the yellow line under About centered */
 	width: 433px;
+	text-align: center;
 }
 
 .brandeis-logo {
@@ -176,9 +178,10 @@ contact }
 	margin-top: 50px;
 }
 .contact-underline {
-	border-bottom: 4px solid #edc27b;
 	margin: 0px auto;
+	border-bottom: 4px solid #edc27b;
 	width: 205px;
+	text-align: center;
 }
 
 
