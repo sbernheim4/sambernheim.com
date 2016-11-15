@@ -42,29 +42,16 @@ contact }
 	color: #9d9d9d;
 }
 
-.container {
-	width: 1170px;
-	margin: 0 auto;
-}
-
 .jumbotron {
 	opacity: .9
 }
 
 /*************************************************************************/
-/*FONT, TEXT AND IMAGE STYLING*/
 
 * {
 	font-family: monaco, serif;
 }
 
-.center-text {
-	text-align: center;
-}
-
-.center-image {
-	margin: 0 auto;
-}
 /******************************************************************************/
 /* Separator Styling */
 
@@ -101,9 +88,14 @@ contact }
 
 .about-container {
 	max-width: 1300px;
+	width: 85%;
 	margin: 0 auto;
 	font-size: 14pt;
 	color: black;
+}
+
+.fix-text {
+	padding-left: 20px;
 }
 
 .about-underline{
@@ -120,8 +112,7 @@ contact }
 	max-width: 25vw;
 }
 
-.about--bio-description {
-	text-align: justify;
+.about--bio--description {
 	padding-left: 20px;
 	padding-right: 20px;
 }
@@ -171,6 +162,12 @@ contact }
 	width: 433px;
 }
 
+.edu-exp--container {
+	margin: 0 auto;
+	max-width: 1000px;
+	width: 85%;
+}
+
 .brandeis-logo {
 	float: right;
 }
@@ -203,6 +200,27 @@ contact }
 	display: flex;
 }
 
+@media all and (max-width: 1200px) {
+	.interests--info {
+		padding-top: 0;
+		max-width: 600px;
+		flex-direction: column;
+	}
+}
+
+.interests--info--box {
+	padding: 15px;
+	opacity: .8;
+	display: flex;
+	justify-content: center;
+	flex-direction: column;
+	align-items: center;
+}
+
+
+.interests--info--box > p {
+	padding-top: 15px;
+}
 
 /******************************************************************************/
 /*CONTACT FORM STYLING*/
@@ -278,30 +296,6 @@ input:focus, textarea:focus{
 	opacity: .7;
 }*/
 
-/******************************************************************************/
-/*BORDERS AND MARGINS*/
-
-.top-margin {
-	margin-top: 2em;
-}
-
-.bottom-margin {
-	margin-bottom: 2em;
-}
-
-.left-margin {
-	margin-left: 2em;
-}
-
-.top {
-	padding-top: 2em;
-}
-
-.opacity {
-	opacity: .8;
-}
-
-/******************************************************************************/
 
 /*FOR DYNAMIC BACKGROUND*/
 
