@@ -12,6 +12,7 @@ contact }
 */
 
 .main-title {
+	font-size: 60px;
 	display: flex;
 	flex-direction: row;
 }
@@ -32,6 +33,7 @@ contact }
 	display: block;
 	margin-top: 5em;
 	padding: 20px;
+	font-size: 60px;
 }
 
 .fa-github {
