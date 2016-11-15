@@ -178,6 +178,7 @@ contact }
 	}
 
 	.brandeis-logo {
+		display: block;
 		margin: 0 auto;
 		float: none;
 		width: 300px;
