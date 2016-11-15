@@ -171,14 +171,7 @@ contact }
 }
 
 .edu-exp-underline{
-<<<<<<< HEAD:css/mainpage.css
-=======
-	margin: auto; /* this  keeps the yellow line under About centered */
-	padding-top: 20px;
-	border-bottom: 4px solid #edc27b;
->>>>>>> b26cee33d48f9ea7ac84600214f0a894fa5891a4:mystyle.css
 	width: 433px;
-	text-align: center;
 }
 
 .brandeis-logo {
