@@ -51,6 +51,7 @@ contact }
 * {
 	@import url('https://fonts.googleapis.com/css?family=Lato');
 	font-family: 'Lato', sans-serif;
+	font-size: 20px;
 }
 
 /******************************************************************************/
@@ -91,7 +92,6 @@ contact }
 	max-width: 1300px;
 	width: 85%;
 	margin: 0 auto;
-	font-size: 14pt;
 	color: black;
 }
 
@@ -156,7 +156,6 @@ contact }
 /*****************************************************************************/
 /* Education and Experience Styling */
 .edu-exp {
-	font-size: 14pt;
 }
 
 .edu-exp-underline{
@@ -330,7 +329,6 @@ input:focus, textarea:focus{
 
 .demo-1 .main-title {
 	text-transform: uppercase;
-	font-size: 4.2em;
 	letter-spacing: 0.1em;
 }
 
