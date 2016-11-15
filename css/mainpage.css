@@ -42,6 +42,11 @@ contact }
 	color: #9d9d9d;
 }
 
+.container {
+	width: 1170px;
+	margin: 0 auto;
+}
+
 .jumbotron {
 	opacity: .9
 }
@@ -49,7 +54,7 @@ contact }
 /*************************************************************************/
 /*FONT, TEXT AND IMAGE STYLING*/
 
-.baron-neue {
+* {
 	font-family: monaco, serif;
 }
 
@@ -102,15 +107,7 @@ contact }
 }
 
 .about-underline{
-<<<<<<< HEAD:css/mainpage.css
 	width: 93px;
-=======
-	margin: auto; /* this  keeps the yellow line under About centered */
-	padding-top: 20px;
-	border-bottom: 4px solid #edc27b;
-	width: 92.5px;
-	text-align: center;
->>>>>>> b26cee33d48f9ea7ac84600214f0a894fa5891a4:mystyle.css
 }
 
 .about--bio {
@@ -201,6 +198,11 @@ contact }
 	width: 162px
 }
 
+.interests--info {
+	padding-top: 30px;
+	display: flex;
+}
+
 
 /******************************************************************************/
 /*CONTACT FORM STYLING*/
@@ -210,13 +212,7 @@ contact }
 	margin-top: 50px;
 }
 .contact-underline {
-<<<<<<< HEAD:css/mainpage.css
-=======
-	margin: 0px auto;
-	border-bottom: 4px solid #edc27b;
->>>>>>> b26cee33d48f9ea7ac84600214f0a894fa5891a4:mystyle.css
 	width: 205px;
-	text-align: center;
 }
 
 
