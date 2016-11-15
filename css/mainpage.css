@@ -8,8 +8,13 @@ div {
 /*
 section {
 	border: 1px solid blue;
-contact } 
-*/ 
+contact }
+*/
+
+.main-title {
+	display: flex;
+	flex-direction: row;
+}
 
 .main-title a {
 	color: #FFFFFF;
@@ -18,15 +23,34 @@ contact }
 
 @media screen and (max-width: 767px){
 	* {
-		font-size: 12pt; 
+		font-size: 12pt;
 	}
+}
+
+/*RANDOM STUFF */
+.fa-github, .fa-file-text{
+	display: block;
+	margin-top: 5em;
+	padding: 20px;
+}
+
+.fa-github {
+	color: orange;
+}
+
+.fa-file-text {
+	color: #9d9d9d;
+}
+
+.jumbotron {
+	opacity: .9
 }
 
 /*************************************************************************/
 /*FONT, TEXT AND IMAGE STYLING*/
 
 .baron-neue {
-	font-family: monaco;
+	font-family: monaco, serif;
 }
 
 .center-text {
@@ -58,39 +82,46 @@ contact }
 }
 
 /******************************************************************************/
+
+/* Common Settings */
+.underline {
+	margin: 0 auto; /* this  keeps the yellow line centered */
+	border-bottom: 4px solid #edc27b;
+	padding-top: 20px;
+	text-align: center;
+}
+
+/******************************************************************************/
 /*ABOUT SECTION */
 
 .about-container {
-	max-width: 1300px; 
+	max-width: 1300px;
 	margin: 0 auto;
 	font-size: 14pt;
 	color: black;
 }
 
 .about-underline{
-	padding-top: 20px;
-	border-bottom: 4px solid #edc27b;
-	margin: auto; /* this  keeps the yellow line under About centered */
-	width: 92.5px; 
+	width: 93px;
 }
 
-.bio {
+.about--bio {
 	float: left;
 }
 
 .bio-image {
 	float: left;
-	margin: 0 20px 0px 20px;
+	margin: 0 20px 0 20px;
 	max-width: 25vw;
 }
 
-.bio-description {
+.about--bio-description {
 	text-align: justify;
-	padding-left: 20px; 
+	padding-left: 20px;
 	padding-right: 20px;
 }
 
-.icons {
+.about--icons {
 	padding-top: 15px;
 	clear:left;
 	text-align: center;
@@ -99,7 +130,7 @@ contact }
 	justify-content: center;
 }
 
-.icon {
+.about--icons--icon {
 	width: 33vw;
 }
 
@@ -110,31 +141,28 @@ contact }
 		float: none;
 		min-width: 95%;
 }
-	
-	.bio-description {
+
+	.about--bio--description {
 		padding-top: 10px;
 		padding-left: 20px;
 		padding-right: 20px;
-	}	
-	
-	.icons {
+	}
+
+	.about--icons {
 		flex-wrap: wrap;
 	}
 
-	.icon {
+	.about--icons--icon {
 		width:100vw;
 	}
 }
 /*****************************************************************************/
 /* Education and Experience Styling */
 .edu-exp {
-	font-size: 14pt; 
+	font-size: 14pt;
 }
 
 .edu-exp-underline{
-	padding-top: 20px;
-	border-bottom: 4px solid #edc27b;
-	margin: auto; /* this  keeps the yellow line under About centered */
 	width: 433px;
 }
 
@@ -162,8 +190,6 @@ contact }
 }
 
 .interests-underline {
-	border-bottom: 4px solid #edc27b;
-	margin: 0px auto;
 	width: 162px
 }
 
@@ -176,8 +202,6 @@ contact }
 	margin-top: 50px;
 }
 .contact-underline {
-	border-bottom: 4px solid #edc27b;
-	margin: 0px auto;
 	width: 205px;
 }
 
@@ -269,35 +293,20 @@ input:focus, textarea:focus{
 
 /******************************************************************************/
 
-/*RANDOM STUFF */
-
-.fa-github {
-	color: orange;
-	display: block;
-	margin-top: 5em;
-}
-
-.jumbotron {
-	opacity: .9
-}
-
-/******************************************************************************/
-
 /*FOR DYNAMIC BACKGROUND*/
 
 /* Header */
 .large-header {
 	position: relative;
 	width: 100%;
-	background: #333;
 	overflow: hidden;
 	background-size: cover;
-	background-position: center center;
+	background: #333 center center;
 	z-index: 1;
 }
 
 .demo-1 .large-header {
-	background-image: url("images/demo-2-bg.jpg");
+	background-image: url("../images/demo-2-bg.jpg");
 	opacity: .9
 }
 
@@ -313,15 +322,10 @@ input:focus, textarea:focus{
 	transform: translate3d(-50%,-50%,0);
 }
 
-.demo-1 .main-title,
-.demo-3 .main-title {
+.demo-1 .main-title {
 	text-transform: uppercase;
 	font-size: 4.2em;
 	letter-spacing: 0.1em;
-}
-
-.main-title .thin {
-	font-weight: 200;
 }
 
 @media screen and (max-width : 767px) {
