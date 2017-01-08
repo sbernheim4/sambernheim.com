@@ -7,38 +7,39 @@
 		<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 		<title>Samuel Bernheim</title>
 
+		<!-- My CSS -->
+		<link rel="stylesheet" href="css/mainpage.css">
+
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
 		<!-- My Icon -->
 		<link rel="icon" href="images/icon.png">
 	</head>
 
 	<body>
-		<nav id="navbar">
-			<ul>
-				<li> <a href="#about">About</a> </li>
-				<li> <a href="#edu-exp">Education and Experience</a> </li>
-				<li> <a href="#interests">Interests</a> </li>
-			</ul>
+		<nav id="navbar" class="navbar" >
+			<div>
+				<p class="name">Samuel Bernheim</p>
+				<p> <a href="#about">About</a> </p>
+				<p> <a href="#edu-exp">Education and Experience</a> </p>
+				<p> <a href="#interests">Interests</a> </p>
+			</div>
 		</nav>
 
 
-		<section id="main" name="main" class="main">
+		<section id="main" class="main">
 			<h1 class="main--title">Samuel Bernheim</h1>
-			<div class="main--title">
-				<a href="https://github.com/sbernheim4"  target="_blank"> <i class="fa fa-github" aria-hidden="true"></i> </a>
-				<a href="resume.html"  target="_blank">
-					<i class="fa fa-file-text" aria-hidden="true"></i>
-				</a>
-			</div>
 		</section>
 
 		<section id="about" name="about" class="about">
-			<h2 class="underline about-underline">About</h2>
+			<h2 class="underline about__underline">About</h2>
 			<br>
 			<div class="about--bio">
-				<img src="images/profile.jpg" alt="Samuel Bernheim" class="bio-image">
+				<img src="images/profile.jpg" alt="Samuel Bernheim" class="bio--image">
 				<div class="about--bio--description">
-					<p>Hi. <br> I'm Sam</p>
-					<p>I'm from New York City attending Brandeis University in Waltham, MA just outside of Boston.</p>
+					<p>Hi.</p>
+					<p>I'm Sam</p>
+					<p>I'm from New York City currently attending Brandeis University in Waltham, MA just outside of Boston.</p>
 					<p>I've been interested in computers and programming for as long as I can remember and love learning new technologies.</p>
 					<p>Outside of my academics, I play Ultimate Frisbee, am the Treasurer for Deis3D (the 3D Printing Club at Brandeis) and an active member of the French Buisness and Lifestyle Club.</p>
 					<p>I am a big fan of Science Fiction TV shows, reading Historical Fiction and Biographies and following current Political and Economic events.</p>
@@ -54,7 +55,7 @@
 
 				<div class="about--icons--icon">
 					<i class="fa fa-apple fa-3x"></i>
-					<p>I do all my work on a Mac but am fully comfortable with Windows and Linux</p>
+					<p>I do all my work on a Mac with Vim as my trusty text editor</p>
 				</div>
 
 				<div class="about--icons--icon">
@@ -64,6 +65,7 @@
 			</div>
 		</section>
 
+		<!--
 		<div class="separator">
 			<a href="#edu-exp">
 				<div class="circle">
@@ -116,6 +118,7 @@
 			</div>
 		</section>
 
+		-->
 	</body>
 
 </html>
