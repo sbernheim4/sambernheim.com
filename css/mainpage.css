@@ -45,6 +45,7 @@ contact }
 /* Separator Styling */
 
 .separator {
+	padding: 30px;
 	display: flex;
 	justify-content: center;
 }
@@ -53,7 +54,8 @@ contact }
 	width: 60px;
 	height: 60px;
 	border-radius: 100%;
-	background-color: rgb(228,228,228);
+	display: flex;
+	justify-content: center;
 }
 
 .center-down-arrow {
@@ -68,8 +70,11 @@ contact }
 .underline {
 	margin: 0 auto; /* this  keeps the yellow line centered */
 	border-bottom: 4px solid #edc27b;
-	padding-top: 20px;
 	text-align: center;
+}
+
+section {
+	padding: 0 60px 0 60px;
 }
 
 /******************************************************************************/
@@ -129,8 +134,7 @@ contact }
 /*ABOUT SECTION */
 
 .about {
-	padding: 0 60px 0 60px;
-	background-color: rgb(240, 240, 240);
+	padding-top: 30px;
 }
 
 .about__underline{
@@ -203,29 +207,31 @@ contact }
 
 /*****************************************************************************/
 /* Education and Experience Styling */
-.edu-exp {
+
+.edu-exp__underline{
+	width: 340px;
 }
 
-.edu-exp-underline{
-	width: 433px;
-}
-
-.edu-exp--container {
-	margin: 0 auto;
-	max-width: 1000px;
-	width: 85%;
-}
-
-.brandeis-logo {
+.edu-exp--brandeis {
 	float: right;
+	padding: 15px;
+}
+
+.edu-exp--description {
+	padding: 15px;
+}
+
+.edu-exp--description > p {
+	padding: 5px;
+	line-height: 1.2em;
 }
 
 @media screen and (max-width: 767px) {
-	.edu-exp-underline {
+	.edu-exp__underline {
 		width: 232px;
 	}
 
-	.brandeis-logo {
+	.edu-exp--brandeis {
 		display: block;
 		margin: 0 auto;
 		float: none;
@@ -237,11 +243,10 @@ contact }
 
 .interests {
 	height: 100vh;
-	margin-top: 50px;
 }
 
-.interests-underline {
-	width: 162px
+.interests__underline {
+	width: 122px
 }
 
 .interests--info {
@@ -251,6 +256,7 @@ contact }
 
 @media all and (max-width: 1200px) {
 	.interests--info {
+		margin: 0 auto;
 		padding-top: 0;
 		max-width: 600px;
 		flex-direction: column;
