@@ -4,7 +4,7 @@ var express = require('express');
 var app = express();
 var path = require('path');
 
-var port = 1337;
+var port = process.env.PORT || 1337;
 
 // serve static files
 app.use(express.static(path.join(__dirname, '../minifiedCSS')));
