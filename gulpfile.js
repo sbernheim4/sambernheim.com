@@ -6,3 +6,12 @@ gulp.task('minifyCSS', function() {
 	.pipe(cleanCSS())
 	.pipe(gulp.dest('minifiedCSS'));
 });
+
+
+// watch all css files for changes
+gulp.task('watch', function() {
+  gulp.watch('css/*.css', ['minifyCSS']);
+});
+
+// The default task (called when you run `gulp` from cli)
+gulp.task('default', ['watch']);

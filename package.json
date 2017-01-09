@@ -17,7 +17,9 @@
   },
   "homepage": "https://github.com/sbernheim4/website#readme",
   "dependencies": {
+    "express": "^4.14.0",
     "gulp": "^3.9.1",
-    "gulp-clean-css": "^2.3.2"
+    "gulp-clean-css": "^2.3.2",
+    "path": "^0.12.7"
   }
 }

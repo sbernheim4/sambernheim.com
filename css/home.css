@@ -117,7 +117,7 @@ section {
 
 .main {
 	height: 100vh;
-	background-image: url("../images/NYC.jpg");
+	background-image: url("NYC.jpg");
 	display: flex;
 	justify-content: center;
 	align-items: center;
