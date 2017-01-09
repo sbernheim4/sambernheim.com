@@ -10,7 +10,6 @@ var port = process.env.PORT || 1337;
 app.use(express.static(path.join(__dirname, '../minifiedCSS')));
 app.use(express.static(path.join(__dirname, '../images')));
 
-
 app.get('/', function(req, res) {
 	res.sendFile(path.join(__dirname, '../views/home.html'));
 });
@@ -18,6 +17,10 @@ app.get('/', function(req, res) {
 app.get('/resume', function(req, res) {
 	res.sendFile(path.join(__dirname, '../views/resume.html'));
 });
+
+app.get('/manifest.json', function(req, res) {
+	res.sendFile(path.join(__dirname, '../manifest.json'));
+})
 
 
 // listen on port
