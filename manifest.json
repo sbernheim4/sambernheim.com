@@ -4,6 +4,7 @@
 	"start_url": ".",
 	"display": "standalone",
 	"background_color": "#323232",
+	"theme_color": "#323232",
 	"description": "My personal website detailing my experience and bio",
 	"lang": "en-US",
 	"icons": [
