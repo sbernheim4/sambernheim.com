@@ -22,7 +22,7 @@ gulp.task('buildJS', function() {
 
 // watch all css files for changes
 gulp.task('watch', function() {
-	gulp.watch('css/*.css', ['buildCSS']);
+	gulp.watch('scss/*.css', ['buildCSS']);
 	gulp.watch('js/*.js', ['buildJS']);
 
 });

@@ -35,7 +35,6 @@ contact }
 /******************************************************************************/
 
 * {
-	@import url('https://fonts.googleapis.com/css?family=Lato');
 	font-family: 'Lato', sans-serif;
 	margin: 0;
 	padding: 0;
@@ -93,12 +92,12 @@ section {
 
 .navbar > div > p {
 	padding: 15px;
+	color: white;
 }
 
 .navbar > div > .name {
 	padding-left: 60px;
 	font-size: 24px;
-	color: white;
 }
 
 .navbar > div > p > a {
