@@ -2,21 +2,21 @@
   "name": "sbernheim4.github.io",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon --watch server -e js,html server/index.js"
+    "start": "nodemon"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sbernheim4/website.git"
+    "url": "git+https://github.com/sbernheim4/sbernheim4.github.io"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/sbernheim4/website/issues"
+    "url": "https://github.com/sbernheim4/sbernheim4.github.io"
   },
-  "homepage": "https://github.com/sbernheim4/website#readme",
+  "homepage": "https://github.com/sbernheim4/sbernheim4.github.io#readme",
   "dependencies": {
     "express": "^4.14.0",
     "gulp": "^3.9.1",

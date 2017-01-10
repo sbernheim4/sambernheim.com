@@ -11,11 +11,11 @@ app.use(express.static(path.join(__dirname, 'public'))); //css
 app.use(express.static(path.join(__dirname, '../images'))); // images
 
 app.get('/', function(req, res) {
-	res.sendFile(path.join(__dirname, '../views/home.html'));
+	res.sendFile(path.join(__dirname, '../html/home.html'));
 });
 
 app.get('/resume', function(req, res) {
-	res.sendFile(path.join(__dirname, '../views/resume.html'));
+	res.sendFile(path.join(__dirname, '../html/resume.html'));
 });
 
 // listen on port
