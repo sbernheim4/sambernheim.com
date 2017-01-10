@@ -6,7 +6,7 @@ const sass = require('gulp-sass');
 const jshint = require('gulp-jshint');
 
 gulp.task('buildCSS', function() {
-	return gulp.src('scss/*.css')
+	return gulp.src('scss/*.scss')
 	.pipe(sass())
 	.pipe(cleanCSS())
 	.pipe(concat('index.css'))
@@ -25,7 +25,7 @@ gulp.task('buildJS', function() {
 
 // watch all css files for changes
 gulp.task('watch', function() {
-	gulp.watch('scss/*.css', ['buildCSS']);
+	gulp.watch('scss/*.scss', ['buildCSS']);
 	gulp.watch('js/*.js', ['buildJS']);
 
 });
