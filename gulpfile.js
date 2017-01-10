@@ -6,7 +6,7 @@ const sass = require('gulp-sass');
 const jshint = require('gulp-jshint');
 
 gulp.task('buildCSS', function() {
-	return gulp.src('scss/*.scss')
+	return gulp.src('scss/main.scss')
 	.pipe(sass())
 	.pipe(cleanCSS())
 	.pipe(concat('index.css'))
