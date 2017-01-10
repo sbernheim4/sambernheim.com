@@ -11,6 +11,12 @@ border: 1px solid blue;
 contact }
 */
 
+@media all and (min-width: 1000px) {
+	section {
+		padding: 0 90px;
+	}
+}
+
 @import url('https://fonts.googleapis.com/css?family=Lato');
 
 * {
