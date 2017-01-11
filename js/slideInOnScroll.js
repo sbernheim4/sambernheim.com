@@ -5,7 +5,6 @@ var elements = document.querySelectorAll('.slideFromLeft');
 var elements2 = document.querySelectorAll('.slideFromRight');
 
 function slide() {
-	console.log('SCROLLING');
 	elements.forEach(element => {
 	    // Check to see if the window y position is greater than the top of the element
 	    if ((window.scrollY % window.innerHeight / 2) + window.innerHeight * 0.6 > element.getBoundingClientRect().top) {
@@ -23,8 +22,8 @@ function slide() {
 	});
 }
 
-// Debounce function grabbed from the interweb so the scroll function doesn't fire so often 
-// ruining performance 
+// Debounce function grabbed from the interweb so the scroll function doesn't fire so often
+// ruining performance
 function debounce(func, wait, immediate) {
 	var timeout;
 	return function() {
