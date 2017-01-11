@@ -23,7 +23,6 @@
 /* Separator Styling */
 
 .separator {
-	padding: 30px;
 	display: flex;
 	justify-content: center;
 }
@@ -32,6 +31,7 @@
 	width: 60px;
 	height: 60px;
 	border-radius: 100%;
+	background: #BADA55;
 	display: flex;
 	justify-content: center;
 }
@@ -177,8 +177,7 @@
 }
 
 .about--bio--description {
-	padding-left: 20px;
-	padding-right: 20px;
+	padding: 0 30px;
 }
 
 .about--bio--description > p {
@@ -201,6 +200,7 @@
 
 .about--icons--icon {
 	width: 33vw;
+	padding: 15px;
 }
 
 .about--icons--icon > p {
@@ -216,9 +216,7 @@
 	}
 
 	.about--bio--description {
-		padding-top: 10px;
-		padding-left: 20px;
-		padding-right: 20px;
+		padding: 30px;
 	}
 
 	.about--icons {
@@ -233,30 +231,32 @@
 /*****************************************************************************/
 /* Education and Experience Styling */
 
-.edu-exp__underline{
-	width: 340px;
+.education__underline{
+	width: 150px;
 }
 
-.edu-exp--brandeis {
+.education--brandeis {
 	float: right;
 	padding: 15px;
 }
 
-.edu-exp--description {
-	padding: 15px;
-}
+.education--description {
+	padding: 30px;
 
-.edu-exp--description > p {
-	padding: 5px;
-	line-height: 1.2em;
-}
-
-@media screen and (max-width: 767px) {
-	.edu-exp__underline {
-		width: 232px;
+	p {
+		padding: 5px;
+		line-height: 1.2em;
 	}
 
-	.edu-exp--brandeis {
+}
+
+
+@media screen and (max-width: 767px) {
+	.education__underline {
+		margin-bottom: 15px;
+	}
+
+	.education--brandeis {
 		display: block;
 		margin: 0 auto;
 		float: none;
@@ -298,5 +298,6 @@
 
 
 .interests--info--box > p {
-	padding-top: 15px;
+	padding: 15px;
+	text-align: justify;
 }
