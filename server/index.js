@@ -20,7 +20,11 @@ app.get('/resume', function(req, res) {
 
 app.get('/robots.txt', function(req, res) {
 	res.sendFile(path.join(__dirname, 'robots.txt'));
-})
+});
+
+app.get('/sitemap.xml', function(req, res) {
+	res.sendFile(path.join(__dirname, 'sitemap.xml'));
+});
 
 // listen on port
 app.listen(port, function() {
