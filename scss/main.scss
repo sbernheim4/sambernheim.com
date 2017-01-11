@@ -4,9 +4,6 @@
 	}
 }
 
-// Google Lato Font
-@import url('https://fonts.googleapis.com/css?family=Lato');
-
 * {
 	margin: 0;
 	padding: 0;
@@ -16,7 +13,7 @@
 @import 'home';
 @import 'resume';
 
-// CSS used for sliding in animations 
+// CSS used for sliding in animations
 .slide {
 	transition: all .5s ease;
 	opacity: 0;
