@@ -18,6 +18,10 @@ app.get('/resume', function(req, res) {
 	res.sendFile(path.join(__dirname, '../minihtml/resume.html'));
 });
 
+app.get('/robots.txt', function(req, res) {
+	res.sendFile(path.join(__dirname, 'robots.txt'));
+})
+
 // listen on port
 app.listen(port, function() {
 	console.log('Listening to port ', port);
