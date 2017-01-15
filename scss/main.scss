@@ -1,5 +1,9 @@
-@media all and (min-width: 1000px) {
-	section {
+
+section {
+	margin: 0 auto;
+	min-height: 311px;
+
+	@media all and (min-width: 1000px) {
 		padding: 30px 90px;
 	}
 }
