@@ -1,0 +1,14 @@
+{
+  "lang": "en",
+  "background_color": "#3c3c3c",
+  "name": "Samuel Bernheim",
+  "short_name": "Samuel Bernh",
+  "display": "standalone",
+  "icons": [
+    {
+      "src": "favicon.png",
+      "sizes": "144x144",
+      "type": "image/png"
+    }
+  ]
+}
