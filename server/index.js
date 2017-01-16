@@ -1,11 +1,14 @@
 'use strict';
 
+var compression = require('compression');
 var express = require('express');
 var app = express();
 var path = require('path');
 
 var port = process.env.PORT || 1337;
 var cacheTime = 86400000;
+
+app.use(compression());
 
 // serve static files
 app.use(express.static(path.join(__dirname, 'public'), {maxAge: cacheTime})); //css
