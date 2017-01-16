@@ -61,29 +61,28 @@
 	@media all and (max-width: 1000px) {
 		display: none;
 	}
-}
 
-.navbar > div {
-	display: flex;
-	height: 70px;
-	padding-left: 60px;
-	background: #323232;
-	flex-direction: row;
-	align-items: center;
-}
+	div {
+		display: flex;
+		height: 70px;
+		padding-left: 60px;
+		background: #323232;
+		flex-direction: row;
+		align-items: center;
 
+		p {
+			padding: 15px;
+			color: white;
 
-.navbar > div > p {
-	padding: 15px;
-	color: white;
+			&:hover {
+				cursor: pointer;
+			}
+		}
 
-	&:hover {
-		cursor: pointer;
+		.main-nav {
+			font-size: 20pt;
+		}
 	}
-}
-
-.navbar > div > .main-nav {
-	font-size: 20pt;
 }
 
 .mobile-navbar {
@@ -176,10 +175,21 @@
 			float: left;
 			margin: 0 20px 0 20px;
 			max-width: 380px;
+
+			@media screen and (max-width: 767px) {
+				display: block;
+				margin: 0 auto;
+				float: none;
+				min-width: 95%;
+			}
 		}
 
 		&--description {
 			padding: 0 30px;
+
+			@media screen and (max-width: 767px){
+				padding: 30px;
+			}
 
 			p {
 				padding: 5px;
@@ -200,35 +210,21 @@
 		flex-wrap: nowrap;
 		justify-content: center;
 
+		@media screen and (max-width: 767px){
+			flex-wrap: wrap;
+		}
+
 		&--icon {
 			width: 33vw;
 			padding: 15px;
+			@media screen and (max-width: 767px){
+				width:100vw;
+			}
 
 			p {
 				padding-top: 15px;
 			}
 		}
-	}
-}
-
-@media screen and (max-width: 767px){
-	.bio--image {
-		display: block;
-		margin: 0 auto;
-		float: none;
-		min-width: 95%;
-	}
-
-	.about--bio--description {
-		padding: 30px;
-	}
-
-	.about--icons {
-		flex-wrap: wrap;
-	}
-
-	.about--icons--icon {
-		width:100vw;
 	}
 }
 
@@ -271,7 +267,7 @@
 /*****************************************************************************/
 
 .interests {
-	width: 1500px;
+	max-width: 1500px;
 }
 
 .interests__underline {
