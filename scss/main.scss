@@ -1,3 +1,7 @@
+// stop others from dragging and droping images from the site to save as their own
+img {
+	pointer-events: none;
+}
 
 section {
 	margin: 0 auto;
