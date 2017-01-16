@@ -141,74 +141,74 @@
 
 .main {
 	height: 100vh;
+	padding: 0;
 	background-image: url("NYC.jpg");
 	background-size: 100vw 100vh;
 	background-repeat: no-repeat;
 	display: flex;
 	justify-content: center;
 	align-items: center;
-}
 
-.main--title {
-	padding: 30px;
-	text-align: center;
-	font-size: 50px;
-	text-transform: uppercase;
-	color: black;
-	font-size: 50pt;
-	text-shadow: 0 0px 25px white;
+	&--title {
+		padding: 30px;
+		text-align: center;
+		font-size: 50px;
+		text-transform: uppercase;
+		color: black;
+		font-size: 50pt;
+		text-shadow: 0 0px 25px white;
+	}
 }
 
 /******************************************************************************/
 /*ABOUT SECTION */
 
 .about {
-	padding-top: 30px;
-}
+	max-width: 1400px;
 
-.about__underline{
-	width: 93px;
-}
+	&__underline {
+		width: 93px;
+	}
 
-.about--bio {
-	float: left;
-}
+	&--bio {
 
-.bio--image {
-	float: left;
-	margin: 0 20px 0 20px;
-	max-width: 25vw;
-}
+		&--image {
+			float: left;
+			margin: 0 20px 0 20px;
+			max-width: 380px;
+		}
 
-.about--bio--description {
-	padding: 0 30px;
-}
+		&--description {
+			padding: 0 30px;
 
-.about--bio--description > p {
-	padding: 5px;
-}
+			p {
+				padding: 5px;
 
-.about--bio--description > p > a {
-	text-decoration: none;
-	color: rgb(54, 101, 175);
-}
+				a {
+					text-decoration: none;
+					color: rgb(54, 101, 175);
+				}
+			}
+		}
+	}
 
-.about--icons {
-	padding-top: 15px;
-	clear:left;
-	text-align: center;
-	display: flex;
-	flex-wrap: nowrap;
-	justify-content: center;
-}
+	&--icons {
+		padding-top: 15px;
+		clear:left;
+		text-align: center;
+		display: flex;
+		flex-wrap: nowrap;
+		justify-content: center;
 
-.about--icons--icon {
-	width: 33vw;
-	padding: 15px;
-}
+		&--icon {
+			width: 33vw;
+			padding: 15px;
 
-.about--icons--icon > p {
-	padding-top: 15px;
+			p {
+				padding-top: 15px;
+			}
+		}
+	}
 }
 
 @media screen and (max-width: 767px){
@@ -234,6 +234,9 @@
 
 /*****************************************************************************/
 /* Education and Experience Styling */
+.education {
+	max-width: 1300px;
+}
 
 .education__underline{
 	width: 150px;
@@ -248,12 +251,10 @@
 	padding: 30px;
 
 	p {
-		padding: 5px;
-		line-height: 1.2em;
+		padding: 10px;
+		line-height: 1.5em;
 	}
-
 }
-
 
 @media screen and (max-width: 767px) {
 	.education__underline {
@@ -270,7 +271,7 @@
 /*****************************************************************************/
 
 .interests {
-	height: 100vh;
+	width: 1500px;
 }
 
 .interests__underline {
