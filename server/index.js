@@ -8,7 +8,6 @@ var port = process.env.PORT || 1337;
 var oneDay = 86400000;
 
 // enable g-zip compression
-app.use(express.compress());
 
 // serve static files
 app.use(express.static(path.join(__dirname, 'public'), {maxAge: oneDay})); //css
