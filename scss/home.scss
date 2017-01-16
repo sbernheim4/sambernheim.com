@@ -232,35 +232,32 @@
 /* Education and Experience Styling */
 .education {
 	max-width: 1300px;
-}
 
-.education__underline{
-	width: 150px;
-}
-
-.education--brandeis {
-	float: right;
-	padding: 15px;
-}
-
-.education--description {
-	padding: 30px;
-
-	p {
-		padding: 10px;
-		line-height: 1.5em;
-	}
-}
-
-@media screen and (max-width: 767px) {
-	.education__underline {
-		margin-bottom: 15px;
+	&__underline {
+		width: 150px;
+		@media all and (max-width: 767px) {
+			margin-bottom: 15px;
+		}
 	}
 
-	.education--brandeis {
-		display: block;
-		margin: 0 auto;
-		float: none;
+	&--brandeis {
+		float: right;
+		padding: 15px;
+
+		@media all and (max-width: 767px) {
+			display: block;
+			margin: 0 auto;
+			float: none;
+		}
+	}
+
+	&--description {
+		padding: 30px;
+
+		p {
+			padding: 10px;
+			line-height: 1.5em;
+		}
 	}
 }
 
@@ -268,37 +265,34 @@
 
 .interests {
 	max-width: 1500px;
-}
 
-.interests__underline {
-	width: 122px
-}
-
-.interests--info {
-	padding-top: 30px;
-	display: flex;
-}
-
-@media all and (max-width: 1200px) {
-	.interests--info {
-		margin: 0 auto;
-		padding-top: 0;
-		max-width: 600px;
-		flex-direction: column;
+	&__underline {
+		width: 122px;
 	}
-}
 
-.interests--info--box {
-	padding: 15px;
-	opacity: .8;
-	display: flex;
-	justify-content: center;
-	flex-direction: column;
-	align-items: center;
-}
+	&--info {
+		padding-top: 30px;
+		display: flex;
 
+		@media all and (max-width: 1200px) {
+			margin: 0 auto;
+			padding-top: 0;
+			max-width: 600px;
+			flex-direction: column;
+		}
 
-.interests--info--box > p {
-	padding: 15px;
-	text-align: justify;
+		&--box {
+			padding: 15px;
+			opacity: .8;
+			display: flex;
+			justify-content: center;
+			flex-direction: column;
+			align-items: center;
+
+			p {
+				padding: 15px;
+				text-align: justify;
+			}
+		}
+	}
 }
