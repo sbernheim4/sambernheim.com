@@ -30,6 +30,10 @@ app.get('/sitemap.xml', function(req, res) {
 	res.sendFile(path.join(__dirname, 'sitemap.xml'));
 });
 
+app.get('/manifest.json', function(req, res) {
+	res.send(path.join(__dirname, '../manifest.json'));
+})
+
 // listen on port
 app.listen(port, function() {
 	console.log('Listening to port ', port);
