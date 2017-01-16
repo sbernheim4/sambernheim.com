@@ -5,10 +5,14 @@ var app = express();
 var path = require('path');
 
 var port = process.env.PORT || 1337;
+var oneDay = 86400000;
+
+// enable g-zip compression
+app.use(express.compress());
 
 // serve static files
-app.use(express.static(path.join(__dirname, 'public'))); //css
-app.use(express.static(path.join(__dirname, '../images'))); // images
+app.use(express.static(path.join(__dirname, 'public'), {maxAge: oneDay})); //css
+app.use(express.static(path.join(__dirname, '../images'), {maxAge: oneDay})); // images
 
 app.get('/', function(req, res) {
 	res.sendFile(path.join(__dirname, '../minihtml/home.html'));
