@@ -2,6 +2,7 @@
   "manifest_version": 2,
   "lang": "en",
   "background_color": "#3c3c3c",
+  "start_url": "/",
   "theme_color": "#3c3c3c",
   "app": {
     "launch": {
