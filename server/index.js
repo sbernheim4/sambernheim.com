@@ -30,7 +30,7 @@ app.get('/sitemap.xml', function(req, res) {
 	res.sendFile(path.join(__dirname, 'sitemap.xml'));
 });
 
-app.get('/manifest*', function(req, res) {
+app.get('/manifest.json', function(req, res) {
 	res.sendFile(path.join(__dirname, '../manifest.json'));
 })
 

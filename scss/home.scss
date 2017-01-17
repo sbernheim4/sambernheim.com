@@ -156,6 +156,10 @@
 		color: black;
 		font-size: 50pt;
 		text-shadow: 0 0px 25px white;
+		@media all and (max-width: 365px) {
+			padding: 0;
+			font-size: 40px;
+		}
 	}
 }
 
@@ -180,7 +184,7 @@
 				display: block;
 				margin: 0 auto;
 				float: none;
-				min-width: 95%;
+				width: 100%;
 			}
 		}
 
