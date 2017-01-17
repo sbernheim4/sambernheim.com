@@ -11,7 +11,7 @@ var cacheTime = 86400000;
 app.use(compression());
 
 // serve static files
-app.use(express.static(path.join(__dirname, 'public'), {maxAge: cacheTime})); //css
+app.use(express.static(path.join(__dirname, 'public'), {maxAge: cacheTime})); //css and js
 app.use(express.static(path.join(__dirname, '../images'), {maxAge: cacheTime})); //images
 
 app.get('/', function(req, res) {
@@ -31,7 +31,7 @@ app.get('/sitemap.xml', function(req, res) {
 });
 
 app.get('/manifest.json', function(req, res) {
-	res.send(path.join(__dirname, '../manifest.json'));
+	res.sendFile(path.join(__dirname, '../manifest.json'));
 })
 
 // listen on port
