@@ -182,10 +182,10 @@
 
 		&--image {
 			float: left;
-			margin: 0 20px 0 20px;
+			margin: 0 20px;
 			max-width: 380px;
 
-			@media screen and (max-width: 767px) {
+			@media screen and (max-width: 850px) {
 				display: block;
 				margin: 0 auto;
 				float: none;
@@ -196,7 +196,7 @@
 		&--description {
 			padding: 0 30px;
 
-			@media screen and (max-width: 767px){
+			@media screen and (max-width: 850px){
 				padding: 30px;
 			}
 
@@ -219,15 +219,15 @@
 		flex-wrap: nowrap;
 		justify-content: center;
 
-		@media screen and (max-width: 767px){
+		@media screen and (max-width: 700px){
 			flex-wrap: wrap;
 		}
 
 		&--icon {
 			width: 33vw;
 			padding: 15px;
-			@media screen and (max-width: 767px){
-				width:100vw;
+			@media screen and (max-width: 700px){
+				width: 80vw;
 			}
 
 			p {
@@ -239,13 +239,16 @@
 
 /*****************************************************************************/
 /* Education Styling */
+
+$education-media-change: 900px;
+
 .education {
 	max-width: 1100px;
 	
 
 	&__underline {
 		width: 150px;
-		@media all and (max-width: 767px) {
+		@media all and (max-width: $education-media-change) {
 			margin-bottom: 15px;
 		}
 	}
@@ -255,16 +258,14 @@
 		flex-direction: row-reverse;
 		align-items: center;
 
-		$media-change: 900px;
-
-		@media all and (max-width: $media-change) {
+		@media all and (max-width: $education-media-change) {
 			display: block;
 		}
 
 		&--brandeis {
 			padding: 15px;
 
-			@media all and (max-width: $media-change) {
+			@media all and (max-width: $education-media-change) {
 				display: block;
 				margin: 0 auto;
 			}
@@ -273,12 +274,12 @@
 		&--description {
 			padding: 15px 30px;
 			flex: 1;
-			@media all and (max-width: $media-change) {
+			@media all and (max-width: $education-media-change) {
 				padding-top: 0;
 			}
 
 			p {
-				padding: 10px;
+				padding: 10px 0;
 				text-align: justify;
 				line-height: 1.5em;
 			}
@@ -288,6 +289,7 @@
 
 /*****************************************************************************/
 /* Interests Styling */
+
 .interests {
 	max-width: 1100px;
 
