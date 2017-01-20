@@ -1,6 +1,15 @@
 /******************************************************************************/
+/* Common Homepage Settings */
 
-/*RANDOM STUFF */
+.underline {
+	margin: 0 auto; /* this  keeps the yellow line centered */
+	border-bottom: 4px solid #edc27b;
+	text-align: center;
+}
+
+/******************************************************************************/
+/* Font Awesome Styling */
+
 .fa-github, .fa-file-text{
 	display: block;
 	margin-top: 5em;
@@ -13,10 +22,6 @@
 
 .fa-file-text {
 	color: #9d9d9d;
-}
-
-.jumbotron {
-	opacity: .9
 }
 
 /******************************************************************************/
@@ -43,16 +48,9 @@
 }
 
 /******************************************************************************/
-/* Common Settings */
+/* Navbar Styling */
 
-.underline {
-	margin: 0 auto; /* this  keeps the yellow line centered */
-	border-bottom: 4px solid #edc27b;
-	text-align: center;
-}
-
-/******************************************************************************/
-/* Navbar */
+/* Desktop Navbar */
 .navbar {
 	position: fixed;
 	width: 100vw;
@@ -85,6 +83,7 @@
 	}
 }
 
+/* Molbile Navbar */
 .mobile-navbar {
 	width: 100vw;
 	background: rgb(50, 50, 50);
@@ -102,7 +101,6 @@
 	}
 
 	&--text {
-		/*display: none;*/
 		visibility: hidden;
 		height: 0px;
 		opacity: 0;
@@ -130,13 +128,11 @@
 		padding: 0 30px 30px 0;
 		transform: translateY(0px);
 		opacity: 1;
-
-
 	}
 }
 
 /******************************************************************************/
-/* MAIN SECTION */
+/* Main Styling */
 
 .main {
 	height: 100vh;
@@ -164,10 +160,10 @@
 }
 
 /******************************************************************************/
-/*ABOUT SECTION */
+/* About Styling */
 
 .about {
-	max-width: 1400px;
+	max-width: 1100px;
 
 	&__underline {
 		width: 93px;
@@ -233,9 +229,10 @@
 }
 
 /*****************************************************************************/
-/* Education and Experience Styling */
+/* Education Styling */
 .education {
-	max-width: 1300px;
+	max-width: 1100px;
+	
 
 	&__underline {
 		width: 150px;
@@ -244,31 +241,46 @@
 		}
 	}
 
-	&--brandeis {
-		float: right;
-		padding: 15px;
+	&--info {
+		display: flex;
+		flex-direction: row-reverse;
+		align-items: center;
 
-		@media all and (max-width: 767px) {
+		$media-change: 900px;
+
+		@media all and (max-width: $media-change) {
 			display: block;
-			margin: 0 auto;
-			float: none;
 		}
-	}
 
-	&--description {
-		padding: 30px;
+		&--brandeis {
+			padding: 15px;
 
-		p {
-			padding: 10px;
-			line-height: 1.5em;
+			@media all and (max-width: $media-change) {
+				display: block;
+				margin: 0 auto;
+			}
+		}
+
+		&--description {
+			padding: 15px 30px;
+			flex: 1;
+			@media all and (max-width: $media-change) {
+				padding-top: 0;
+			}
+
+			p {
+				padding: 10px;
+				text-align: justify;
+				line-height: 1.5em;
+			}
 		}
 	}
 }
 
 /*****************************************************************************/
-
+/* Interests Styling */
 .interests {
-	max-width: 1500px;
+	max-width: 1100px;
 
 	&__underline {
 		width: 122px;
