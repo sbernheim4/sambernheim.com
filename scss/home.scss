@@ -10,18 +10,26 @@
 /******************************************************************************/
 /* Font Awesome Styling */
 
-.fa-github, .fa-file-text{
-	display: block;
-	margin-top: 5em;
-	padding: 20px;
-}
+.main--icons {
+	display: flex;
 
-.fa-github {
-	color: orange;
-}
+	a {
+		.fa-file-text, .fa-github {
+			padding: 15px 30px;
+			text-shadow: 0 0 7px black;
+		}
 
-.fa-file-text {
-	color: #9d9d9d;
+		.fa-file-text {
+			font-size: 3em;
+			color: #2dc6aa;
+		}
+
+		.fa-github {
+			color: #3689c9;
+			font-size: 3.5em;
+		}
+	}
+	
 }
 
 /******************************************************************************/
@@ -141,6 +149,7 @@
 	background-size: 100vw 100vh;
 	background-repeat: no-repeat;
 	display: flex;
+	flex-direction: column;
 	justify-content: center;
 	align-items: center;
 
