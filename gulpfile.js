@@ -4,7 +4,7 @@ const babel = require('gulp-babel');
 const concat = require('gulp-concat');
 const sass = require('gulp-sass');
 const jshint = require('gulp-jshint');
-var htmlmin = require('gulp-htmlmin');
+const htmlmin = require('gulp-htmlmin');
 
 gulp.task('buildHTML', function() {
 	return gulp.src('html/*.html')
