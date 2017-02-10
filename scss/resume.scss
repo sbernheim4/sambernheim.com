@@ -57,19 +57,21 @@ $icon-font-size: 25px;
 		padding: $section-padding;
 
 		&__names {
-			display: flex;
+			display: inline-flex;
 			justify-content: flex-start;
 			flex-wrap: nowrap;
 			align-items: center;
 
 			&--container {
-				padding: 5px 30px 0 30px;
+				width: calc(100vw / 3);
+				padding-top: 5px;
+
+				p:before {
+					content: "\2022";
+					padding: 3px;
+				}
 			}
 
-			p:before {
-				content: "\2022";
-				padding: 3px;
-			}
 		}
 	}
 
@@ -127,6 +129,10 @@ $icon-font-size: 25px;
 			&--responsibilities {
 				font-size: 10pt;
 				padding-left: 30px;
+
+				li:before {
+					content: '\2219 ';
+				}
 			}
 		}
 	}
