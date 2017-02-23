@@ -5,11 +5,13 @@ const concat = require('gulp-concat');
 const sass = require('gulp-sass');
 const jshint = require('gulp-jshint');
 const htmlmin = require('gulp-htmlmin');
+const livereload = require('gulp-livereload');
 
 gulp.task('buildHTML', function() {
 	return gulp.src('html/*.html')
 		.pipe(htmlmin({collapseWhitespace: true}))
-		.pipe(gulp.dest('minihtml'));
+		.pipe(gulp.dest('minihtml'))
+		.pipe(livereload());
 });
 
 
@@ -18,7 +20,8 @@ gulp.task('buildCSS', function() {
 		.pipe(sass())
 		.pipe(cleanCSS())
 		.pipe(concat('index.css'))
-		.pipe(gulp.dest('server/public'));
+		.pipe(gulp.dest('server/public'))
+		.pipe(livereload());
 });
 
 gulp.task('buildJS', function() {
@@ -27,12 +30,14 @@ gulp.task('buildJS', function() {
 		.pipe(jshint.reporter('default'))
 		.pipe(babel())
 		.pipe(concat('index.js'))
-		.pipe(gulp.dest('server/public'));
+		.pipe(gulp.dest('server/public'))
+		.pipe(livereload());
 })
 
 
 // watch all css files for changes
 gulp.task('watch', function() {
+	livereload.listen();
 	gulp.watch('scss/*.scss', ['buildCSS']);
 	gulp.watch('js/*.js', ['buildJS']);
 	gulp.watch('html/*.html', ['buildHTML']);

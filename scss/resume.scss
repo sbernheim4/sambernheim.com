@@ -128,10 +128,15 @@ $icon-font-size: 25px;
 
 			&--responsibilities {
 				font-size: 10pt;
+				padding-top: 5px;
 				padding-left: 30px;
 
-				li:before {
-					content: '\2219 ';
+				li {
+					display: inline-block;
+
+					&:before {
+						content: '\2219';
+					}
 				}
 			}
 		}
