@@ -6,7 +6,7 @@ var path = require('path');
 var compression = require('compression');
 
 var port = process.env.PORT || 1337;
-var cacheTime = 86400000;
+var cacheTime = 31536000000; // One year
 
 app.use(compression());
 
