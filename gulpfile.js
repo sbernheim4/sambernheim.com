@@ -43,7 +43,7 @@ gulp.task('watch', function() {
 	gulp.watch('html/*.html', ['buildHTML']);
 });
 
-gulp.task('buildProduction', ['buildHTMLprod', 'buildJSProd', 'buildCSSProd']);
+gulp.task('buildProduction', ['buildHTMLProd', 'buildJSProd', 'buildCSSProd']);
 
 gulp.task('buildHTMLProd', function() {
 	return gulp.src('html/*.html')
