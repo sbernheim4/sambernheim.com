@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon",
-	"postinstall": "gulp buildProduction"
+    "postinstall": "gulp buildProduction"
   },
   "repository": {
     "type": "git",
