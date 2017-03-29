@@ -43,6 +43,29 @@ gulp.task('watch', function() {
 	gulp.watch('html/*.html', ['buildHTML']);
 });
 
+gulp.task('buildProduction', ['buildHTMLprod', 'buildJSProd', 'buildCSSProd']);
+
+gulp.task('buildHTMLProd', function() {
+	return gulp.src('html/*.html')
+		.pipe(htmlmin({collapseWhitespace: true}))
+		.pipe(gulp.dest('minihtml'))
+});
+
+gulp.task('buildCSSProd', function() {
+	return gulp.src('scss/main.scss')
+		.pipe(sass())
+		.pipe(cleanCSS())
+		.pipe(concat('index.css'))
+		.pipe(gulp.dest('server/public'))
+});
+
+gulp.task('buildJSProd', function() {
+	return gulp.src('js/*.js')
+		.pipe(babel())
+		.pipe(concat('index.js'))
+		.pipe(gulp.dest('server/public'))
+})
+
 // The default task (called when you run `gulp` from cli)
 // first run buildCSS, then buildJS, and then start watching
 gulp.task('default', ['buildCSS', 'buildJS', 'buildHTML','watch']);
