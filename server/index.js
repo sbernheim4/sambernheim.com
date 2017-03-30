@@ -36,5 +36,5 @@ app.get('/manifest.json', function(req, res) {
 
 // listen on port
 app.listen(port, function() {
-	console.log('Listening to port ', port);
+	console.log('Listening to port', port);
 });
