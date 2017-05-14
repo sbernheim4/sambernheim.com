@@ -16,44 +16,46 @@
 
 		<!-- Google Analytics tracking code -->
 		<meta name="google-site-verification" content="zHcVBbY7cgsbEuhwVpBJXUmxIoOJVjyx7OFqxmUequM" />
-
 	</head>
 
 	<body>
 
+		<!-- Above the fold CSS - CSS necessary to view the first visible part of the website -->
 		<style>
 			.navbar{position:fixed;width:100vw;z-index:1}@media all and (max-width:1000px){.navbar{display:none}}.navbar div{display:flex;height:70px;padding-left:60px;background:#323232;flex-direction:row;align-items:center}.navbar div p{padding:15px;color:#fff}.navbar div p:hover{cursor:pointer}.navbar div .main-nav{font-size:20pt}.mobile-navbar{width:100vw;background:#323232;color:#fff}@media all and (min-width:1000px){.mobile-navbar{display:none}}.mobile-navbar i{display:flex;justify-content:flex-end;padding:15px 30px 15px 15px;cursor:pointer}.mobile-navbar--text{visibility:hidden;height:0;opacity:0;display:flex;flex-direction:column;align-items:flex-end;transform:translateY(-30px);transition:height .3s ease,transform .3s ease,opacity .3s ease}.mobile-navbar--text__item{padding:5px;cursor:pointer}.mobile-navbar--text__item:hover{cursor:pointer;color:#bebebe}.mobile-navbar .display{visibility:visible;height:100px;padding:0 30px 30px 0;transform:translateY(0);opacity:1}.main{height:100vh;padding:0;background-image:url(NYC.jpg);background-size:100vw 100vh;background-repeat:no-repeat;display:flex;flex-direction:column;justify-content:center;align-items:center}.main--title{padding:30px;text-align:center;text-transform:uppercase;color:#000;font-size:50pt;text-shadow:0 0 25px #fff}@media all and (max-width:365px){.main--title{padding:0;font-size:40px}}
 		</style>
 
 		<nav id="navbar" class="navbar" >
 			<div>
-				<p class="main-nav" name='main'>Samuel Bernheim</p>
-				<p class="about-nav" name='about'>About</p>
-				<p class="education-nav" name='education'>Education</p>
-				<p class="interests-nav" name='interests'>Interests</p>
+				<p class="main-nav" name="main">Samuel Bernheim</p>
+				<p class="about-nav" name="about">About</p>
+				<p class="education-nav" name="education">Education</p>
+				<p class="interests-nav" name="interests">Interests</p>
+				<p class="projects-nav" name="projects">Projects</p>
 			</div>
 		</nav>
 
 		<nav id="mobile-navbar" class="mobile-navbar" >
-			<div class='mobile-navbar--btn'>
+			<div class="mobile-navbar--btn">
 				<i class="fa fa-bars fa-2x" aria-hidden="true"></i>
 			</div>
-			<div class='mobile-navbar--text'>
-				<p class="mobile-navbar--text__item about-nav" name='about'>About</p>
-				<p class="mobile-navbar--text__item education-nav" name='education'>Education and Experience</p>
-				<p class="mobile-navbar--text__item interests-nav" name='interests'>Interests</p>
+			<div class="mobile-navbar--text">
+				<p class="mobile-navbar--text__item about-nav" name="about">About</p>
+				<p class="mobile-navbar--text__item education-nav" name="education">Education and Experience</p>
+				<p class="mobile-navbar--text__item interests-nav" name="interests">Interests</p>
+				<p class="mobile-navbar--text__item projects-nav" name="projects">Projects</p>
 			</div>
 		</nav>
 
 		<section id="main" class="main">
 			<h1 class="main--title">Samuel Bernheim</h1>
 
-			<div class='main--icons'>
-				<a href='/resume'>
+			<div class="main--icons">
+				<a href="/resume">
 					<i class="fa fa-file-text" aria-hidden="true"></i>
 				</a>
 
-				<a href='https://github.com/sbernheim4'>
+				<a href="https://github.com/sbernheim4">
 					<i class="fa fa-github" aria-hidden="true"></i>
 				</a>
 			</div>
@@ -141,6 +143,33 @@
 					<p>I helped to cofound the French Buisness and Lifestyle Club and served as its Treasurer for two years where I was responsible for overseeing our budget and handling all contracts and payments for our speakers and events.</p>
 				</div>
 			</div>
+		</section>
+
+		<section id="projects" class="projects" name="projects">
+			<div class="project">
+				<h2>This Website</h2>
+				<img src="" alt="">
+				<p>I built this website in pure HTML, CSS (well, SCSS anyways) and JS writing all of it on my own without the use of any external frameworks to keep loading time as quick as possible. I used this website as a way to get familiar with the BEM naming convention and to practice writing clean HTML, CSS and JS as well as for using build tools like GulpJS and NodeJS. Using the ExpressJS package I also learned how to enable compression for static files and designate which files were to be cached as wel as for some simple routing between the home page and resume page as well as its manifest.json and robots.txt page for managing the sites SEO. All of this allowed me to achieve a score of 100 on Google's Page Speed test.</p>
+			</div>
+
+			<div class="project">
+				<h2>Kinetic Global</h2>
+				<img src="" alt="">
+				<p>I, along with another developer, built the website for Kinetic Global.We used the MEAN stack (Angular 1) to develop it. It's hosted on heroku and uses Amazon's S3 bucket for resource management. The website has several forms which use Sendgrid's API to send emails upon any form submission to members of the Kinetic Team with all the relevent information. Additionally, we use StripeJS to allow online donation to Kinetic Global and have a online forum that integrates with Kinetic's Slack channel ensuring a 1 to 1 correspondance between anything posted online or in slack. In addition to building the website I also manage its SEO and got the website to be at the top when searching for Kinetic Global, Kinetic Think Tank and other similar terms.</p>
+			</div>
+
+			<div class="project">
+				<h2>Angular Bootstrapping App</h2>
+				<img src="" alt="">
+				<p>After building the Kinetic Global website, I wanted to have a base stack that I could then use to easily create new websites without having to set up anything, essentially my own yeoman application. That led me to building this application which is pretty much just a MEAN stack application but without the Mongo. Building this, I spent a lot of time determining its structure, the essential npm modules I would need and how the build process should work. Out of the box it has GulpJS production and development builds for minifying all HTML, CSS, and JS as well as SCSS compilation, JS ES6 transpiling with Babel and livereloading with an additional chrome extension, everything you need to go from nothing to something with minimal effort. Beyond the already mentioned packages it uses Angular's UI Router for front end routing.
+			</div>
+
+			<div class="project">
+				<h2>Edelman for Brandeis</h2>
+				<img src="" alt="">
+				<p>Shortly after building the Angular App a friend of mine told me he was running for Student Union President for Brandeis Univeristy. Immidiately I asked him if he wanted a website and when he said yes I knew it was the perfect time to test using my Angular App. After about 3 hours, I had copied, formatted and designed the entire website, reviewed and revised it with him and had pushed it live onto a free heroku domain (Union rules say that no money can be spent on campaigning so no domain registration was allowed). I found that the app I had built was incredibly easy to use and going from 0 to nothing for a nice functioning website was awesome. Later that week he won the election. While the website did not reach hundreds of people, the google analytics said 25 or so viewed it and helped get him elected.</p>
+			</div>
+
 		</section>
 
 		<!-- My CSS -->
