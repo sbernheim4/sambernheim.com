@@ -1,0 +1,67 @@
+/* About Section Styling */
+
+.about {
+	max-width: 1100px;
+
+	&__underline {
+		width: 93px;
+	}
+
+	&--bio {
+
+		&--image {
+			float: left;
+			margin: 0 20px;
+			max-width: 380px;
+
+			@media screen and (max-width: 850px) {
+				display: block;
+				margin: 0 auto;
+				float: none;
+				width: 90%;
+			}
+		}
+
+		&--description {
+			padding: 0 30px;
+
+			@media screen and (max-width: 850px){
+				padding: 30px;
+			}
+
+			p {
+				padding: 5px;
+
+				a {
+					text-decoration: none;
+					color: rgb(54, 101, 175);
+				}
+			}
+		}
+	}
+
+	&--icons {
+		padding-top: 15px;
+		clear:left;
+		text-align: center;
+		display: flex;
+		flex-wrap: nowrap;
+		justify-content: center;
+
+		@media screen and (max-width: 700px){
+			flex-wrap: wrap;
+		}
+
+		&--icon {
+			width: 33vw;
+			padding: 15px;
+			@media screen and (max-width: 700px){
+				width: 80vw;
+			}
+
+			p {
+				padding-top: 15px;
+			}
+		}
+	}
+}

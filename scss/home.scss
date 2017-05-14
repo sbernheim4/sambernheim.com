@@ -54,6 +54,8 @@
 	padding-top: 13px;
 }
 
+
+// NOTE: The next two sections are commented out since this is above the fold content and this css is in the HTML in a style element
 /******************************************************************************/
 /* Navbar Styling */
 
@@ -149,7 +151,7 @@
 	height: 100vh;
 	padding: 0;
 	background-image: url("NYC.jpg");
-	background-size: 100vw 100vh;
+	background-size: cover;
 	background-repeat: no-repeat;
 	display: flex;
 	flex-direction: column;
@@ -171,148 +173,3 @@
 	}
 }
 */
-
-/******************************************************************************/
-/* About Styling */
-
-.about {
-	max-width: 1100px;
-
-	&__underline {
-		width: 93px;
-	}
-
-	&--bio {
-
-		&--image {
-			float: left;
-			margin: 0 20px;
-			max-width: 380px;
-
-			@media screen and (max-width: 850px) {
-				display: block;
-				margin: 0 auto;
-				float: none;
-				width: 90%;
-			}
-		}
-
-		&--description {
-			padding: 0 30px;
-
-			@media screen and (max-width: 850px){
-				padding: 30px;
-			}
-
-			p {
-				padding: 5px;
-
-				a {
-					text-decoration: none;
-					color: rgb(54, 101, 175);
-				}
-			}
-		}
-	}
-
-	&--icons {
-		padding-top: 15px;
-		clear:left;
-		text-align: center;
-		display: flex;
-		flex-wrap: nowrap;
-		justify-content: center;
-
-		@media screen and (max-width: 700px){
-			flex-wrap: wrap;
-		}
-
-		&--icon {
-			width: 33vw;
-			padding: 15px;
-			@media screen and (max-width: 700px){
-				width: 80vw;
-			}
-
-			p {
-				padding-top: 15px;
-			}
-		}
-	}
-}
-
-/*****************************************************************************/
-/* Education Styling */
-
-$education-media-change: 900px;
-
-.education {
-	max-width: 1100px;
-
-	&__underline {
-		width: 150px;
-		margin-bottom: 15px;
-	}
-
-	&--info {
-		@media all and (max-width: $education-media-change) {
-			display: block;
-		}
-
-		&--brandeis {
-			padding: 15px;
-			float: right;
-
-			@media all and (max-width: $education-media-change) {
-				display: block;
-				margin: 0 auto;
-				float: none;
-			}
-		}
-
-		p {
-			padding: 10px;
-			line-height: 1.5em;
-			@media all and (max-width: $education-media-change) {
-				padding: 10px 30px;
-			}
-		}
-	}
-}
-
-/*****************************************************************************/
-/* Interests Styling */
-
-.interests {
-	max-width: 1100px;
-
-	&__underline {
-		width: 122px;
-	}
-
-	&--info {
-		padding-top: 30px;
-		display: flex;
-
-		@media all and (max-width: 1200px) {
-			margin: 0 auto;
-			padding-top: 0;
-			max-width: 600px;
-			flex-direction: column;
-		}
-
-		&--box {
-			padding: 15px;
-			opacity: .8;
-			display: flex;
-			justify-content: center;
-			flex-direction: column;
-			align-items: center;
-
-			p {
-				padding: 15px;
-				text-align: justify;
-			}
-		}
-	}
-}
