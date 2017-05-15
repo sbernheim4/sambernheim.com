@@ -16,44 +16,46 @@
 
 		<!-- Google Analytics tracking code -->
 		<meta name="google-site-verification" content="zHcVBbY7cgsbEuhwVpBJXUmxIoOJVjyx7OFqxmUequM" />
-
 	</head>
 
 	<body>
 
+		<!-- Above the fold CSS - CSS necessary to view the first visible part of the website -->
 		<style>
-			.navbar{position:fixed;width:100vw;z-index:1}@media all and (max-width:1000px){.navbar{display:none}}.navbar div{display:flex;height:70px;padding-left:60px;background:#323232;flex-direction:row;align-items:center}.navbar div p{padding:15px;color:#fff}.navbar div p:hover{cursor:pointer}.navbar div .main-nav{font-size:20pt}.mobile-navbar{width:100vw;background:#323232;color:#fff}@media all and (min-width:1000px){.mobile-navbar{display:none}}.mobile-navbar i{display:flex;justify-content:flex-end;padding:15px 30px 15px 15px;cursor:pointer}.mobile-navbar--text{visibility:hidden;height:0;opacity:0;display:flex;flex-direction:column;align-items:flex-end;transform:translateY(-30px);transition:height .3s ease,transform .3s ease,opacity .3s ease}.mobile-navbar--text__item{padding:5px;cursor:pointer}.mobile-navbar--text__item:hover{cursor:pointer;color:#bebebe}.mobile-navbar .display{visibility:visible;height:100px;padding:0 30px 30px 0;transform:translateY(0);opacity:1}.main{height:100vh;padding:0;background-image:url(NYC.jpg);background-size:100vw 100vh;background-repeat:no-repeat;display:flex;flex-direction:column;justify-content:center;align-items:center}.main--title{padding:30px;text-align:center;text-transform:uppercase;color:#000;font-size:50pt;text-shadow:0 0 25px #fff}@media all and (max-width:365px){.main--title{padding:0;font-size:40px}}
+			.circle,.separator{justify-content:center;display:flex}.circle,.main--icons,.separator{display:flex}.underline{margin:0 auto;border-bottom:4px solid #edc27b;text-align:center}.main--icons a .fa-file-text,.main--icons a .fa-github{padding:15px 30px;text-shadow:0 0 7px #000}.main--icons a .fa-file-text{font-size:3em;color:#2dc6aa}.main--icons a .fa-github{color:#3689c9;font-size:3.5em}.circle{width:60px;height:60px;border-radius:100%;background:#BADA55}.center-down-arrow{display:flex;justify-content:center;padding-top:13px}.navbar{position:fixed;width:100vw;z-index:1}@media all and (max-width:1000px){.navbar{display:none}}.navbar div{display:flex;height:70px;padding-left:60px;background:#323232;flex-direction:row;align-items:center}.navbar div p{padding:15px;color:#fff}.navbar div p:hover{cursor:pointer}.navbar div .main-nav{font-size:20pt}.mobile-navbar{width:100vw;background:#323232;color:#fff}@media all and (min-width:1000px){.mobile-navbar{display:none}}.mobile-navbar i{display:flex;justify-content:flex-end;padding:15px 30px 15px 15px;cursor:pointer}.mobile-navbar--text{visibility:hidden;height:0;opacity:0;display:flex;flex-direction:column;align-items:flex-end;transform:translateY(-30px);transition:height .3s ease,transform .3s ease,opacity .3s ease}.mobile-navbar--text__item{padding:5px;cursor:pointer}.mobile-navbar--text__item:hover{cursor:pointer;color:#bebebe}.mobile-navbar .display{visibility:visible;height:100px;padding:0 30px 30px 0;transform:translateY(0);opacity:1}.main{height:100vh;margin:0;background-image:url(NYC.jpg);background-size:cover;background-repeat:no-repeat;display:flex;flex-direction:column;justify-content:center;align-items:center}.main--title{margin:30px;text-align:center;text-transform:uppercase;color:#000;font-size:50pt;text-shadow:0 0 25px #fff}@media all and (max-width:365px){.main--title{padding:0;font-size:40px}}
 		</style>
 
 		<nav id="navbar" class="navbar" >
 			<div>
-				<p class="main-nav" name='main'>Samuel Bernheim</p>
-				<p class="about-nav" name='about'>About</p>
-				<p class="education-nav" name='education'>Education</p>
-				<p class="interests-nav" name='interests'>Interests</p>
+				<p class="main-nav" name="main">Samuel Bernheim</p>
+				<p class="about-nav" name="about">About</p>
+				<p class="education-nav" name="education">Education</p>
+				<p class="interests-nav" name="interests">Interests</p>
+				<p class="projects-nav" name="projects">Projects</p>
 			</div>
 		</nav>
 
 		<nav id="mobile-navbar" class="mobile-navbar" >
-			<div class='mobile-navbar--btn'>
+			<div class="mobile-navbar--btn">
 				<i class="fa fa-bars fa-2x" aria-hidden="true"></i>
 			</div>
-			<div class='mobile-navbar--text'>
-				<p class="mobile-navbar--text__item about-nav" name='about'>About</p>
-				<p class="mobile-navbar--text__item education-nav" name='education'>Education and Experience</p>
-				<p class="mobile-navbar--text__item interests-nav" name='interests'>Interests</p>
+			<div class="mobile-navbar--text">
+				<p class="mobile-navbar--text__item about-nav" name="about">About</p>
+				<p class="mobile-navbar--text__item education-nav" name="education">Education</p>
+				<p class="mobile-navbar--text__item interests-nav" name="interests">Interests</p>
+				<p class="mobile-navbar--text__item projects-nav" name="projects">Projects</p>
 			</div>
 		</nav>
 
 		<section id="main" class="main">
 			<h1 class="main--title">Samuel Bernheim</h1>
 
-			<div class='main--icons'>
-				<a href='/resume'>
+			<div class="main--icons">
+				<a href="/resume">
 					<i class="fa fa-file-text" aria-hidden="true"></i>
 				</a>
 
-				<a href='https://github.com/sbernheim4'>
+				<a href="https://github.com/sbernheim4">
 					<i class="fa fa-github" aria-hidden="true"></i>
 				</a>
 			</div>
@@ -141,6 +143,37 @@
 					<p>I helped to cofound the French Buisness and Lifestyle Club and served as its Treasurer for two years where I was responsible for overseeing our budget and handling all contracts and payments for our speakers and events.</p>
 				</div>
 			</div>
+		</section>
+
+		<section id="projects" class="projects" name="projects">
+			<h2 class="underline projects__underline">Projects</h2>
+
+			<div class="projects__container">
+				<div class="project">
+				<h2>This Website</h2>
+				<img src="personal-website.png" alt="Screen shot of this website's landing page">
+				<p>I built this website with HTML, NodeJS/ExpressJS, and SCSS using GulpJS as my task runner. The goal in mind was a quick, clean and simple website. I followed the BEM naming convention for my HTML and SCSS and used ExpressJS to enable compression and cacheing of static resources. All of this plus some additional optimizations got me a score of 100 on Google's Page Speed Test.</p>
+			</div>
+
+			<div class="project">
+				<h2><a href="https://www.kineticglobal.org">Kinetic Global</a></h2>
+				<img src="kinetic.png" alt="Screen shot of Kinetic Global's landing page">
+				<p>I, along with another developer, built the website for Kinetic Global. We used the MEAN stack (Angular 1) to develop it. It's hosted on Heroku and uses Amazon's S3 bucket for resource management. The website uses Sendgrid's API, and StripeJS to collect online donations. An online forum also integrates into Kinetic's Slack channels. In addition to building the website I also manage its SEO and got the website to be at the top when searching for Kinetic Global, Kinetic Think Tank and other similar terms.</p>
+			</div>
+
+			<div class="project">
+				<h2><a href="https://github.com/sbernheim4/angular-stack">Angular App</a></h2>
+				<img src="angular-app.png" alt="Screen shot of blank website template">
+				<p>After building the Kinetic Global website, I wanted to build a base stack to review what I had just learned and built and to easily create new websites, essentially my own yeoman generator. That led me to building this app, a MEAN stack application but without the Mongo. I spent a lot of time determining the project's structure, essential npm modules needed and how the build process should work. It uses GulpJS for minification SCSS compilation, JS ES6 transpiling, livereloading and more. </p>
+			</div>
+
+			<div class="project">
+				<h2><a href="https://edelmanforbrandeis.herokuapp.com">Edelman for Brandeis</a></h2>
+				<img src="edelman-for-brandeis.png" alt="Screen shot of Edelman For Brandeis' landing page.">
+				<p>Shortly after building the Angular App a friend of mine told me he was running for Student Union President. When he asked if I could build his website I knew that this would be an ideal time to test the Angular App I had built. After about 3 hours, I had copied, formatted and designed the entire website, reviewed and revised it with him and had pushed it live onto a free heroku domain. Later that week he won the election.</p>
+			</div>
+			</div>
+
 		</section>
 
 		<!-- My CSS -->

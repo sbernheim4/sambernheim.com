@@ -1,0 +1,34 @@
+/* Education Section Styling */
+
+$education-media-change: 900px;
+
+.education {
+	max-width: 1100px;
+
+	&__underline {
+		width: 150px;
+		margin-bottom: 15px;
+	}
+
+	&--info {
+		@media all and (max-width: $education-media-change) {
+			display: block;
+		}
+
+		&--brandeis {
+			padding: 15px;
+			float: right;
+
+			@media all and (max-width: $education-media-change) {
+				display: block;
+				margin: 0 auto;
+				float: none;
+			}
+		}
+
+		p {
+			padding: 10px;
+			line-height: 1.5em;
+		}
+	}
+}
