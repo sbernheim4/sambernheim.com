@@ -1,54 +1,58 @@
 /* Projects Section Styling */
 
 .projects {
-	margin: 30px;
-	@media all and (max-width: 1000px) {
-		margin: 0;
-		overflow-x: scroll;
-		overflox-y: hidden;
-		display: flex;
-	}
 
 	&__underline {
 		width: 109px;
 	}
 
-	.project {
-		margin: 0 auto;
-		padding: 20px;
+	.projects__container {
+		margin: 30px;
 		@media all and (max-width: 1000px) {
-			width: 300px;
+			margin: 0;
+			overflow-x: scroll;
+			overflox-y: hidden;
 			display: flex;
-			flex-direction: column;
-			align-items: center;
-			flex-shrink: 0;
 		}
 
-		h2 {
-			padding-bottom: 15px;
+		.project {
+			margin: 0 auto;
+			padding: 20px;
 			@media all and (max-width: 1000px) {
-				text-align: center;
+				width: calc(50% - 50px);
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				flex-shrink: 0;
 			}
 
-		}
+			h2 {
+				padding-bottom: 15px;
+				@media all and (max-width: 1000px) {
+					text-align: center;
+				}
 
-		img {
-			width: 300px;
-			float: left;
-			border: 1px solid gray;
-			@media all and (max-width: 1000px) {
-				width: 80%;
+			}
+
+			img {
+				width: 300px;
+				float: left;
+				border: 1px solid gray;
+				@media all and (max-width: 1000px) {
+					width: 80%;
+				}
+			}
+
+			p {
+				line-height: 1.5em;
+				padding-left: 30px;
+				@media all and (max-width: 1000px) {
+					margin-top: 15px;
+					padding-left: 0;
+					font-size: .9em;
+				}
 			}
 		}
 
-		p {
-			line-height: 1.5em;
-			padding-left: 30px;
-			@media all and (max-width: 1000px) {
-				margin-top: 15px;
-				padding-left: 0;
-				font-size: .9em;
-			}
-		}
 	}
 }
