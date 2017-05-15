@@ -60,7 +60,7 @@
 /* Navbar Styling */
 
 /* Desktop Navbar */
-/*
+
 .navbar {
 	position: fixed;
 	width: 100vw;
@@ -92,10 +92,10 @@
 		}
 	}
 }
-*/
+
 
 /* Molbile Navbar */
-/*
+
 .mobile-navbar {
 	width: 100vw;
 	background: rgb(50, 50, 50);
@@ -142,14 +142,13 @@
 		opacity: 1;
 	}
 }
-*/
 
 /******************************************************************************/
 /* Main Styling */
-/*
+
 .main {
 	height: 100vh;
-	padding: 0;
+	margin: 0;
 	background-image: url("NYC.jpg");
 	background-size: cover;
 	background-repeat: no-repeat;
@@ -159,9 +158,8 @@
 	align-items: center;
 
 	&--title {
-		padding: 30px;
+		margin: 30px;
 		text-align: center;
-		font-size: 50px;
 		text-transform: uppercase;
 		color: black;
 		font-size: 50pt;
@@ -172,4 +170,3 @@
 		}
 	}
 }
-*/
