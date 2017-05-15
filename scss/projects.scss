@@ -15,11 +15,9 @@
 
 	.project {
 		margin: 0 auto;
-		// width: 1000px;
 		padding: 20px;
-
 		@media all and (max-width: 1000px) {
-			width: 500px;
+			width: 300px;
 			display: flex;
 			flex-direction: column;
 			align-items: center;

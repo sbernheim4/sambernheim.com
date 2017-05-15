@@ -29,9 +29,6 @@ $education-media-change: 900px;
 		p {
 			padding: 10px;
 			line-height: 1.5em;
-			@media all and (max-width: $education-media-change) {
-				padding: 10px 30px;
-			}
 		}
 	}
 }
