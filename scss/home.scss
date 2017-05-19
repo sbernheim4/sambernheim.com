@@ -66,7 +66,7 @@
 // 	width: 100vw;
 // 	z-index: 1;
 
-// 	@media all and (max-width: 1000px) {
+// 	@media all and (max-width: 770px) {
 // 		display: none;
 // 	}
 
@@ -74,7 +74,7 @@
 // 		display: flex;
 // 		height: 70px;
 // 		padding-left: 60px;
-// 		background: #323232;
+// 		background: #3d585f;
 // 		flex-direction: row;
 // 		align-items: center;
 
@@ -97,13 +97,16 @@
 // /* Molbile Navbar */
 
 // .mobile-navbar {
-// 	width: 100vw;
-// 	background: rgb(50, 50, 50);
-// 	color: white;
 
-// 	@media all and (min-width: 1000px) {
+// 	@media all and (min-width: 770px) {
 // 		display: none;
 // 	}
+
+
+// 	width: 100vw;
+// 	background: #3d585f;
+// 	color: white;
+
 
 // 	i {
 // 		display: flex;
@@ -145,7 +148,7 @@
 
 // /******************************************************************************/
 // /* Main Styling */
-// /*
+
 // .main {
 // 	height: 100vh;
 // 	margin: 0;
@@ -170,4 +173,4 @@
 // 		}
 // 	}
 // }
-// */
+
