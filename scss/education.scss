@@ -20,14 +20,17 @@ $education-media-change: 900px;
 			float: right;
 
 			@media all and (max-width: $education-media-change) {
+				padding: 15px 0;
 				display: block;
 				margin: 0 auto;
+				max-width: 300px;
+				width: 80%;
 				float: none;
 			}
 		}
 
 		p {
-			padding: 10px;
+			padding-bottom: 10px;
 			line-height: 1.5em;
 		}
 	}

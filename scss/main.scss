@@ -13,12 +13,8 @@ img {
 
 // Universal css
 section {
-	margin: 30px auto;
-	padding: 0 30px;
+	margin: 30px;
 	min-height: 311px;
-	@media all and (max-width: 767px) {
-		margin: 30px;
-	}
 }
 
 a {
