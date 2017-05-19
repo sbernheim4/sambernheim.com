@@ -23,10 +23,9 @@
 		}
 
 		&--description {
-			padding: 0 30px;
 
 			@media screen and (max-width: 850px){
-				padding: 30px;
+				margin-top: 30px;
 			}
 
 			p {

@@ -44,8 +44,9 @@
 			}
 
 			p {
-				line-height: 1.5em;
 				padding-left: 30px;
+				text-align: justify;
+				line-height: 1.5em;
 				@media all and (max-width: 1000px) {
 					margin-top: 15px;
 					padding-left: 0;
