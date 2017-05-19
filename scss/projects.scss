@@ -1,7 +1,8 @@
 /* Projects Section Styling */
 
 .projects {
-	margin: 20px;
+	padding: 20px;
+	max-width: 1200px;
 	&__underline {
 		width: 109px;
 	}
@@ -16,15 +17,16 @@
 
 		.project {
 			margin: 0 auto;
-			padding: 0 20px;
+			padding: 0 20px 20px 20px;
 			flex-direction: row;
 
 			@media all and (max-width: 1000px) {
+				padding: 0 20px;
+				width: calc(50% - 40px);
 				display: flex;
 				flex-direction: column;
 				align-items: center;
 				flex-shrink: 0;
-				width: calc(50% - 40px);
 			}
 			@media all and (max-width: 500px) {
 				width: calc(87% - 40px);
