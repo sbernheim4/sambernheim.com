@@ -35,5 +35,7 @@
     "nodemon": "^1.11.0",
     "path": "^0.12.7"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "browser-sync": "^2.18.13"
+  }
 }

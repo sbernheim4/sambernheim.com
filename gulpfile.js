@@ -5,13 +5,14 @@ const concat = require('gulp-concat');
 const sass = require('gulp-sass');
 const jshint = require('gulp-jshint');
 const htmlmin = require('gulp-htmlmin');
-const livereload = require('gulp-livereload');
+const browserSync = require('browser-sync');
+const reload = browserSync.reload;
 
 gulp.task('buildHTML', function() {
 	return gulp.src('html/*.html')
 		.pipe(htmlmin({collapseWhitespace: true}))
 		.pipe(gulp.dest('minihtml'))
-		.pipe(livereload());
+		.pipe(browserSync.stream());
 });
 
 
@@ -21,7 +22,7 @@ gulp.task('buildCSS', function() {
 		.pipe(cleanCSS())
 		.pipe(concat('index.css'))
 		.pipe(gulp.dest('server/public'))
-		.pipe(livereload());
+		.pipe(browserSync.stream());
 });
 
 gulp.task('buildJS', function() {
@@ -31,17 +32,26 @@ gulp.task('buildJS', function() {
 		.pipe(babel())
 		.pipe(concat('index.js'))
 		.pipe(gulp.dest('server/public'))
-		.pipe(livereload());
+		.pipe(browserSync.stream());
 })
 
+gulp.task('browser-sync', () => {
+	browserSync.init({
+		proxy: 'localhost:1337',
+		port: 5000
+	});
+});
 
 // watch all css files for changes
 gulp.task('watch', function() {
-	livereload.listen();
 	gulp.watch('scss/*.scss', ['buildCSS']);
 	gulp.watch('js/*.js', ['buildJS']);
 	gulp.watch('html/*.html', ['buildHTML']);
 });
+
+// The default task (called when you run `gulp` from cli)
+// first run buildCSS, then buildJS, and then start watching
+gulp.task('default', ['browser-sync', 'buildCSS', 'buildJS', 'buildHTML','watch']);
 
 gulp.task('buildProduction', ['buildHTMLProd', 'buildJSProd', 'buildCSSProd']);
 
@@ -66,6 +76,3 @@ gulp.task('buildJSProd', function() {
 		.pipe(gulp.dest('server/public'))
 })
 
-// The default task (called when you run `gulp` from cli)
-// first run buildCSS, then buildJS, and then start watching
-gulp.task('default', ['buildCSS', 'buildJS', 'buildHTML','watch']);
