@@ -1,12 +1,16 @@
 'use strict';
 
-var express = require('express');
-var app = express();
-var path = require('path');
-var compression = require('compression');
+require('dotenv').config()
 
-var port = process.env.PORT || 1337;
-var cacheTime = 31536000000; // One year
+const express = require('express');
+const app = express();
+const path = require('path');
+const compression = require('compression');
+
+const port = process.env.PORT || 1337;
+const cacheTime = 31536000000; // One year
+
+const MongoClient = require('mongodb').MongoClient
 
 app.use(compression());
 
@@ -22,6 +26,10 @@ app.get('/resume', function(req, res) {
 	res.sendFile(path.join(__dirname, '../minihtml/resume.html'));
 });
 
+app.get('/blog', (req, res) => {
+	res.sendFile(path.join(__dirname, '../minihtml/blog.html'));
+});
+
 app.get('/robots.txt', function(req, res) {
 	res.sendFile(path.join(__dirname, 'robots.txt'));
 });
@@ -32,9 +40,22 @@ app.get('/sitemap.xml', function(req, res) {
 
 app.get('/manifest.json', function(req, res) {
 	res.sendFile(path.join(__dirname, '../manifest.json'));
-})
-
-// listen on port
-app.listen(port, function() {
-	console.log('Listening to port', port);
 });
+
+let db;
+const url = process.env.DB_URI;
+
+MongoClient.connect(url, (err, database) => {
+	if (err) {
+		console.log(err);
+	} else {
+		db = database;
+
+		// listen on port
+		app.listen(port, function() {
+			console.log('Listening to port', port);
+		});
+	}
+
+});
+
