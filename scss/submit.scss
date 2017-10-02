@@ -1,0 +1,24 @@
+.submit {
+		display: flex;
+		align-items: center;
+		flex-direction: column;
+
+	h1 {
+
+	}
+
+	textarea {
+		margin: 20px auto;
+		width: 80vw;
+		height: 30vh;
+		resize: none;
+	}
+
+	input {
+		width: 100px;
+		padding: 10px;
+		background-color: #BADA55;
+		border: 1px solid gray;;
+		border-radius: 5px;
+	}
+}

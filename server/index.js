@@ -6,6 +6,10 @@ const express = require('express');
 const app = express();
 const path = require('path');
 const compression = require('compression');
+const bodyParser = require('body-parser');
+
+app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.json());
 
 const port = process.env.PORT || 1337;
 const cacheTime = 31536000000; // One year
@@ -17,6 +21,7 @@ app.use(compression());
 // serve static files
 app.use(express.static(path.join(__dirname, 'public'), {maxAge: cacheTime})); //css and js
 app.use(express.static(path.join(__dirname, '../images'), {maxAge: cacheTime})); //images
+app.use(express.static(path.join(__dirname, '../js'), {maxAge: cacheTime}));
 
 app.get('/', function(req, res) {
 	res.sendFile(path.join(__dirname, '../minihtml/home.html'));
@@ -26,9 +31,8 @@ app.get('/resume', function(req, res) {
 	res.sendFile(path.join(__dirname, '../minihtml/resume.html'));
 });
 
-app.get('/blog', (req, res) => {
-	res.sendFile(path.join(__dirname, '../minihtml/blog.html'));
-});
+const submitArticle = require('./submitArticle');
+app.use('/submit-article', submitArticle);
 
 app.get('/robots.txt', function(req, res) {
 	res.sendFile(path.join(__dirname, 'robots.txt'));
