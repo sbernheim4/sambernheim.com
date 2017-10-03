@@ -34,6 +34,10 @@ app.get('/resume', function(req, res) {
 const submitArticle = require('./submitArticle');
 app.use('/submit-article', submitArticle);
 
+const blog = require('./blog');
+app.use('/blog', blog);
+
+
 app.get('/robots.txt', function(req, res) {
 	res.sendFile(path.join(__dirname, 'robots.txt'));
 });
