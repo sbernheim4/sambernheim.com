@@ -1,20 +1,33 @@
 .submit {
-		display: flex;
-		align-items: center;
-		flex-direction: column;
+	display: flex;
+	align-items: center;
+	flex-direction: column;
 
 	h1 {
 
 	}
 
-	textarea {
-		margin: 20px auto;
-		width: 80vw;
-		height: 30vh;
-		resize: none;
+	.submit-blog {
+		margin: 30px;
+		display: flex;
+		align-items: center;
+		flex-direction:column;
+
+ 		input {
+			margin: 15px;
+			width: 80vw;
+			height: 30px;
+			box-sizing: border-box;
+		}
+
+		textarea {
+			width: 80vw;
+			height: 30vh;
+			resize: none;
+		}
 	}
 
-	input {
+	button {
 		width: 100px;
 		padding: 10px;
 		background-color: #BADA55;

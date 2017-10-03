@@ -1,6 +1,9 @@
+require('dotenv').config()
+
 const express = require('express');
 const router = express.Router();
 const path = require('path');
+const MongoClient = require('mongodb').MongoClient
 
 var bodyParser = require('body-parser');
 
@@ -9,8 +12,21 @@ router.get('/', (req, res) => {
 });
 
 router.post('/', (req, res) => {
-	console.log("POST request sent");
-	console.log(req.body);
+
+	const text = req.body;
+
+	let db;
+	const url = process.env.DB_URI;
+
+	MongoClient.connect(url, (err, database) => {
+		if (err) {
+			console.log(err);
+		} else {
+			db = database;
+			const collection = db.collection('blog');
+			collection.insert({ article: req.body});
+		}
+	});
 })
 
 module.exports = router;

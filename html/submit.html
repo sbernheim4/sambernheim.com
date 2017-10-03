@@ -3,6 +3,7 @@
 	<head>
 		<title>Submit a new Article for your blog</title>
 		<link rel="stylesheet" href="index.css">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 	</head>
 
 	<body>
@@ -10,11 +11,13 @@
 
 			<h1>Submit Article in the text box below</h1>
 
-			<textarea>
-			</textarea>
+			<div class='submit-blog'>
+				<input type='name' placeholder='Article Name' id='article-title'></input>
+				<textarea placeholder='Article Content Here' id='article-text'></textarea>
+			</div>
 
 			<br>
-			<input type='submit' id='submit-article-btn'></input>
+			<button type='submit' id='submit-article-btn'>Submit</button>
 		</section>
 		<script src='submit.js'></script>
 	</body>

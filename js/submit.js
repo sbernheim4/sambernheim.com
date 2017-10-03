@@ -1,11 +1,20 @@
 var btn = document.querySelector('#submit-article-btn');
 
 function btnClick(e) {
-	console.log("MAKING POST REQUEST TO SEREVR");
-	var xhr = new XMLHttpRequest();
-	xhr.open('POST', 'http://sambernheim.tech/submit-article', false);
-	xhr.send('This is a test of making a post request');
-	console.log("POST REQUEST MADE TO SERVER");
+	const articleTitle = document.querySelector('#article-title').value;
+	const articleText = document.querySelector('#article-text').value;
+
+	const obj = {
+		title: articleTitle,
+		text: articleText
+	}
+
+	//TODO: Change url to production URL when it goes live
+	$.ajax({
+		type: "POST",
+		url: "http://localhost:5000/submit-article",
+		data: obj
+	});
 };
 
 btn.addEventListener('click', btnClick);
