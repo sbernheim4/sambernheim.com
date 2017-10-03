@@ -21,10 +21,12 @@ router.post('/', (req, res) => {
 	MongoClient.connect(url, (err, database) => {
 		if (err) {
 			console.log(err);
-		} else {
+		} else if (process.env.NODE_ENV === 'production'){
 			db = database;
 			const collection = db.collection('blog');
 			collection.insert({ article: req.body});
+		} else if (process.env.NODE_ENV === 'development') {
+			console.log(`Not in Production\nData that would be added is:\n${JSON.stringify(req.body)}`);
 		}
 	});
 })
