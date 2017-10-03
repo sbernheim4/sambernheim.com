@@ -39,6 +39,8 @@
     "path": "^0.12.7"
   },
   "devDependencies": {
-    "browser-sync": "^2.18.13"
+    "browser-sync": "^2.18.13",
+    "gulp-stylelint": "^5.0.0",
+    "stylelint-order": "^0.7.0"
   }
 }

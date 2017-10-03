@@ -6,8 +6,8 @@ $education-media-change: 900px;
 	max-width: 1100px;
 
 	&__underline {
-		width: 150px;
 		margin-bottom: 15px;
+		width: 150px;
 	}
 
 	&--info {
@@ -20,11 +20,11 @@ $education-media-change: 900px;
 			float: right;
 
 			@media all and (max-width: $education-media-change) {
-				padding: 15px 0;
-				display: block;
 				margin: 0 auto;
 				max-width: 300px;
 				width: 80%;
+				padding: 15px 0;
+				display: block;
 				float: none;
 			}
 		}

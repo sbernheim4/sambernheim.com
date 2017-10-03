@@ -13,8 +13,8 @@
 
 		@media all and (max-width: 1200px) {
 			margin: 0 auto;
-			padding-top: 0;
 			max-width: 600px;
+			padding-top: 0;
 			flex-direction: column;
 		}
 
@@ -22,8 +22,8 @@
 			padding: 15px;
 			opacity: .8;
 			display: flex;
-			justify-content: center;
 			flex-direction: column;
+			justify-content: center;
 			align-items: center;
 
 			p {

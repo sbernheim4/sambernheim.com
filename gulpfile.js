@@ -7,6 +7,7 @@ const jshint = require('gulp-jshint');
 const htmlmin = require('gulp-htmlmin');
 const browserSync = require('browser-sync');
 const reload = browserSync.reload;
+const gulpStylelint = require('gulp-stylelint');
 
 gulp.task('buildHTML', function() {
 	return gulp.src('html/*.html')
@@ -27,13 +28,33 @@ gulp.task('buildCSS', function() {
 
 gulp.task('buildJS', function() {
 	return gulp.src('js/*.js')
-		.pipe(jshint())
-		.pipe(jshint.reporter('default'))
 		.pipe(babel())
 		.pipe(concat('index.js'))
 		.pipe(gulp.dest('server/public'))
 		.pipe(browserSync.stream());
 })
+
+gulp.task('lintJS', () => {
+	return gulp.src('js/*.js')
+		.pipe(jshint())
+		.pipe(jshint.reporter('default'));
+});
+
+gulp.task('lintCSS', () => {
+	return gulp.src('./scss/*.scss')
+        .pipe(gulpStylelint({
+			reporters: [
+				{formatter: 'string', console: true}
+			]
+		}));
+});
+
+gulp.task('lint', () => {
+	gulp.start('lintJS')
+	gulp.start('lintCSS')
+});
+
+
 
 gulp.task('browser-sync', () => {
 	browserSync.init({
@@ -44,14 +65,14 @@ gulp.task('browser-sync', () => {
 
 // watch all css files for changes
 gulp.task('watch', function() {
-	gulp.watch('scss/*.scss', ['buildCSS']);
-	gulp.watch('js/*.js', ['buildJS']);
+	gulp.watch('scss/*.scss', ['buildCSS', 'lintCSS']);
+	gulp.watch('js/*.js', ['buildJS', 'lintJS']);
 	gulp.watch('html/*.html', ['buildHTML']);
 });
 
 // The default task (called when you run `gulp` from cli)
 // first run buildCSS, then buildJS, and then start watching
-gulp.task('default', ['browser-sync', 'buildCSS', 'buildJS', 'buildHTML','watch']);
+gulp.task('default', ['browser-sync', 'buildCSS', 'buildJS', 'buildHTML','watch', 'lint']);
 
 gulp.task('buildProduction', ['buildHTMLProd', 'buildJSProd', 'buildCSSProd']);
 
