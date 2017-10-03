@@ -81,13 +81,14 @@ function btnClick(e) {
 	const obj = {
 		title: articleTitle,
 		text: articleText
+	};
 
-		//TODO: Change url to production URL when it goes live
-	};$.ajax({
+	//TODO: Change url to production URL when it goes live
+	$.ajax({
 		type: "POST",
 		url: "http://localhost:5000/submit-article",
 		data: obj
 	});
-};
+}
 
 btn.addEventListener('click', btnClick);
