@@ -10,11 +10,15 @@ function btnClick(e) {
 	};
 
 	//TODO: Change url to production URL when it goes live
-	$.ajax({
-		type: "POST",
-		url: "http://localhost:5000/submit-article",
-		data: obj
-	});
+	var url = 'http://localhost:5000/submit-article';
+
+	var xhr = new XMLHttpRequest();
+	xhr.open("POST", url, true);
+	xhr.setRequestHeader('Content-Type', 'application/json');
+	xhr.send(JSON.stringify(obj));
+
+	// Hide the button after the post request is submitted
+	btn.style.display = 'none';
 }
 
 btn.addEventListener('click', btnClick);
