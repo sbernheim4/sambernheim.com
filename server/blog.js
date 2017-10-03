@@ -26,30 +26,27 @@ MongoClient.connect(url, (err, database) => {
 
 
 function generateHTML(records) {
+	// Beginning of HTML response that will be sent
 	let html = `
 		<!DOCTYPE html>
 		<html>
 			<head>
 				<title>Welcome to my Blog</title>
+				<link rel="stylesheet" href="index.css">
 			</head>
 
 			<body>
-	`;
-
-	records.forEach( record => {
-		html += `
-				<div class='article'>
-					<h2 class='article__title' >${record.title}</h2>
-					<p class='article__text'>${record.text}</p>
+				<div class='articles'>
+					${records.map( r =>
+					`<div class='article'>
+						<h2 class='article__title'>${r.title}</h2>
+						<p class='article__text'>${r.text}</p>
+					</div>`).join(``)}
 				</div>
-				`
-	})
-
-
-	html += `
 			</body>
 		</html>
-	`
+		`;
+
 	return html;
 }
 
