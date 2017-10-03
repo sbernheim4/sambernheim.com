@@ -15,7 +15,7 @@ function btnClick(e) {
 	var xhr = new XMLHttpRequest();
 	xhr.open("POST", url, true);
 	xhr.setRequestHeader('Content-Type', 'application/json');
-	xhr.send(JSON.stringify(obj));
+	xhr.send(obj);
 
 	// Hide the button after the post request is submitted
 	btn.style.display = 'none';
