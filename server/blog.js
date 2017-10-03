@@ -35,7 +35,10 @@ function generateHTML(records) {
 				<link rel="stylesheet" href="index.css">
 			</head>
 
-			<body>
+			<body class='blog'>
+				<div class='blog__landing-page'>
+					<h1>Welcome to my Blog</h1>
+				</div>
 				<div class='articles'>
 					${records.map( r =>
 					`<div class='article'>
