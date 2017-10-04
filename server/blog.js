@@ -43,6 +43,7 @@ function generateHTML(records) {
 					${records.map( r =>
 					`<div class='article'>
 						<h2 class='article__title'>${r.title}</h2>
+						${r.image !== undefined ? `<img src=${r.image}` : ``}
 						<p class='article__text'>${r.text}</p>
 					</div>`).join(``)}
 				</div>

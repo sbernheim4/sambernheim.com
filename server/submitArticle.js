@@ -21,16 +21,16 @@ router.post('/', (req, res) => {
 	MongoClient.connect(url, (err, database) => {
 		if (err) {
 			console.log(err);
-		} else if (process.env.NODE_ENV === 'production') {
+		} else if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'development') {
 			db = database;
 			const collection = db.collection('blog');
 			collection.insertOne(req.body, (err, res) => {
 				if (err) throw err;
 				console.log(`Article added to DB`);
 			});
-		} else if (process.env.NODE_ENV === 'development') {
+		} /*else if (process.env.NODE_ENV === 'development') {
 			console.log(`Not in Production\nData that would be added is:\n${JSON.stringify(req.body)}`);
-		}
+		}*/
 	});
 })
 
