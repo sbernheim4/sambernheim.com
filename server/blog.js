@@ -14,9 +14,9 @@ MongoClient.connect(url, (err, database) => {
 		console.log(err);
 	} else {
 		db = database;
-		db.collection('blog').find({}).toArray(function (err, result) {
-			if (err) throw err;
-			router.get('/', (req, res) => {
+		if (err) throw err;
+		router.get('/', (req, res) => {
+			db.collection('blog').find({}).toArray(function (err, result) {
 				const html = generateHTML(result)
 				res.send(html);
 			});
