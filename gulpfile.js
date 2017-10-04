@@ -9,7 +9,7 @@ const browserSync = require('browser-sync');
 const reload = browserSync.reload;
 const gulpStylelint = require('gulp-stylelint');
 
-gulp.task('buildHTML', function() {
+gulp.task('buildHTML', () => {
 	return gulp.src('html/*.html')
 		.pipe(htmlmin({collapseWhitespace: true}))
 		.pipe(gulp.dest('minihtml'))
@@ -17,7 +17,7 @@ gulp.task('buildHTML', function() {
 });
 
 
-gulp.task('buildCSS', function() {
+gulp.task('buildCSS', () => {
 	return gulp.src('scss/main.scss')
 		.pipe(sass())
 		.pipe(cleanCSS())
@@ -26,7 +26,7 @@ gulp.task('buildCSS', function() {
 		.pipe(browserSync.stream());
 });
 
-gulp.task('buildJS', function() {
+gulp.task('buildJS', () => {
 	return gulp.src('js/*.js')
 		.pipe(babel())
 		.pipe(concat('index.js'))
@@ -54,17 +54,16 @@ gulp.task('lint', () => {
 	gulp.start('lintCSS')
 });
 
-
-
 gulp.task('browser-sync', () => {
 	browserSync.init({
 		proxy: 'localhost:1337',
-		port: 5000
+		port: 5000,
+		online: true
 	});
 });
 
 // watch all css files for changes
-gulp.task('watch', function() {
+gulp.task('watch', () => {
 	gulp.watch('scss/*.scss', ['buildCSS', 'lintCSS']);
 	gulp.watch('js/*.js', ['buildJS', 'lintJS']);
 	gulp.watch('html/*.html', ['buildHTML']);
@@ -76,13 +75,13 @@ gulp.task('default', ['browser-sync', 'buildCSS', 'buildJS', 'buildHTML','watch'
 
 gulp.task('buildProduction', ['buildHTMLProd', 'buildJSProd', 'buildCSSProd']);
 
-gulp.task('buildHTMLProd', function() {
+gulp.task('buildHTMLProd', () => {
 	return gulp.src('html/*.html')
 		.pipe(htmlmin({collapseWhitespace: true}))
 		.pipe(gulp.dest('minihtml'))
 });
 
-gulp.task('buildCSSProd', function() {
+gulp.task('buildCSSProd', () => {
 	return gulp.src('scss/main.scss')
 		.pipe(sass())
 		.pipe(cleanCSS())
@@ -90,7 +89,7 @@ gulp.task('buildCSSProd', function() {
 		.pipe(gulp.dest('server/public'))
 });
 
-gulp.task('buildJSProd', function() {
+gulp.task('buildJSProd', () => {
 	return gulp.src('js/*.js')
 		.pipe(babel())
 		.pipe(concat('index.js'))
