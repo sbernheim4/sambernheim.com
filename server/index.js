@@ -7,6 +7,7 @@ const app = express();
 const path = require('path');
 const compression = require('compression');
 const bodyParser = require('body-parser');
+const chalk = require('chalk');
 
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
@@ -22,6 +23,11 @@ app.use(compression());
 app.use(express.static(path.join(__dirname, 'public'), {maxAge: cacheTime})); //css and js
 app.use(express.static(path.join(__dirname, '../images'), {maxAge: cacheTime})); //images
 app.use(express.static(path.join(__dirname, '../js'), {maxAge: cacheTime}));
+
+app.all('*', (req, res, next) => {
+	console.log(chalk.blue(`New ${req.method} request for ${req.path}`));
+	next();
+});
 
 app.get('/', function(req, res) {
 	res.sendFile(path.join(__dirname, '../minihtml/home.html'));
