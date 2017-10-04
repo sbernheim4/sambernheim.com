@@ -18,6 +18,7 @@ router.post('/', (req, res) => {
 	let db;
 	const url = process.env.DB_URI;
 
+	//TODO: uncomment lines below so that publishing is only possible from production mode
 	MongoClient.connect(url, (err, database) => {
 		if (err) {
 			console.log(err);
