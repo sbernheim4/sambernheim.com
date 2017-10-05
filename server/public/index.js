@@ -93,8 +93,14 @@ function btnClick(e) {
 	var xhr = new XMLHttpRequest();
 	xhr.open("POST", url, true);
 	xhr.setRequestHeader('Content-Type', 'application/json');
-	xhr.send(JSON.stringify(obj));
 
-	// Hide the button after the post request is submitted
-	btn.style.display = 'none';
+	// Ensure the article has at least a title and  text
+	if (obj.text === "" || obj.title === "") {
+		alert('Missing Article Title and/or Text');
+	} else {
+		xhr.send(JSON.stringify(obj));
+
+		// Hide the button after the post request is submitted
+		btn.style.display = 'none';
+	}
 }
