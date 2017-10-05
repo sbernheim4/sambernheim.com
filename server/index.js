@@ -14,7 +14,7 @@ app.use(compression());
 const port = process.env.PORT || 1337;
 const cacheTime = 31536000000; // One year
 
-// serve static files
+/******************* SERVE STATIC FILES  *****************************/
 app.use(express.static(path.join(__dirname, 'public'), {maxAge: cacheTime})); //css and js
 app.use(express.static(path.join(__dirname, '../images'), {maxAge: cacheTime})); //images
 app.use(express.static(path.join(__dirname, '../js'), {maxAge: cacheTime})); // used for /submit-article
@@ -24,32 +24,39 @@ app.all('*', (req, res, next) => {
 	next();
 });
 
-app.get('/', (req, res) => {
-	res.sendFile(path.join(__dirname, '../minihtml/home.html'));
-});
+/******************* SPECIAL PATHS FOR WEBSITE *****************************/
 
-app.get('/resume', (req, res) => {
-	res.sendFile(path.join(__dirname, '../minihtml/resume.html'));
-});
-
-const submitArticle = require('./submitArticle');
-app.use('/submit-article', submitArticle);
-
-const blog = require('./blog');
-app.use('/blog', blog);
+// Hand off routing for /submit-article and /blog to separate sub components
+app.use('/submit-article', require(`./submitArticle`));
+app.use('/blog', require('./blog'));
 
 
+// SEO and other simple files
 app.get('/robots.txt', (req, res) => {
-	res.sendFile(path.join(__dirname, 'robots.txt'));
+	res.sendFile(path.join(__dirname, './public/robots.txt'));
 });
 
 app.get('/sitemap.xml', (req, res) => {
-	res.sendFile(path.join(__dirname, 'sitemap.xml'));
+	res.sendFile(path.join(__dirname, './public/sitemap.xml'));
 });
 
 app.get('/manifest.json', (req, res) => {
-	res.sendFile(path.join(__dirname, '../manifest.json'));
+	res.sendFile(path.join(__dirname, './public/manifest.json'));
 });
+
+/******************* Smart-Routing FOR ALL OTHER PATHS *********************/
+app.get(`/*`, (req, res) => {
+	res.sendFile(fileFinder(req.path));
+});
+
+function fileFinder (urlPath) {
+	if (urlPath === '/'){
+		return path.join(__dirname, `../minihtml/home.html`);
+	} else {
+		urlPath = urlPath.substring(1, urlPath.length);
+		return path.join(__dirname,`../minihtml/${urlPath}.html`);
+	}
+};
 
 app.listen(port, () => {
 	console.log(chalk.yellow('Listening to port:', port));
