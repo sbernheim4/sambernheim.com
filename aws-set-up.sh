@@ -12,7 +12,7 @@ nvm use node
 sudo yum install -y git
 git clone https://github.com/sbernheim4/Personal-Website.git
 cd Personal-Website
-npm install
+yarn install
 
 # Set up port forwarding. Redirect all incoming port 80 requests to port 8080
 sudo iptables --insert INPUT --protocol tcp --dport 80 --jump ACCEPT
@@ -20,9 +20,6 @@ sudo iptables --insert INPUT --protocol tcp --dport 8080 --jump ACCEPT
 sudo iptables --table nat --append PREROUTING --in-interface eth0 --protocol tcp --dport 80 --jump REDIRECT --to-port 8080
 # run next line to have changes survive reboot
 sudo service iptables save
-
-# Set environment variable PORT to be 8080
-export PORT=8080
 
 # Start the application
 npm start
