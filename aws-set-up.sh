@@ -12,6 +12,9 @@ nvm use node
 sudo yum install -y git
 git clone https://github.com/sbernheim4/Personal-Website.git
 cd Personal-Website
+
+# Install yarn
+curl -o- -L https://yarnpkg.com/install.sh | bash
 yarn install
 
 # Set up port forwarding. Redirect all incoming port 80 requests to port 8080
