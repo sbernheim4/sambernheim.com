@@ -82,7 +82,7 @@ function btnClick(e) {
 
 	const obj = {
 		title: articleTitle,
-		text: articleText,
+		text: JSON.stringify(articleText),
 		image: articleImage,
 		date: new Date()
 	};
