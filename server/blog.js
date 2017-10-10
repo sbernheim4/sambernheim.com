@@ -24,7 +24,7 @@ MongoClient.connect(url, (err, database) => {
 
 function generateHTML(records) {
 	records = records.reverse();
-	let html = `<!DOCTYPE html>
+	return `<!DOCTYPE html>
 		<html>
 			<head>
 				<meta charset="UTF-8" />
@@ -34,16 +34,15 @@ function generateHTML(records) {
 				<meta name="theme-color" content="#3c3c3c">
 				<title>Samuel Bernheim</title>
 
-				<!-- My Icon -->
-				<link rel="icon" href="icon144x144.png">
-
-				<!-- My Manifest.json -->
-				<link rel="manifest" href="manifest.json">
-
 				<!-- Google Analytics tracking code -->
 				<meta name="google-site-verification" content="zHcVBbY7cgsbEuhwVpBJXUmxIoOJVjyx7OFqxmUequM" />
 				<title>Welcome to my Blog</title>
+
 				<link rel="stylesheet" href="index.css">
+
+				<link rel="stylesheet" href="prism.css">
+				<script src='prism.js'> </srcipt>
+
 			</head>
 
 			<body class='blog'>
@@ -54,14 +53,13 @@ function generateHTML(records) {
 					${records.map( r =>
 					`<div class='article'>
 						<h2 class='article__title'>${r.title}</h2>
-						${r.image !== undefined ? `<img src=${r.image}` : ``}
-						<p class='article__text'>${JSON.parse(r.text).replace(/\n/g, '<br>\n')}</p>
+						${r.image !== undefined ? `<img src=${r.image}>` : ``}
+						<div class='article__text'>${JSON.parse(r.text).replace(/\n/g, '<br>\n')}</div>
 					</div>`).join(``)}
 				</div>
 			</body>
 		</html>`;
 
-	return html;
 }
 
 module.exports = router;

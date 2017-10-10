@@ -12,32 +12,39 @@
 			text-align: center;
 		}
 	}
+}
 
-	.articles {
-		margin: 0 auto;
-		max-width: 800px;
-		width: 75vw;
+.articles {
+	margin: 0 auto;
 
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+
+	.article {
+		margin: 30px;
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
 
-		.article {
-			margin: 30px;
-			display: flex;
-			flex-direction: column;
-			justify-content: center;
-			align-items: center;
+		&__title {
+			margin: 10px 0;
+		}
 
-			&__title {
-				margin: 10px 0;
-			}
-
-			&__text {
-				line-height: 1.3em;
-			}
+		&__text {
+			line-height: 1.3em;
 		}
 	}
 }
 
+pre {
+	margin: 15px auto !important;
+	display: flex;
+	justify-content: center;
+
+	code {
+
+	}
+}
