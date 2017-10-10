@@ -41,7 +41,7 @@ function generateHTML(records) {
 				<link rel="stylesheet" href="index.css">
 
 				<link rel="stylesheet" href="prism.css">
-				<script src='prism.js'> </srcipt>
+				<script src='prism.js'> </script>
 
 			</head>
 
