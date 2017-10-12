@@ -5,7 +5,7 @@ const router = express.Router();
 const path = require('path');
 const MongoClient = require('mongodb').MongoClient
 
-var bodyParser = require('body-parser');
+const bodyParser = require('body-parser');
 
 const url = process.env.DB_URI;
 

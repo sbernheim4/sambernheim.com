@@ -1,5 +1,7 @@
 'use strict';
 
+require('dotenv').config()
+
 const express = require('express');
 const app = express();
 const path = require('path');
@@ -29,7 +31,7 @@ app.all('*', (req, res, next) => {
 // Hand off routing for /submit-article and /blog to separate sub components
 app.use('/submit-article', require(`./submitArticle`));
 app.use('/blog', require('./blog'));
-
+app.use('/login', require('./login'));
 
 // SEO and other simple files
 app.get('/robots.txt', (req, res) => {
