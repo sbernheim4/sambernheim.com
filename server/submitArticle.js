@@ -1,9 +1,9 @@
-require('dotenv').config()
+require('dotenv').config();
 
 const express = require('express');
 const router = express.Router();
 const path = require('path');
-const MongoClient = require('mongodb').MongoClient
+const MongoClient = require('mongodb').MongoClient;
 const session = require('client-sessions');
 
 const bodyParser = require('body-parser');
@@ -22,9 +22,6 @@ router.all('/*', (req, res, next) => {
 			if (!user){
 				req.session.reset();
 				res.redirect('../login');
-			} else {
-				res.locals.user = user;
-				next();
 			}
 		})
 	} else {
@@ -43,21 +40,20 @@ router.post('/', (req, res) => {
 	let db;
 	const url = process.env.DB_URI;
 
-	//TODO: uncomment lines below so that publishing is only possible from production mode
 	MongoClient.connect(url, (err, database) => {
-		if (err) {
-			console.log(err);
-		} else if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'development') {
+		if (err) throw err;
+
+		if (process.env.NODE_ENV === 'production') {
 			db = database;
 			const collection = db.collection('blog');
 			collection.insertOne(req.body, (err, res) => {
 				if (err) throw err;
 				console.log(`Article added to DB`);
 			});
-		} /*else if (process.env.NODE_ENV === 'development') {
+		} else if (process.env.NODE_ENV === 'development') {
 			console.log(`Not in Production\nData that would be added is:\n${JSON.stringify(req.body)}`);
-		}*/
+		}
 	});
-})
+});
 
 module.exports = router;

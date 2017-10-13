@@ -21,8 +21,10 @@ app.use(express.static(path.join(__dirname, 'public'), {maxAge: cacheTime})); //
 app.use(express.static(path.join(__dirname, '../images'), {maxAge: cacheTime})); //images
 app.use(express.static(path.join(__dirname, '../js'), {maxAge: cacheTime})); // used for /submit-article
 
+
+/******************* LOG REQUESTS  *****************************/
 app.all('*', (req, res, next) => {
-	console.log(chalk.blue(`New ${req.method} request for ${req.path}`));
+	console.log(chalk.blue(`New ${req.method} request for ${req.path} on ${new Date().toLocaleString()}`));
 	next();
 });
 

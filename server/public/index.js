@@ -17,7 +17,7 @@ function btnClick(e) {
 		password: userPassword
 	};
 
-	// URL for post request.
+	// URL for post request
 	var url = 'http://sambernheim.tech/login';
 
 	var xhr = new XMLHttpRequest();
@@ -115,7 +115,6 @@ function btnClick(e) {
 		date: new Date()
 	};
 
-	//TODO: Change url to production URL when it goes live
 	var url = 'http://sambernheim.tech/submit-article';
 
 	var xhr = new XMLHttpRequest();

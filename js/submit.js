@@ -13,7 +13,6 @@ function btnClick(e) {
 		date: new Date()
 	};
 
-	//TODO: Change url to production URL when it goes live
 	var url = 'http://sambernheim.tech/submit-article';
 
 	var xhr = new XMLHttpRequest();

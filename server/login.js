@@ -3,11 +3,9 @@ require('dotenv').config();
 const express = require('express');
 const router = express.Router();
 const path = require('path');
-const MongoClient = require('mongodb').MongoClient
+const MongoClient = require('mongodb').MongoClient;
 const session = require('client-sessions');
-
 const bodyParser = require('body-parser');
-
 const url = process.env.DB_URI;
 
 let db;
@@ -19,11 +17,15 @@ router.use(session ({
 	activeDuration: 5 * 60 * 1000
 }));
 
-
 router.get('/', (req, res) => {
-	res.sendFile(path.join(__dirname, `../html/login.html`));
+	if (req.session.user) {
+		// If the user is already signed in redirect them to the submit-article page
+		res.redirect('../submit-article');
+	} else {
+		// Otherwise send them to the login page
+		res.sendFile(path.join(__dirname, `../html/login.html`));
+	}
 });
-
 
 router.post('/', (req, res, next) => {
 	MongoClient.connect(url, (err, database) => {
@@ -36,22 +38,15 @@ router.post('/', (req, res, next) => {
 			if (err) throw err;
 
 			if (!dbRes){
-				console.log(`--------------------------`);
-				console.log('NO USER FOUND');
-				console.log(req.body);
-				console.log(`--------------------------`);
-
 				req.session.reset();
 				res.redirect('../');
 			} else {
-				console.log(`dbRes IS: ${dbRes}`);
-				console.log(`--------------------------`);
-				console.log('USER FOUND');
-				console.log(req.body);
-				console.log(`--------------------------`);
-
-				req.session.user = dbRes;
-				res.redirect('../submit-article');
+				if (req.body.password === dbRes.password) {
+					req.session.user = dbRes;
+					res.redirect('../submit-article');
+				} else {
+					res.redirect('../');
+				}
 			}
 		});
 	});

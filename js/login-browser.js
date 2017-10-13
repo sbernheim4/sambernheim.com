@@ -12,7 +12,7 @@ function btnClick(e) {
 		password: userPassword,
 	};
 
-	// URL for post request.
+	// URL for post request
 	var url = 'http://sambernheim.tech/login';
 
 	var xhr = new XMLHttpRequest();
