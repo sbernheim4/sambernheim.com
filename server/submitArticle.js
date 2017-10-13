@@ -22,7 +22,10 @@ router.all('/*', (req, res, next) => {
 			if (!user){
 				req.session.reset();
 				res.redirect('../login');
-			}
+			} else {
+				res.locals.user = user;
+				next();
+  			}
 		})
 	} else {
 		res.redirect('../login');
