@@ -27,29 +27,4 @@ router.get('/', (req, res) => {
 	}
 });
 
-router.post('/', (req, res, next) => {
-	MongoClient.connect(url, (err, database) => {
-
-		if (err) throw err;
-		db = database;
-
-		const collection = db.collection('users');
-		collection.findOne( { email: req.body.email } , (err, dbRes) => {
-			if (err) throw err;
-
-			if (!dbRes){
-				req.session.reset();
-				res.redirect('../');
-			} else {
-				if (req.body.password === dbRes.password) {
-					req.session.user = dbRes;
-					res.redirect('../submit-article');
-				} else {
-					res.redirect('../');
-				}
-			}
-		});
-	});
-});
-
 module.exports = router;

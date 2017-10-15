@@ -36,27 +36,4 @@ router.get('/', (req, res) => {
 	res.sendFile(path.join(__dirname, '../minihtml/submit.html'));
 });
 
-router.post('/', (req, res) => {
-
-	const text = req.body;
-
-	let db;
-	const url = process.env.DB_URI;
-
-	MongoClient.connect(url, (err, database) => {
-		if (err) throw err;
-
-		if (process.env.NODE_ENV === 'production') {
-			db = database;
-			const collection = db.collection('blog');
-			collection.insertOne(req.body, (err, res) => {
-				if (err) throw err;
-				console.log(`Article added to DB`);
-			});
-		} else if (process.env.NODE_ENV === 'development') {
-			console.log(`Not in Production\nData that would be added is:\n${JSON.stringify(req.body)}`);
-		}
-	});
-});
-
 module.exports = router;

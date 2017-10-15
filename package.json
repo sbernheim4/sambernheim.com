@@ -5,8 +5,8 @@
   "main": "server/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "export NODE_ENV=development; nodemon server/index.js",
-    "start": "export NODE_ENV=production;  forever start -c nodemon server/index.js",
+    "dev": "nodemon server/index.js",
+    "start": "forever start -c nodemon server/index.js",
     "postinstall": "gulp buildProduction"
   },
   "repository": {

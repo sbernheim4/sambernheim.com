@@ -1,6 +1,6 @@
 'use strict';
 
-require('dotenv').config()
+require('dotenv').config();
 
 const express = require('express');
 const app = express();
@@ -13,7 +13,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 app.use(compression());
 
-const port = process.env.PORT || 1337;
+const port = process.env.PORT;
 const cacheTime = 31536000000; // One year
 
 /******************* SERVE STATIC FILES  *****************************/
@@ -34,6 +34,7 @@ app.all('*', (req, res, next) => {
 app.use('/submit-article', require(`./submitArticle`));
 app.use('/blog', require('./blog'));
 app.use('/login', require('./login'));
+app.use(`/api`, require(`./api`));
 
 // SEO and other simple files
 app.get('/robots.txt', (req, res) => {
@@ -62,6 +63,11 @@ function fileFinder (urlPath) {
 	}
 };
 
-app.listen(port, () => {
-	console.log(chalk.yellow('Listening to port:', port));
-});
+if (port === undefined) {
+	throw Error("PORT ENV VARIABLE NOT SET");
+} else {
+	app.listen(port, () => {
+		console.log(chalk.yellow('Listening to port:', port));
+	});
+
+}
