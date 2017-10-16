@@ -6,6 +6,7 @@ function login(e) {
 
 	//TODO: The password should be encrypted eventually here on the browser before being sent to the server
 	const userPassword = document.querySelector('#login-password').value;
+	const finalPassword = hashPassword(getSalt() + userPassword);
 
 	const obj = {
 		email: userEmail,
@@ -25,4 +26,33 @@ function login(e) {
 	} else {
 		xhr.send(JSON.stringify(obj));
 	}
+}
+
+function getSalt() {
+	const url = 'http://localhost:5000/api/salt';
+	let salt = '';
+	const userEmail = document.querySelector('#login-email').value
+
+	let xhr = new XMLHttpRequest();
+
+	const obj = {
+		email: userEmail
+	}
+
+	xhr.onreadystatechange = function() {
+		if (xhr.readyState === 4)  {
+			salt = xhr.responseText;
+		}
+	}
+
+	xhr.open("POST", url, true);
+	xhr.setRequestHeader('Content-Type', 'application/json');
+	xhr.send(JSON.stringify(obj));
+
+	return salt
+
+}
+
+function hash(pass) {
+
 }
