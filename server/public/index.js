@@ -4,9 +4,15 @@
   }, i[r].l = 1 * new Date();a = s.createElement(o), m = s.getElementsByTagName(o)[0];a.async = 1;a.src = g;m.parentNode.insertBefore(a, m);
 })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');ga('create', 'UA-90187710-1', 'auto');ga('send', 'pageview');
 var btn = document.querySelector('#login-submit');
+<<<<<<< HEAD
 btn.addEventListener('click', btnClick);
 
 function btnClick(e) {
+=======
+btn.addEventListener('click', login);
+
+function login(e) {
+>>>>>>> bug-fixes
 	const userEmail = document.querySelector('#login-email').value;
 
 	//TODO: The password should be encrypted eventually here on the browser before being sent to the server
@@ -18,7 +24,11 @@ function btnClick(e) {
 	};
 
 	// URL for post request
+<<<<<<< HEAD
 	var url = 'http://sambernheim.tech/login';
+=======
+	var url = 'http://localhost:5000/api/login';
+>>>>>>> bug-fixes
 
 	var xhr = new XMLHttpRequest();
 	xhr.open("POST", url, true);
@@ -115,7 +125,12 @@ function btnClick(e) {
 		date: new Date()
 	};
 
+<<<<<<< HEAD
 	var url = 'http://sambernheim.tech/submit-article';
+=======
+	//TODO: Change url to production URL when it goes live
+	var url = 'http://localhost:5000/api/submit-article';
+>>>>>>> bug-fixes
 
 	var xhr = new XMLHttpRequest();
 	xhr.open("POST", url, true);

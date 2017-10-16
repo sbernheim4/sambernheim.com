@@ -13,7 +13,9 @@ function btnClick(e) {
 		date: new Date()
 	};
 
-	var url = 'http://sambernheim.tech/submit-article';
+
+	//TODO: Change url to production URL when it goes live
+	var url = 'http://localhost:5000/api/submit-article';
 
 	var xhr = new XMLHttpRequest();
 	xhr.open("POST", url, true);

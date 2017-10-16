@@ -20,6 +20,7 @@ const cacheTime = 31536000000; // One year
 app.use(express.static(path.join(__dirname, 'public'), {maxAge: cacheTime})); //css and js
 app.use(express.static(path.join(__dirname, '../images'), {maxAge: cacheTime})); //images
 app.use(express.static(path.join(__dirname, '../js'), {maxAge: cacheTime})); // used for /submit-article
+app.use(express.static(path.join(__dirname, './public/images'), {maxAge: cacheTime})); // serve images
 
 
 /******************* LOG REQUESTS  *****************************/
@@ -33,8 +34,9 @@ app.all('*', (req, res, next) => {
 // Hand off routing for /submit-article and /blog to separate sub components
 app.use('/submit-article', require(`./submitArticle`));
 app.use('/blog', require('./blog'));
+app.use('/blog', require('./blog'));
 app.use('/login', require('./login'));
-app.use(`/api`, require(`./api`));
+app.use('/api', require('./api'));
 
 // SEO and other simple files
 app.get('/robots.txt', (req, res) => {
@@ -69,5 +71,4 @@ if (port === undefined) {
 	app.listen(port, () => {
 		console.log(chalk.yellow('Listening to port:', port));
 	});
-
 }

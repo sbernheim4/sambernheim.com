@@ -10,8 +10,6 @@ const bodyParser = require('body-parser');
 
 const url = process.env.DB_URI;
 
-//----------------------------------------------------------------------------\\
-
 router.use(session ({
 	cookieName: 'session',
 	secret: process.env.SESSION_SECRET,
@@ -19,10 +17,10 @@ router.use(session ({
 	activeDuration: 5 * 60 * 1000
 }));
 
-
-// ROUTES FOR /login
+//-------------------------------LOGIN----------------------------------------\\
 
 router.post('/login', (req, res, next) => {
+
 	MongoClient.connect(url, (err, database) => {
 
 		if (err) throw err;
@@ -47,9 +45,12 @@ router.post('/login', (req, res, next) => {
 	});
 });
 
+//----------------------------------------------------------------------------\\
 
 
-// ROUTES FOR /submit-article
+
+
+//----------------------------SUBMIT ARTICLE----------------------------------\\
 
 // For any type of request to /submit-article ensure the user is logged in
 router.all('/submit-article', (req, res, next) => {
@@ -68,8 +69,6 @@ router.all('/submit-article', (req, res, next) => {
 		res.redirect('../login');
 	}
 });
-
-
 
 router.post('/submit-article', (req, res) => {
 	const text = req.body;
@@ -92,5 +91,8 @@ router.post('/submit-article', (req, res) => {
 		}
 	});
 });
+
+
+//----------------------------------------------------------------------------\\
 
 module.exports = router;

@@ -15,6 +15,7 @@ router.use(session ({
 	activeDuration: 5 * 60 * 1000
 }));
 
+
 router.all('/*', (req, res, next) => {
 	if (req.session && req.session.user) {
 		const collection = db.collection('users');
@@ -26,6 +27,7 @@ router.all('/*', (req, res, next) => {
 				res.locals.user = user;
 				next();
   			}
+
 		})
 	} else {
 		res.redirect('../login');
