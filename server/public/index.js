@@ -3,6 +3,34 @@
     (i[r].q = i[r].q || []).push(arguments);
   }, i[r].l = 1 * new Date();a = s.createElement(o), m = s.getElementsByTagName(o)[0];a.async = 1;a.src = g;m.parentNode.insertBefore(a, m);
 })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');ga('create', 'UA-90187710-1', 'auto');ga('send', 'pageview');
+var btn = document.querySelector('#login-submit');
+btn.addEventListener('click', login);
+
+function login(e) {
+	const userEmail = document.querySelector('#login-email').value;
+
+	//TODO: The password should be encrypted eventually here on the browser before being sent to the server
+	const userPassword = document.querySelector('#login-password').value;
+
+	const obj = {
+		email: userEmail,
+		password: userPassword
+	};
+
+	// URL for post request
+	var url = 'http://localhost:5000/api/login';
+
+	var xhr = new XMLHttpRequest();
+	xhr.open("POST", url, true);
+	xhr.setRequestHeader('Content-Type', 'application/json');
+
+	// Ensure the article has at least a title and  text
+	if (obj.email === "" || obj.password === "") {
+		alert('Missing email and or password');
+	} else {
+		xhr.send(JSON.stringify(obj));
+	}
+}
 // Desktop navbar
 const desktopBtns = document.querySelector('.navbar').querySelectorAll('p');
 desktopBtns.forEach(btns => {
@@ -88,7 +116,7 @@ function btnClick(e) {
 	};
 
 	//TODO: Change url to production URL when it goes live
-	var url = 'http://sambernheim.tech/submit-article';
+	var url = 'http://localhost:5000/api/submit-article';
 
 	var xhr = new XMLHttpRequest();
 	xhr.open("POST", url, true);

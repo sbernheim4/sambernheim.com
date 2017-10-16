@@ -1,5 +1,7 @@
 'use strict';
 
+require('dotenv').config();
+
 const express = require('express');
 const app = express();
 const path = require('path');
@@ -11,16 +13,17 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 app.use(compression());
 
-const port = process.env.PORT || 1337;
+const port = process.env.PORT;
 const cacheTime = 31536000000; // One year
 
 /******************* SERVE STATIC FILES  *****************************/
 app.use(express.static(path.join(__dirname, 'public'), {maxAge: cacheTime})); //css and js
 app.use(express.static(path.join(__dirname, '../images'), {maxAge: cacheTime})); //images
 app.use(express.static(path.join(__dirname, '../js'), {maxAge: cacheTime})); // used for /submit-article
+app.use(express.static(path.join(__dirname, './public/images'), {maxAge: cacheTime})); // serve images
 
 app.all('*', (req, res, next) => {
-	console.log(chalk.blue(`New ${req.method} request for ${req.path}`));
+	console.log(chalk.blue(`New ${req.method} request for ${req.path} on ${new Date().toLocaleString()}`));
 	next();
 });
 
@@ -29,6 +32,9 @@ app.all('*', (req, res, next) => {
 // Hand off routing for /submit-article and /blog to separate sub components
 app.use('/submit-article', require(`./submitArticle`));
 app.use('/blog', require('./blog'));
+app.use('/blog', require('./blog'));
+app.use('/login', require('./login'));
+app.use('/api', require('./api'));
 
 
 // SEO and other simple files
@@ -58,6 +64,10 @@ function fileFinder (urlPath) {
 	}
 };
 
-app.listen(port, () => {
-	console.log(chalk.yellow('Listening to port:', port));
-});
+if (port === undefined) {
+	throw Error("PORT ENV VARIABLE NOT SET");
+} else {
+	app.listen(port, () => {
+		console.log(chalk.yellow('Listening to port:', port));
+	});
+}

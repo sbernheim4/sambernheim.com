@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const gulp = require('gulp');
 const cleanCSS = require('gulp-clean-css');
 const babel = require('gulp-babel');
@@ -56,7 +58,7 @@ gulp.task('lint', () => {
 
 gulp.task('browser-sync', () => {
 	browserSync.init({
-		proxy: 'localhost:1337',
+		proxy: `localhost:${process.env.PORT}`,
 		port: 5000,
 		online: true
 	});
