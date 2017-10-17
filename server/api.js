@@ -7,6 +7,7 @@ const MongoClient = require('mongodb').MongoClient
 
 const session = require('client-sessions');
 const bodyParser = require('body-parser');
+const bcrypt = require('bcryptjs');
 
 const url = process.env.DB_URI;
 
@@ -20,13 +21,14 @@ router.use(session ({
 //-------------------------------LOGIN----------------------------------------\\
 
 router.post('/login', (req, res, next) => {
+	let db;
 
 	MongoClient.connect(url, (err, database) => {
-
 		if (err) throw err;
-		db = database;
 
+		db = database;
 		const collection = db.collection('users');
+
 		collection.findOne( { email: req.body.email } , (err, dbRes) => {
 			if (err) throw err;
 
@@ -34,12 +36,19 @@ router.post('/login', (req, res, next) => {
 				req.session.reset();
 				res.redirect('../');
 			} else {
-				if (req.body.password === dbRes.password) {
+
+				let hashedPassword = bcrypt.hashSync(req.body.password, dbRes.salt);
+
+				// TODO: Use bcrypt's builtin compare method to compare db and hash
+				// bcrypt.compareSync(dbRes.password, hashedPassword)
+				// if the hashed password is the same as the password in the DB set the user
+				if (hashedPassword === dbRes.password) {
 					req.session.user = dbRes;
-					res.redirect('../submit-article');
+					res.redirect('/submit-article');
 				} else {
 					res.redirect('../');
 				}
+
 			}
 		});
 	});
