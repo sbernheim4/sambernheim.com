@@ -23,7 +23,7 @@ let db;
 router.all('/', (req, res, next) => {
 	MongoClient.connect(url, (err, database) => {
 		if (err) throw err;
-		let db = database;
+		db = database;
 	})
 })
 
