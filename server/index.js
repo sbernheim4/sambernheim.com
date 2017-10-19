@@ -34,7 +34,6 @@ app.all('*', (req, res, next) => {
 // Hand off routing for /submit-article and /blog to separate sub components
 app.use('/submit-article', require(`./submitArticle`));
 app.use('/blog', require('./blog'));
-app.use('/blog', require('./blog'));
 app.use('/login', require('./login'));
 app.use('/api', require('./api'));
 

@@ -103,20 +103,5 @@ router.post('/submit-article', (req, res) => {
 
 //----------------------------------------------------------------------------\\
 
-let salt = ``;
-
-router.post('/salt', (req, res) => {
-	const collection = db.collection('users');
-	collection.findOne({ email: req.body.email }, (err, user) => {
-		if (!user){
-			req.session.reset();
-			res.redirect('../');
-		} else {
-			salt = user.salt;
-			res.send(salt);
-		}
-	})
-});
-
 
 module.exports = router;
