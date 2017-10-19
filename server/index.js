@@ -19,7 +19,7 @@ const cacheTime = 31536000000; // One year
 /******************* SERVE STATIC FILES  *****************************/
 app.use(express.static(path.join(__dirname, 'public'), {maxAge: cacheTime})); //css and js
 app.use(express.static(path.join(__dirname, '../images'), {maxAge: cacheTime})); //images
-app.use(express.static(path.join(__dirname, '../js'), {maxAge: cacheTime})); // used for /submit-article
+app.use(express.static(path.join(__dirname, './public/js-pages'), {maxAge: cacheTime})); // used for /submit-article
 app.use(express.static(path.join(__dirname, './public/images'), {maxAge: cacheTime})); // serve images
 
 

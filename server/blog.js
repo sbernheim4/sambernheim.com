@@ -50,16 +50,25 @@ function generateHTML(records) {
 					<h1>Welcome to my Blog</h1>
 				</div>
 				<div class='articles'>
-					${records.map( r =>
+				${records.map( r =>
 					`<div class='article'>
 						<h2 class='article__title'>${r.title}</h2>
-						${r.image !== undefined ? `<img src=${r.image}>` : ``}
+						${displayImage(r.image)}
 						<div class='article__text'>${JSON.parse(r.text).replace(/\n/g, '<br>\n')}</div>
-					</div>`).join(``)}
+					</div>`).join(``)
+				}
 				</div>
 			</body>
 		</html>`;
 
+}
+
+function displayImage(imageUrl) {
+	if (imageUrl !== undefined) {
+		return `<img src='${imageUrl}'>`;
+	} else {
+		return `<img src=''>`;
+	}
 }
 
 module.exports = router;
