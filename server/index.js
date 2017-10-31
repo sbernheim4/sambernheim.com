@@ -8,6 +8,7 @@ const path = require('path');
 const compression = require('compression');
 const bodyParser = require('body-parser');
 const chalk = require('chalk');
+const errors = require('./errors.js');
 
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
@@ -31,7 +32,7 @@ app.all('*', (req, res, next) => {
 
 /******************* SPECIAL PATHS FOR WEBSITE *****************************/
 
-// Hand off routing for /submit-article and /blog to separate sub components
+// Hand off routing to separate sub components where appropriate
 app.use('/submit-article', require(`./submitArticle`));
 app.use('/blog', require('./blog'));
 app.use('/login', require('./login'));
@@ -50,7 +51,7 @@ app.get('/manifest.json', (req, res) => {
 	res.sendFile(path.join(__dirname, './public/manifest.json'));
 });
 
-/******************* Smart-Routing FOR ALL OTHER PATHS *********************/
+/******************* Smart-Routing for All Other Routes *********************/
 app.get(`/*`, (req, res) => {
 	res.sendFile(fileFinder(req.path));
 });
@@ -65,7 +66,7 @@ function fileFinder (urlPath) {
 };
 
 if (port === undefined) {
-	throw Error("PORT ENV VARIABLE NOT SET");
+	throw Error(errors.INVALID_PORT);
 } else {
 	app.listen(port, () => {
 		console.log(chalk.yellow('Listening to port:', port));

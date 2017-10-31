@@ -8,6 +8,7 @@ const MongoClient = require('mongodb').MongoClient
 const session = require('client-sessions');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcryptjs');
+const errors = require('./errors.js');
 
 const url = process.env.DB_URI;
 
@@ -30,6 +31,8 @@ router.all('/', (req, res, next) => {
 //-------------------------------LOGIN----------------------------------------\\
 
 router.post('/login', (req, res, next) => {
+	if (!db) throw Error(errors.DB_CONNECTION);
+
 	const collection = db.collection('users');
 
 	collection.findOne( { email: req.body.email } , (err, dbRes) => {
@@ -64,6 +67,9 @@ router.post('/login', (req, res, next) => {
 // For any type of request to /submit-article ensure the user is logged in
 router.all('/submit-article', (req, res, next) => {
 	if (req.session && req.session.user) {
+
+		if (!db) throw Error(errors.DB_CONNECTION);
+
 		const collection = db.collection('users');
 		collection.findOne({ email: req.session.user.email}, (err, user) => {
 			if (!user){
@@ -84,6 +90,8 @@ router.post('/submit-article', (req, res) => {
 
 	if (process.env.NODE_ENV === 'production') {
 
+		if (!db) throw Error(errors.DB_CONNECTION);
+
 		const collection = db.collection('blog');
 		collection.insertOne(req.body, (err, res) => {
 			if (err) throw err;
@@ -97,6 +105,5 @@ router.post('/submit-article', (req, res) => {
 
 
 //----------------------------------------------------------------------------\\
-
 
 module.exports = router;

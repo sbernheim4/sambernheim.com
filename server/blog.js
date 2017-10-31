@@ -2,7 +2,6 @@ require('dotenv').config();
 
 const express = require('express');
 const router = express.Router();
-const path = require('path');
 const MongoClient = require('mongodb').MongoClient
 
 const bodyParser = require('body-parser');
@@ -68,5 +67,4 @@ function generateHTML(records) {
 		</html>`;
 }
 
-// <img src='${r.image !== "" ? `${r.image}` : 'null'}'>
 module.exports = router;
