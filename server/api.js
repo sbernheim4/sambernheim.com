@@ -21,10 +21,11 @@ router.use(session ({
 
 let db;
 
-router.all((req, res, next) => {
+router.all('/*', (req, res, next) => {
 	MongoClient.connect(url, (err, database) => {
 		if (err) throw err;
 		db = database;
+		next();
 	})
 })
 
