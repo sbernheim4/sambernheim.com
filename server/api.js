@@ -41,7 +41,7 @@ router.post('/login', (req, res, next) => {
 
 		if (!dbRes){
 			req.session.reset();
-			res.redirect('../');
+			res.redirect('/login');
 		} else {
 			let hashedPassword = bcrypt.hashSync(req.body.password, dbRes.salt);
 
@@ -52,7 +52,7 @@ router.post('/login', (req, res, next) => {
 				req.session.user = dbRes;
 				res.redirect('/submit-article');
 			} else {
-				res.redirect('../');
+				res.redirect('/login');
 			}
 		}
 	});

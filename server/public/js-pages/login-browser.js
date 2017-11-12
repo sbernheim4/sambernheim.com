@@ -16,6 +16,7 @@ function login(e) {
 	var url = 'http://sambernheim.tech/api/login';
 
 	var xhr = new XMLHttpRequest();
+	xhr.addEventListener("load", redirect);
 	xhr.open("POST", url, true);
 	xhr.setRequestHeader('Content-Type', 'application/json');
 
@@ -25,4 +26,9 @@ function login(e) {
 	} else {
 		xhr.send(JSON.stringify(obj));
 	}
+}
+
+function redirect() {
+	// After the request is sent, try sending the user to the submit-article page. They will just be redirected back to login if the login failed
+	window.location.href = 'http://sambernheim.tech/submit-article'
 }

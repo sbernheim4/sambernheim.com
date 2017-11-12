@@ -22,7 +22,7 @@ router.all('/*', (req, res, next) => {
 		collection.findOne({ email: req.session.user.email}, (err, user) => {
 			if (!user){
 				req.session.reset();
-				res.redirect('../login');
+				res.redirect('/login');
 			} else {
 				res.locals.user = user;
 				next();
@@ -30,7 +30,7 @@ router.all('/*', (req, res, next) => {
 
 		})
 	} else {
-		res.redirect('../login');
+		res.redirect('/login');
 	}
 });
 

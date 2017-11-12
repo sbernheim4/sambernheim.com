@@ -20,7 +20,7 @@ router.use(session ({
 router.get('/', (req, res) => {
 	if (req.session.user) {
 		// If the user is already signed in redirect them to the submit-article page
-		res.redirect('../submit-article');
+		res.redirect('/submit-article');
 	} else {
 		// Otherwise send them to the login page
 		res.sendFile(path.join(__dirname, `../html/login.html`));
