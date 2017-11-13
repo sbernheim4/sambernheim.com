@@ -14,7 +14,7 @@ function btnClick(e) {
 	};
 
 
-	var url = `http://localhost:5000/api/login`;
+	var url = `http://sambernheim.tech/api/login`;
 
 	var xhr = new XMLHttpRequest();
 	xhr.open("POST", url, true);
