@@ -33,6 +33,7 @@ router.all('/*', (req, res, next) => {
 
 router.post('/login', (req, res, next) => {
 	if (!db) throw Error(errors.DB_CONNECTION);
+	let unauthorizedErrorCode = 401;
 
 	const collection = db.collection('users');
 
@@ -41,7 +42,8 @@ router.post('/login', (req, res, next) => {
 
 		if (!dbRes){
 			req.session.reset();
-			res.redirect('/login');
+			// send an error code
+			res.sendStatus(unauthorizedErrorCode);
 		} else {
 			let hashedPassword = bcrypt.hashSync(req.body.password, dbRes.salt);
 
@@ -52,7 +54,7 @@ router.post('/login', (req, res, next) => {
 				req.session.user = dbRes;
 				res.redirect('/submit-article');
 			} else {
-				res.redirect('/login');
+				res.sendStatus(unauthorizedErrorCode);
 			}
 		}
 	});

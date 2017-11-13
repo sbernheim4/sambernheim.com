@@ -1,34 +1,61 @@
 var btn = document.querySelector('#login-submit');
-btn.addEventListener('click', login);
+btn.addEventListener('click', getUserData);
 
-function login(e) {
+function getUserData(e) {
 	const userEmail = document.querySelector('#login-email').value;
-
 	// Consider hashing the password just so the plain text password isn't sent
 	const userPassword = document.querySelector('#login-password').value;
-
-	const obj = {
-		email: userEmail,
-		password: userPassword,
-	};
 
 	// URL for post request
 	var url = 'http://sambernheim.tech/api/login';
 
-	var xhr = new XMLHttpRequest();
-	xhr.addEventListener("load", redirect);
-	xhr.open("POST", url, true);
-	xhr.setRequestHeader('Content-Type', 'application/json');
+	// Credentials the user entered
+	const credentials = {
+		email: userEmail,
+		password: userPassword,
+	};
 
-	// Ensure the article has at least a title and  text
-	if (obj.email === "" || obj.password === "") {
-		alert('Missing email and or password');
-	} else {
-		xhr.send(JSON.stringify(obj));
-	}
+	login(url, credentials)
+	.then( function (response) {
+		console.log("Successfully logged in");
+	}).catch( function(error) {
+		showError();
+	});
+
 }
 
-function redirect() {
-	// After the request is sent, try sending the user to the submit-article page. They will just be redirected back to login if the login failed
-	window.location.href = 'http://sambernheim.tech/submit-article'
+function login(url, credentials) {
+	return new Promise((resolve, reject) => {
+
+		var xhr = new XMLHttpRequest();
+		xhr.open("POST", url, true);
+		xhr.setRequestHeader('Content-Type', 'application/json');
+
+		xhr.onload = function() {
+			if (xhr.status == 200) {
+				resolve(xhr.response);
+			} else {
+				reject(Error(xhr.statusText));
+			}
+		};
+
+		xhr.onerror = function() {
+			reject(Error("Network Error"));
+		};
+		//
+		// Ensure the article has at least a title and  text
+		if (credentials.email === "" || credentials.password === "") {
+			alert('Missing email and or password');
+		} else {
+			xhr.send(JSON.stringify(credentials));
+		}
+
+	})
+}
+
+function showError() {
+	const error = document.querySelector('.login__error');
+	error.classList.add('error-show');
+
+	setTimeout(function() {error.classList.remove('error-show')}, 3500)
 }
