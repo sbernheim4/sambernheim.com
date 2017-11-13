@@ -1,18 +1,18 @@
-require('dotenv').config();
+require(`dotenv`).config();
 
-const express = require('express');
+const express = require(`express`);
 const router = express.Router();
-const MongoClient = require('mongodb').MongoClient
+const MongoClient = require(`mongodb`).MongoClient
 
-const bodyParser = require('body-parser');
+const bodyParser = require(`body-parser`);
 
 const url = process.env.DB_URI;
 
 MongoClient.connect(url, (err, database) => {
 	if (err) throw err;
 	db = database;
-	router.get('/', (req, res) => {
-		db.collection('blog').find({}).toArray( (err, result) => {
+	router.get(`/`, (req, res) => {
+		db.collection(`blog`).find({}).toArray( (err, result) => {
 			if (err) throw err;
 			const html = generateHTML(result)
 			res.send(html);
@@ -32,7 +32,6 @@ function generateHTML(records) {
 				<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
 				<meta name="theme-color" content="#3c3c3c">
-				<title>Samuel Bernheim</title>
 
 				<!-- Google Analytics tracking code -->
 				<meta name="google-site-verification" content="zHcVBbY7cgsbEuhwVpBJXUmxIoOJVjyx7OFqxmUequM" />

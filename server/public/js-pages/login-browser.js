@@ -7,7 +7,7 @@ function getUserData(e) {
 	const userPassword = document.querySelector('#login-password').value;
 
 	// URL for post request
-	var url = 'http://sambernheim.tech/api/login';
+	var url = `http://localhost:5000/api/login`;
 
 	// Credentials the user entered
 	const credentials = {
