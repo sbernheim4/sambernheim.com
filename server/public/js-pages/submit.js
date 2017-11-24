@@ -1,7 +1,7 @@
 var btn = document.querySelector('#submit-article-btn');
-btn.addEventListener('click', btnClick);
+btn.addEventListener('click', submitArticle);
 
-function btnClick(e) {
+function submitArticle(e) {
 	const articleTitle = document.querySelector('#article-title').value;
 	const articleText = document.querySelector('#article-text').value;
 	const articleImage = document.querySelector('#article-image').value;
@@ -14,7 +14,7 @@ function btnClick(e) {
 	};
 
 
-	var url = `http://sambernheim.tech/api/login`;
+	var url = `http://sambernheim.tech/api/submit-article`;
 
 	var xhr = new XMLHttpRequest();
 	xhr.open("POST", url, true);
