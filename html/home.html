@@ -121,23 +121,24 @@
 		<section id="projects" class="projects" name="projects">
 			<h2 class="underline projects__underline">Projects</h2>
 
+
 			<div class="projects__container">
+
 				<div class="project">
-					<h2>This Website</h2>
-					<img src="./server/public/images/personal-website.jpg" alt="Screen shot of this website's landing page">
-					<p>I built this website with HTML, NodeJS/ExpressJS, and SCSS using GulpJS as my task runner. The goal in mind was a quick, clean and simple website. I followed the BEM naming convention for my HTML and SCSS and used ExpressJS to enable compression and cacheing of static resources. All of this plus some additional optimizations got me a score of 100 on Google's Page Speed Test.</p>
+					<h2><a href="https://budgeteer-prod.herokuapp.com/budgeteer/">Weatherterm</a></h2>
+					<img src="./server/public/images/budgeteer.png" alt="Budgeteer welcome page">
+					<p>After working with React in many small projects and examples, I decided to use it for my next project, a budgeting tool to keep track of my purchases - Budgeteer. It uses Plaid's API to connect to bank accounts and access transactions, Recharts to generate all the graphics, and PassportJS to handle login and user accounts combined with MongoDB. I also built it as a Progressive Web App and can install and work like a native app on either iOS or Android.</p>
 				</div>
 
 				<div class="project">
-					<h2><a href="https://www.kineticglobal.org">Kinetic Global</a></h2>
-					<img src="./server/public/images/kinetic.jpg" alt="Screen shot of Kinetic Global's landing page">
-					<p>I, along with another developer, built the website for Kinetic Global. We used the MEAN stack (Angular 1) to develop it. It's hosted on Heroku and uses Amazon's S3 bucket for resource management, Sendgrid for form emails, and StripeJS to collect online donations. An online forum also integrates into Kinetic's Slack channels. I also manage its SEO and worked to get the site to appear at the top of Google.</p>
+					<h2><a href="https://www.npmjs.com/package/weatherterm">Weatherterm</a></h2>
+					<img src="./server/public/images/weatherterm.png" alt="Screen shot of weatherm's output showing temperature, humidity, wind speed and current conditions">
+					<p>In the summer of 2017, I discovered a whole bunch of cool CLI tools like ansiweather. I didn't like the way ansiweather looked though so I decided to make my own version. This was my first npm CLI tool. It gets a user's external IP address and then performs an IP to location lookup to get the user's zipcode. The zip code is then sent to Open Weather Map's API to get the data. I published the package to the registry expecting 0 downloads and was shocked when it got over 1000 downloads within a month.</p>
 				</div>
-
 				<div class="project">
-					<h2><a href="https://github.com/sbernheim4/angular-stack">Angular App</a></h2>
-					<img src="./server/public/images/angular-app.png" alt="Screen shot of blank website template">
-					<p>After building the Kinetic Global website, I wanted to build a base stack to review what I had just learned and built to easily create new websites, essentially my own yeoman generator. That led to this app, a MEAN stack application. I spent a lot of time determining the project's structure, essential npm packages, and more. I use GulpJS for minification SCSS compilation, JS transpiling, livereloading and more.</p>
+					<h2><a href="http://www.m5systems.com">M5 Systems</a></h2>
+					<img src="./server/public/images/m5systems.jpg" alt="Screen shot of M5 Systems homepage">
+					<p>My first freelance work, I was hired to rebuild M5 Systems's website. M5 Systems is a consulting group that helps companies transition to the cloud. Using my Angular Stack the site runs in an Amazon EC2 Instace and uses Amazon's Simple Email Service and Nodemailer to handle form submissions. Working on this gave me the chance to finally delve into AWS  and after the project was done, I transitioned my own  website from Heroku to AWS</p>
 				</div>
 
 				<div class="project">
@@ -147,16 +148,23 @@
 				</div>
 
 				<div class="project">
-					<h2><a href="http://www.m5systems.com">M5 Systems</a></h2>
-					<img src="./server/public/images/m5systems.jpg" alt="Screen shot of M5 Systems homepage">
-					<p>My first freelance work, I was hired to rebuild M5 Systems's website. M5 Systems is a consulting group that helps companies transition to the cloud. Using my Angular Stack the site runs in an Amazon EC2 Instace and uses Amazon's Simple Email Service and Nodemailer to handle form submissions. Working on this gave me the chance to finally delve into AWS  and after the project was done, I transitioned my own  website from Heroku to AWS</p>
+					<h2><a href="https://github.com/sbernheim4/angular-stack">Angular App</a></h2>
+					<img src="./server/public/images/angular-app.png" alt="Screen shot of blank website template">
+					<p>After building the Kinetic Global website, I wanted to build a base stack to review what I had just learned and built to easily create new websites, essentially my own yeoman generator. That led to this app, a MEAN stack application. I spent a lot of time determining the project's structure, essential npm packages, and more. I use GulpJS for minification SCSS compilation, JS transpiling, livereloading and more.</p>
 				</div>
 
 				<div class="project">
-					<h2><a href="https://www.npmjs.com/package/weatherterm">Weatherterm</a></h2>
-					<img src="./server/public/images/weatherterm.png" alt="Screen shot of weatherm's output showing temperature, humidity, wind speed and current conditions">
-					<p>In the summer of 2017, I discovered a whole bunch of cool CLI tools like ansiweather. I didn't like the way ansiweather looked though so I decided to make my own version. This was my first npm CLI tool. It gets a user's external IP address and then performs an IP to location lookup to get the user's zipcode. The zip code is then sent to Open Weather Map's API to get the data. I published the package to the registry expecting 0 downloads and was shocked when it got over 1000 downloads within a month.</p>
+					<h2><a href="https://www.kineticglobal.org">Kinetic Global</a></h2>
+					<img src="./server/public/images/kinetic.jpg" alt="Screen shot of Kinetic Global's landing page">
+					<p>I, along with another developer, built the website for Kinetic Global. We used the MEAN stack (Angular 1) to develop it. It's hosted on Heroku and uses Amazon's S3 bucket for resource management, Sendgrid for form emails, and StripeJS to collect online donations. An online forum also integrates into Kinetic's Slack channels. I also manage its SEO and worked to get the site to appear at the top of Google.</p>
 				</div>
+
+				<div class="project">
+					<h2>This Website</h2>
+					<img src="./server/public/images/personal-website.jpg" alt="Screen shot of this website's landing page">
+					<p>I built this website with HTML, NodeJS/ExpressJS, and SCSS using GulpJS as my task runner. The goal in mind was a quick, clean and simple website. I followed the BEM naming convention for my HTML and SCSS and used ExpressJS to enable compression and cacheing of static resources. All of this plus some additional optimizations got me a score of 100 on Google's Page Speed Test.</p>
+				</div>
+
 			</div>
 
 		</section>
