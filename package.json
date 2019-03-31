@@ -28,25 +28,25 @@
     "compression": "^1.6.2",
     "dotenv": "^4.0.0",
     "express": "^4.14.0",
-    "forever": "^0.15.3",
-    "gulp": "^3.9.1",
+    "forever": "^0.15.4",
+    "gulp": "^4.0.0",
     "gulp-babel": "^6.1.2",
-    "gulp-clean-css": "^2.3.2",
+    "gulp-clean-css": "^4.0.0",
     "gulp-concat": "^2.6.1",
     "gulp-htmlmin": "^3.0.0",
     "gulp-jshint": "^2.0.4",
-    "gulp-livereload": "^3.8.1",
+    "gulp-livereload": "^4.0.1",
     "gulp-sass": "^3.1.0",
-    "jshint": "^2.9.4",
+    "jshint": "^2.10.2",
     "mongodb": "^2.2.31",
     "nodemon": "^1.11.0",
     "path": "^0.12.7"
   },
   "devDependencies": {
-    "browser-sync": "^2.18.13",
+    "browser-sync": "^2.26.3",
     "chalk": "^2.1.0",
     "concurrently": "^3.5.0",
-    "gulp-stylelint": "^5.0.0",
-    "stylelint-order": "^0.7.0"
+    "gulp-stylelint": "^8.0.0",
+    "stylelint-order": "^2.1.0"
   }
 }
