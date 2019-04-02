@@ -4,6 +4,11 @@
  * delete this file or customize it to fit your own needs
  */
 
+@font-face {
+    font-family: 'verlag';
+    src: url("/verlag.woff2");
+}
+
 * {
 	margin: 0;
 	padding: 0;

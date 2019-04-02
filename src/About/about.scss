@@ -18,6 +18,8 @@
         bottom: 0;
 
         text {
+            font-family: 'verlag', 'Lato', sans-serif;
+            font-weight: 300;
 
             @media all and (max-width: 800px) {
                 display: none;
