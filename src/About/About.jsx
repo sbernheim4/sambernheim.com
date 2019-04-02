@@ -21,13 +21,18 @@ class About extends Component {
             <section className='about'>
                 <svg className={css} viewBox="0 0 500 80">
                     <polygon points="40,80 500,80  500,0" />
-                    <text x="380" y="60" font-size="24px" fill="black">About Me</text>
+                    <text x="380" y="60" fontSize="24px" fill="black">About Me</text>
                 </svg>
 
                 <div>
                     <h1>About Me</h1>
                     <br/>
-                    <p>In addition to my work as a software engineer I have many other interests. I love to play soccer, ultimate frisbee, and tennis, as well as ski and kyak.</p>
+                    <p>Hi</p>
+                    <p>I'm Sam</p>
+                    <p>I live in New York City and work at Disney Streaming Services</p>
+                    <p>I've been interested in computers and programming for as long as I can remember and love learning new technologies.</p>
+
+                    <p>Outside of work I love to play soccer, ultimate frisbee, and tennis, as well as ski and kyak.</p>
                     <p>I love reading historical fiction and fantasy novels, and am an avid fan of science fiction and politcal TV shows</p>
                     <p>I also greatly enjoy following political and economic events, cooking, baking, and of course eating.</p>
                 </div>

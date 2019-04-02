@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import './home.scss';
 import LandingPage from "../../LandingPage/LandingPage.jsx";
 import About from "../../About/About.jsx";
+import Parallax from "../../Parallax/Parallax.jsx";
 import Projects from "../../Projects/Projects.jsx";
 
 class Home extends Component {
@@ -14,7 +15,9 @@ class Home extends Component {
 	}
 
 	render() {
+
 		return (
+
 			<section className="home">
 
 				<LandingPage />
