@@ -11,9 +11,15 @@ class About extends Component {
     }
 
     render() {
+        let css = '';
+
+        if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+            css = "mobile";
+        }
+
         return (
             <section className='about'>
-                <svg viewBox="0 0 500 80">
+                <svg className={css} viewBox="0 0 500 80">
                     <polygon points="40,80 500,80  500,0" />
                     <text x="380" y="60" font-size="24px" fill="black">About Me</text>
                 </svg>
