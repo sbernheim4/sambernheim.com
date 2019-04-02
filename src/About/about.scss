@@ -7,6 +7,9 @@
 }
 
 .about {
+        width: 100vw;
+        max-height: 70vh;
+        height: 500px;
         fill: var(--main-bg-color);;
         background: var(--main-bg-color);;
 
@@ -26,6 +29,10 @@
         margin: 0 auto;
         max-width: 1200px;
         padding: 20px 60px 60px 60px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        //align-items: center;
 
         h1 {
             display: none;
