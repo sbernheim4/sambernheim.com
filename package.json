@@ -1,52 +1,66 @@
 {
-  "name": "sbernheim4.github.io",
-  "version": "1.0.0",
-  "description": "",
-  "main": "server/index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "concurrently --kill-others \"npm run gulp\" \"npm run express-server\"",
-    "express-server": "nodemon ./server/index.js",
-    "gulp": "gulp",
-    "start": "forever start -c nodemon server/index.js",
-    "postinstall": "gulp buildProduction"
+  "name": "personal-site",
+  "author": {
+    "name": "Samuel Bernheim",
+    "email": "sambernheim@gmail.com"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/sbernheim4/sbernheim4.github.io"
-  },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/sbernheim4/sbernheim4.github.io"
-  },
-  "homepage": "https://github.com/sbernheim4/sbernheim4.github.io#readme",
+  "version": "0.0.1",
+  "description": "Samuel Bernheim&#39;s personal site",
   "dependencies": {
-    "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.2",
-    "client-sessions": "^0.8.0",
-    "compression": "^1.6.2",
-    "dotenv": "^4.0.0",
-    "express": "^4.14.0",
-    "forever": "^0.15.4",
-    "gulp": "^4.0.0",
-    "gulp-babel": "^6.1.2",
-    "gulp-clean-css": "^4.0.0",
-    "gulp-concat": "^2.6.1",
-    "gulp-htmlmin": "^3.0.0",
-    "gulp-jshint": "^2.0.4",
-    "gulp-livereload": "^4.0.1",
-    "gulp-sass": "^3.1.0",
-    "jshint": "^2.10.2",
-    "mongodb": "^2.2.31",
-    "nodemon": "^1.11.0",
-    "path": "^0.12.7"
+    "chalk": "^2.3.2",
+    "compression": "^1.7.1",
+    "express": "^4.16.2",
+    "helmet": "^3.13.0",
+    "path": "^0.12.7",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0",
+    "react-router-dom": "^4.2.2"
   },
   "devDependencies": {
-    "browser-sync": "^2.26.3",
-    "chalk": "^2.1.0",
-    "concurrently": "^3.5.0",
-    "gulp-stylelint": "^8.0.0",
-    "stylelint-order": "^2.1.0"
+    "@babel/core": "^7.1.2",
+    "@babel/node": "^7.0.0",
+    "@babel/plugin-syntax-dynamic-import": "^7.0.0",
+    "@babel/preset-env": "^7.1.0",
+    "@babel/preset-react": "^7.0.0",
+    "autoprefixer": "^9.3.1",
+    "babel-eslint": "^10.0.1",
+    "babel-loader": "^8.0.4",
+    "concurrently": "^4.0.1",
+    "css-loader": "^1.0.1",
+    "cssnano": "^4.1.7",
+    "eslint": "^5.8.0",
+    "eslint-loader": "^2.1.1",
+    "eslint-plugin-react": "^7.5.1",
+    "html-webpack-plugin": "^3.2.0",
+    "node-sass": "^4.9.2",
+    "nodemon": "^1.12.5",
+    "optimize-css-assets-webpack-plugin": "^5.0.1",
+    "postcss-loader": "^3.0.0",
+    "react-loadable": "^5.5.0",
+    "sass-loader": "^7.1.0",
+    "style-loader": "^0.23.1",
+    "stylelint": "^9.7.1",
+    "stylelint-order": "^1.0.0",
+    "stylelint-webpack-plugin": "^0.10.5",
+    "webpack": "^4.23.1",
+    "webpack-cli": "^3.1.2",
+    "webpack-dev-server": "^3.1.10",
+    "webpackbar": "^2.6.1"
+  },
+  "engines": {
+    "node": ">=8.9.3"
+  },
+  "scripts": {
+    "start": "concurrently \"npm run wds\" \"npm run server\"",
+    "wds": "./node_modules/.bin/webpack-dev-server --open --hot",
+    "server": "nodemon --watch server server/index.js",
+    "build:dev": "./node_modules/.bin/webpack",
+    "build:prod": "./node_modules/.bin/webpack --mode=production",
+    "build:watch": "./node_modules/.bin/webpack -w",
+    "lint": "npm run lintServer; npm run lintCSS",
+    "lintCSS": "node_modules/.bin/stylelint --fix src/**/*",
+    "lintServer": "node_modules/.bin/eslint --fix server/",
+    "copyFiles": "cp public/* ./"
   }
 }

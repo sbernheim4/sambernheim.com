@@ -1,0 +1,70 @@
+$blue: rgb(80, 152, 196);
+
+@keyframes text {
+	0% {
+		text-shadow: none;
+		color: white;
+    }
+    50% {
+		color: $blue;
+    }
+	99% {
+		text-shadow: 2px 3px 9px black;
+	}
+	100% {
+		text-shadow: 2px 3px 9px black;
+	}
+}
+
+@keyframes drop {
+
+	0% {
+		top: -200px;
+	}
+
+	100% {
+		top: 0;
+	}
+
+}
+
+.landing {
+
+    height: 100vh;
+    background: linear-gradient( rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.4) ), url('https://d2rx8thx7xqki2.cloudfront.net/background-image.jpg') center no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+
+    h1 {
+        position: relative;
+        margin: 5vw 30px 0 5vw;
+        font-size: 80px;
+        text-shadow: 2px 3px 9px black;
+        animation: text 3s, drop 1s;
+        animation-delay: .3s;
+        animation-fill-mode: both;
+        color: $blue;
+
+        @media all and (max-width: 410px) {
+            font-size: 63px;
+        }
+    }
+
+    p {
+        margin: 0 30px 0 5vw;
+        font-size: 18px;
+        color: white;
+    }
+
+    svg {
+        position: absolute;
+        bottom: 0;
+    }
+
+    h2 {
+        margin-top: 200px;
+        color: white;
+        text-align: center;
+    }
+
+}

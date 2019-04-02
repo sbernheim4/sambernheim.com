@@ -1,75 +1,46 @@
-`use strict`;
 
-require(`dotenv`).config();
-
-const express = require(`express`);
+const path = require('path');
+const util = require('util');
+const express = require('express');
 const app = express();
-const path = require(`path`);
-const compression = require(`compression`);
-const bodyParser = require(`body-parser`);
-const chalk = require(`chalk`);
-const errors = require(`./errors.js`);
+const chalk = require('chalk');
+const compression = require('compression');
+const helmet = require('helmet');
+const bodyParser = require('body-parser');
 
-app.use(bodyParser.urlencoded( { extended: false } ));
-app.use(bodyParser.json());
-app.use(compression());
+const PORT = process.env.PORT || 3000;
 
-const port = process.env.PORT;
-const cacheTime = 31536000000; // One year
+/****************** Serve Static Files --> JS, CSS, IMAGES ETC ******************/
+const cacheTime = 172800000; // 2 Days in ms - Tells clients to cache static files
+app.use(express.static(path.join(__dirname, '../public'), { maxAge: cacheTime } ));
 
+/****************** Server Options ******************/
+app.use(helmet()); // Sets some good default headers
+app.use(compression()); // Enables gzip compression
+app.use(bodyParser.json()) // Lets express handle JSON encoded data sent on the body of requests
+app.use(bodyParser.urlencoded({ extended: true }));
 
-/******************* SERVE STATIC FILES  *****************************/
+/****************** Log Requests ******************/
+app.use('*', (req, res, next) => {
+	console.log('--------------------------------------------------------------------------');
+	console.log(util.format(chalk.red('%s: %s %s'), 'REQUEST ', req.method, req.path));
+	console.log(util.format(chalk.yellow('%s: %s'), 'QUERY   ', util.inspect(req.query)));
+	console.log(util.format(chalk.cyan('%s: %s'), 'BODY    ', util.inspect(req.body)));
 
-app.use(express.static(path.join(__dirname, `public`), {maxAge: cacheTime})); // css and js
-app.use(express.static(path.join(__dirname, `../images`), {maxAge: cacheTime})); // images
-app.use(express.static(path.join(__dirname, `./public/js-pages`), {maxAge: cacheTime})); // used for /submit-article
-app.use(express.static(path.join(__dirname, `./public/images`), {maxAge: cacheTime})); // images
-
-
-/******************* LOG REQUESTS  *****************************/
-
-app.all(`*`, (req, res, next) => {
-	console.log(chalk.blue(`New ${req.method} request for ${req.path} on ${new Date().toLocaleString()}`));
 	next();
 });
 
-/******************* VALID PATHS FOR WEBSITE *****************************/
-
-// Hand off routing to separate sub components where appropriate
-app.use(`/submit-article`, require(`./submitArticle`));
-app.use(`/blog`, require(`./blog`));
-app.use(`/login`, require(`./login`));
-app.use(`/api`, require(`./api`));
-
-app.get(`/`, (req, res) => {
-	res.sendFile(path.resolve(`./minihtml/home.html`));
+/****************** Route Handling ******************/
+app.use('/*', (req, res) => {
+	res.sendFile(path.join(__dirname, "../public/index.html"));
 });
 
-app.get(`/resume`, (req, res) => {
-	res.sendFile(path.resolve(`./minihtml/resume.html`));
+// Return a 404 page for all other requests - This should be the last get/put/post/delete/all/use call for app
+app.use("*", (req, res) => {
+	res.status(404).send(`<h1>404 Page Not Found</h1>`);
 });
 
-// SEO and other simple files
-app.get(`/robots.txt`, (req, res) => {
-	res.sendFile(path.join(__dirname, `./public/robots.txt`));
-});
-
-app.get(`/sitemap.xml`, (req, res) => {
-	res.sendFile(path.join(__dirname, `./public/sitemap.xml`));
-});
-
-app.get(`/manifest.json`, (req, res) => {
-	res.sendFile(path.join(__dirname, `./public/manifest.json`));
-});
-
-/******************* RETURN A 404 FOR ALL OTHER ROUTES *********************/
-
-app.get(`/*`, (req, res) => {
-	res.sendStatus(404);
-});
-
-/******************* START THE SERVER *******************/
-
-app.listen(port, () => {
-	console.log(chalk.yellow(`Listening to port:`, port));
+/****************** Start the Server and DB (if DB_URI env var is set) ******************/
+app.listen(PORT, () => {
+	console.log(chalk.green(`Listening on port ${PORT}`));
 });
