@@ -4,10 +4,10 @@ $blue: rgb(80, 152, 196);
 	0% {
 		text-shadow: none;
 		color: white;
-    }
-    50% {
+	}
+	50% {
 		color: $blue;
-    }
+	}
 	99% {
 		text-shadow: 2px 3px 9px black;
 	}
@@ -19,54 +19,53 @@ $blue: rgb(80, 152, 196);
 @keyframes drop {
 
 	0% {
-		top: -200px;
+		transform: translatey(-20vh);
 	}
 
 	100% {
-		top: 0;
+		transform: translatey(0);
 	}
 
 }
 
 .landing {
 
-    height: 100vh;
-    background: linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 1)), url(https://d2rx8thx7xqki2.cloudfront.net/background-image.jpg) center no-repeat;
-    background-size: cover;
-    background-attachment: fixed;
+	height: 100vh;
+	background: linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 1)), url(https://d2rx8thx7xqki2.cloudfront.net/background-image.jpg) center no-repeat;
+	background-size: cover;
+	background-attachment: fixed;
 
-    h1 {
-        position: relative;
-        margin: 5vw 30px 0 5vw;
-        font-family: 'verlag', 'Lato', sans-serif;
-        font-weight: 300;
-        font-size: 80px;
-        //text-shadow: 2px 3px 9px black;
-        animation: text 3s, drop 1s;
-        animation-delay: .3s;
-        animation-fill-mode: both;
-        color: $blue;
+	h1 {
+		position: relative;
+		margin: 5vw 30px 0 5vw;
+		font-family: 'verlag', 'Lato', sans-serif;
+		font-weight: 300;
+		font-size: 80px;
+		animation: text 3s, drop 1s;
+		animation-delay: .3s;
+		animation-fill-mode: both;
+		color: $blue;
 
-        @media all and (max-width: 410px) {
-            font-size: 63px;
-        }
-    }
+		@media all and (max-width: 410px) {
+			font-size: 63px;
+		}
+	}
 
-    p {
-        margin: 0 30px 0 5vw;
-        font-size: 18px;
-        color: white;
-    }
+	p {
+		margin: 0 30px 0 5vw;
+		font-size: 18px;
+		color: white;
+	}
 
-    svg {
-        position: absolute;
-        bottom: 0;
-    }
+	svg {
+		position: absolute;
+		bottom: 0;
+	}
 
-    h2 {
-        margin-top: 200px;
-        color: white;
-        text-align: center;
-    }
+	h2 {
+		margin-top: 200px;
+		color: white;
+		text-align: center;
+	}
 
 }

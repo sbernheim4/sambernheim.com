@@ -12,13 +12,13 @@ class LandingPage extends Component {
 	}
 
 	render() {
-        return (
-            <section className='landing'>
-                <h1>Samuel Bernheim</h1>
-                <p>Software Engineer at Disney Streaming Services</p>
-            </section>
-        );
-    }
+		return (
+			<section className='landing'>
+				<h1>Samuel Bernheim</h1>
+				<p>Software Engineer at Disney Streaming Services</p>
+			</section>
+		);
+	}
 }
 
 export default LandingPage;

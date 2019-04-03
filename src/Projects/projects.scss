@@ -1,97 +1,97 @@
 .projects {
-    --darken-amount: .6;
+	--darken-amount: .6;
 
-    background: white;
+	background: white;
 
-    h1 {
-        font-family: 'verlag', 'Lato', sans-serif;
-        font-weight: 300;
-        margin: 20px 0 20px 0;
-        font-size: 60px;
-        text-align: center;
-    }
+	h1 {
+		font-family: 'verlag', 'Lato', sans-serif;
+		font-weight: 300;
+		margin: 20px 0 20px 0;
+		font-size: 60px;
+		text-align: center;
+	}
 
-    p {
-        margin: 0 0 30px 30px;
-    }
+	p {
+		margin: 0 0 30px 30px;
+	}
 
-    &__container {
-        display: grid;
-        grid-template-columns: 2fr 3fr;
-        grid-template-rows: 200px 100px 300px;
-        grid-template-areas: "project1 project2"
-                             "project1 project4"
-                             "project3 project4";
+	&__container {
+		display: grid;
+		grid-template-columns: 2fr 3fr;
+		grid-template-rows: 200px 100px 300px;
+		grid-template-areas: "project1 project2"
+							 "project1 project4"
+							 "project3 project4";
 
-        &__project {
-            width: 100%;
-            height: 100%;
-            transition: font-size .3s ease-in-out;
-            overflow: hidden;
+		&__project {
+			width: 100%;
+			height: 100%;
+			transition: font-size .3s ease-in-out;
+			overflow: hidden;
 
-            div {
-                width: 100%;
-                height: 100%;
-                transition: all .3s ease-in-out;
-                justify-content: center;
-                align-items: center;
-                background-size: cover !important;
-                display: flex;
+			div {
+				width: 100%;
+				height: 100%;
+				transition: all .3s ease-in-out;
+				justify-content: center;
+				align-items: center;
+				background-size: cover !important;
+				display: flex;
 
-                &:hover {
-                    width: 100%;
-                    height: 100%;
-                    cursor: pointer;
-                    transform: scale(1.2);
-                    transition-timing-function: ease-in-out;
-                    transition-duration: 0.3s;
+				&:hover {
+					width: 100%;
+					height: 100%;
+					cursor: pointer;
+					transform: scale(1.2);
+					transition-timing-function: ease-in-out;
+					transition-duration: 0.3s;
 
-                    h2 {
-                        transition-duration: 0.3s;
-                        transform: scale(1.2);
-                    }
-                }
+					h2 {
+						transition-duration: 0.3s;
+						transform: scale(1.2);
+					}
+				}
 
-                h2 {
-                    font-size: 20px;
-                    color: white;
-                    text-align: center;
-                    transform: scale(1);
-                    transition-duration: 0.3s;
-                }
-            }
-        }
-    }
+				h2 {
+					font-size: 20px;
+					color: white;
+					text-align: center;
+					transform: scale(1);
+					transition-duration: 0.3s;
+				}
+			}
+		}
+	}
 }
 
 .one {
-    grid-area: project1;
+	grid-area: project1;
 
-    div {
-        background: linear-gradient( rgba(0, 0, 0, var(--darken-amount)), rgba(0, 0, 0, var(--darken-amount))), url('https://d2rx8thx7xqki2.cloudfront.net/budgeteer.png') top left no-repeat;
-    }
+	div {
+		background: linear-gradient( rgba(0, 0, 0, var(--darken-amount)), rgba(0, 0, 0, var(--darken-amount))), url('https://d2rx8thx7xqki2.cloudfront.net/budgeteer.png') top left no-repeat;
+	}
 }
 
 .two {
-    grid-area: project2;
+	grid-area: project2;
 
-    div {
-        background: linear-gradient( rgba(0, 0, 0, var(--darken-amount)), rgba(0, 0, 0, var(--darken-amount))),  url('https://d2rx8thx7xqki2.cloudfront.net/weatherterm.png') top left no-repeat;
-    }
+	div {
+		background: linear-gradient( rgba(0, 0, 0, var(--darken-amount)), rgba(0, 0, 0, var(--darken-amount))),  url('https://d2rx8thx7xqki2.cloudfront.net/weatherterm.png') top left no-repeat;
+	}
 }
 
 .three {
-    grid-area: project3;
+	grid-area: project3;
 
-    div {
-        background: linear-gradient( rgba(0, 0, 0, var(--darken-amount)), rgba(0, 0, 0, var(--darken-amount))),  url('https://d2rx8thx7xqki2.cloudfront.net/m5systems.png') top left no-repeat;
-    }
+	div {
+		background: linear-gradient( rgba(0, 0, 0, var(--darken-amount)), rgba(0, 0, 0, var(--darken-amount))),  url('https://d2rx8thx7xqki2.cloudfront.net/m5systems.png') top left no-repeat;
+	}
 }
 
 .four {
-    grid-area: project4;
+	grid-area: project4;
 
-    div {
-        background: linear-gradient( rgba(0, 0, 0, var(--darken-amount)), rgba(0, 0, 0, var(--darken-amount))),  url('https://d2rx8thx7xqki2.cloudfront.net/kinetic.png') top left no-repeat;
-    }
+	div {
+		background: linear-gradient( rgba(0, 0, 0, var(--darken-amount)), rgba(0, 0, 0, var(--darken-amount))),  url('https://d2rx8thx7xqki2.cloudfront.net/kinetic.png') top left no-repeat;
+	}
 }
