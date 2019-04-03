@@ -27,15 +27,12 @@ class About extends Component {
 				<div>
 					<h1>About Me</h1>
 					<br/>
-					<h2>Hi</h2>
-					<h2>I'm Sam</h2>
-					<br/>
+					<h2>Hi, I'm Sam</h2>
+					<br />
 					<p>I live in New York City and work at Disney Streaming Services</p>
-					<p>I've been interested in computers and programming for as long as I can remember and love learning new technologies.</p>
-
-					<p>Outside of work I love to play soccer, ultimate frisbee, and tennis, as well as ski and kyak.</p>
-					<p>I love reading historical fiction and fantasy novels, and am an avid fan of science fiction and politcal TV shows</p>
-					<p>I also greatly enjoy following political and economic events, cooking, baking, and of course eating.</p>
+					<p>I'm fairly active outside of work</p>
+					<p>I enjoy playing soccer and ultimate frisbee, reading fantasy novels, cooking great meals, and watching TV</p>
+					<p>I also love to build things</p>
 				</div>
 			</section>
 

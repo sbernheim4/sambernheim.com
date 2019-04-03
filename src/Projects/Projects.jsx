@@ -14,8 +14,11 @@ class Projects extends Component {
 	render() {
 		return (
 			<section className="projects">
-				<h1>Projects</h1>
-				<p>I've worked on some pretty fun side projects, each helping me explore a new framework, technology, or platform.</p>
+
+				<div className="projects__header">
+					<h1>Projects</h1>
+					<h2>I've worked on some pretty fun side projects, each helping me explore a new framework, technology, or platform.</h2>
+				</div>
 
 				<div className="projects__container">
 

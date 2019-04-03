@@ -1,18 +1,21 @@
 .projects {
 	--darken-amount: .6;
-
 	background: white;
 
-	h1 {
-		font-family: 'verlag', 'Lato', sans-serif;
-		font-weight: 300;
-		margin: 20px 0 20px 0;
-		font-size: 60px;
-		text-align: center;
-	}
+	&__header {
+		h1 {
+			margin: 20px 0 20px 0;
+			font-family: 'verlag', 'Lato', sans-serif;
+			font-weight: 300;
+			font-size: 60px;
+			text-align: center;
+		}
 
-	p {
-		margin: 0 0 30px 30px;
+		h2 {
+			width: 900px;
+			text-align: center;
+			margin: 0 auto 30px auto;
+		}
 	}
 
 	&__container {

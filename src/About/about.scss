@@ -1,5 +1,5 @@
 :root {
-	--main-bg-color: rgb(245, 241, 225);
+	--main-bg-color: rgba(245, 70, 50, 1);
 }
 
 .mobile {
@@ -8,8 +8,6 @@
 
 .about {
 	width: 100vw;
-	max-height: 70vh;
-	height: 500px;
 	fill: var(--main-bg-color);;
 	background: var(--main-bg-color);;
 
@@ -34,7 +32,6 @@
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
-		//align-items: center;
 
 		h1 {
 			display: none;
@@ -47,9 +44,10 @@
 		}
 
 		p {
-			margin-bottom: 10px;
+			margin: 20px 0;
 			font-size: 18px;
 		}
+
 	}
 
 }
