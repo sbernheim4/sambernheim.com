@@ -67,4 +67,4 @@ typings/
 .idea/
 .hgignore
 public/
-static-assets/
+package-lock.json
