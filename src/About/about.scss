@@ -2,22 +2,18 @@
 	--main-bg-color: rgba(245, 70, 50, 1);
 }
 
-.mobile {
-	bottom: -60px !important;
-}
-
-.ios {
-	bottom: -120px !important;
-}
-
 .about {
+    position: relative;
 	width: 100vw;
 	fill: var(--main-bg-color);;
 	background: var(--main-bg-color);;
+    overflow: initial;
 
 	svg {
 		position: absolute;
-		bottom: 0;
+		top: 0;
+        transform: translateY(calc(-100% + 1px));
+
 
 		text {
 			font-family: 'verlag', 'Lato', sans-serif;
