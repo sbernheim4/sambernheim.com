@@ -7,7 +7,7 @@ script: npm run build:prod
 
 branches:
     only:
-        - updates
+        - release
 
 deploy:
     local_dir: ./public/
@@ -16,4 +16,4 @@ deploy:
     github_token: $GITHUB_TOKEN
     target_branch: master
     on:
-        branch: updates
+        branch: release
