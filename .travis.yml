@@ -13,6 +13,7 @@ deploy:
     local_dir: ./public/
     skip_cleanup: true
     keep_history: true
+    fqdn: "sambernheim.com"
     provider: pages
     github_token: $GITHUB_TOKEN
     target_branch: master
