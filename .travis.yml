@@ -1,13 +1,19 @@
 language: node_js
+
 node_js:
     node
+
 script: npm run build:prod
+
+branches:
+    only:
+        - updates
+
 deploy:
     local_dir: ./public/
-    provider: pages
     skip_cleanup: true
+    provider: pages
     github_token: $GITHUB_TOKEN
-    keep_history: true
     target_branch: master
     on:
-        branch: udpates
+        branch: updates
