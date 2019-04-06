@@ -12,6 +12,7 @@ branches:
 deploy:
     local_dir: ./public/
     skip_cleanup: true
+    keep_history: true
     provider: pages
     github_token: $GITHUB_TOKEN
     target_branch: master
