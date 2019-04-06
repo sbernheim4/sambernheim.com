@@ -6,20 +6,46 @@ class About extends Component {
 		super(props);
 
 		this.state = {
-
+			os: "none"
 		};
+
+		this.getMobileOperatingSystem = this.getMobileOperatingSystem.bind(this);
+	}
+
+
+	getMobileOperatingSystem() {
+		const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+
+		// Windows Phone must come first because its UA also contains "Android"
+		if (/windows phone/i.test(userAgent)) {
+			this.setState({
+				os: "windows"
+			});
+		}
+
+		if (/android/i.test(userAgent)) {
+			this.setState({
+				os: "android"
+			});
+		}
+
+		// iOS detection from: http://stackoverflow.com/a/9039885/177710
+		if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+			this.setState({
+				os: "ios"
+			});
+		}
+	}
+
+	componentDidMount() {
+		this.getMobileOperatingSystem();
 	}
 
 	render() {
-		let css = '';
-
-		if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
-			css = "mobile";
-		}
 
 		return (
 			<section className='about'>
-				<svg className={css} viewBox="0 0 500 80">
+				<svg className={this.state.os} viewBox="0 0 500 80">
 					<polygon points="40,80 500,80  500,0" />
 					<text x="380" y="60" fontSize="24px" fill="black">About Me</text>
 				</svg>

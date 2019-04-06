@@ -9,7 +9,7 @@ export default function (templateConfig) {
                 <title>${title}</title>
 
                 <!-- Google Fonts -->
-                <link href="https://fonts.googleapis.com/css?family=Lato:300,400" rel="stylesheet preload">
+                <link href="https://fonts.googleapis.com/css?family=Lato:300,400" rel="stylesheet preload" as="style">
 
                 <meta charset="UTF-8" />
                 <meta http-equiv="X-UA-Compatible" content="IE=edge">
