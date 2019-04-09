@@ -2,34 +2,22 @@ $blue: rgb(80, 152, 196);
 
 @keyframes text {
 	0% {
-		text-shadow: none;
+		transform: translatey(-100vh);
 		color: white;
 	}
-	50% {
-		color: $blue;
-	}
-	99% {
-		text-shadow: 2px 3px 9px black;
-	}
-	100% {
-		text-shadow: 2px 3px 9px black;
-	}
-}
-
-@keyframes drop {
-
-	0% {
-		transform: translatey(-20vh);
-	}
-
-	100% {
+    70% {
+		color: white;
+    }
+	90% {
 		transform: translatey(0);
 	}
-
+	100% {
+		color: $blue;
+		text-shadow: 2px 3px 9px black;
+	}
 }
 
 .landing {
-
 	height: 100vh;
 	background: linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 1)), url(https://d2rx8thx7xqki2.cloudfront.net/background-image.jpg) center no-repeat;
 	background-size: cover;
@@ -41,8 +29,7 @@ $blue: rgb(80, 152, 196);
 		font-family: 'verlag', 'Lato', sans-serif;
 		font-weight: 300;
 		font-size: 80px;
-		animation: text 3s, drop 1s;
-		animation-delay: .3s;
+		animation: text 1.3s;
 		animation-fill-mode: both;
 		color: $blue;
 
