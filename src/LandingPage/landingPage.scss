@@ -31,6 +31,7 @@ $blue: rgb(80, 152, 196);
 		font-size: 80px;
 		animation: text 1.3s;
 		animation-fill-mode: both;
+		animation-delay: .5s;
 		color: $blue;
 
 		@media all and (max-width: 410px) {
