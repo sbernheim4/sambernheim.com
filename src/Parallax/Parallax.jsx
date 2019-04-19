@@ -9,7 +9,6 @@ class Parallax extends Component {
     render() {
 
         const backgroundImageUrl = this.props.url;
-        console.log(backgroundImageUrl)
 
         const style = {
             //background: `linear-gradient(rgba(0, 0, 0, .65), rgba(0, 0, 0, 1)), url(${backgroundImageUrl})`,
