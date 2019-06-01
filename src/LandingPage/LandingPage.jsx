@@ -39,20 +39,30 @@ class LandingPage extends Component {
 
 
 	updateBackgroundImage() {
-		// Get the landing page element
 		const element = this.landingPageSection.current;
-
-		// Must be between between 1 and -1 exclusive - 0 yields no effect,
-		// negative values shift image up as the user scrolls down
-		// positive values shift image down as the user scrolls down
 		const parallaxEffect = -.5
-
-		// Must be the same as css background-position-y value
 		const offset = 0;
+		const header = element.querySelector('h1');
+		const p = element.querySelector('p');
 
-		// Update the background-position-y style property using the vertical scroll position only if on desktop
+		// Update background image
 		if (!isMobile.any()) {
 			element.style.backgroundPositionY = `calc(${parallaxEffect * window.scrollY}px + ${offset}px)`;
+		}
+
+		// Hide and show the header/p tags so they don't pop out further down the page
+		if (window.scrollY > 920) {
+			header.style.display = 'none';
+			p.style.display = 'none';
+
+		} else if (window.scrollY < 920) {
+			header.style.display = 'block';
+			p.style.display = 'block';
+		}
+
+		// If the user has scrolled past 800px disable header drop down animation
+		if (window.scrollY > 800) {
+			header.style.animation = 'none';
 		}
 
 	}
