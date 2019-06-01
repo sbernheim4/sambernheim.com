@@ -18,13 +18,25 @@ $blue: rgb(80, 152, 196);
 }
 
 .landing {
+	--overlay: 0.75;
+    position: relative;
 	height: 100vh;
-	background: linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 1)), url(https://d2rx8thx7xqki2.cloudfront.net/background-image.jpg) center no-repeat;
+	background: linear-gradient(
+		rgba(0, 0, 0, 1),
+		rgba(0, 0, 0, var(--overlay)),
+		rgba(0, 0, 0, 1),
+	),
+	url(https://d2rx8thx7xqki2.cloudfront.net/background-image.jpg)
+	center
+	no-repeat;
 	background-size: cover;
 	background-attachment: fixed;
+	background-repeat: no-repeat;
+	//background-position-x: center;
+
 
 	h1 {
-		position: relative;
+		position: fixed;
 		margin: 5vw 30px 0 5vw;
 		font-family: 'verlag', 'Lato', sans-serif;
 		font-weight: 300;
@@ -40,20 +52,18 @@ $blue: rgb(80, 152, 196);
 	}
 
 	p {
-		margin: 0 30px 0 5vw;
+        position: fixed;
+		margin: calc(100px + 5vw) 30px 0 5vw;
 		font-size: 18px;
 		color: white;
-	}
 
-	svg {
-		position: absolute;
-		bottom: 0;
-	}
+		@media all and (max-width: 659px) {
+            margin-top: calc(5vw + 200px);
+		}
 
-	h2 {
-		margin-top: 200px;
-		color: white;
-		text-align: center;
-	}
+		@media all and (max-width: 410px) {
+            margin-top: calc(5vw + 155px);
+		}
 
+	}
 }
