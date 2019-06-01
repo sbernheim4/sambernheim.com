@@ -56,7 +56,6 @@ class About extends Component {
 					<h2>Hi, I'm Sam</h2>
 					<br />
 					<p>I live in New York City and work at Disney Streaming Services</p>
-					<p>I'm fairly active outside of work</p>
 					<p>I enjoy playing soccer and ultimate frisbee, reading fantasy novels, cooking great meals, and watching TV</p>
 					<p>I also love to build things</p>
 				</div>
