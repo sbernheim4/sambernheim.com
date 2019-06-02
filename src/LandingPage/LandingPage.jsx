@@ -40,7 +40,7 @@ class LandingPage extends Component {
 
 	updateBackgroundImage() {
 		const element = this.landingPageSection.current;
-		const parallaxEffect = -.5
+		const parallaxEffect = -.2
 		const offset = 0;
 		const header = element.querySelector('h1');
 		const p = element.querySelector('p');
