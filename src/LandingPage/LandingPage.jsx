@@ -42,27 +42,9 @@ class LandingPage extends Component {
 		const element = this.landingPageSection.current;
 		const parallaxEffect = -.2
 		const offset = 0;
-		const header = element.querySelector('h1');
-		const p = element.querySelector('p');
 
-		// Update background image
 		if (!isMobile.any()) {
 			element.style.backgroundPositionY = `calc(${parallaxEffect * window.scrollY}px + ${offset}px)`;
-		}
-
-		// Hide and show the header/p tags so they don't pop out further down the page
-		if (window.scrollY > 920) {
-			header.style.display = 'none';
-			p.style.display = 'none';
-
-		} else if (window.scrollY < 920) {
-			header.style.display = 'block';
-			p.style.display = 'block';
-		}
-
-		// If the user has scrolled past 800px disable header drop down animation
-		if (window.scrollY > 800) {
-			header.style.animation = 'none';
 		}
 
 	}
@@ -70,8 +52,10 @@ class LandingPage extends Component {
 	render() {
 		return (
 			<section ref={this.landingPageSection} className='landing'>
-				<h1>Samuel Bernheim</h1>
-				<p>Software Engineer at Disney Streaming Services</p>
+				<div className='landing--text'>
+					<h1>Samuel Bernheim</h1>
+					<p>Software Engineer at Disney Streaming Services</p>
+				</div>
 			</section>
 		);
 	}
