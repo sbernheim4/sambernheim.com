@@ -51,7 +51,6 @@ class About extends Component {
 
 				<div>
 					<h1>About Me</h1>
-					<br/>
 					<h2>Hi, I'm Sam</h2>
 					<br />
 					<p>I live in New York City and work at Disney Streaming Services</p>
