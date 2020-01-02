@@ -1,11 +1,18 @@
 .projects {
 	position: relative;
 	--darken-amount: .6;
-	background: white;
+	background: #ce4848;
 
-	&__header {
+	&--header {
+		margin: 45px 30px;
+		min-height: 250px;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-around;
+		align-items: center;
+
 		h1 {
-			margin: 20px 0 20px 0;
+			margin-bottom: 40px;
 			font-family: 'verlag', 'Lato', sans-serif;
 			font-weight: 300;
 			font-size: 60px;
@@ -14,7 +21,7 @@
 
 		h2 {
 			max-width: 900px;
-			margin: 0 auto 30px auto;
+			margin: 0 auto;
 			padding: 0 30px;
 			text-align: center;
 		}

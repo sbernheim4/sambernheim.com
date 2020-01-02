@@ -15,7 +15,7 @@ class Projects extends Component {
 		return (
 			<section className="projects">
 
-				<div className="projects__header">
+				<div className="projects--header">
 					<h1>Projects</h1>
 					<h2>I've worked on some pretty fun side projects, each helping me explore a new framework, technology, or platform.</h2>
 				</div>
