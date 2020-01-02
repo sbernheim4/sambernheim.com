@@ -1,5 +1,5 @@
 :root {
-	--main-bg-color: rgba(245, 70, 50, 1);
+	--main-bg-color: rgb(231, 168, 18);
 }
 
 .about {
@@ -37,14 +37,19 @@
 
 			@media all and (max-width: 800px) {
 				display: block;
+				margin-top: 10px;
 				font-family: 'verlag', 'Lato', sans-serif;
 				font-size: 50px;
 				text-align: center;
 			}
 		}
 
+		h2 {
+			margin-top: 30px;
+		}
+
 		p {
-			margin: 20px 0;
+			margin: 15px 0 0 0;
 			font-size: 18px;
 		}
 

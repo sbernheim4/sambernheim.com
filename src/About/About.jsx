@@ -12,7 +12,6 @@ class About extends Component {
 		this.getMobileOperatingSystem = this.getMobileOperatingSystem.bind(this);
 	}
 
-
 	getMobileOperatingSystem() {
 		const userAgent = navigator.userAgent || navigator.vendor || window.opera;
 
@@ -46,7 +45,7 @@ class About extends Component {
 		return (
 			<section className='about'>
 				<svg className={this.state.os} viewBox="0 0 500 80">
-					<polygon points="40,80 500,80  500,0" />
+					<polygon points="40, 80 500, 80 500, 0" />
 					<text x="380" y="60" fontSize="24px" fill="black">About Me</text>
 				</svg>
 
@@ -56,7 +55,7 @@ class About extends Component {
 					<h2>Hi, I'm Sam</h2>
 					<br />
 					<p>I live in New York City and work at Disney Streaming Services</p>
-					<p>I enjoy playing soccer and ultimate frisbee, reading fantasy novels, cooking great meals, and watching TV</p>
+					<p>I enjoy lifting and working out, reading fantasy novels, cooking great meals, and watching excellant TV shows</p>
 					<p>I also love to build things</p>
 				</div>
 			</section>
