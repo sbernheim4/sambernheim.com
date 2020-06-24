@@ -1,25 +1,17 @@
-import React, { Component } from "react";
+import React from "react";
 import { Link } from 'react-router-dom';
 
 import "./navbar.css";
 
-class Navbar extends Component {
+export default function Navbar() {
 
-	constructor(props) {
-		super(props);
-	}
+	return (
+		<nav className='navbar'>
+			<Link id="main" to='/'>Home</Link>
 
-	render() {
-		return (
-			<nav className='navbar'>
-				<Link id="main" to='/'>Home</Link>
+			<hr/>
 
-				<hr/>
-
-				<Link to='/subpage'>Subpage</Link>
-			</nav>
-		);
-	}
+			<Link to='/subpage'>Subpage</Link>
+		</nav>
+	);
 }
-
-export default Navbar;

@@ -1,25 +1,13 @@
-import React, { Component } from "react";
+import React from "react";
 import './parallax.scss';
 
-class Parallax extends Component {
-    constructor(props) {
-        super(props);
-    }
+export default function Parallax(props) {
 
-    render() {
+	const { url: backgroundImageUrl } = props;
+	const style = { background: `url(${backgroundImageUrl}`, }
 
-        const backgroundImageUrl = this.props.url;
+	return (
+		<section style={style} className='parallax'></section>
+	);
 
-        const style = {
-            background: `url(${backgroundImageUrl}`,
-        }
-
-        return (
-            <section style={style} className='parallax'>
-            </section>
-
-        );
-    }
 }
-
-export default Parallax;

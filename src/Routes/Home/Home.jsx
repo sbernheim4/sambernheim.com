@@ -1,34 +1,23 @@
-import React, { Component } from "react";
+import React from "react";
 import './home.scss';
 
 import LandingPage from "../../LandingPage/LandingPage.jsx";
 import About from "../../About/About.jsx";
 import Projects from "../../Projects/Projects.jsx";
 
-class Home extends Component {
-	constructor(props) {
-		super(props);
+export default function() {
 
-		this.state = {
+	return (
 
-		};
-	}
+		<section className="home">
 
-	render() {
+			<LandingPage />
 
-		return (
+			<About />
 
-			<section className="home">
+			<Projects />
 
-				<LandingPage />
+		</section>
 
-				<About />
-
-				<Projects />
-
-			</section>
-		);
-	}
+	);
 }
-
-export default Home;

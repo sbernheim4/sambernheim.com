@@ -1,5 +1,5 @@
 
-import React, { Component } from "react";
+import React, { useEffect } from "react";
 import './landingPage.scss';
 
 const isMobile = {
@@ -24,22 +24,12 @@ const isMobile = {
 };
 
 
-class LandingPage extends Component {
-	constructor(props) {
-		super(props);
+export default function LandingPage() {
 
-		this.landingPageSection = React.createRef();
-		this.updateBackgroundImage = this.updateBackgroundImage.bind(this);
+	const landingPageSection = React.createRef();
 
-	}
-
-	componentDidMount() {
-		window.addEventListener('scroll', this.updateBackgroundImage);
-	}
-
-
-	updateBackgroundImage() {
-		const element = this.landingPageSection.current;
+	const updateBackgroundImage = () => {
+		const element = landingPageSection.current;
 		const parallaxEffect = -.2
 		const offset = 0;
 
@@ -49,16 +39,19 @@ class LandingPage extends Component {
 
 	}
 
-	render() {
-		return (
-			<section ref={this.landingPageSection} className='landing'>
-				<div className='landing--text'>
-					<h1>Samuel Bernheim</h1>
-					<p>Software Engineer at Disney Streaming Services</p>
-				</div>
-			</section>
-		);
-	}
-}
+	useEffect(() => {
+		window.addEventListener('scroll', updateBackgroundImage);
 
-export default LandingPage;
+		return window.removeEventListener('scroll', updateBackgroundImage);
+	}, []);
+
+
+	return (
+		<section ref={landingPageSection} className='landing'>
+			<div className='landing--text'>
+				<h1>Samuel Bernheim</h1>
+				<p>Software Engineer at Disney Streaming Services</p>
+			</div>
+		</section>
+	);
+}
