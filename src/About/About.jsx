@@ -42,7 +42,6 @@ export default function About() {
 				<h2>Hi, I'm Sam</h2>
 				<p>I live in New York City and work at Twitter</p>
 
-				<Link to="/about">About</Link>
 				<p>Previously Disney Streaming </p>
 			</div>
 		</section>
