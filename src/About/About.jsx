@@ -38,9 +38,8 @@ export default function About() {
 			<div>
 				<h1>About Me</h1>
 				<h2>Hi, I'm Sam</h2>
-				<p>I live in New York City and work at Disney Streaming Services</p>
-				<p>I enjoy lifting and working out, reading fantasy novels, cooking great meals, and watching excellent TV shows</p>
-				<p>I also love to build things</p>
+				<p>I live in New York City and work at Twitter</p>
+				<p>Previously Disney Streaming </p>
 			</div>
 		</section>
 
