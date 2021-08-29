@@ -31,4 +31,4 @@ jobs:
 
       # Runs a single command using the runners shell
       - name: Run a build
-        run: npm run build:prod
+        run: npm i && npm run build:prod
