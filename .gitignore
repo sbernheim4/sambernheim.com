@@ -66,5 +66,4 @@ typings/
 
 .idea/
 .hgignore
-public/
 package-lock.json
