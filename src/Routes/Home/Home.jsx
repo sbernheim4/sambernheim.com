@@ -3,7 +3,6 @@ import './home.scss';
 
 import LandingPage from "../../LandingPage/LandingPage.jsx";
 import About from "../../About/About.jsx";
-import Projects from "../../Projects/Projects.jsx";
 
 export default function() {
 
@@ -14,8 +13,6 @@ export default function() {
 			<LandingPage />
 
 			<About />
-
-			<Projects />
 
 		</section>
 
