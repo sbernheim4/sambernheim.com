@@ -50,7 +50,7 @@ export default function LandingPage() {
 		<section ref={landingPageSection} className='landing'>
 			<div className='landing--text'>
 				<h1>Samuel Bernheim</h1>
-				<p>Software Engineer at Disney Streaming Services</p>
+				<p>Software Engineer at Twitter</p>
 			</div>
 		</section>
 	);
