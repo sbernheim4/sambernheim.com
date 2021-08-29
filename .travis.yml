@@ -10,12 +10,12 @@ branches:
         - release
 
 deploy:
-    local_dir: ./public/
+    local_dir: ./public
     skip_cleanup: true
     keep_history: true
     fqdn: "sambernheim.com"
     provider: pages
     github_token: $GITHUB_TOKEN
-    target_branch: master
+    target_branch: main
     on:
         branch: release
