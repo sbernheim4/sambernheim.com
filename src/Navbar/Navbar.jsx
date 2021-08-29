@@ -11,7 +11,7 @@ export default function Navbar() {
 
 			<hr/>
 
-			<Link to='/subpage'>Subpage</Link>
+			<Link to='/blog'>Blog</Link>
 		</nav>
 	);
 }

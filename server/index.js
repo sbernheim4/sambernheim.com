@@ -6,29 +6,29 @@ const app = express();
 const chalk = require('chalk');
 const compression = require('compression');
 const helmet = require('helmet');
-const bodyParser = require('body-parser');
 
 const PORT = process.env.PORT || 3000;
 
 /****************** Serve Static Files --> JS, CSS, IMAGES ETC ******************/
 const cacheTime = 172800000; // 2 Days in ms - Tells clients to cache static files
-app.use(express.static(path.join(__dirname, '../public'), { maxAge: cacheTime } ));
 
 /****************** Server Options ******************/
 app.use(helmet()); // Sets some good default headers
 app.use(compression()); // Enables gzip compression
-app.use(bodyParser.json()) // Lets express handle JSON encoded data sent on the body of requests
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json()) // Lets express handle JSON encoded data sent on the body of requests
+app.use(express.urlencoded({ extended: true }));
 
 /****************** Log Requests ******************/
 app.use('*', (req, res, next) => {
 	console.log('--------------------------------------------------------------------------');
-	console.log(util.format(chalk.red('%s: %s %s'), 'REQUEST ', req.method, req.path));
+	console.log(util.format(chalk.red('%s: %s %s'), 'REQUEST ', req.method, req.baseUrl));
 	console.log(util.format(chalk.yellow('%s: %s'), 'QUERY   ', util.inspect(req.query)));
 	console.log(util.format(chalk.cyan('%s: %s'), 'BODY    ', util.inspect(req.body)));
 
 	next();
 });
+
+app.use(express.static(path.join(__dirname, '../public'), { maxAge: cacheTime } ));
 
 /****************** Route Handling ******************/
 app.use('/*', (req, res) => {

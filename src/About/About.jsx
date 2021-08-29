@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 
+import { Link } from 'react-router-dom';
+
 import './about.scss';
 
 export default function About() {
@@ -39,6 +41,8 @@ export default function About() {
 				<h1>About Me</h1>
 				<h2>Hi, I'm Sam</h2>
 				<p>I live in New York City and work at Twitter</p>
+
+				<Link to="/about">About</Link>
 				<p>Previously Disney Streaming </p>
 			</div>
 		</section>

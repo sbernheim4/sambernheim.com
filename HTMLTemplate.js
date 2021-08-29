@@ -1,5 +1,5 @@
 export default function (templateConfig) {
-        const { title, message } = templateConfig.htmlWebpackPlugin.options;
+	const { title } = templateConfig.htmlWebpackPlugin.options;
 
     return `
         <!DOCTYPE html>
@@ -7,6 +7,7 @@ export default function (templateConfig) {
             <head>
                 <meta charset="UTF-8" />
                 <title>${title}</title>
+                <base href="http://localhost:3000">
 
                 <!-- Google Fonts -->
                 <link href="https://fonts.googleapis.com/css?family=Lato:300,400" rel="stylesheet preload" as="style">

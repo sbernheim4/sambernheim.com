@@ -1,0 +1,20 @@
+.article-list {
+	margin: 15px;
+	height: 100%;
+	left: 0;
+
+	h3 {
+		margin: 10px 0 10px 10px;
+	}
+
+	&__link {
+		&:before {
+			content: ' * ';
+			vertical-align: -25%;
+		}
+
+		a {
+            color: green;
+		}
+	}
+}
