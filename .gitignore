@@ -67,4 +67,4 @@ typings/
 .idea/
 .hgignore
 package-lock.json
-./public/
+public/**/*
