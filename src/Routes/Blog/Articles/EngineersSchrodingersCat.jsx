@@ -200,7 +200,6 @@ export const EngineersSchrodingersCat = () => {
 				return !inline ?
 					(
 						<SyntaxHighlighter
-							showLineNumbers
 							children={String(children).replace(/\n$/, '')}
 							style={vscDarkPlus}
 							language={"typescript"}
