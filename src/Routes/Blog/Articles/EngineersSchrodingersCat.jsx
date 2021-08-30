@@ -156,7 +156,7 @@ const maybeAppendExclamationPoint = (str) => {
 
 };
 
-// ~~then~~ works regardless of the type that the function passed to it returns
+// then works regardless of the type that the function passed to it returns
 const myOpt = Some("hello")
     .then(appendWorld)
     .then(maybeAppendExclamationPoint)
