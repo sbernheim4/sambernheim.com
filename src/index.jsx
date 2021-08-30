@@ -5,7 +5,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 
-import { BrowserRouter } from 'react-router-dom'
+import { HashRouter } from 'react-router-dom'
 
 import "./styles/reset.css";
 
@@ -13,8 +13,8 @@ import "./styles/reset.css";
 import Routes from './Routes/index.jsx';
 
 ReactDOM.render(
-	<BrowserRouter basename="/">
+	<HashRouter basename="/">
 		<Routes />
-	</BrowserRouter>
+	</HashRouter>
 	,document.getElementById("root")
 );
