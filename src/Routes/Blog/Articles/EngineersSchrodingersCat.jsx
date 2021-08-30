@@ -163,7 +163,7 @@ const myOpt = Some("hello")
     .log();
 ~~~
 
-then will always return an Option just as \`map\` and \`flatMap\` do.
+\`then\` will always return an Option just as \`map\` and \`flatMap\` do.
 
 > Promise.then always returns a promise for the same reason
 
