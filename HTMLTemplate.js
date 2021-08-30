@@ -28,7 +28,6 @@ export default function (templateConfig) {
                 </noscript>
 
                 <div id='root'></div>
-                <script src='./main.js'></script>
             </body>
         </html>
     `;
