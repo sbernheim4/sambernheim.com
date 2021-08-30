@@ -169,7 +169,7 @@ const myOpt = Some("hello")
 
 ## Helper Methods
 
-This library exposes several additional methods to provide more capability and an exceptional development experience. Some of these are standard in other languages that support options natively and implementations but there are a few unique and beneficial ones
+This library exposes several additional methods to provide more capability and an exceptional development experience. Some of these are standard in other languages that support Options natively but there are a few unique methods that are especially useful for development.
 
 Above the \`log\` method is used to conveniently log the Option to see its value (and is simpler than doing \`console.log(myOption))\`.
 
