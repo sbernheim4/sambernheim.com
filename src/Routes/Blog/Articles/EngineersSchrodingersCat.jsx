@@ -54,7 +54,7 @@ In the first example, the argument is checked to make sure it’s not undefined.
 
 TypeScript’s strict mode helps in these circumstances, but only in validating that when calling the function, a string is always passed (instead of undefined). The function can still return undefined and the callers of \`uppercaseStrOne\` will have the burden of checking that the return value is again not undefined before passing the result to the next function (or implement these undefined checks in every function).
 
-In the second example, we use the map method on the Option passing in a function that transforms the underlying value (by uppercasing it). No undefined check is needed in the function passed to map.
+In the second example, we use the \`map\` method on the Option passing in a function that transforms the underlying value (by uppercasing it). No undefined check is needed in the function passed to \`map\`.
 
 This works regardless if the Option contains an underlying value or not like with \`valFour\`.
 
@@ -68,7 +68,7 @@ Uncaught TypeError: Cannot read property 'foo' of undefined at myIncrediblyImpor
 
 ## Constructing Instances of Options
 
-Using Options necessitates constructing instances. The example above uses excoptional which exposes functions Some and None which, when invoked, return Options.
+Using Options necessitates constructing instances. The example above uses the npm package \`excoptional\` which exposes functions Some and None which, when invoked, return Options.
 
 \`Some()\` takes one argument and is used to create an instance of an Option with that argument as the underlying value. \`None()\` is used when there is no underlying value and so takes no arguments.
 
@@ -97,9 +97,9 @@ Some("hi!")
 
 ~~~
 
-The map method on an Option works for a transformation function that returns a value that is not an Option. Transformation functions that do return an Option - like the above - need \`flatMap\`.
+The \`map\` method on an Option works for a transformation function that returns a value that is not an Option. Transformation functions that do return an Option - like the above - need \`flatMap\`.
 
-If map were used, the result would be a nested Option. To see this, copy the above snippet into [runkit](https://npm.runkit.com/excoptional) and swap \`flatMap\` to \`map\`. Try also shortening the string to 2 characters or fewer.
+If \`map\` were used, the result would be a nested Option. To see this, copy the above snippet into [runkit](https://npm.runkit.com/excoptional) and swap \`flatMap\` to \`map\`. Try also shortening the string to 2 characters or fewer.
 
 You can also npm install the module (\`excoptional\`) locally to run examples and test out its various methods. It is production ready.
 
@@ -113,9 +113,9 @@ The TLDR here is:
 
 Eventually the underlying value is needed and we must leave the world of Options. One goal though is to avoid extracting the underlying value for as long as possible preferring to instead pass around the Option instance. In doing so, the context that there may or may not be a value is maintained, and the ability to define a fallback value (if it’s a None) is left up to whoever finally needs it.
 
-This is to avoid retrieving the underlying value from the Option, working with it, putting it back into an Option later on, retrieving it again, putting it back into an Option again etc. Doing this is an anti-pattern where the methods - \`map\`, \`flatMap\`, then and others - should be used instead.
+This is to avoid retrieving the underlying value from the Option, working with it, putting it back into an Option later on, retrieving it again, putting it back into an Option again etc. Doing this is an anti-pattern where the methods - \`map\`, \`flatMap\`, \`then\` and others - should be used instead.
 
-At some point though, the value is needed and are retrieved by calling getOrElse.
+At some point though, the value is needed and are retrieved by calling \`getOrElse\`.
 
 ~~~ts
 const { Some, None } = require('excoptional');
@@ -133,11 +133,13 @@ When the Option is a None, the argument is returned.
 
 ## And Then…
 
-The excoptional implementation of Option also exposes a then method which has similar behavior to Promise.then and removes having to ask and answer the question, to map or to flatMap.
+The \`excoptional\` implementation of Option also exposes a \`then\` method which has similar behavior to \`Promise.then\` and removes having to ask and answer the question, to map or to flatMap.
 
-A then method is a unique benefit and improvement of this package over others. Not all implementations expose one.
+A \`then\` method is a unique benefit and improvement of this package over others. Not all implementations expose one.
 
-Regardless of whether the function used to transform the underlying value returns an Option or a different value, then will work as expected and avoid creating a nested Option.
+> Since this implementation exposes a then method with the described behavior, this Option implementation is also a thenable.
+
+Regardless of whether the function used to transform the underlying value returns an Option or a different value, \`then\` will work as expected and avoid creating a nested Option.
 
 ~~~ts
 const { Some, None } = require('excoptional');
