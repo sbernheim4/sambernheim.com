@@ -165,7 +165,7 @@ const myOpt = Some("hello")
 
 then will always return an Option just as \`map\` and \`flatMap\` do.
 
-Promise.then always returns a promise for the same reason
+> Promise.then always returns a promise for the same reason
 
 ## Helper Methods
 
