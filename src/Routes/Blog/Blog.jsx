@@ -17,7 +17,6 @@ export const Blog = () => {
 			<Switch>
 				{
 					articles.map(article => {
-						console.log(article)
 						const { to, Component, id } = article;
 						const path = "/blog/" + to
 

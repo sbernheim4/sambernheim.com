@@ -1,10 +1,12 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown'
-import {dark} from 'react-syntax-highlighter/dist/esm/styles/prism'
-import {Prism as SyntaxHighlighter} from 'react-syntax-highlighter'
+import SyntaxHighlighter from 'react-syntax-highlighter';
+import { gruvboxDark } from 'react-syntax-highlighter/dist/esm/styles/hljs';
+
+import remarkGfm from 'remark-gfm'
+import rehypeRaw from 'rehype-raw'
 
 const markdown = `
-
 # The Engineer's Schrodinger's Cat
 Options are a powerful functional programming construct, commonly introduced along with pure functions and referential transparency.
 
@@ -20,7 +22,7 @@ Formally, Options are an abstraction that work well with functions that may or m
 
 Options naturally remove repetitive null and undefined checks that might otherwise be necessary when working with functions that may or may not return a value (instead of always returning an Option).
 
-Below is a quick example with two versions of an uppercasing function. One takes a string and returns either a string or undefined. The other takes an Option<string> and returns an Option<string>.
+Below is a quick example with two versions of an uppercasing function. One takes a string and returns either a string or undefined. The other takes an Option string and returns an Option string.
 
 Note the uniformity of the return type for the Option version.
 
@@ -42,10 +44,10 @@ const valTwo = uppercaseStr(undefined); // => undefined
 
 // With Options
 const valThree = Some("hello world") // An option containing "hello world"
-    .map(str => str.toUpperCase()); // => Option<string>
+    .map(str => str.toUpperCase()); // => Option string
 
 const valFour = None() // An option with no underlying value
-    .map(str => str.toUpperCase()); // => Option<string>
+    .map(str => str.toUpperCase()); // => Option string
 ~~~
 
 In the first example, the argument is checked to make sure it’s not undefined.
@@ -56,7 +58,7 @@ In the second example, we use the map method on the Option passing in a function
 
 This works regardless if the Option contains an underlying value or not like with valFour.
 
-The result remains an Option<string> allowing for it to be chained again with map (and other methods). No more undefined or null checks needed. Since the type remains an Option<string>, the context that there may not be a value here is maintained.
+The result remains an Option string allowing for it to be chained again with map (and other methods). No more undefined or null checks needed. Since the type remains an Option string, the context that there may not be a value here is maintained.
 
 Options provide the ability to remove errors (like the one below) by wrapping values that may be undefined in an Option.
 
@@ -144,7 +146,7 @@ const { Some, None } = require('excoptional');
 // Returns a string
 const appendWorld = (str) => str + " world";
 
-// Returns an Option<string>
+// Returns an Option string
 const maybeAppendExclamationPoint = (str) => {
 
   return Math.random() > .5 ?
@@ -189,26 +191,31 @@ I hope you find it (and more broadly, Options) useful.
 
 export const EngineersSchrodingersCat = () => {
 	return <ReactMarkdown
-	children={markdown}
-	components={{
-		code({node, inline, className, children, ...props}) {
-			const match = /language-(\w+)/.exec(className || '')
-			return !inline && match ?
-				(
-					<SyntaxHighlighter
-						children={String(children).replace(/\n$/, '')}
-						style={dark}
-						language={match[1]}
-						PreTag="div"
-						{...props}
-					/>
-				) :
-				(
-					<code className={className} {...props}>
-						{children}
-					</code>
-				)
-		}
-	}}
-		/>
+		rehypePlugins={[rehypeRaw]}
+		remarkPlugins={[remarkGfm]}
+		children={markdown}
+		components={{
+			code({node, inline, className, children, ...props}) {
+				const match = /language-(\w+)/.exec(className || '');
+				console.log(match)
+
+				return !inline && match ?
+					(
+						<SyntaxHighlighter
+							wrap
+							children={String(children).replace(/\n$/, '')}
+							style={gruvboxDark}
+							language={match[1]}
+							PreTag="div"
+							{...props}
+						/>
+					) :
+					(
+						<code className={className} {...props}>
+							{children}
+						</code>
+					)
+			}
+		}}
+	/>
 }
