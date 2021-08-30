@@ -2,10 +2,11 @@ import { useState, useEffect } from "react";
 
 export const useProgress = () => {
 
-	const [currentHeight, setCurrentHeight] = useState();
+	const [currentHeight, setCurrentHeight] = useState(window.scrollY);
 	const totalHeight = document.documentElement.scrollHeight;
 
 	useEffect(() => {
+
 		const onScroll = () => {
 			const newHeight = window.scrollY;
 
@@ -18,8 +19,8 @@ export const useProgress = () => {
 
 	});
 
-	const percentage = currentHeight / totalHeight + .14224446
+	const percentageScrolled = currentHeight / totalHeight + .14224446
 
-	return percentage;
+	return percentageScrolled;
 
 };

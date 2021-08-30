@@ -6,35 +6,27 @@ import "./navbar.scss";
 
 export default function Navbar() {
 
+	const [ overrideStyle, setOverrideStyle ] = useState({});
 	const { pathname } = useLocation();
 	const progress = useProgress();
-	const [ overrideStyle, setOverrideStyle ] = useState({});
 
 	useEffect(() => {
 
-		if (pathname.includes("blog/")) {
+		const style = pathname.includes("blog/") ?
+			{ width: progress * 100 + "%" } :
+			{};
 
-			const maximumNavbarLineWidth = .6;
-
-			setOverrideStyle({
-				width: progress * maximumNavbarLineWidth * 100 + "%"
-			});
-
-		} else {
-
-			setOverrideStyle({});
-
-		}
+		setOverrideStyle(style);
 
 	}, [progress, pathname]);
-
-	console.log(overrideStyle);
 
 	return (
 		<nav className='navbar'>
 			<Link id="main" to='/'>Home</Link>
 
-			<hr style={overrideStyle}/>
+			<div className='navbar__line-container'>
+				<hr style={overrideStyle}/>
+			</div>
 
 			<Link to='/blog'>Blog</Link>
 		</nav>
