@@ -2,13 +2,13 @@ import { useState, useEffect } from "react";
 
 export const useProgress = () => {
 
-	const [currentHeight, setCurrentHeight] = useState(window.scrollY);
-	const totalHeight = document.documentElement.scrollHeight;
+	const [currentHeight, setCurrentHeight] = useState(window.scrollY + window.innerHeight)
+	const totalHeight = document.documentElement.scrollHeight
 
 	useEffect(() => {
 
 		const onScroll = () => {
-			const newHeight = window.scrollY;
+			const newHeight = window.scrollY + window.innerHeight;
 
 			setCurrentHeight(newHeight);
 		};
@@ -17,10 +17,8 @@ export const useProgress = () => {
 
 		return () => window.removeEventListener('scroll', onScroll);
 
-	});
+	}, []);
 
-	const percentageScrolled = currentHeight / totalHeight + .14224446
-
-	return percentageScrolled;
+	return currentHeight / totalHeight;
 
 };
