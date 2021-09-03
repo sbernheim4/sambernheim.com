@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 
 export const useProgress = () => {
 
-	const [currentHeight, setCurrentHeight] = useState(window.scrollY + window.innerHeight)
-	const totalHeight = document.documentElement.scrollHeight
+	const [currentHeight, setCurrentHeight] = useState(window.scrollY + window.innerHeight);
+	const totalHeight = document.documentElement.scrollHeight;
 
 	useEffect(() => {
 
