@@ -115,7 +115,7 @@ Eventually the underlying value is needed and we must leave the world of Options
 
 This is to avoid retrieving the underlying value from the Option, working with it, putting it back into an Option later on, retrieving it again, putting it back into an Option again etc. Doing this is an anti-pattern where the methods - \`map\`, \`flatMap\`, \`then\` and others - should be used instead.
 
-At some point though, the value is needed and are retrieved by calling \`getOrElse\`.
+At some point though, the value is needed and is retrieved by calling \`getOrElse\`.
 
 ~~~ts
 const { Some, None } = require('excoptional');
