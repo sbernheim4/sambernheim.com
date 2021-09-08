@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond&display=swap');
+
 .blog {
 
 	h1 {
@@ -6,13 +8,32 @@
 		max-width: 700px;
 	}
 
+
 	h2 {
-		margin-top: 10px;
+		margin: 10px 0 5px 0;
+	}
+
+	h3 {
+		margin: 10px 0 5px 0;
 	}
 
 	p {
-		margin-top: 15px;
+		margin: 7px 0;
 		font-size: 1.2em;
 		line-height: 1.7em;
+	}
+
+	ol {
+		font-size: 1.2em;
+		font-family: 'Crimson Text', serif;
+	}
+
+	ul {
+		font-size: 1.2em;
+		font-family: 'Crimson Text', serif;
+	}
+
+	em {
+		font-family: 'Crimson Text', serif;
 	}
 };
