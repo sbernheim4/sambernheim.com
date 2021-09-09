@@ -4,17 +4,17 @@
 
 	h1 {
 		text-align: center;
-		margin: 0 auto;
+		margin: 30px auto 0 auto;
 		max-width: 700px;
 	}
 
 
 	h2 {
-		margin: 10px 0 5px 0;
+		margin: 30px auto 0 auto;
 	}
 
 	h3 {
-		margin: 10px 0 5px 0;
+		margin: 30px auto 0 auto;
 	}
 
 	p {
@@ -24,13 +24,21 @@
 	}
 
 	ol {
+		padding: 0 0 0 30px;
 		font-size: 1.2em;
-		font-family: 'Crimson Text', serif;
+
+		li {
+			font-family: 'Crimson Text', serif;
+		}
 	}
 
 	ul {
+
+		padding: 0 0 0 30px;
 		font-size: 1.2em;
-		font-family: 'Crimson Text', serif;
+		li {
+			font-family: 'Crimson Text', serif;
+		}
 	}
 
 	em {

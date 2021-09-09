@@ -16,22 +16,23 @@ What's the big deal?
 This phrase is the cheeky line to (somewhat) formally define the monad;  While a fun line, it begs a couple of questions.
 
 1. What's a monoid?
-2. What's an endofucntor.
+2. What's an endofucntor?
 
 ## What's in a Monoid
 
 Monoids are types under an operation that follow 2 rules. For the provided operation, the type must:
 
 * Have an identity
+* Produce a value of the same type when two of those values are combined under the specified operation.
 * Be associative
 
 An example. Let's use \`string\` as our type and \`concatenation\` as our operation.
 
-Does it obey the 2 rules?
+Does it obey the 3 rules?
 
 That is, for any given string, is there another string that when combined with the original string - under the specified operation (concatenation in this case) - returns the original string?
 
-To concatenate two strings, we can just use \`+\` operator available in most langauges. Of course, we could also create a method on our string class called \`concat\` (and in JavaScript, this method does actually exist).
+To concatenate two strings, we can just use \`+\` operator available in most languages. Of course, we could also create a method on our string class called \`concat\` (and in JavaScript, this method does actually exist).
 
 ~~~ts
 const myStr = "hello world!";
@@ -40,11 +41,11 @@ const stillMyStr = myStr + "";
 console.log(stillMyStr); // => "hello world!"
 ~~~
 
-That's point 1. What about point 2?
+For point 2, the result of combing two (or more) strings, yields yet another string.
+
+That's requirements 1 and 2. What about point 3?
 
 Associativity means \`(a + b) + c\` is equivalent to \`a + (b + c)\`.
-
-> Associativity is distinct from the commutative property. The order of the values does matter, but for a given order, doing one operation before the other should be arbitrary.
 
 ~~~ts
 const myStr = "hello";
@@ -54,39 +55,61 @@ const myFinalStr = "!";
 const result = (myStr + myOtherStr) + myFinalStr;
 const sameResult = myStr + (myOtherStr + myFinalStr);
 ~~~
-We've show strings *under concatenation* are monoids. Strings, under other operations, may not be monoids.
+
+> Associativity is distinct from the commutative property. The order of the values matters, but for a given order, executing one operation before the other is arbitrary and holds over an arbitrary number of values.
+
+Take the following operation
+~~~ts
+"he" + "l" + "l" + "o" + "wor" + "ld" + "!"\`
+~~~
+
+Since strings under concatenation are monoids - and so are associative - each joining operation can be parallelized and performed independent of the other. Which joinings are performed first is irrelevant. They can occur on separate threads, across separate services etc with each incremental result delivered to a different machine to carry on the computation.
+
+~~~ts
+("he" + "l") + ("l" + "o" + "wor" + "ld") + ("!")
+
+// The above is just as valid as
+
+("he" + "l" + "l" + "o") + ("wor" + "ld") + ("!")
+~~~
+
+Anything that is a monoid is naturally parallelizable.
+
+We've show strings *under concatenation* are monoids, but strings, under other operations, may not be monoids.
 
 ### When a Thing is not a Monoid
 An example of where a type under an operation is not a monoid is easily found in numbers under subtraction.
 
+> We could demonstrate this with strings under subtraction too, but defining 'subtraction' for a string isn't quite as natural or intuitive.
+
 ~~~ts
-// Numbers under subtraction have an identity of 0 ✅
+// Numbers under subtraction have an identity: 0 ✅
 const stillFive = 5 - 0;
 
-// Numbers under subtraction are not associative ❌
+// but umbers under subtraction are not associative ❌
 const someNum = (12 - 4) - 2 // => 6
-const stillSomeNum = 12 - (4 - 2) // => 10
+const stillSomeNum? = 12 - (4 - 2) // => 10
 
-someNum === stillSomeNum // => false
+someNum === stillSomeNum? // => false
 ~~~
 
 Numbers under subtraction are not monoids since subtraction of numbers is not associative.
 
-If you are desiging your own types (or classes really) and create them in such a way that for some operations, there is an identity element, and the operation is associative, your class, under that operation, is a monoid!
+If you are designing your own types and classes, and create them in such a way that for a given operation, they obey the 3 points, your class, under that operation, is a monoid!
 
-We'll explore an example of this later on.
+Typically the "given operation" is a means of combining two values of that type. Joining two values typically has a natural and intuitive solution.
 
 ## What's an Endofunctor
 
-Functors should seem familiar. Functors are types that support a mapping transformation that allow us to map values of one type (aka category) to values of another type.
+Functors should be familiar. They are types that support a mapping transformation that allow us to map values of one type (aka category) to values of another type.
 
 ~~~ts
-// numbers -> string
+// converts a number to a string
 const numToStr = (num) => {
     return "" + num;
 };
 
-const 3AsString = numToStr(3); // => "3"
+const threeAsAString = numToStr(3); // => "3"
 ~~~
 
 Endofunctors are related but are just a bit more strict. An endofunctor is a functor where the result of the transformation has the same type as the starting type.
@@ -96,7 +119,7 @@ const vals = [1, 2, 3];
 
 const myOtherVals = vals.map(x => x * 2); // => [2, 4, 6]
 ~~~
-The result in the above \`map\` call is an Array, the same type that we started with. In fact, it doesn't even matter if the type of values in the Array changes.
+The result of the \`map\` call is an Array, the same type that we started with. In fact, it doesn't matter if the type of values in the Array changes.
 ~~~ts
 const vals = [1, 2, 3];
 
@@ -107,30 +130,35 @@ const numToStr = (num) => {
 const myOtherVals = vals.map(numToStr); // => ["2", "4", "6"]
 ~~~
 
-In this case, we still end up with an Array of values. The type of those values though is different but the result of \`map\` is an Array. The same type we started with.
+In this case, we still end up with an Array of values. The type of those values is different from what we started with but the result of \`map\` is always Array. The same type we started with.
 
-Another example to demonstrate this from a different angle
+Another example to demonstrate this from a different angle.
 
 ~~~ts
 const double = (val) => val + val;
 
 const ten = double(5);
 ~~~
-\`double\` is a transformation function on values of type number and returns a number; it is an endofunctor since it transforms a value, and returns a new value whose type is the same as the consumed value.
+\`double\` is a function that maps numbers to numbers making it an endofunctor. The return value has the same type as the input value.
 
-A function like \`numToStr\` however is *not* an endofucntor. The return type differs from the consumed type. It is instead a regular ol functor.
+Another interesting note is that the mapping function can only accept one argument. If it accepted more than one argument, the type of the function wouldn't be \`number => number\` but rather \`(number, number) => number\`.
 
-## Come Together
-So, repeating the mantra again. Monads are monoids in the category of endofunctors.
+A function like \`numToStr\` is *not* an endofucntor. The return type differs from the consumed type. It instead is a plain 'ol functor.
 
-Well we know what monoids are, and we know what endofunctors are. If we have a monoid, that also is an endofunctor, we have a monad.
+## Coming Together
+Repeating the mantra again. Monads are monoids in the category of endofunctors.
 
-That is, if we have a monoid and a transformation function for that monoid, whose return value has the same type as the input value, that monoid is in the category of endofunctors and is therefore a monad.
+Well we know what monoids are and the benefits they bring, and we know what endofunctors are. If we have a monoid, that also is an endofunctor, we have a monad.
 
-Let's examine the Arrays example once more. We can conclude that Arrays, themselves, are monoids.
+That is, if we have a monoid and a means of transforming the value of that monoid in a way where the transformed value is the same type, that monoid is in the category of endofunctors and is therefore a monad!
+
+Let's examine the Arrays example once more to demonstrate. We can conclude that Arrays, themselves, are monoids.
 ~~~ts
 // The identity element exists
 const myArr = [1, 2, 3, ...[]]; // => [1, 2, 3]
+
+// Joining two arrays yields still an array
+const myOtherArray = [...[1, 2], ...[3, 4]] // => [1, 2, 3, 4]
 
 // The associative property holds
 const a = [1, 2];
@@ -138,16 +166,16 @@ const b = [3, 4];
 const c = [5];
 
 const resultOne = [
-    ...(...a, ...b),
-    ...c
+    ...[...a, ...b], // combine the result of joining \`a\` and \`b\`
+    ...c             // with \`c\`
 ]; // => [1, 2, 3, 4, 5]
 
 const resultTwo = [
-    ...a,
-    ...(...b, ...c)
+    ...a,           // combine \`a\` with
+    ...[...b, ...c] // the result of first combining \`b\` and \`c\`
 ]; // => [1, 2, 3, 4, 5]
 ~~~
-Of course, as we saw above, Arrays support a \`map\` method whose return value is still an Array, making them endofunctors.
+Of course, as we saw above, Arrays support a \`map\` method which allow us to transform the values of the array but do so in a way that returns an Array (the same type as the starting type), making them endofunctors.
 
 ~~~ts
 const vals = [1, 2, 3];
@@ -155,13 +183,13 @@ const vals = [1, 2, 3];
 const myOtherVals = vals.map(x => x * 2); // => [2, 4, 6]
 ~~~
 
-Arrays under concatenation are monoids in the category of endofunctors. More simply, they are monadic.
+Arrays are monoids in the category of endofunctors. More simply, they are monadic.
 
 ## Creating a new Monad
 
-Understanding why an existing class is a monad can be simple. Implementing a class that is a monad can be much more challenging.
+Understanding why an existing class is a monad can be simple. Implementing a class that adheres to all the rules however can be much more challenging.
 
-Of course, to create a monad that doesn't already exist requires a usecase for which the existing ones are unsuitable. It may also seem like every Mondad that is needed already exists. See the following (unexhaustive) list.
+Of course, to create a monad that doesn't already exist requires a use case for which the existing monads are unsuitable. It may also seem like every monad that is needed already exists. Some common ones are
 
 * Array (sometimes called List or Sequence)
 * Option (sometimes called Maybe)
@@ -172,6 +200,10 @@ Of course, to create a monad that doesn't already exist requires a usecase for w
 * Random
 * State
 * Observable
+* Set
+
+
+And I'm sure there are more!
 
 In the next article, we'll review a usecase that doesn't yet have a supporting Monad and write a new one to fit the specific needs.
 `
