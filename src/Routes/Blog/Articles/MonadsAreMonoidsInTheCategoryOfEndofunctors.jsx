@@ -200,8 +200,6 @@ Of course, to create a monad that doesn't already exist requires a use case for 
 * Random
 * State
 * Observable
-* Set
-
 
 And I'm sure there are more!
 
