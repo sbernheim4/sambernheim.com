@@ -86,7 +86,7 @@ An example of where a type under an operation is not a monoid is easily found in
 // Numbers under subtraction have an identity: 0 ✅
 const stillFive = 5 - 0;
 
-// but umbers under subtraction are not associative ❌
+// but numbers under subtraction are not associative ❌
 const someNum = (12 - 4) - 2 // => 6
 const stillSomeNum? = 12 - (4 - 2) // => 10
 
@@ -97,7 +97,7 @@ Numbers under subtraction are not monoids since subtraction of numbers is not as
 
 If you are designing your own types and classes, and create them in such a way that for a given operation, they obey the 3 points, your class, under that operation, is a monoid!
 
-Typically the "given operation" is a means of combining two values of that type. Joining two values typically has a natural and intuitive solution.
+Often the "given operation" is a means of combining two values of that type. Joining two values typically has a natural and intuitive solution.
 
 ## What's an Endofunctor
 
