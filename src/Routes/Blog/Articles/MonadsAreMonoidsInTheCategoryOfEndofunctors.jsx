@@ -20,7 +20,7 @@ This phrase is the cheeky line to (somewhat) formally define the monad;  While a
 
 ## What's in a Monoid
 
-Monoids are types under an operation that follow 2 rules. For the provided operation, the type must:
+Monoids are types under an operation that follow 3 rules. For the provided operation, the type must:
 
 * Have an identity
 * Produce a value of the same type when two of those values are combined under the specified operation.
