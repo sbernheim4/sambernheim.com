@@ -16,7 +16,7 @@ What's the big deal?
 This phrase is the cheeky line to (somewhat) formally define the monad;  While a fun line, it begs a couple of questions.
 
 1. What's a monoid?
-2. What's an endofucntor?
+2. What's an endofunctor?
 
 ## What's in a Monoid
 
