@@ -10,8 +10,7 @@ import { Route, Switch } from 'react-router-dom';
 import Navbar from './../Navbar/Navbar.jsx';
 
 // Import lazy loaded route components
-import { Home, ErrorPage } from './LazyLoadRoutes.jsx';
-import { Blog } from './Blog/Blog.jsx';
+import { Home, ErrorPage, Blog } from './LazyLoadRoutes.jsx';
 
 class Routes extends Component {
 	constructor(props) {
@@ -34,7 +33,6 @@ class Routes extends Component {
 					<Route> <ErrorPage/> </Route>
 				</Switch>
 
-				{/* <Link /> elements are in Navbar.jsx */}
 			</div>
 		);
 	}

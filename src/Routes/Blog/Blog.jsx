@@ -1,5 +1,6 @@
 import React from 'react';
 import { Route, Switch, useLocation } from 'react-router-dom';
+import { Helmet } from "react-helmet";
 
 import { ArticleList } from './ArticleList/ArticleList.jsx';
 import { articles } from "./articles.config";
@@ -7,7 +8,7 @@ import { ArticleContainer } from './ArticleContainer/ArticleContainer.jsx';
 
 import "./blog.scss"
 
-export const Blog = () => {
+export default () => {
 
 	const location = useLocation();
 	const isViewingArticle = location.pathname !== "/blog"
@@ -16,16 +17,13 @@ export const Blog = () => {
 		<div className='blog'>
 
 			{
-				isViewingArticle ?
-				null :
-				<h1>My Blog</h1>
+				/* Only show when not viewing a specific article */
+				isViewingArticle ? null : <h1>My Blog</h1>
 			}
 
 			{
 				/* Hide article list when viewing a specific post */
-					isViewingArticle ?
-					null :
-					<ArticleList />
+				isViewingArticle ? null : <ArticleList />
 			}
 
 			<Switch>
@@ -36,14 +34,19 @@ export const Blog = () => {
 
 						return (
 							<Route key={id} exact path={path}>
-								{<ArticleContainer> <Component /> </ArticleContainer>}
+								<Helmet>
+									<title>{article.title}</title>
+									<link rel="cannonical" href={`https://sambernheim.com/#/blog/${article.to}`} />
+								</Helmet>
+
+								<ArticleContainer>
+									<Component />
+								</ArticleContainer>
 							</Route>
 						)
 					})
 				}
 			</Switch>
-
-
 		</div>
 	);
 };

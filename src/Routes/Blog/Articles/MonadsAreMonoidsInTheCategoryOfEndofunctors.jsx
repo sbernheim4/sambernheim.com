@@ -206,7 +206,9 @@ And I'm sure there are more!
 In the next article, we'll review a usecase that doesn't yet have a supporting Monad and write a new one to fit the specific needs.
 `
 export const MonadsAreMonoidsInTheCategoryOfEndofunctors = () => {
-	return <ReactMarkdown
+	return (
+		<div>
+		<ReactMarkdown
 		rehypePlugins={[rehypeRaw]}
 		remarkPlugins={[remarkGfm]}
 		children={markdown}
@@ -234,5 +236,7 @@ export const MonadsAreMonoidsInTheCategoryOfEndofunctors = () => {
 					)
 			}
 		}}
-	/>
+		/>
+		</div>
+	)
 }

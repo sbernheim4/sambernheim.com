@@ -24,3 +24,8 @@ export const ErrorPage = Loadable({
 	loader: () => import ('./404/404.jsx'),
 	loading: () => <div>Loading...</div>
 });
+
+export const Blog = Loadable({
+	loader: () => import('./Blog/Blog.jsx'),
+	loading: () => <div>Loading...</div>
+});
