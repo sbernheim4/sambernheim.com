@@ -5,7 +5,7 @@ const markdown = `
 
 We're going to build a new monad. To get there, we'll explore creating a means of tracking analytics events and start with some simple solutions that will eventually coalesce into a class that will become a monad.
 
-Let's assume we have a function \`track\` that fires off analytics event to some backend service. The exact implementation doesn't matter. Consider the below example:
+Let's assume we have a function \`track\` that fires off analytics event to some backend service. The exact implementation is fairly arbitrary. Consider the below example:
 
 ~~~ts
 const track = ({ functionName, functionArguments }) => {
@@ -31,7 +31,7 @@ const addThree = (val) => {
 
 This implementation allows us to track what function was called and with what argument(s). We aren't however able to include the result of the function call. We also are mixing application code and logic with analytics code and logic. This works well for simple cases but can quickly grow to contain cluttered conditionals as requirements change.
 
-We should aim to decouple these two concerns - application and analytics code - and can do so with a simple improvement that also gives us access to the return value in the \`track\` function.
+We should aim to decouple these two concerns - application and analytics code - and build a loosely coupled but cohesive implementation. We can do so with a simple improvement that also exposes the return value to \`track\`.
 
 ~~~ts
 // Update our track function to accept a 3rd value - the result of the
@@ -75,9 +75,9 @@ trackedAddThree(3) // => returns 6 and logs "addThree, 3, 6"
 
 We create a higher order function - \`withTracking\` - that consumes a function, and returns a function. The function it returns calls the original function along with the \`track\` function, and returns the result.
 
-We've achieved a great amount of work in very few lines. But what if the event we want to track should depend on the arguments to our function?
+With this approach we no longer mix analytics and application code. \`track\` can also leverage the return value to replicate logic in the original function or outline distinct code paths.
 
-For example, when calling \`addThree\` with a number less than 10, we want to specify a different value in our event object from when \`addThree\` is called for a value greater than 10. We can encode these rules in a function.
+For example, when calling \`addThree\` with a number less than 10, we may want to use one message in the analytics event from when \`addThree\` is called for a value greater than 10. We can encode these rules in a function and pass that function to \`withTracking\` to invoke on our behalf.
 
 ~~~ts
 // A function that implements custom logic for addThree.
@@ -130,6 +130,8 @@ trackedAddThree(5) // => { functionName: addThree, info: 'less than 10', result:
 We can see the event payload differs based on the argument to our function! More broadly, this allows us to incorporate any custom logic to the analytics code without any changes to withTracking or the underlying application code. These 2 concerns remain decoupled.
 
 The only piece that will need updating is the implementation of \`createTrackingEvent\`. Of course, a different implementation of \`createTrackingEvent\` may be needed for each application code related function, but each of these functions replaces logic that would otherwise be embeded directly in that same application code. Should the requirements around how events should be recorded change, only the event creation function will need to be updated.
+
+In this solution, every domain specific function becomes pure, vastly simplifying tests and future updates. Invocations of \`track\` are isolated to the higher order function leaving all the remaining code pure.
 
 We've come pretty far. This solution works well for most use cases but there is one major limitation. Consider the following function:
 
@@ -357,6 +359,8 @@ const val = addThreeAndRandom(7).map(val => {
 
 Now we have an issue, since we'd end up with a nested Trackable. To avoid this, we add a method for specifically the case where the function passed to the method itself returns a \`Trackable\`. We'll call it \`flatMap\`.
 
+> \`map\` only works when the function passed to it does not return a Trackable instance. More generally, \`map\` only works when the function passed to it does not return an instance of the thing being mapped over.
+
 ~~~ts
 class Trackable {
 
@@ -401,6 +405,15 @@ class Trackable {
 }
 ~~~
 
+Using \`flatMap\` for functions that return a Trackable is simple.
+
+~~~ts
+const val = addThreeAndRandom(7).map(val => {
+    const randomNum2 = Math.random();
+    return new Trackable(val * randomNum2, { randomNum2 });
+});
+~~~
+
 The final step is a method that actually fires off all the built up analytics events!
 
 ~~~ts
@@ -425,12 +438,25 @@ class Trackable {
 }
 ~~~
 
-Calling \`run\` fires off all the analytics events that have been built up, and returns the underlying value. In this system, Trackables wrap our values in a context that there is an associated analytics event.
+Calling \`run\` fires off all the analytics events that have been built up, and returns the underlying value. In this system, Trackables wrap our values in a context with their ssociated analytics events.
 
-The \`map\` and \`flatMap\` methods provide mechanisms to continuously and safely transform the underlying value. Analytics events are safely built up and stored until they are ready to be emitted.
+The \`map\` and \`flatMap\` methods provide mechanisms to continuously and safely transform the underlying value. Analytics events are safely built up and stored until they are ready to be emitted via \`run\`.
+
+Finally we have a complete solution. What's left is an abstraction that should feel clean and familiar.
+
+~~~ts
+const subtractSeven = val => val - 7;
+
+const res = addThreeAndRandom(2)    // number -> Trackable
+    .flatMap(multiplyByARandomNumber)  // number -> Trackable
+    .flatMap(addThreeAndRandom)        // number -> Trackable
+    .map(subtractSeven)                // number -> number
+    .run(); // Fire all queued track events, returning the wrapped value
+
+console.log(res); // 13.585 (or some other number - its random!)
+~~~
 
 Almost by accident, the \`Trackable\` class is also a monad.
-
 `
 
 export const BuildingAMonad = withStyling(markdown)
