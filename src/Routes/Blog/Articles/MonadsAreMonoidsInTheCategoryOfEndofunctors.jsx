@@ -1,5 +1,3 @@
-import React from 'react';
-
 import ReactMarkdown from 'react-markdown'
 
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
@@ -18,19 +16,19 @@ This phrase is the cheeky line to (somewhat) formally define the monad;  While a
 1. What's a monoid?
 2. What's an endofunctor?
 
-## What's in a Monoid
+## What's a Monoid
 
 Monoids are types under an operation that follow 3 rules. For the provided operation, the type must:
 
 * Have an identity
-* Produce a value of the same type when two of those values are combined under the specified operation.
+* Produce a value of the same type when two of those values are combined (this may require defining how o combine two values of this type)
 * Be associative
 
-An example. Let's use \`string\` as our type and \`concatenation\` as our operation.
+An example. Let's use \`string\` as our type and \`concatenation\` as the definition for combining.
 
 Does it obey the 3 rules?
 
-That is, for any given string, is there another string that when combined with the original string - under the specified operation (concatenation in this case) - returns the original string?
+That is, for any given string, is there another string that when combined with the original string (via concatenation) - returns the original string?
 
 To concatenate two strings, we can just use \`+\` operator available in most languages. Of course, we could also create a method on our string class called \`concat\` (and in JavaScript, this method does actually exist).
 
@@ -56,26 +54,24 @@ const result = (myStr + myOtherStr) + myFinalStr;
 const sameResult = myStr + (myOtherStr + myFinalStr);
 ~~~
 
-> Associativity is distinct from the commutative property. The order of the values matters, but for a given order, executing one operation before the other is arbitrary and holds over an arbitrary number of values.
+> Associativity is distinct from the commutative property. The order of the values matters, but for a given order, executing one operation before the other is arbitrary and holds over an arbitrary number of values. The end result is the same.
 
 Take the following operation
 ~~~ts
-"he" + "l" + "l" + "o" + "wor" + "ld" + "!"\`
-~~~
-
-Since strings under concatenation are monoids - and so are associative - each joining operation can be parallelized and performed independent of the other. Which joinings are performed first is irrelevant. They can occur on separate threads, across separate services etc with each incremental result delivered to a different machine to carry on the computation.
-
-~~~ts
-("he" + "l") + ("l" + "o" + "wor" + "ld") + ("!")
+("he" + "l") + ("l" + "o" + " wor" + "ld") + ("!")
 
 // The above is just as valid as
 
-("he" + "l" + "l" + "o") + ("wor" + "ld") + ("!")
+("he" + "l" + "l" + "o") + (" wor" + "ld") + ("!")
+
+// And produces the same result.
+// => "hello world!"
 ~~~
+We've show strings *under concatenation* are monoids, but strings, under other operations, may not be monoids.
+
+Since strings under concatenation are monoids - and so are associative - each joining operation can be parallelized and performed independent of the other. Which joinings are performed first is irrelevant. They can occur on separate threads, across separate services etc with each incremental result delivered to a different machine to carry on the computation. This capability generalizes to all monoids.
 
 Anything that is a monoid is naturally parallelizable.
-
-We've show strings *under concatenation* are monoids, but strings, under other operations, may not be monoids.
 
 ### When a Thing is not a Monoid
 An example of where a type under an operation is not a monoid is easily found in numbers under subtraction.
@@ -95,31 +91,29 @@ someNum === stillSomeNum? // => false
 
 Numbers under subtraction are not monoids since subtraction of numbers is not associative.
 
-If you are designing your own types and classes, and create them in such a way that for a given operation, they obey the 3 points, your class, under that operation, is a monoid!
-
-Often the "given operation" is a means of combining two values of that type. Joining two values typically has a natural and intuitive solution.
+If you are designing your own types and classes, and create them in such a way that for a defined joining operation, they obey the 3 points, your class, under that operation, is a monoid!
 
 ## What's an Endofunctor
 
 Functors should be familiar. They are types that support a mapping transformation that allow us to map values of one type (aka category) to values of another type.
 
 ~~~ts
-// converts a number to a string
+// converts any number (our starting category) to a string (our ending category)
 const numToStr = (num) => {
     return "" + num;
 };
 
 const threeAsAString = numToStr(3); // => "3"
-~~~
+~~
 
-Endofunctors are related but are just a bit more strict. An endofunctor is a functor where the result of the transformation has the same type as the starting type.
+Endofunctors are related but are just a bit more strict. An endofunctor is a functor where the result of the transformation has the same type as the starting type (and continues to obey all the other rules around functors like functional composition).
 
 ~~~ts
 const vals = [1, 2, 3];
 
 const myOtherVals = vals.map(x => x * 2); // => [2, 4, 6]
 ~~~
-The result of the \`map\` call is an Array, the same type that we started with. In fact, it doesn't matter if the type of values in the Array changes.
+The result of the \`map\` call is an Array, and the function passed to the map method maps strings to numbers (our two categories). The end result is the same type that we started with while the containing values have changed and been mapped from one cateogry to another.
 ~~~ts
 const vals = [1, 2, 3];
 
@@ -129,8 +123,6 @@ const numToStr = (num) => {
 
 const myOtherVals = vals.map(numToStr); // => ["2", "4", "6"]
 ~~~
-
-In this case, we still end up with an Array of values. The type of those values is different from what we started with but the result of \`map\` is always Array. The same type we started with.
 
 Another example to demonstrate this from a different angle.
 
@@ -148,9 +140,9 @@ A function like \`numToStr\` is *not* an endofucntor. The return type differs fr
 ## Coming Together
 Repeating the mantra again. Monads are monoids in the category of endofunctors.
 
-Well we know what monoids are and the benefits they bring, and we know what endofunctors are. If we have a monoid, that also is an endofunctor, we have a monad.
+We know what monoids are and the benefits they bring, and we know what endofunctors are. If we have a monoid, that also is an endofunctor, we have a monad.
 
-That is, if we have a monoid and a means of transforming the value of that monoid in a way where the transformed value is the same type, that monoid is in the category of endofunctors and is therefore a monad!
+That is, if we have a monoid and a means of transforming the monoid in a way where the result of the transformation is the same type continaing our monoid as we started with, that thing is a monoid in the category of endofunctors aka a monad!
 
 Let's examine the Arrays example once more to demonstrate. We can conclude that Arrays, themselves, are monoids.
 ~~~ts
