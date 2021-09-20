@@ -31,6 +31,8 @@ const addThree = (val) => {
 
 This implementation allows us to track what function was called and with what argument(s). We aren't however able to include the result of the function call. We're also mixing application code and logic with analytics code and logic. This works well for simple cases but can quickly grow to contain cluttered conditionals as requirements change eventually becoming a tangled mess as the two concerns grow and deviate.
 
+## With Higher Ordered Functions
+
 We should aim to decouple these two concerns - application and analytics code - and build a loosely coupled but cohesive system that easily handles changes and updates. We can do so with a simple improvement that also exposes the return value to \`track\`.
 
 ~~~ts
@@ -127,9 +129,9 @@ trackedAddThree(10) // => { functionName: addThree, info: '10 or more', result: 
 trackedAddThree(5) // => { functionName: addThree, info: 'less than 10', result: 8 }
 ~~~
 
-We can see the event payload differs based on the argument to our function! More broadly, this allows us to incorporate any custom logic to the analytics code without any changes to withTracking or the underlying application code. These 2 concerns remain decoupled.
+We can see the event payload differs based on the argument to our function! More broadly, this allows us to incorporate any custom logic to the analytics code without any changes to \`withTracking\` or the underlying application code. These 2 concerns remain decoupled.
 
-The only piece that will need updating is the implementation of \`createTrackingEvent\`. Of course, a different implementation of \`createTrackingEvent\` may be needed for each application code related function, but each of these functions replaces logic that would otherwise be embeded directly in that same application code. Should the requirements around how events should be recorded change, only the event creation function will need to be updated.
+The only piece that will need updating is the implementation of \`createTrackingEvent\`. Of course, a different implementation of \`createTrackingEvent\` may be needed for each application code related function, but each of these functions replaces logic that would otherwise be embeded directly in that same application code. Should the requirements around how events be recorded change, only the event creation function will need to be updated.
 
 In this solution, every domain specific function becomes pure, vastly simplifying tests and future updates. Invocations of \`track\` are isolated to the higher order function leaving all the remaining code pure.
 
@@ -253,7 +255,7 @@ To enable this behavior requires a more formal abstratction than functions - hig
 
 ## Building a Trackable Class
 
-To enable similar behavior we need a better abstraction beyond \`withTracking\`. We already have a pseudo special type - objects with a \`__trackingInfo\` property - and we want to add this \`.map\` or \`.then\` method, even if we're not quire sure how it should work yet.  We're also storing some stateful information, the number returned by these functions and their associated tracking data. Let's formalize these relationships into a class that binds all this together.
+To enable similar behavior we need a better abstraction beyond \`withTracking\`. We already have a pseudo special type - objects with a \`__trackingInfo\` property - and we want to add something like this \`.then\` method, even if we're not quire sure how it should work yet. We're also storing some stateful information, the number returned by these functions and their associated tracking data. Let's formalize these relationships into a class that binds all this together.
 
 ~~~ts
 class Trackable {
@@ -408,7 +410,7 @@ class Trackable {
 Using \`flatMap\` for functions that return a Trackable is simple.
 
 ~~~ts
-const val = addThreeAndRandom(7).map(val => {
+const val = addThreeAndRandom(7).flatMap(val => {
     const randomNum2 = Math.random();
     return new Trackable(val * randomNum2, { randomNum2 });
 });
@@ -447,7 +449,7 @@ Finally we have a complete solution. What's left is an abstraction that should f
 ~~~ts
 const subtractSeven = val => val - 7;
 
-const res = addThreeAndRandom(2)    // number -> Trackable
+const res = addThreeAndRandom(2)       // number -> Trackable
     .flatMap(multiplyByARandomNumber)  // number -> Trackable
     .flatMap(addThreeAndRandom)        // number -> Trackable
     .map(subtractSeven)                // number -> number
