@@ -15,17 +15,7 @@ export const withStyling = (markdown) => () => {
 		    children={markdown}
 		    components={{
 		    	code({node, inline, className, children, ...props}) {
-
-		    		return !inline ?
-		    			(
-		    				<SyntaxHighlighter
-		    					children={String(children).replace(/\n$/, '')}
-		    					style={vscDarkPlus}
-		    					language={"typescript"}
-		    					PreTag="div"
-		    					{...props}
-		    				/>
-		    			) :
+		    		return inline ?
 		    			(
 		    				<SyntaxHighlighter
 		    					useInlineStyles={false}
@@ -34,9 +24,18 @@ export const withStyling = (markdown) => () => {
 		    					PreTag="span"
 		    					{...props}
 		    				/>
+		    			) :
+		    			(
+		    				<SyntaxHighlighter
+		    					children={String(children).replace(/\n$/, '')}
+		    					style={vscDarkPlus}
+		    					language={"typescript"}
+		    					PreTag="div"
+		    					{...props}
+		    				/>
 		    			)
 		    	}
 		    }}
 	    />
     )
-}
+};
