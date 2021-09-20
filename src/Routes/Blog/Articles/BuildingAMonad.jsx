@@ -29,9 +29,9 @@ const addThree = (val) => {
 };
 ~~~
 
-This implementation allows us to track what function was called and with what argument(s). We aren't however able to include the result of the function call. We also are mixing application code and logic with analytics code and logic. This works well for simple cases but can quickly grow to contain cluttered conditionals as requirements change.
+This implementation allows us to track what function was called and with what argument(s). We aren't however able to include the result of the function call. We're also mixing application code and logic with analytics code and logic. This works well for simple cases but can quickly grow to contain cluttered conditionals as requirements change eventually becoming a tangled mess as the two concerns grow and deviate.
 
-We should aim to decouple these two concerns - application and analytics code - and build a loosely coupled but cohesive implementation. We can do so with a simple improvement that also exposes the return value to \`track\`.
+We should aim to decouple these two concerns - application and analytics code - and build a loosely coupled but cohesive system that easily handles changes and updates. We can do so with a simple improvement that also exposes the return value to \`track\`.
 
 ~~~ts
 // Update our track function to accept a 3rd value - the result of the
