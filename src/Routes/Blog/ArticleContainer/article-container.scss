@@ -6,18 +6,36 @@
 	max-width: 700px;
 	padding: 10px;
 
+	h1 {
+		text-align: center;
+		margin: 30px auto 0 auto;
+		max-width: 700px;
+	}
+
+	h2 {
+		margin: 30px auto 0 auto;
+	}
+
+	h3 {
+		margin: 30px auto 0 auto;
+	}
+
+
 	a {
 		font-size: .9em;
+	}
+
+	p {
+		font-family: 'Crimson Text', serif;
+		margin: 7px 0;
+		font-size: 1.2em;
+		line-height: 1.7em;
 	}
 
 	blockquote {
 		margin: 10px auto;
 		width: 80%;
 		font-style: italic;
-	}
-
-	p {
-		font-family: 'Crimson Text', serif;
 	}
 
 	.prismjs {
@@ -36,5 +54,28 @@
 			font-family: 'Fira Mono', serif !important;
 		}
 
+	}
+
+	ol {
+		padding: 0 0 0 30px;
+		font-size: 1.2em;
+
+		li {
+			font-family: 'Crimson Text', serif;
+		}
+	}
+
+	ul {
+
+		padding: 0 0 0 30px;
+		font-size: 1.2em;
+
+		li {
+			font-family: 'Crimson Text', serif;
+		}
+	}
+
+	em {
+		font-family: 'Crimson Text', serif;
 	}
 }
