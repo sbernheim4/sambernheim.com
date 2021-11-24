@@ -11,10 +11,10 @@ Let's assume we have a function \`track\` that fires off analytics event to some
 ~~~ts
 const track = ({ functionName, args }) => {
 
-    // An extremely naive approach. This would really consist of firing off a
+	// An extremely naive approach. This would really consist of firing off a
 	// network request to a backend service with a payload containing this data.
 
-    console.log(functionName, args);
+	console.log(functionName, args);
 };
 
 
@@ -665,7 +665,7 @@ This method may be useful for when a given flow should only report all the built
 const md = new Remarkable({
 	langPrefix: 'hljs language-',
 	highlight: function (str: string, lang: string) {
-		
+
 		if (lang && hljs.getLanguage(lang)) {
 			try {
 				return hljs.highlight(lang, str).value;

@@ -2,13 +2,11 @@ import { useLoaderData } from "remix";
 import type { LoaderFunction, LinksFunction, MetaFunction } from "remix";
 import invariant from "tiny-invariant";
 import { getPost, Post } from "~/post";
-import globals from './../../globals.css'
-import articleStyles from './../../article.css'
+import blogStyles from './../../article.css'
 
 export const links: LinksFunction = () => {
 	return [
-		{ rel: 'stylesheet', href: globals },
-		{ rel: 'stylesheet', href: articleStyles },
+		{ rel: 'stylesheet', href: blogStyles },
 		{ rel: 'stylesheet', href: 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/styles/atom-one-dark.min.css' },
 		{ rel: 'javascript', href: 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/highlight.min.js' },
 		{ rel: 'stylesheet', href: '//fonts.googleapis.com/css?family=Crimson+Text' },

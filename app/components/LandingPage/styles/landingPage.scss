@@ -1,5 +1,10 @@
 $blue: rgb(80, 152, 196);
 
+@font-face {
+    font-family: 'verlag';
+    src: url("./../../../../fonts/verlag.woff2");
+}
+
 @keyframes text {
 	0% {
 		transform: translatey(-40vh);
@@ -52,7 +57,12 @@ $blue: rgb(80, 152, 196);
 			}
 		}
 
+		h2 {
+            font-family: 'Lato', 'sans-serif';
+		}
+
 		p {
+            font-family: 'Lato', 'sans-serif';
 			margin: 15px 0 0 30px;
 			font-size: 18px;
 			color: white;

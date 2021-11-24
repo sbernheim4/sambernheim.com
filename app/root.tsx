@@ -1,13 +1,28 @@
 import * as React from "react";
+import { useEffect, useState } from "react";
 import {
   Links,
+  Link,
   LiveReload,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
-  useCatch
+  useCatch,
+  LinksFunction,
+  useLocation
 } from "remix";
+import { useProgress } from "./hooks/useProgress";
+
+import globalStyles from './styles/globals.css';
+import navbarStyles from './styles/navbar.css';
+
+export const links: LinksFunction = () => {
+	return [
+		{ rel: 'stylesheet', href: globalStyles },
+		{ rel: 'stylesheet', href: navbarStyles }
+	]
+};
 
 /**
  * The root module's default export is a component that renders the current
@@ -17,9 +32,7 @@ import {
 export default function App () {
   return (
     <Document>
-      <Layout>
-        <Outlet />
-      </Layout>
+      <Outlet />
     </Document>
   );
 }
@@ -43,6 +56,7 @@ const Document = ({
       </head>
 
       <body>
+        <Navbar />
         {children}
         <ScrollRestoration />
         <Scripts />
@@ -52,10 +66,34 @@ const Document = ({
   );
 }
 
-const Layout = ({ children }: React.PropsWithChildren<{}>) => {
-  return (
-   <>{children}</>
-  );
+export const Navbar = () => {
+
+	const [ overrideStyle, setOverrideStyle ] = useState({});
+	const { pathname } = useLocation();
+	const progress = useProgress();
+	// const progress = .5;
+
+	useEffect(() => {
+
+		const style = pathname.includes("blog/") ?
+			{ width: progress * 100 + "%" } :
+			{};
+
+		setOverrideStyle(style);
+
+	}, [progress, pathname]);
+
+	return (
+		<nav className='navbar'>
+			<Link id="main" to='/'>Home</Link>
+
+			<div className='navbar__line-container'>
+				<hr style={overrideStyle}/>
+			</div>
+
+			<Link to='/blog'>Blog</Link>
+		</nav>
+	);
 }
 
 export const CatchBoundary = () => {
@@ -83,12 +121,10 @@ export const CatchBoundary = () => {
 
   return (
     <Document title={`${caught.status} ${caught.statusText}`}>
-      <Layout>
         <h1>
           {caught.status}: {caught.statusText}
         </h1>
         {message}
-      </Layout>
     </Document>
   );
 }
@@ -97,7 +133,6 @@ export const ErrorBoundary = ({ error }: { error: Error }) => {
   console.error(error);
   return (
     <Document title="Error!">
-      <Layout>
         <div>
           <h1>There was an error</h1>
           <p>{error.message}</p>
@@ -107,7 +142,6 @@ export const ErrorBoundary = ({ error }: { error: Error }) => {
             users to see.
           </p>
         </div>
-      </Layout>
     </Document>
   );
 }
