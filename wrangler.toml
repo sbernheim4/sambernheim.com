@@ -1,4 +1,4 @@
-name = "remix-cloudflare-workers"
+name = "personal-site"
 type = "javascript"
 
 zone_id = ""
