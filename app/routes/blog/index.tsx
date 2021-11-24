@@ -26,16 +26,26 @@ export default function Posts() {
 
 	return (
 		<div className='blog'>
-			<h1>My Blog</h1>
 
-			<ul>
+			<div className='article-container'>
 				{loadedPosts.map(post => (
-					<li key={post.slug}>
-						<Link to={post.slug}>{post.title}</Link>
-					</li>
+					<ArticleItem {...post} />
 				))}
-			</ul>
+			</div>
 
 		</div>
    );
+};
+
+const ArticleItem = (props: Post) => {
+	const { slug, title, description } = props;
+
+	return (
+		<Link className='article-item' to={slug}>
+			<h2>{title}</h2>
+
+			<p>{description}</p>
+		</Link>
+
+   )
 };
