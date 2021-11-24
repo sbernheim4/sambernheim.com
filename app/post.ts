@@ -1,76 +1,35 @@
 import path from "path";
-import fs from "fs/promises";
-import parseFrontMatter from "front-matter";
-import invariant from "tiny-invariant";
-import { processMarkdown } from "@ryanflorence/md";
+import { BuildingAMonad } from "./components/Articles/BuildingAMonad";
 
 export type Post = {
 	slug: string;
 	title: string;
+	id: number;
+	html: string;
+	description: string;
 };
 
 export type PostMarkdownAttributes = {
 	title: string;
 };
 
-const postsPath = path.join(__dirname, "../posts");
+const articles: Array<Post> = [
+	{
+		title: "Building a Monad",
+		slug: "building-a-monad",
+		html: BuildingAMonad,
+		id: 3,
+		description: "Learn about monads by building a new monad that doesn't exist"
+	}
+];
 
-console.log({ postsPath });
-
-function isValidPostAttributes(
-	attributes: any
-): attributes is PostMarkdownAttributes {
-	return attributes?.title;
-}
-
-
-export async function getPosts() {
-	const dir = await fs.readdir(postsPath);
-
-	return Promise.all(
-
-		dir.map(async filename => {
-
-			const file = await fs.readFile(
-				path.join(postsPath, filename)
-			);
-
-			const { attributes } = parseFrontMatter(
-				file.toString()
-			);
-
-			const { title } = attributes as { title: string };
-
-			invariant(
-				isValidPostAttributes(attributes),
-				`${filename} has bad meta data!`
-			);
-
-			return {
-				slug: filename.replace(/\.md$/, ""),
-				title
-			};
-
-		})
-
-	);
+export function getPosts(): Array<Post> {
+	return articles;
 };
 
-export async function getPost(slug: string) {
-	const filepath = path.join(postsPath, slug + ".md");
-	const file = await fs.readFile(filepath);
-	const { attributes, body } = parseFrontMatter(file.toString());
+export function getPost(slug: string) {
 
-	invariant(
-		isValidPostAttributes(attributes),
-		`Post ${filepath} is missing attributes`
-	);
-
-	const html = await processMarkdown(body);
-
-	return {
-		slug,
-		html,
-		title: attributes.title,
-	};
-}
+	const article = articles.find(article => article.slug === slug);
+	
+	return article;
+};

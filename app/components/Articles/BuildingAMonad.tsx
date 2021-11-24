@@ -1,6 +1,12 @@
----
-title: Building a Monad
----
+// import { withStyling } from "~/routes/posts/withStyling"
+// import showdown  from 'showdown';
+// const showdown  = require('showdown');
+import { Remarkable } from 'remarkable';
+import hljs from 'highlight.js';
+
+
+const markdown = `
+# Building a Monad
 
 We're going to build a new monad. To get there, we'll explore creating a means of tracking analytics events and start with some simple solutions that will eventually coalesce into our monad.
 
@@ -658,4 +664,30 @@ class Trackable {
 }
 ~~~
 This method may be useful for when a given flow should only report all the built up analytics events once a specific point in a user flow is reached. If that point is never reached (or bypassed or not relevant) there's no need to fire off the events. It provides a transactional like approach to our system.
+`
 
+// const converter = new showdown.Converter();
+// const html = converter.makeHtml(markdown);
+import javascript from 'highlight.js/lib/languages/javascript';
+import typescript from 'highlight.js/lib/languages/javascript';
+hljs.registerLanguage('javascript', javascript);
+hljs.registerLanguage('typescript', typescript);
+
+const md = new Remarkable({
+	langPrefix: 'hljs language-',
+	highlight: function (str: string, lang: string) {
+		
+		if (lang && hljs.getLanguage(lang)) {
+			try {
+				return hljs.highlight(lang, str).value;
+			} catch (err) { }
+		}
+
+		try {
+			return hljs.highlightAuto(str).value;
+		} catch (err) { }
+
+		return '';
+	}
+});
+export const BuildingAMonad = md.render(markdown);

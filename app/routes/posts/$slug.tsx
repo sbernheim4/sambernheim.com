@@ -1,8 +1,24 @@
 import { useLoaderData } from "remix";
-import type { LoaderFunction } from "remix";
+import type { LoaderFunction, LinksFunction, MetaFunction } from "remix";
 import invariant from "tiny-invariant";
-import { getPost } from "~/post";
+import { getPost, Post } from "~/post";
 
+export const links: LinksFunction = () => {
+
+	return [
+		{ rel: 'stylesheet', href: 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/styles/atom-one-dark.min.css' },
+		{ rel: 'javascript', href: 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/highlight.min.js' },
+	]
+}
+
+export const meta: MetaFunction = (x) => {
+	const postData = x.data as Post;
+
+	return {
+		title: postData.title,
+		description: postData.description
+	}
+}
 
 export const loader: LoaderFunction = async ({ params }) => {
 	invariant(params.slug, "expected params.slug");
@@ -11,12 +27,12 @@ export const loader: LoaderFunction = async ({ params }) => {
 };
 
 export default function PostSlug() {
-	const post = useLoaderData();
+	const Post = useLoaderData<Post>();
 
 	return (
 		<div>
-			<h1>{post.title}</h1>
-			<div dangerouslySetInnerHTML={{ __html: post.html }} />
+			<div dangerouslySetInnerHTML={{ __html: Post.html }} />
 		</div>
 	);
+
 }
