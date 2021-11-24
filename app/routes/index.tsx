@@ -3,6 +3,7 @@ import { About } from "~/components/About/About";
 import { LandingPage } from "~/components/LandingPage/LandingPage";
 import aboutStyles from './../components/About/styles/about.css';
 import landingStyles from './../components/LandingPage/styles/landingPage.css';
+import globals from './../globals.css'
 
 export const meta: MetaFunction = () => {
 	return {
@@ -14,7 +15,8 @@ export const meta: MetaFunction = () => {
 export const links: LinksFunction = () => {
 	return [
 		{ rel: "stylesheet", href: landingStyles },
-		{ rel: "stylesheet", href: aboutStyles }
+		{ rel: "stylesheet", href: aboutStyles },
+		{ rel: "stylesheet", href: globals }
 	];
 };
 

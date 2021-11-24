@@ -12,7 +12,6 @@ export default function handleRequest(
   const markup = renderToString(
     <RemixServer context={remixContext} url={request.url} />
   );
-  console.log(markup)
 
   responseHeaders.set("Content-Type", "text/html");
 

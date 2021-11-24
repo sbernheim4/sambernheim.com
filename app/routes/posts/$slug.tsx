@@ -2,12 +2,17 @@ import { useLoaderData } from "remix";
 import type { LoaderFunction, LinksFunction, MetaFunction } from "remix";
 import invariant from "tiny-invariant";
 import { getPost, Post } from "~/post";
+import globals from './../../globals.css'
+import articleStyles from './../../article.css'
 
 export const links: LinksFunction = () => {
-
 	return [
+		{ rel: 'stylesheet', href: globals },
+		{ rel: 'stylesheet', href: articleStyles },
 		{ rel: 'stylesheet', href: 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/styles/atom-one-dark.min.css' },
 		{ rel: 'javascript', href: 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/highlight.min.js' },
+		{ rel: 'stylesheet', href: '//fonts.googleapis.com/css?family=Crimson+Text' },
+		{ rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Lato&display=swap' }
 	]
 }
 
@@ -30,9 +35,7 @@ export default function PostSlug() {
 	const Post = useLoaderData<Post>();
 
 	return (
-		<div>
-			<div dangerouslySetInnerHTML={{ __html: Post.html }} />
-		</div>
+		<div className='article' dangerouslySetInnerHTML={{ __html: Post.html }} />
 	);
 
 }

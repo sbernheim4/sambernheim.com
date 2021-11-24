@@ -54,9 +54,7 @@ const Document = ({
 
 const Layout = ({ children }: React.PropsWithChildren<{}>) => {
   return (
-    <div className="">
-        <div className="">{children}</div>
-    </div>
+   <>{children}</>
   );
 }
 

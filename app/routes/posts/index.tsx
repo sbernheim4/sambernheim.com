@@ -13,8 +13,8 @@ export default function Posts() {
 	const loadedPosts = useLoaderData<Post[]>();
 
 	return (
-		<div>
-			<h1>Posts</h1>
+		<>
+			<h1>My Blog</h1>
 
 			<ul>
 				{loadedPosts.map(post => (
@@ -24,6 +24,6 @@ export default function Posts() {
 				))}
 			</ul>
 
-		</div>
+		</>
    );
 };
