@@ -1,5 +1,9 @@
 body {
-    background: #21333b;
+    background: #1e2427;
+}
+
+pre {
+    white-space: break-spaces;
 }
 
 .article {
