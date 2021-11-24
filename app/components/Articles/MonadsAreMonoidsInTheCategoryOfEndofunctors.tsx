@@ -99,7 +99,7 @@ const numToStr = (num) => {
 };
 
 const threeAsAString = numToStr(3); // => "3"
-~~
+~~~
 
 Endofunctors are related but are just a bit more strict. An endofunctor is a functor where the result of the transformation has the same type as the starting type (and continues to obey all the other rules around functors like functional composition).
 
@@ -198,7 +198,7 @@ In the next article, we'll review a usecase that doesn't yet have a supporting M
 const md = new Remarkable({
 	langPrefix: 'hljs language-',
 	highlight: function (str: string, lang: string) {
-		
+
 		if (lang && hljs.getLanguage(lang)) {
 			try {
 				return hljs.highlight(lang, str).value;

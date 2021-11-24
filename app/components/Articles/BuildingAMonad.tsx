@@ -11,10 +11,10 @@ Let's assume we have a function \`track\` that fires off analytics event to some
 ~~~ts
 const track = ({ functionName, args }) => {
 
-	// An extremely naive approach. This would really consist of firing off a
-	// network request to a backend service with a payload containing this data.
+    // An extremely naive approach. This would really consist of firing off a
+    // network request to a backend service with a payload containing this data.
 
-	console.log(functionName, args);
+    console.log(functionName, args);
 };
 
 
@@ -51,26 +51,26 @@ const track = ({ functionName, args, result }) => {
 // the \`track\` function.
 const withTracking = (originalFunction) => {
 
-	// Create a new function
-	const wrappedOriginalFunction = (...args) => {
+    // Create a new function
+    const wrappedOriginalFunction = (...args) => {
 
-		// That invokes the original function
-		const result = originalFunction(...args);
+        // That invokes the original function
+        const result = originalFunction(...args);
 
-		// And that invokes the track function
-		track({
-			functionName: originalFunction.name,
-			args,
-			result
-		});
+        // And that invokes the track function
+        track({
+            functionName: originalFunction.name,
+            args,
+            result
+        });
 
-		// And returns the result of the original function
-		return result
+        // And returns the result of the original function
+        return result
 
-	};
+    };
 
-	// Return the above function
-	return wrappedOriginalFunction;
+    // Return the above function
+    return wrappedOriginalFunction;
 
 };
 
@@ -110,23 +110,23 @@ We update \`withTracking\` to accept a 2nd parameter which will be a function th
 ~~~ts
 const withTracking = (originalFunction, constructAnalyticsEvent) => {
 
-	return (...args) => {
+    return (...args) => {
 
-		const result = originalFunction(...args);
+        const result = originalFunction(...args);
 
-		track(
-			// Call the passed in function to construct the analytics event
-			// passing in the function name, arguments, and return value
-			constructAnalyticsEvent(
-				originalFunction.name,
-				args,
-				result
-			)
-		);
+        track(
+            // Call the passed in function to construct the analytics event
+            // passing in the function name, arguments, and return value
+            constructAnalyticsEvent(
+                originalFunction.name,
+                args,
+                result
+            )
+        );
 
-		return result;
+        return result;
 
-	};
+    };
 
 };
 ~~~
@@ -200,23 +200,23 @@ const createAdd3AnalyticsEvent = (functionName, args, returnValue) => {
 // the __trackingInfo property
 const withTracking = (originalFunction, constructAnalyticsEvent) => {
 
-	return (...args) => {
+    return (...args) => {
 
-		const returnValue = originalFunction(...args);
+        const returnValue = originalFunction(...args);
 
-		track(
-			constructAnalyticsEvent(
-				originalFunction.name,
-				args,
-				returnValue.__trackingInfo
-			)
-		);
+        track(
+            constructAnalyticsEvent(
+                originalFunction.name,
+                args,
+                returnValue.__trackingInfo
+            )
+        );
 
-		// Return just the actual value and not the object so callers of tracked
-		// verions of the function work as expected.
-		return returnValue.result
+        // Return just the actual value and not the object so callers of tracked
+        // verions of the function work as expected.
+        return returnValue.result
 
-	};
+    };
 
 };
 ~~~
@@ -300,36 +300,36 @@ We already have a pseudo special type - objects with a \`__trackingInfo\` proper
 ~~~ts
 class Trackable {
 
-	constructor(value, analyticsEvents) {
-		this.value = value;
+    constructor(value, analyticsEvents) {
+        this.value = value;
 
-		// We'll review why this conditional is necessary further on.
-		const data = Array.isArray(analyticsEvents) ?
-			analyticsEvents :
-			[analyticsEvents]
+        // We'll review why this conditional is necessary further on.
+        const data = Array.isArray(analyticsEvents) ?
+            analyticsEvents :
+            [analyticsEvents]
 
-		this.analyticsEvents = data;
-	}
+        this.analyticsEvents = data;
+    }
 
-	// Some simple helper methods
+    // Some simple helper methods
 
-	getValue() {
-		return this.value;
-	}
+    getValue() {
+        return this.value;
+    }
 
-	getAnalyticsEvents() {
-		return this.analyticsEvents;
-	}
+    getAnalyticsEvents() {
+        return this.analyticsEvents;
+    }
 
-	containsValue() {
-		return !!this.getValue();
-	}
+    containsValue() {
+        return !!this.getValue();
+    }
 
-	toString() {
-		return     "value: " + this.getValue() + "\\n" +
-			"analyticsEvents: " + this.getAnalyticsEvents()
-		;
-	}
+    toString() {
+        return     "value: " + this.getValue() + "\\n" +
+            "analyticsEvents: " + this.getAnalyticsEvents()
+        ;
+    }
 }
 ~~~
 
@@ -337,37 +337,37 @@ With our new class, we can update the initial application functions to return in
 
 ~~~ts
 const addThreeAndRandom = (val) => {
-	const random = Math.random();
+    const random = Math.random();
 
-	const newValue = val + 3 + random;
+    const newValue = val + 3 + random;
 
-	return new Trackable(
-		newValue,
-		// The analytics event for this function call
-		{
-			functionName: 'addThreeAndRandom',
-			arguments: [val],
-			result: newValue,
-			info: { random }
-		}
-	);
+    return new Trackable(
+        newValue,
+        // The analytics event for this function call
+        {
+            functionName: 'addThreeAndRandom',
+            arguments: [val],
+            result: newValue,
+            info: { random }
+        }
+    );
 }
 
 const multiplyBy5AndRandom = (val) => {
-	const random = Math.random();
+    const random = Math.random();
 
-	const newValue = val * 5 * random;
+    const newValue = val * 5 * random;
 
-	return new Trackable(
-		newValue,
-		// The analytics event for this function call
-		{
-			functionName: 'multiplyBy5AndRandom',
-			arguments: [val],
-			result: newValue,
-			info: { random }
-		}
-	);
+    return new Trackable(
+        newValue,
+        // The analytics event for this function call
+        {
+            functionName: 'multiplyBy5AndRandom',
+            arguments: [val],
+            result: newValue,
+            info: { random }
+        }
+    );
 }
 ~~~
 
@@ -380,33 +380,33 @@ class Trackable {
 
     // Methods from above ...
 
-	// Just like Array.map, our map method will take a function as an argument,
-	// and apply the function to the underlying value.
-	map(fn) {
+    // Just like Array.map, our map method will take a function as an argument,
+    // and apply the function to the underlying value.
+    map(fn) {
 
-		if (this.containsValue()) {
+        if (this.containsValue()) {
 
-			// Apply the function to the underlying value
-			const transformedValue = fn(this.getValue());
+            // Apply the function to the underlying value
+            const transformedValue = fn(this.getValue());
 
-			// Return a Track instance with the transformed value
-			// while preserving the existing analytics events.
+            // Return a Track instance with the transformed value
+            // while preserving the existing analytics events.
 
-			return new Trackable (
-				transformedValue,
-				this.getAnalyticsEvents()
-			);
+            return new Trackable (
+                transformedValue,
+                this.getAnalyticsEvents()
+            );
 
-		} else {
+        } else {
 
-			// If we have no underlying value, fn can't be applied
-			// to nothing so just return the current instance for continued safe
-			// chaining and to preserve any existing analytics data.
+            // If we have no underlying value, fn can't be applied
+            // to nothing so just return the current instance for continued safe
+            // chaining and to preserve any existing analytics data.
 
-			return this;
+            return this;
 
-		}
-	}
+        }
+    }
 }
 ~~~
 Instances of \`Trackables\` can have their underlying value arbitrarily manipulated with our \`map\` method while all the built up analytics events are stored and maintained.
@@ -415,23 +415,23 @@ Instances of \`Trackables\` can have their underlying value arbitrarily manipula
 const addThreeAndRandom = (val) => {
     const random = Math.random();
 
-	const newValue = val + 3 + random,
+    const newValue = val + 3 + random,
 
     return new Trackable(
-		newValue,
-		// The analytics event for this function call
-		{
-			functionName: 'addThreeAndRandom',
-			arguments: [val],
-			result: NewValue,
-			info: { random }
-		}
+        newValue,
+        // The analytics event for this function call
+        {
+            functionName: 'addThreeAndRandom',
+            arguments: [val],
+            result: NewValue,
+            info: { random }
+        }
     );
 }
 
 const val = addThreeAndRandom(7)
-	.map(val => val + 12) // Add 12 to the underlying value
-	.map(val => val * 2); // Multiple the underlying value by 2
+    .map(val => val + 12) // Add 12 to the underlying value
+    .map(val => val * 2); // Multiple the underlying value by 2
 // val is still of type Trackable and still contains all the analytics events
 ~~~
 
@@ -439,22 +439,22 @@ But what if the function passed to \`map\` also returns a \`Trackable\` and it i
 
 ~~~ts
 const val = addThreeAndRandom(7)
-	.map(val => {
-		const randomNum2 = Math.random();
+    .map(val => {
+        const randomNum2 = Math.random();
 
-		const newValue = val + randomNum2
+        const newValue = val + randomNum2
 
-		return new Trackable(
-			newValue,
-		    // The analytics event for this function call
-			{
-				functionName: 'addThreeAndRandom',
-				arguments: [val],
-				result: newValue,
-				info: { randomNum2 }
-			}
-		);
-	});
+        return new Trackable(
+            newValue,
+            // The analytics event for this function call
+            {
+                functionName: 'addThreeAndRandom',
+                arguments: [val],
+                result: newValue,
+                info: { randomNum2 }
+            }
+        );
+    });
 ~~~
 
 This would cause an issue where we'd end up with a nested \`Trackable\`. The return value of the function passed to \`map\` (which is a \`Trackable\`) is itself placed into a \`Trackable\` by \`map\` leading to a nested \`Trackable\`.
@@ -464,45 +464,45 @@ To avoid this, we need a separate method for specifically this case where the fu
 ~~~ts
 class Trackable {
 
-	// Methods from above ...
+    // Methods from above ...
 
-	flatMap(fn) {
+    flatMap(fn) {
 
-		if (this.containsValue()) {
+        if (this.containsValue()) {
 
-			// Get the new Trackable by applying fn to the underlying value (fn
-			// returns a Trackable in this case unlike map where fn returns a
-			// non Trackable value).
-			const newTrackableInstance = fn(this.getValue());
+            // Get the new Trackable by applying fn to the underlying value (fn
+            // returns a Trackable in this case unlike map where fn returns a
+            // non Trackable value).
+            const newTrackableInstance = fn(this.getValue());
 
-			// Get the new underlying value
-			const newUnderlyingValue = newTrackableInstance.getValue();
+            // Get the new underlying value
+            const newUnderlyingValue = newTrackableInstance.getValue();
 
-			// From the note in the constructor before, since we're passing in
-			// an array of analytics events, we want to avoid creating a nested
-			// array which is why the conditional in the constructor is
-			// necessary. We combine the existing analytics events with the new
-			// analytics event into a new array.
-			const mergedTrackingData = [
-				...this.getAnalyticsEvents(),
-				...newTrackableInstance.getAnalyticsEvents()
+            // From the note in the constructor before, since we're passing in
+            // an array of analytics events, we want to avoid creating a nested
+            // array which is why the conditional in the constructor is
+            // necessary. We combine the existing analytics events with the new
+            // analytics event into a new array.
+            const mergedTrackingData = [
+                ...this.getAnalyticsEvents(),
+                ...newTrackableInstance.getAnalyticsEvents()
 
-			];
+            ];
 
-			return new Trackable(
-				newUnderlyingValue,
-				mergedTrackingData
-			);
+            return new Trackable(
+                newUnderlyingValue,
+                mergedTrackingData
+            );
 
-		} else {
+        } else {
 
-			// If we have no underlying value then we can't apply fn
-			// to nothing so we just return the current instance
-			return this;
+            // If we have no underlying value then we can't apply fn
+            // to nothing so we just return the current instance
+            return this;
 
-		}
+        }
 
-	}
+    }
 
 }
 ~~~
@@ -514,10 +514,10 @@ Using \`flatMap\` for functions that return a \`Trackable\` is simple.
 
 ~~~ts
 const val = addThreeAndRandom(7)
-	.flatMap(val => {
-		const randomNum2 = Math.random();
-		return new Trackable(val * randomNum2, { randomNum2 });
-	});
+    .flatMap(val => {
+        const randomNum2 = Math.random();
+        return new Trackable(val * randomNum2, { randomNum2 });
+    });
 ~~~
 
 \`map\` and \`flatMap\` provide mechanisms to easily transform the underlying value while preserving any built up analytics payloads. But we still need a way to send the built up analytics events to our service.
@@ -529,20 +529,20 @@ class Trackable {
 
     // Methods from above ...
 
-	run() {
+    run() {
 
-		// Get all the built up analytics events
-		const analyticsEvents = this.getAnalyticsEvents();
+        // Get all the built up analytics events
+        const analyticsEvents = this.getAnalyticsEvents();
 
-		// For every analytics event, invoke the track function
-		analyticsEvents.forEach(analyticsEvent => {
-			track(analyticsEvent);
-		});
+        // For every analytics event, invoke the track function
+        analyticsEvents.forEach(analyticsEvent => {
+            track(analyticsEvent);
+        });
 
-		// Finally return the underlying value
-		return this.getValue();
+        // Finally return the underlying value
+        return this.getValue();
 
-	}
+    }
 }
 ~~~
 
@@ -557,20 +557,20 @@ Finally we have a complete solution. What's left is an abstraction that should f
 const subtractSeven = val => val - 7;
 
 const addThreeAndRandom = (val) => {
-	const randomNum = Math.random();
+    const randomNum = Math.random();
 
-	const newValue = val + 3 + random;
+    const newValue = val + 3 + random;
 
-	return new Trackable(
-		newValue,
-		// The analytics event for this function call
-		{
-			functionName: 'addThreeAndRandom',
-			arguments: [val],
-			result: newValue,
-			info: { randomNum }
-		}
-	);
+    return new Trackable(
+        newValue,
+        // The analytics event for this function call
+        {
+            functionName: 'addThreeAndRandom',
+            arguments: [val],
+            result: newValue,
+            info: { randomNum }
+        }
+    );
 };
 
 const res = addThreeAndRandom(2) // addThreeAndRandom: number -> Trackable
@@ -599,47 +599,47 @@ In the above example, we're still embedding analytics code - the analytics event
 
 ~~~ts
 const constructAddThreeAndRandomAnalyticsEvent = (
-	functionName,
-	args,
-	result,
-	info
+    functionName,
+    args,
+    result,
+    info
 ) => {
 
-	// We can add conditional logic based on the arguments to the original
-	// function so this logic doesn't have to go in the application code
-	const info = args[0] < 10 ?
-		"called with a number less than 10" :
-		"called with a number greather than or equal to 10";
+    // We can add conditional logic based on the arguments to the original
+    // function so this logic doesn't have to go in the application code
+    const info = args[0] < 10 ?
+        "called with a number less than 10" :
+        "called with a number greather than or equal to 10";
 
-	// We can also add conditional logic based on data constructed in
-	// the body of the function
-	const analyticsEventMessage = info.randomNum > .5 ?
-		"Heads" :
-		"Tails";
+    // We can also add conditional logic based on data constructed in
+    // the body of the function
+    const analyticsEventMessage = info.randomNum > .5 ?
+        "Heads" :
+        "Tails";
 
-	return {
-		functionName,
-		args,
-		message: analyticsEventMessage
-		info,
-	}
+    return {
+        functionName,
+        args,
+        message: analyticsEventMessage
+        info,
+    }
 
 };
 
 const addThreeAndRandom = (val) => {
-	const randomNum = Math.random();
+    const randomNum = Math.random();
 
-	const newValue = val + 3 + random;
+    const newValue = val + 3 + random;
 
-	return new Trackable(
-		newValue,
-		constructAddThreeAndRandomAnalyticsEvent(
-			'addThreeAndRandom',
-			args: arguments,
-			result: newValue,
-			info: { randomNum }
-		)
-	);
+    return new Trackable(
+        newValue,
+        constructAddThreeAndRandomAnalyticsEvent(
+            'addThreeAndRandom',
+            args: arguments,
+            result: newValue,
+            info: { randomNum }
+        )
+    );
 };
 ~~~
 
@@ -650,13 +650,13 @@ class Trackable {
 
     // Methods from above ...
 
-	forgetAndReturn() {
-		// Drop all the built up analytics events
-		this.analyticsEvents = [];
+    forgetAndReturn() {
+        // Drop all the built up analytics events
+        this.analyticsEvents = [];
 
-		// Return the underlying value
-		return this.value;
-	}
+        // Return the underlying value
+        return this.value;
+    }
 }
 ~~~
 This method may be useful for when a given flow should only report all the built up analytics events once a specific point in a user flow is reached. If that point is never reached (or bypassed or not relevant) there's no need to fire off the events. It provides a transactional like approach to our system.

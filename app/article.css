@@ -16,7 +16,6 @@ body, .navbar {
 }
 
 pre {
-    white-space: break-spaces;
 }
 
 .article {
@@ -24,6 +23,25 @@ pre {
     margin: 0 auto;
     max-width: 650px;
     color: #bcbfc9;
+    --main-bg-color: rgb(59 77 86);
+}
+
+.article > blockquote {
+    margin: 0 auto !important;
+    font-style: italic;
+    width: 80%;
+    font-size: 1em;
+    margin: 2rem 0;
+    line-height: 1.75em;
+    font-family: 'Lato'
+}
+
+.article > ul, li {
+    font-family: 'Lato'
+}
+
+.article > blockquote > p {
+    margin: 0 auto;
 }
 
 .article > p {
@@ -31,6 +49,28 @@ pre {
     margin: 2rem 0;
     line-height: 1.75em;
     font-family: 'Lato'
+}
+
+.article > p > code:before, code:after {
+    content: '';
+    background: var(--main-bg-color);
+}
+
+.article > p > code {
+    padding: 0 3px;
+    border-radius: 3px;
+    background: var(--main-bg-color);
+}
+
+.article > p > a {
+    color: #bcbfc9;
+    text-decoration: underline;
+}
+
+.article > p > a:hover {
+    color: #bcbfc9;
+    filter: brightness(85%);
+    text-decoration: underline;
 }
 
 .article > h1, h2 {
