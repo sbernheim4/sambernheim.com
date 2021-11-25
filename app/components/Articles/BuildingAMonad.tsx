@@ -6,7 +6,7 @@ const markdown = `
 
 We're going to build a new monad. To get there, we'll explore creating a means of tracking analytics events and start with some simple solutions that will eventually coalesce into our monad.
 
-Let's assume we have a function ~track~ that fires off analytics event to some backend service. The exact implementation is fairly arbitrary. Consider the below example:
+Let's assume we have a function \`track\` that fires off analytics event to some backend service. The exact implementation is fairly arbitrary. Consider the below example:
 
 ~~~ts
 const track = ({ functionName, args }) => {
