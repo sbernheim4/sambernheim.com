@@ -53,4 +53,3 @@ export const useProgress = () => {
 	return currentHeight / totalHeight;
 
 };
-

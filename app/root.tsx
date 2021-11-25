@@ -71,7 +71,6 @@ export const Navbar = () => {
 	const [ overrideStyle, setOverrideStyle ] = useState({});
 	const { pathname } = useLocation();
 	const progress = useProgress();
-	// const progress = .5;
 
 	useEffect(() => {
 
