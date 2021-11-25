@@ -35,6 +35,7 @@
   text-decoration: none;
 }
 .article-container .article-item p {
+  font-family: "Lato", "sans-serif";
   padding: 30px;
   text-align: center;
   text-decoration: none;
