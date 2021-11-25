@@ -1,5 +1,4 @@
-import { Remarkable } from 'remarkable';
-import hljs from 'highlight.js';
+import { md } from "./highlightingHelpers";
 
 const markdown = `
 # The Engineer's Schrodinger's Cat
@@ -182,23 +181,5 @@ It is a standalone package with 0 dependencies and 100% test coverage.
 
 I hope you find it (and more broadly, Options) useful.
 `
-
-const md = new Remarkable({
-	langPrefix: 'hljs language-',
-	highlight: function (str: string, lang: string) {
-		
-		if (lang && hljs.getLanguage(lang)) {
-			try {
-				return hljs.highlight(lang, str).value;
-			} catch (err) { }
-		}
-
-		try {
-			return hljs.highlightAuto(str).value;
-		} catch (err) { }
-
-		return '';
-	}
-});
 
 export const EngineersSchrodingersCat = md.render(markdown);

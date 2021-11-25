@@ -1,5 +1,4 @@
-import { Remarkable } from 'remarkable';
-import hljs from 'highlight.js';
+import { md } from './highlightingHelpers';
 
 const markdown = `
 # Monads are Monoids in the Category of Endofunctors
@@ -194,23 +193,5 @@ And I'm sure there are more!
 
 In the next article, we'll review a usecase that doesn't yet have a supporting Monad and write a new one to fit the specific needs.
 `
-
-const md = new Remarkable({
-	langPrefix: 'hljs language-',
-	highlight: function (str: string, lang: string) {
-
-		if (lang && hljs.getLanguage(lang)) {
-			try {
-				return hljs.highlight(lang, str).value;
-			} catch (err) { }
-		}
-
-		try {
-			return hljs.highlightAuto(str).value;
-		} catch (err) { }
-
-		return '';
-	}
-});
 
 export const MonadsAreMonoidsInTheCategoryOfEndofunctors = md.render(markdown);
