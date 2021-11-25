@@ -3,8 +3,9 @@
   "description": "",
   "license": "",
   "scripts": {
+    "wrangler": "yarn && npx wrangler publish",
     "build": "remix build",
-    "dev": "remix dev",
+    "dev": " npx remix setup && remix dev",
     "postinstall": "remix setup cloudflare-workers",
     "build:worker": "esbuild --define:process.env.NODE_ENV='\"production\"' --minify --bundle --sourcemap --outdir=dist ./worker",
     "start": "remix-serve build",

@@ -29,7 +29,7 @@ export default function Posts() {
 
 			<div className='article-container'>
 				{loadedPosts.map(post => (
-					<ArticleItem {...post} />
+					<ArticleItem key={post.id} {...post} />
 				))}
 			</div>
 
