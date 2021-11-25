@@ -16,7 +16,7 @@ This phrase is the cheeky line to (somewhat) formally define the monad;  While a
 Monoids are types under an operation that follow 3 rules. For the provided operation, the type must:
 
 * Have an identity
-* Produce a value of the same type when two of those values are combined (this may require defining how o combine two values of this type)
+* Produce a value of the same type when two of those values are combined (this may require defining how two values of this type can be combined)
 * Be associative
 
 An example. Let's use \`string\` as our type and \`concatenation\` as the definition for combining.
@@ -68,7 +68,7 @@ Since strings under concatenation are monoids - and so are associative - each jo
 
 Anything that is a monoid is naturally parallelizable.
 
-### When a Thing is not a Monoid
+## When a Thing is not a Monoid
 An example of where a type under an operation is not a monoid is easily found in numbers under subtraction.
 
 > We could demonstrate this with strings under subtraction too, but defining 'subtraction' for a string isn't quite as natural or intuitive.
