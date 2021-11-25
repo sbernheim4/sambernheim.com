@@ -3,12 +3,13 @@
   "description": "",
   "license": "",
   "scripts": {
-    "wrangler": "yarn && npx wrangler publish",
     "build": "remix build",
-    "dev": " npx remix setup && remix dev",
+    "dev": "remix watch",
     "postinstall": "remix setup cloudflare-workers",
     "build:worker": "esbuild --define:process.env.NODE_ENV='\"production\"' --minify --bundle --sourcemap --outdir=dist ./worker",
-    "start": "remix-serve build",
+    "dev:worker": "esbuild --define:process.env.NODE_ENV='\"development\"' --bundle --sourcemap --outdir=dist ./worker",
+    "start": "miniflare --build-command \"npm run dev:worker\" --watch",
+    "deploy": "npm run build && wrangler publish",
     "sass": "sass --watch app/:app/"
   },
   "dependencies": {
@@ -29,6 +30,8 @@
     "@types/react-dom": "^17.0.9",
     "@types/react-syntax-highlighter": "^13.5.2",
     "@types/remarkable": "^2.0.3",
+    "esbuild": "0.13.14",
+    "miniflare": "2.0.0-next.3",
     "sass": "^1.43.4",
     "typescript": "^4.1.2"
   },
