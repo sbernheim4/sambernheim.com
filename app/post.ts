@@ -1,6 +1,7 @@
 import { BuildingAMonad } from "./components/Articles/BuildingAMonad";
 import { EngineersSchrodingersCat } from "./components/Articles/EngineersSchrodingersCat";
 import { MonadsAreMonoidsInTheCategoryOfEndofunctors } from './components/Articles/MonadsAreMonoidsInTheCategoryOfEndofunctors';
+import { ThePartyMathTrick } from "./components/Articles/ThePartyMathTrick";
 
 export type Post = {
 	slug: string;
@@ -15,6 +16,13 @@ export type PostMarkdownAttributes = {
 };
 
 const articles: Array<Post> = [
+	{
+		title: "The Party Math Trick",
+		slug: "the-party-math-trick",
+		html: ThePartyMathTrick,
+		id: 4,
+		description: "A quick and fun math trick for parties"
+	},
 	{
 		title: "Building a Monad",
 		slug: "building-a-monad",
