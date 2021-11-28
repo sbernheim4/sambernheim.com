@@ -15,17 +15,17 @@ Once they have the result, they should select a digit from the result that is no
 
 A quick example.
 
-I pick the number 7834, scrambling the digits I pick 4837. Subtracting the bigger from the smaller (7834 - 4837) - subtracting the smaller from the bigger is also fine, you just drop the negative sign - yields 2997. I pick a digit that's not 0 or 9 (so either 2 or 7) and say the remaining digits.
+I pick the number 7,834, scrambling the digits I pick 4,837. Subtracting the bigger from the smaller (7,834 - 4,837) -- subtracting the smaller from the bigger is also fine, you just drop the negative sign -- yields 2,997. I pick a digit that's not 0 or 9 (so either 2 or 7) and say the remaining digits.
 
 If I pick 2 I'll say 9, 9 and 7. Then the person performing the trick should be able to figure out that I picked a 2.
 
-This relies on some fun math but it's also easy to program. [Go ahead and try it out](https://www.sambernheim.com/the-math-trick). Come back to learn the secret behind the trick.
+This relies on some fun math but it's also easy to program. [Go ahead and try it out](https://www.sambernheim.com/the-party-math-trick-demo). Come back to learn the secret behind the trick.
 
-I promise that the page is doing the trick and not just showing the number you click on. Feel free to inspect the client side JS and the data sent to the server if you don't believe me. You'll see it's the same
+I promise that the page is doing the trick and not just showing the number you click on. Feel free to inspect the client side JS and the data sent to the server if you don't believe me. You'll see it's the same as the information you get doing this trick manually.
 
 ## How This works
 
-This trick can be done fully without any computers with some easy mental (or frantically back of the napkin math) - like at a party.
+This trick can be done fully without any computers with some easy mental math (or frantically with some back of the napkin work, or you know, your phone) - like at a party.
 
 Like many math tricks, it relies on some properties of numbers, also known as number theory.
 
@@ -39,13 +39,15 @@ That or someone screwed up their subtraction.
 
 The curious piece in all this is why the subtraction of these two numbers yields a result that is always a multiple of 9.
 
-To start, any number can be represted by its digits times 10 to a power. For example 743 can be written as \`(7 * 10^2 + 4 * 10^1 + 3 * 10^0) = 743\`.
+To start, 743 can be written as \`(7 * 10^2 + 4 * 10^1 + 3 * 10^0) = 743\`.
 
-More broadly we can say any number N can be written as the sum of its digits times 10 to a power. Abstracting the concrete digits in 7, 4, and 3 for variables a, b, and c, and N for the result we get:
+More generally we can say any number N (743 in our concrete example above) can be written as the sum of its digits times 10 to a power. Abstracting the concrete digits - 7, 4, and 3 - for variables a, b, and c, we get:
+
+## The Proof
 
 \`N = (c * 100) + (b * 10) + (a * 1)\`
 
-> For numbers with more than 3 digits we would tack on a \`d * 1000\` and so on and so forth for more digits.
+> For numbers with more than 3 digits we would tack on a \`(d * 1000)\` and so on and so forth for more digits.
 
 This is equivalent to
 
@@ -55,7 +57,7 @@ If we remove all the parentheses we see it becomes
 
 \`N = c + 99c + b + 9b + a\`
 
-With some regrouping this is
+With some regrouping this becomes
 
 \`N = (c + b + a + 99c + 9b)\`
 
@@ -73,26 +75,41 @@ Which is equivalent to
 
  Which finally is equivalent to
 
- \`N - (c + b + a) = 9 * k\` - where k = (11c + 1b)
+ \`N - (c + b + a) = 9 * k\` - where \`k = (11c + 1b)\`
 
-This shows that for any number N, made up of digits a, b, and c, if you subtract the sum of the digits from N, the result is a number divisible by 9 - it doesn't matter what the value for \`k\` will be, it is always multipled by a factor of 9.
+This shows that for any number N, made up of digits \`a\`, \`b\`, and \`c\`, if you subtract the sum of the digits from \`N\`, the result is a number divisible by 9 - it doesn't matter what the value for \`k\` will be, it is always multipled by a factor of 9.
 
 Try it, take any number, and subtract from it the sum of its digits and you'll be left with a number that is divisible by 9.
 
 This is what gives us the quick test to determine if a number is divisible by 9, just see if the digits add up to a multiple of 9.
 
-If they do, from the step where we had \`N = c + b + a + (99c + 9b)\`, \`(c + b + a)\` must also be a multiple of 9 and can be written as \`(9x)\` which is the same as \`N = 9x + 99c + 9b\` and a 9 can be divided on boths sides and we're left with \`N / 9 = x + 11c + b\` which shows that N is evenly divisible by 9 - x, c, and b are whole numbers.
+If they do, from the step where we had \`N = c + b + a + (99c + 9b)\`, \`(c + b + a)\` must also be a multiple of 9. After all, our number \`N\` was made up of digits \`c\`, \`b\`, and \`a\`.
 
-More broadly, if we sum the digits of a number N, we know the remainder when we divide by 9 will be the same as the remainder when we divide the sum of the digits by N.
+More broadly, if we sum the digits of a number \`N\`, we know the remainder when we divide by 9 will be the same as the remainder when we divide the sum of the digits by \`N\`.
 
-When we scramble the digits of the same number, we know that dividing this new number by 9 will yield the same remainder as the original number divided by 9. We're using the same digits and so get the same sum!
+When we scramble the digits to get a new number, we know that dividing this new number by 9 will still yield the same remainder as the original number divided by 9. We're using the same digits and so get the same sum!
 
-Subtracting two numbers from each other, where both numbers have the same remainder when divided by 9, means any remainder when dividing the result of the subtraction by 9 will be 0 - as in we're guarnateed to be left with a number divisible by 9. You can just subtract the remainders from each other like an equation. Both remainders are the same number, so we're always left with 0.
+Subtracting two numbers from each other, where both numbers have the same remainder when divided by 9, means any remainder when dividing the result of the subtraction by 9 will be 0.
 
-That is to say, when we do our subtraction, taking two numbers where one is a scrambled version of the other and subtracting it from the original is going to always yield a number that congruent to 0 % 9 which means the result of our subtraction is divisible by 9.
+More formally, if \`b\` is the result of the sum of our digits, we can say \`a ≡ b % 9\` for both our original and scrambled digits (\`a\` is the same value for both).
 
-Knowing that the result of our subtraction must be divisible by 9, once given all but one digit of the result, the sum of the given digits plus some missing digit must be a multiple of 9. You simply find the first multiple of 9 bigger than the sum of the digits, subtract the sum from that multiple and you're left with the missing digit!
+When we subtract our two numbers, it's the equivalent of subtracting \`a\` from \`a\` so we're left with \`0 ≡ b % 9\`. \`b\` is the sum of the digits of the result from our subtraction. This shows that \`b\` must be a multiple of 9.
+
+That is to say, taking two numbers where one is a scrambled version of the other and subtracting one from the other will always yield a number that is divisible by 9.
+
+Knowing that the result of the subtraction must be divisible by 9, and given all but one digit of the result of that subtraction, the sum of the given digits plus the missing digit must also be a multiple of 9!
+
+Simply find the first multiple of 9 bigger than the sum of the digits, subtract the sum from that multiple and you're left with the missing digit!
+
+Congratulations, you're a mind reader!
+
+## Food for Thought
+
+Of course, this only works using modulo 9 in our base 10 counting system. This property however holds true no matter what base of math you use so long as you adjust the modulo arithmetic to be 1 less than the base you use.
+
+If we did this in base 7 (representing numbers as digits 0 through 6 multiplied by 7 raised to some power), we'd have to use do this trick with mod 6.
+
+It's an interesting property of number systems, and all the more interesting as it holds under the rule that the modulus has to be 1 less than the base.
 `
 
 export const ThePartyMathTrick = md.render(markdown);
-
