@@ -1,33 +1,19 @@
 import { useState } from "react";
 import {
     ActionFunction,
-    Form,
     json,
     useActionData,
-    useFormAction,
     useSubmit
 } from "remix";
 
 export const action: ActionFunction = async (args) => {
 
 	return args.request.formData().then(body => {
-		console.log("000000000000", body.get("remainingDigits"));
-
-		console.log("--------");
-		for (let x of body.values()){
-			console.log(x)
-		}
-		console.log("--------");
 
 		// @ts-ignore
 		const remainingDigits = JSON.parse(body.get("remainingDigits")) as number[] || []
 
-		// Sum the digits of the remaining value
-		let sumOfRemainingDigits = 0;
-
-		for (let i = 0; i < remainingDigits.length; i++) {
-			sumOfRemainingDigits += remainingDigits[i];
-		}
+		const sumOfRemainingDigits = remainingDigits.reduce((acc, curr) => acc + curr, 0);
 
 		// Find the first multiple of 9 larger than sumOfRemainingDigits
 		let multiple = 0;
@@ -39,9 +25,9 @@ export const action: ActionFunction = async (args) => {
 
 		return json({ answer });
 
-	}).catch(err => {
-		console.log("===========", err);
-	})
+	}).catch(() => {
+        return json({ answer: "Something went wrong" });
+	});
 }
 
 const getEventValue = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,7 +40,6 @@ const MathTrick = () => {
 	const [scrambledNumber, setScrambledNumber] = useState<number>(0);
 	const data = useActionData<{answer: number}>();
 	const submit = useSubmit();
-	const action = useFormAction();
 
 	const handleInitialNumber = (
 		e: React.ChangeEvent<HTMLInputElement>
@@ -70,35 +55,16 @@ const MathTrick = () => {
 
 	const digits = Array.from(String(subtractionResult), Number);
 
-	const [ digitsToSubmit, setDigitsToSubmit ] = useState<number[]>([]);
 
 	const storeRemainingDigits = (digit: number) => {
 		const indexOfDigitToExclue = digits.findIndex(val => val === digit);
 		const copy = [...digits];
 		copy.splice(indexOfDigitToExclue, 1);
-		setDigitsToSubmit(copy);
 
-		// const serializedData = JSON.stringify(copy);
-		// const formData = new FormData();
-
-		// formData.set("remainingDigits", serializedData);
-
-		// for (let x of formData.values()){
-		// 	console.log("!!!!!!!!!!!!!")
-		// 	console.log(x)
-		// 	console.log("!!!!!!!!!!!!!")
-		// }
-
-		// submit(formData, {
-		// 	method: 'post'
-		// 	// action: action + '?_data=routes%2Fthe-party-math-trick-demo%2Findex&index=',
-		// })
-	};
-
-	const submitRequest = () => {
+		const serializedData = JSON.stringify(copy);
 		const formData = new FormData();
-		formData.set("remainingDigits", JSON.stringify(digitsToSubmit));
-		submit(formData, { method: 'post', action, replace: true })
+		formData.set("remainingDigits", serializedData);
+		submit(formData, { method: 'post' })
 	};
 
 	return (
@@ -116,7 +82,6 @@ const MathTrick = () => {
 			<br />
 
 			<p>Select a digit that is not 0 or 9</p>
-			<Form method="post" onSubmit={submitRequest}>
 				{digits.filter(digit => digit !== 0 && digit !== 9).map((digit, index) => {
 					return (
 						<>
@@ -124,8 +89,6 @@ const MathTrick = () => {
 						</>
 				   )
 				})}
-				<button type='submit'>Submit</button>
-			</Form>
 
 			{data?.answer ? <p>You picked {data.answer}</p> : <></>}
 		</>
