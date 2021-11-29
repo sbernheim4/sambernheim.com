@@ -31,7 +31,7 @@ Like many math tricks, it relies on some properties of numbers, also known as nu
 
 The key lies in the curious truth that the result of the subtraction of two numbers that have the same digits where one is a scrambled version of the other is always going to be a multiple of 9. When you take one of the digits out, I only need to find the first multiple of 9 that's bigger than the sum of the remaining digits, and take the difference between that value and the sum of the remaining digits.
 
-It's also why you can't select a 0 or a 9. If you did, then the sum of the remaining digits would be a multiple of a 9 already and so I'll know you tried to trick me by secretly picking a 0 or a 9.
+It's also why you can't select a 0 or a 9. If you did, then the sum of the remaining digits would be a multiple of 9 already and so I'll know you tried to trick me by secretly picking a 0 or a 9.
 
 That or someone screwed up their subtraction.
 
@@ -39,9 +39,9 @@ That or someone screwed up their subtraction.
 
 The curious piece in all this is why the subtraction of these two numbers yields a result that is always a multiple of 9.
 
-To start, 743 can be written as \`(7 * 10^2 + 4 * 10^1 + 3 * 10^0) = 743\`.
+To start, a number, like 743 for example, can be written as \`(7 * 10^2 + 4 * 10^1 + 3 * 10^0) = 743\`.
 
-More generally we can say any number N (743 in our concrete example above) can be written as the sum of its digits times 10 to a power. Abstracting the concrete digits - 7, 4, and 3 - for variables a, b, and c, we get:
+More generally we can say any number N (743 in our concrete example above) can be written as the sum of its digits times 10 to a power. Abstracting the concrete digits - 7, 4, and 3 - for variables \`c\`, \`b\`, and \`a\` we get:
 
 ## The Proof
 
@@ -77,7 +77,7 @@ Which is equivalent to
 
  \`N - (c + b + a) = 9 * k\` - where \`k = (11c + 1b)\`
 
-This shows that for any number N, made up of digits \`a\`, \`b\`, and \`c\`, if you subtract the sum of the digits from \`N\`, the result is a number divisible by 9 - it doesn't matter what the value for \`k\` will be, it is always multipled by a factor of 9.
+This shows that for any number \`N\`, made up of digits \`a\`, \`b\`, and \`c\`, if you subtract the sum of the digits from \`N\`, the result is a number divisible by 9 - it doesn't matter what the value for \`k\` will be, it is always multipled by a factor of 9. One further observation is \`k\` will always be determinable by the digits of \`N\`.
 
 Try it, take any number, and subtract from it the sum of its digits and you'll be left with a number that is divisible by 9.
 
@@ -91,7 +91,7 @@ When we scramble the digits to get a new number, we know that dividing this new 
 
 Subtracting two numbers from each other, where both numbers have the same remainder when divided by 9, means any remainder when dividing the result of the subtraction by 9 will be 0.
 
-More formally, if \`b\` is the result of the sum of our digits, we can say \`a ≡ b % 9\` for both our original and scrambled digits (\`a\` is the same value for both).
+More formally, if \`b\` is the result of the sum of our digits (\`c + b + a\`), we can say \`a ≡ b % 9\` for both our original number and its scrambled version (\`a\` will be the same value for both numbers).
 
 When we subtract our two numbers, it's the equivalent of subtracting \`a\` from \`a\` so we're left with \`0 ≡ b % 9\`. \`b\` is the sum of the digits of the result from our subtraction. This shows that \`b\` must be a multiple of 9.
 
@@ -107,7 +107,7 @@ Congratulations, you're a mind reader!
 
 Of course, this only works using modulo 9 in our base 10 counting system. This property however holds true no matter what base of math you use so long as you adjust the modulo arithmetic to be 1 less than the base you use.
 
-If we did this in base 7 (representing numbers as digits 0 through 6 multiplied by 7 raised to some power), we'd have to use do this trick with mod 6.
+If we did this in base 7 (representing numbers as digits 0 through 6 multiplied by 7 raised to some power), we'd have to use do this trick with mod 6 and multiples of 6.
 
 It's an interesting property of number systems, and all the more interesting as it holds under the rule that the modulus has to be 1 less than the base.
 `
