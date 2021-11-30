@@ -5,6 +5,8 @@ const markdown = `
 
 You're bored talking to someone at a party and thinking about what to discuss next. This is the party trick for that moment.
 
+> I learned this trick from my dad, and he'd perform it often for me as kid. I always enjoy performing it for others, reliving the sense of wonder and amazement it brings.
+
 The trick goes like this:
 
 Ask someone to pick a 3, 4, 5 or however many digit number randomly (and to keep it to themselves). 3 or 4 digits is usually a good balance.
