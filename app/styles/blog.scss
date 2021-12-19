@@ -47,6 +47,7 @@ body {
 		margin: 10px;
 		max-width: 300px;
 		width: 300px;
+        min-width: 200px;
 		height: 400px;
 		text-decoration: none;
         box-sizing: border-box;
@@ -55,6 +56,14 @@ body {
 		display: flex;
 		justify-content: space-between;
 		flex-direction: column;
+        transition: all cubic-bezier(0.29, -0.02, 0.69, 1.12) .3s;
+
+        &:hover {
+            --width: 311px;
+            width: var(--width);
+            max-width: var(--width);
+            height: 415px;
+        }
 
 		h2 {
 			padding: 30px;
