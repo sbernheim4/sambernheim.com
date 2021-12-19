@@ -1,4 +1,4 @@
-import { ActionFunction, json, LinksFunction, MetaFunction } from "remix";
+import { LinksFunction, MetaFunction } from "remix";
 import { About } from "~/components/About/About";
 import { LandingPage } from "~/components/LandingPage/LandingPage";
 import aboutStyles from './../components/About/styles/about.css';

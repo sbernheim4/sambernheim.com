@@ -87,7 +87,7 @@ This is what gives us the quick test to determine if a number is divisible by 9,
 
 If they do, from the step where we had \`N = c + b + a + (99c + 9b)\`, \`(c + b + a)\` must also be a multiple of 9. After all, our number \`N\` was made up of digits \`c\`, \`b\`, and \`a\`.
 
-More broadly, if we sum the digits of a number \`N\`, we know the remainder when we divide by 9 will be the same as the remainder when we divide the sum of the digits by \`N\`.
+More broadly, if we sum the digits of a number \`N\`, we know the remainder when we divide by 9 will be the same as the remainder when we divide the \`N\` by 9.
 
 When we scramble the digits to get a new number, we know that dividing this new number by 9 will still yield the same remainder as the original number divided by 9. We're using the same digits and so get the same sum!
 
