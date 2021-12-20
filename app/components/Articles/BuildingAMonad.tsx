@@ -243,7 +243,7 @@ const createMultiplyBy5Event = (functionName, args, result) => {
 };
 ~~~
 
-Tracking calls to \`createMultiplyBy5Event\` is trivial just as before.
+Tracking calls to \`multiplyBy5AndRandom\` is trivial just as before.
 
 ~~~ts
 const trackedMultiplyBy5AndRandom = withTracking(
