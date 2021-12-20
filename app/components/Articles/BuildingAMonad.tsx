@@ -421,7 +421,7 @@ const addThreeAndRandom = (val) => {
         {
             functionName: 'addThreeAndRandom',
             arguments: [val],
-            result: NewValue,
+            result: newValue,
             info: { random }
         }
     );
@@ -485,7 +485,6 @@ class Trackable {
             const mergedTrackingData = [
                 ...this.getAnalyticsEvents(),
                 ...newTrackableInstance.getAnalyticsEvents()
-
             ];
 
             return new Trackable(
@@ -642,7 +641,9 @@ const addThreeAndRandom = (val) => {
 };
 ~~~
 
-With this final improvement, we've achieved a complete solution for our goal. The analytics code and application code are decoupled. At the same time, we have an easy means for capturing analytics events that expose both the return value and internally constructed data to our analytics code. Our class provides various mechanisms to easily manipulate the underlying value while maintaining list of analytics events. This approcah also enables the ability to drop all the captured analytics events should we need if something goes wrong or should the requirements do so - perhaps through a method like \`forgetAndReturn\`:
+With this final improvement, we've achieved a complete solution for our goal. The analytics code and application code are decoupled. At the same time, we have an easy means for capturing analytics events that expose both the return value and internally constructed data to our analytics code. Our class provides various mechanisms to easily manipulate the underlying value while maintaining the list of analytics events.
+
+This approcah also enables the ability to drop all the captured analytics events should we need if something goes wrong or should the requirements do so - perhaps through a method like \`forgetAndReturn\`:
 
 ~~~ts
 class Trackable {
