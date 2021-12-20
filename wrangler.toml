@@ -16,3 +16,5 @@ watch_dir = "build/index.js"
 
 [build.upload]
 format="service-worker"
+
+compatibility_date = "2021-12-20"
