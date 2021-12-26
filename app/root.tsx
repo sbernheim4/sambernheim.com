@@ -48,6 +48,7 @@ const Document = ({
     <html lang="en">
 
       <head>
+        <meta name="#1E2427"/>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         {title ? <title>{title}</title> : null}
