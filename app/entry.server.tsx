@@ -14,11 +14,11 @@ export default function handleRequest(
     responseHeaders.set("Content-Type", "text/xml");
 
     return new Response(sitemap, {
-      status: responseStatusCode,
+      status: 200,
       headers: responseHeaders
     });
   }
-  
+
   const markup = renderToString(
     <RemixServer context={remixContext} url={request.url} />
   );
