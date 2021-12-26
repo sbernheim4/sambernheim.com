@@ -1,11 +1,17 @@
-import { Link, LinksFunction, LoaderFunction, MetaFunction, useLoaderData } from "remix";
+import { json, Link, LinksFunction, LoaderFunction, MetaFunction, useLoaderData } from "remix";
 import { Post, getPosts } from '~/post'
 import blogStyles from './../../styles/blog.css'
 
-export const loader: LoaderFunction = () => {
+export const loader: LoaderFunction = async () => {
 	const posts = getPosts();
 
-	return posts;
+    const headers = new Headers();
+    headers.set("Cache-Control", "max-age=60000");
+
+	return json({
+        posts,
+        headers
+	});
 };
 
 export const links: LinksFunction = () => {
@@ -22,7 +28,7 @@ export const meta: MetaFunction = () => {
 };
 
 export default function Posts() {
-	const loadedPosts = useLoaderData<Post[]>();
+	const { posts: loadedPosts } = useLoaderData<{ posts: Post[] }>();
 
 	return (
 		<div className='blog'>

@@ -21,28 +21,28 @@ const articles: Array<Post> = [
 		slug: "the-party-math-trick",
 		html: ThePartyMathTrick,
 		id: 4,
-		description: "A quick and fun math trick for parties"
+		description: "An Math Trick with Some Interesting Properties"
 	},
 	{
 		title: "Building a Monad",
 		slug: "building-a-monad",
 		html: BuildingAMonad,
 		id: 3,
-		description: "Learn about monads by building a new type of monad that doesn't already exist."
+		description: "An Intuitive way to Understand Monads"
 	},
 	{
 		title: "Monads are Monoids in the Category of Endofunctors",
 		slug: "monads-are-monoids-in-the-category-of-endofunctors",
 		html: MonadsAreMonoidsInTheCategoryOfEndofunctors,
 		id: 2,
-		description: "What are monads, what are the properties they have that make them monadic."
+		description: "What Makes a Monad Monadic"
 	},
 	{
 		title: "The Engineer's Schrodinger's Cat",
 		slug: "the-engineers-schrodingers-cat",
 		html: EngineersSchrodingersCat,
 		id: 1,
-		description: "Excoptional: The Option Monad for Javascript and Typescript"
+		description: "Excoptional: The Option Object for JavaScript and TypeScript"
 	}
 
 ];
