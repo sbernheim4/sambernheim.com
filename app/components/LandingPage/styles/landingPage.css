@@ -1,6 +1,6 @@
 @font-face {
   font-family: "verlag";
-  src: url("./../../../../fonts/verlag.woff2");
+  src: url("./../../../fonts//verlag.woff2");
 }
 @keyframes text {
   0% {

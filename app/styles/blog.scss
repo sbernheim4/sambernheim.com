@@ -56,14 +56,14 @@ body {
 		display: flex;
 		justify-content: space-between;
 		flex-direction: column;
-        transition: all cubic-bezier(0.29, -0.02, 0.69, 1.12) .3s;
+        transition: border cubic-bezier(0.29, -0.02, 0.69, 1.12) .3s;
+        border: 1px solid var(--darker-bg-color);
+        box-shadow: inset 0px 0px 10px -1px (--darker-bg-color);
 
-        &:hover {
-            --width: 311px;
-            width: var(--width);
-            max-width: var(--width);
-            height: 415px;
-        }
+		&:hover {
+			border: 1px solid rgb(84, 84, 84);
+            box-shadow: inset 0 0 9px -5px rgb(84, 84, 84);
+		}
 
 		h2 {
 			padding: 30px;
