@@ -30,7 +30,7 @@ export const About = () => {
 		<section className='about'>
 			<svg className={os} viewBox="0 0 500 80">
 				<polygon points="40, 80 500, 80 500, 0" />
-				<text x="380" y="60" fontSize="24px" fill="black">About Me</text>
+				<text x="380" y="50" fontSize="24px" fill="black">About Me</text>
 			</svg>
 
 			<div>
