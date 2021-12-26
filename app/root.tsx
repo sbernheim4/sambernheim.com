@@ -48,7 +48,7 @@ const Document = ({
     <html lang="en">
 
       <head>
-        <meta name="#1E2427"/>
+        <meta name="theme-color" content="#1e2427" />
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <link rel="apple-touch-icon" href="/favicon.ico"/>
