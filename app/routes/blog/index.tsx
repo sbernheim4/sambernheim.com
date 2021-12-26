@@ -23,7 +23,7 @@ export const links: LinksFunction = () => {
 export const meta: MetaFunction = () => {
 	return {
 		title: "My Blog",
-		description: "I often write about functional programming and other vaiours ideas in software engineering."
+		description: "I often write about functional programming and TypeScript"
 	};
 };
 
