@@ -36,8 +36,8 @@ export const About = () => {
 			<div>
 				<h1>About Me</h1>
 				<h2>Hi, I'm Sam</h2>
-				<p>I live in New York City and work at Twitter</p>
-				<p>Previously Disney Streaming </p>
+				<p>I live in New York City and work at Wunderkind</p>
+				<p>Previously Twitter and Disney Streaming </p>
 			</div>
 		</section>
 

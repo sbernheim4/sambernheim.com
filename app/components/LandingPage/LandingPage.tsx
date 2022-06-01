@@ -36,7 +36,7 @@ export const LandingPage = () => {
 		<section ref={landingPageSection} className='landing'>
 			<div className='landing--text'>
 				<h1>Samuel Bernheim</h1>
-				<p>Software Engineer @ Twitter</p>
+				<p>Software Engineer @ Wunderkind</p>
 			</div>
 		</section>
 	);
