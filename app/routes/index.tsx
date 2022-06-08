@@ -6,8 +6,8 @@ import landingStyles from './../components/LandingPage/styles/landingPage.css';
 
 export const meta: MetaFunction = () => {
 	return {
-		title: "Samuel Bernheim - Software Engineer @ Twitter",
-		description: "This is my personal website. I am a software engineer working at Twitter."
+		title: "Samuel Bernheim - Software Engineer @ Wunderkind",
+		description: "Software engineer @ Wunderkind"
 	};
 };
 

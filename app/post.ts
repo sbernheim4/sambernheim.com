@@ -1,4 +1,5 @@
 import { BuildingAMonad } from "./components/Articles/BuildingAMonad";
+import { DebugDrivenDevelopment } from "./components/Articles/DebugDrivenDevelopment";
 import { EngineersSchrodingersCat } from "./components/Articles/EngineersSchrodingersCat";
 import { MonadsAreMonoidsInTheCategoryOfEndofunctors } from './components/Articles/MonadsAreMonoidsInTheCategoryOfEndofunctors';
 import { ThePartyMathTrick } from "./components/Articles/ThePartyMathTrick";
@@ -16,6 +17,13 @@ export type PostMarkdownAttributes = {
 };
 
 const articles: Array<Post> = [
+	{
+		title: "Debug Driven Development",
+		slug: "debug-driven-development",
+		html: DebugDrivenDevelopment,
+		id: 5,
+		description: "An Math Trick with Some Interesting Properties"
+	},
 	{
 		title: "The Party Math Trick",
 		slug: "the-party-math-trick",
