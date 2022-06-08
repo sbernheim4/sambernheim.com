@@ -22,7 +22,7 @@ const articles: Array<Post> = [
 		slug: "debug-driven-development",
 		html: DebugDrivenDevelopment,
 		id: 5,
-		description: "An Math Trick with Some Interesting Properties"
+		description: "Optimizing for clarity and debugability"
 	},
 	{
 		title: "The Party Math Trick",
