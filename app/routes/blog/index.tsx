@@ -2,6 +2,7 @@ import { json, LinksFunction, LoaderFunction, MetaFunction } from "@remix-run/cl
 import { Link, useLoaderData } from "@remix-run/react";
 import { Post, getPosts } from '~/post'
 import blogStyles from './../../styles/blog.css'
+import articleStyles from './../../styles/article.css'
 
 export const loader: LoaderFunction = async () => {
 	return json(getPosts());
@@ -9,7 +10,8 @@ export const loader: LoaderFunction = async () => {
 
 export const links: LinksFunction = () => {
 	return [
-		{ rel: 'stylesheet', href: blogStyles }
+		{ rel: 'stylesheet', href: blogStyles },
+		{ rel: 'stylesheet', href: articleStyles }
 	]
 };
 
