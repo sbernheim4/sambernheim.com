@@ -5,8 +5,8 @@ node_modules
 .mf
 /.cache
 /build
-/functions/\[\[path\]\].js
-/functions/\[\[path\]\].js.map
+functions/\[\[path\]\].js
+functions/\[\[path\]\].js.map
 /public/build
 dist/
 

@@ -64,6 +64,7 @@ const Document = ({
         {children}
         <ScrollRestoration />
         <Scripts />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/highlight.min.js" />
         {process.env.NODE_ENV === "development" && <LiveReload />}
       </body>
     </html>
