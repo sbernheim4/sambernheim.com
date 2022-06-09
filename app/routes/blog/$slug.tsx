@@ -1,6 +1,7 @@
 import { json, LinksFunction, LoaderFunction, MetaFunction } from "@remix-run/cloudflare";
 import { Link, useLoaderData, useParams } from "@remix-run/react";
 import { useEffect } from "react";
+import ReactDOMServer from "react-dom/server";
 import { getPost, Post } from "~/post";
 import articleStyles from './../../styles/article.css'
 
@@ -23,34 +24,33 @@ export const meta: MetaFunction = (x) => {
 };
 
 export const loader: LoaderFunction = async ({ params }) => {
-	return json(params.slug);
+	try {
+
+		const post = getPost(params.slug);
+
+		// @ts-ignore
+		const article = post.default()
+		const html = ReactDOMServer.renderToString(article)
+
+		return json(html);
+
+	} catch (err) {
+
+		return new Response("No article found with name " + params.slug, {
+			status: 404,
+		});
+
+	}
 };
 
 export default function PostSlug() {
-	const { slug } = useParams();
-	const Post = getPost(slug);
+	const html = useLoaderData<string>();
 
 	useEffect(() => {
 		//@ts-ignore
 		hljs.highlightAll();
 	}, []);
 
-	return (
-		<div className="article">
-			{ /* @ts-ignore */}
-			{Post.default()}
-		</div>
-	);
-
-};
-
-export const ErrorBoundary = (props) => {
-	const { slug } = useParams();
-	return (
-		<div className='article'>
-			<p>Uh oh, we couldn't find the article {slug}</p>
-			<Link to="/blog"><p>View all available articles here</p></Link>
-		</div>
-	);
+	return <div className="article" dangerouslySetInnerHTML={{ __html: html }} />
 
 };

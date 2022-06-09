@@ -50,12 +50,12 @@ export const getPosts = (): Post[] => {
 	return articleData;
 };
 
-export const getPost = (slug: string | undefined): null | MDX => {
+export const getPost = (slug: string | undefined): undefined | MDX => {
 	if (!slug) {
-		return null;
+		return undefined;
 	}
 
-	const article = articleMap[slug];
+	const article = articleMap[slug] as MDX | undefined;
 
 	return article;
 };
