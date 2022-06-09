@@ -1,8 +1,12 @@
 node_modules
 
+.DS_Store
+.env
+.mf
 /.cache
 /build
+/functions/\[\[path\]\].js
+/functions/\[\[path\]\].js.map
 /public/build
 dist/
-.DS_Store
-.mf
+
