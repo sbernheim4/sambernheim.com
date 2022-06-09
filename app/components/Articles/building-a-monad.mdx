@@ -11,7 +11,7 @@ headers:
 
 We're going to build a new monad. To get there, we'll explore creating a means of tracking analytics events and start with some simple solutions that will eventually coalesce into our monad.
 
-Let's assume we have a function \`track\` that fires off analytics event to some backend service. The exact implementation is fairly arbitrary. Consider the below example:
+Let's assume we have a function `track` that fires off analytics event to some backend service. The exact implementation is fairly arbitrary. Consider the below example:
 
 ~~~ts
 const track = ({ functionName, args }) => {
@@ -41,7 +41,7 @@ This works well for simple cases but can quickly grow out of hand, containing cl
 
 ## With Higher Ordered Functions
 
-We should aim to decouple these two concerns - application and analytics code - and build a loosely coupled but cohesive system that can easily handle new requirements. We can do so with a simple improvement that also exposes the return value of the original function to \`track\`, providing more capability to our analytics suite.
+We should aim to decouple these two concerns - application and analytics code - and build a loosely coupled but cohesive system that can easily handle new requirements. We can do so with a simple improvement that also exposes the return value of the original function to `track`, providing more capability to our analytics suite.
 
 ~~~ts
 // Update our track function to accept a 3rd parameter - the result of the
@@ -53,7 +53,7 @@ const track = ({ functionName, args, result }) => {
 };
 
 // Write a higher order function that wraps an arbitrary function and invokes
-// the \`track\` function.
+// the `track` function.
 const withTracking = (originalFunction) => {
 
     // Create a new function
@@ -92,9 +92,9 @@ const trackedAddThree = withTracking(addThree);
 trackedAddThree(3) // => returns 6 and logs "addThree, [ 3 ], 6"
 ~~~
 
-With this approach we better isolate the analytics and application code. \`track\` can also leverage the arguments and return value to replicate logic in the original function or outline distinct code paths. Changes to one can be made without affecting the other.
+With this approach we better isolate the analytics and application code. `track` can also leverage the arguments and return value to replicate logic in the original function or outline distinct code paths. Changes to one can be made without affecting the other.
 
-When calling \`addThree\` with a number less than 10, we may want to pass one message to the analytics event versus when \`addThree\` is called with a value greater than 10 - a new requirement from our PM. We can further encode this business logic in a function and pass that function to \`withTracking\` which constructs the analytics event to pass to track.
+When calling `addThree` with a number less than 10, we may want to pass one message to the analytics event versus when `addThree` is called with a value greater than 10 - a new requirement from our PM. We can further encode this business logic in a function and pass that function to `withTracking` which constructs the analytics event to pass to track.
 
 ~~~ts
 // A function that constructs a custom analytics event payload for when addThree
@@ -110,7 +110,7 @@ const createAdd3AnalyticsEvent = (functionName, args, result) => {
 };
 ~~~
 
-We update \`withTracking\` to accept a 2nd parameter which will be a function that constructs the analytics event to pass to \`track\`.
+We update `withTracking` to accept a 2nd parameter which will be a function that constructs the analytics event to pass to `track`.
 
 ~~~ts
 const withTracking = (originalFunction, constructAnalyticsEvent) => {
@@ -158,11 +158,11 @@ trackedAddThree(5);
 addThree(12); // => 15
 ~~~
 
-We can see the event payload differs based on the argument to our function! More broadly, this allows us to incorporate custom logic to the analytics code without any changes to the \`withTracking\` implementation or the underlying application code. These 2 concerns remain decoupled. The only function that would need to be updated is \`createAdd3AnalyticsEvent\` as our analytics requirements change.
+We can see the event payload differs based on the argument to our function! More broadly, this allows us to incorporate custom logic to the analytics code without any changes to the `withTracking` implementation or the underlying application code. These 2 concerns remain decoupled. The only function that would need to be updated is `createAdd3AnalyticsEvent` as our analytics requirements change.
 
-Of course, a different implementation of \`createAdd3AnalyticsEvent\` may be needed for each application code function, but each of these functions replace logic that would otherwise be embeded directly in that same application code.
+Of course, a different implementation of `createAdd3AnalyticsEvent` may be needed for each application code function, but each of these functions replace logic that would otherwise be embeded directly in that same application code.
 
-In this solution, every domain specific function becomes pure, vastly simplifying tests and future updates. Invocations of \`track\` are isolated to the higher order function leaving all the remaining code pure.
+In this solution, every domain specific function becomes pure, vastly simplifying tests and future updates. Invocations of `track` are isolated to the higher order function leaving all the remaining code pure.
 
 We've come a long way. This solution works well for most use cases but there is one major limitation. Consider the following function
 
@@ -174,9 +174,9 @@ const addThreeAndRandom = (val) => {
 };
 ~~~
 
-With our existing implementations, we would not be able to capture the value for \`randomNumber\` to include in the analytics event passed to \`track\`. More broadly, data constructed in the body of an application code function is not available to the \`track\` function and cannot be included in the track event.
+With our existing implementations, we would not be able to capture the value for `randomNumber` to include in the analytics event passed to `track`. More broadly, data constructed in the body of an application code function is not available to the `track` function and cannot be included in the track event.
 
-To get this data in the analytics event (instead of a random number it could be the result of another function call, a network request, reorganized data etc) some changes are needed. Since \`withTracking\` has access to the return value of the function it's calling, we can sneak the internal data (\`randomNumber\` in this case) onto the return value by changing the return type from a number to an object.
+To get this data in the analytics event (instead of a random number it could be the result of another function call, a network request, reorganized data etc) some changes are needed. Since `withTracking` has access to the return value of the function it's calling, we can sneak the internal data (`randomNumber` in this case) onto the return value by changing the return type from a number to an object.
 
 ~~~ts
 // Update addThreeAndRandom to return an object that also contains the
@@ -226,7 +226,7 @@ const withTracking = (originalFunction, constructAnalyticsEvent) => {
 };
 ~~~
 
-This has a lot of changes. And it's starting to get gnarly. All of a sudden we have to return objects instead of values, include a \`__trackingInfo\` property on that returned object, and now our application code is once again littered with analytics code - exactly what we wanted to avoid. This approach has the distinct advantage however of working and solving our problem.
+This has a lot of changes. And it's starting to get gnarly. All of a sudden we have to return objects instead of values, include a `__trackingInfo` property on that returned object, and now our application code is once again littered with analytics code - exactly what we wanted to avoid. This approach has the distinct advantage however of working and solving our problem.
 
 ~~~ts
 // Application code now returns an object instead of just a number
@@ -249,7 +249,7 @@ const createMultiplyBy5Event = (functionName, args, result) => {
 };
 ~~~
 
-Tracking calls to \`multiplyBy5AndRandom\` is trivial just as before.
+Tracking calls to `multiplyBy5AndRandom` is trivial just as before.
 
 ~~~ts
 const trackedMultiplyBy5AndRandom = withTracking(
@@ -258,15 +258,15 @@ const trackedMultiplyBy5AndRandom = withTracking(
 );
 ~~~
 
-Another issue with this solution is we break any function composition we previously had. By changing the return type of \`addThree\` to an object instead of a number, it can no longer be composed with other functions expecting to receive a number as an argument.
+Another issue with this solution is we break any function composition we previously had. By changing the return type of `addThree` to an object instead of a number, it can no longer be composed with other functions expecting to receive a number as an argument.
 
-Composing our two functions - \`addThreeAndRandom\` and \`multiplyBy5AndRandom\` - with each other or other functions that expect numbers, is no longer possible. Trying to do so would throw an error.
+Composing our two functions - `addThreeAndRandom` and `multiplyBy5AndRandom` - with each other or other functions that expect numbers, is no longer possible. Trying to do so would throw an error.
 
 ~~~ts
 const myNum = multiplyBy5AndRandom(addThreeAndRandom(3)) // => Throws an error
 ~~~
 
-The result of \`addThreeAndRandom\` is an object and \`multiplyBy5AndRandom\` expects a number. The tracked versions of these functions however are composable:
+The result of `addThreeAndRandom` is an object and `multiplyBy5AndRandom` expects a number. The tracked versions of these functions however are composable:
 
 ~~~ts
 const trackedMultiplyBy5AndRandom = withTracking(
@@ -282,7 +282,7 @@ const trackedAddThree = withTracking(
 const myNum = trackedMultiplyBy5AndRandom(trackedAddThree(3)) // => 30.34325
 ~~~
 
-This all works, but like when we added the \`__trackingInfo\` property, feels clunky. Composition should be possible on both the tracked version and on the application code version of these functions.
+This all works, but like when we added the `__trackingInfo` property, feels clunky. Composition should be possible on both the tracked version and on the application code version of these functions.
 
 It'd be nicer to use something like:
 
@@ -292,15 +292,15 @@ const number = addThreeAndRandom(3)
     .then(addThreeAndRandom);
 ~~~
 
-But in this example. there's no reference to \`withTracking\`. The \`randomNumber\` that we wanted to track is nowhere to be seen. And there's no call to the \`track\` function.
+But in this example. there's no reference to `withTracking`. The `randomNumber` that we wanted to track is nowhere to be seen. And there's no call to the `track` function.
 
 To enable this behavior requires a more formal abstratction than the functions we've been working with - higher ordered or otherwise.
 
 ## Building a Trackable Class
 
-To enable the described behavior we need a better abstraction beyond \`withTracking\`.
+To enable the described behavior we need a better abstraction beyond `withTracking`.
 
-We already have a pseudo special type - objects with a \`__trackingInfo\` property - and we want to add something like this \`.then\` method, even if we're not quire sure how it should work yet. We're also storing some stateful information, the value returned by these functions and their associated analytics events from each additional function invocation. We can formalize these relationships and capabilties in a class.
+We already have a pseudo special type - objects with a `__trackingInfo` property - and we want to add something like this `.then` method, even if we're not quire sure how it should work yet. We're also storing some stateful information, the value returned by these functions and their associated analytics events from each additional function invocation. We can formalize these relationships and capabilties in a class.
 
 ~~~ts
 class Trackable {
@@ -337,7 +337,7 @@ class Trackable {
 }
 ~~~
 
-With our new class, we can update the initial application functions to return instances of \`Trackable\` rather than objects with a \`__trackingInfo\` property.
+With our new class, we can update the initial application functions to return instances of `Trackable` rather than objects with a `__trackingInfo` property.
 
 ~~~ts
 const addThreeAndRandom = (val) => {
@@ -375,9 +375,9 @@ const multiplyBy5AndRandom = (val) => {
 }
 ~~~
 
-In the above example, we wanted to create a method called \`then\`, similar to how promises work. We can get that eventually, but it will be much easier to use the method names \`map\` and \`flatMap\`, equivalent to the methods of the same name on Arrays.
+In the above example, we wanted to create a method called `then`, similar to how promises work. We can get that eventually, but it will be much easier to use the method names `map` and `flatMap`, equivalent to the methods of the same name on Arrays.
 
-Let's add the \`map\` method first.
+Let's add the `map` method first.
 
 ~~~ts
 class Trackable {
@@ -413,7 +413,7 @@ class Trackable {
     }
 }
 ~~~
-Instances of \`Trackables\` can have their underlying value arbitrarily manipulated with our \`map\` method while all the built up analytics events are stored and maintained.
+Instances of `Trackables` can have their underlying value arbitrarily manipulated with our `map` method while all the built up analytics events are stored and maintained.
 
 ~~~ts
 const addThreeAndRandom = (val) => {
@@ -440,7 +440,7 @@ const val = addThreeAndRandom(7)
 // val is still of type Trackable and still contains all the analytics events
 ~~~
 
-But what if the function passed to \`map\` also returns a \`Trackable\` and it itself should create an analytics event:
+But what if the function passed to `map` also returns a `Trackable` and it itself should create an analytics event:
 
 ~~~ts
 const val = addThreeAndRandom(7)
@@ -462,9 +462,9 @@ const val = addThreeAndRandom(7)
     });
 ~~~
 
-This would cause an issue. We'd end up with a nested \`Trackable\`. The return value of the function passed to \`map\` (which is a \`Trackable\`) is itself placed into a \`Trackable\` by \`map\` leading to a nested \`Trackable\`.
+This would cause an issue. We'd end up with a nested `Trackable`. The return value of the function passed to `map` (which is a `Trackable`) is itself placed into a `Trackable` by `map` leading to a nested `Trackable`.
 
-To avoid this, we need a separate method for specifically this case - where the function passed to the method returns a \`Trackable\`. We'll call this method \`flatMap\`.
+To avoid this, we need a separate method for specifically this case - where the function passed to the method returns a `Trackable`. We'll call this method `flatMap`.
 
 ~~~ts
 class Trackable {
@@ -511,10 +511,10 @@ class Trackable {
 }
 ~~~
 
-> \`map\` only works when the function passed to it *does not* return a Trackable instance. More generally, \`map\` only works when the function passed to it does not return an instance of the thing being mapped over. Use \`flatMap\` in those cases.
+> `map` only works when the function passed to it *does not* return a Trackable instance. More generally, `map` only works when the function passed to it does not return an instance of the thing being mapped over. Use `flatMap` in those cases.
 
 
-Using \`flatMap\` for functions that return a \`Trackable\` is simple.
+Using `flatMap` for functions that return a `Trackable` is simple.
 
 ~~~ts
 const val = addThreeAndRandom(7)
@@ -524,9 +524,9 @@ const val = addThreeAndRandom(7)
     });
 ~~~
 
-\`map\` and \`flatMap\` provide mechanisms to easily transform the underlying value while preserving any built up analytics payloads. But we still need a way to send the built up analytics events to our service.
+`map` and `flatMap` provide mechanisms to easily transform the underlying value while preserving any built up analytics payloads. But we still need a way to send the built up analytics events to our service.
 
-The final step in achieving this is a method that does just that. Let's call it \`run\`.
+The final step in achieving this is a method that does just that. Let's call it `run`.
 
 ~~~ts
 class Trackable {
@@ -550,9 +550,9 @@ class Trackable {
 }
 ~~~
 
-Calling \`run\` fires off all the analytics events that have been built up and returns the underlying value. In this system, \`Trackables\` wrap our values in a context with their associated analytics events.
+Calling `run` fires off all the analytics events that have been built up and returns the underlying value. In this system, `Trackables` wrap our values in a context with their associated analytics events.
 
-The \`map\` and \`flatMap\` methods provide mechanisms to continuously and safely transform the underlying value while preserving existing analytics events. The analytics events can be fired off at any time by simply calling \`run\` and the underlying value extracted from the \`Trackable\` context.
+The `map` and `flatMap` methods provide mechanisms to continuously and safely transform the underlying value while preserving existing analytics events. The analytics events can be fired off at any time by simply calling `run` and the underlying value extracted from the `Trackable` context.
 
 Finally we have a complete solution. What's left is an abstraction that should feel clean and familiar.
 
@@ -585,14 +585,14 @@ const res = addThreeAndRandom(2) // addThreeAndRandom: number -> Trackable
 console.log(res); // => 13.585 (or some other number - it's partially random!)
 ~~~
 
-Almost by accident of design, the \`Trackable\` class is also a monad.
+Almost by accident of design, the `Trackable` class is also a monad.
 
 There are some further improvements we could make.
 
-* \`run\` could be updated to accept a custom track function (or default to a standard implementation) so callers have even more control over how any given set of analytics events are handled (sent to different backends or implement different business logic).
-* Implement a \`then\` method that removes the need to distinguish when to call \`map\` vs \`flatMap\`.
-* \`run\` could be invoked automatically after each \`map\` or \`flatMap\` call - to avoid building up an array of analytics events. This approach however would go against the idea of doing things lazily that is common in functional programming systems.
-* Build up the list of function calls when \`map\` and \`flatMap\` are invoked without invoking the functions passed to them so that they are only actually applied once \`run\` is called - an even more lazy evaluation mechanism.
+* `run` could be updated to accept a custom track function (or default to a standard implementation) so callers have even more control over how any given set of analytics events are handled (sent to different backends or implement different business logic).
+* Implement a `then` method that removes the need to distinguish when to call `map` vs `flatMap`.
+* `run` could be invoked automatically after each `map` or `flatMap` call - to avoid building up an array of analytics events. This approach however would go against the idea of doing things lazily that is common in functional programming systems.
+* Build up the list of function calls when `map` and `flatMap` are invoked without invoking the functions passed to them so that they are only actually applied once `run` is called - an even more lazy evaluation mechanism.
 
 Each of these would lead to slightly different semantics in how instances of the class are used.
 
@@ -649,7 +649,7 @@ const addThreeAndRandom = (val) => {
 
 With this final improvement, we've achieved a complete solution for our goal. The analytics code and application code are decoupled. At the same time, we have an easy means for capturing analytics events that expose both the return value and internally constructed data to our analytics code. Our class provides various mechanisms to easily manipulate the underlying value while maintaining the list of analytics events.
 
-This approcah also enables the ability to drop all the captured analytics events should we need if something goes wrong or should the requirements do so - perhaps through a method like \`forgetAndReturn\`:
+This approcah also enables the ability to drop all the captured analytics events should we need if something goes wrong or should the requirements do so - perhaps through a method like `forgetAndReturn`:
 
 ~~~ts
 class Trackable {

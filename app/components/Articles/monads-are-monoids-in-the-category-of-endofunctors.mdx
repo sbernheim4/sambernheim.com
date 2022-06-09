@@ -24,13 +24,13 @@ Monoids are types under an operation that follow 3 rules. For the provided opera
 * Produce a value of the same type when two of those values are combined (this may require defining how two values of this type can be combined)
 * Be associative
 
-An example. Let's use \`string\` as our type and \`concatenation\` as the definition for combining.
+An example. Let's use `string` as our type and `concatenation` as the definition for combining.
 
 Does it obey the 3 rules?
 
 That is, for any given string, is there another string that when combined with the original string (via concatenation) - returns the original string?
 
-To concatenate two strings, we can just use \`+\` operator available in most languages. Of course, we could also create a method on our string class called \`concat\` (and in JavaScript, this method does actually exist).
+To concatenate two strings, we can just use `+` operator available in most languages. Of course, we could also create a method on our string class called `concat` (and in JavaScript, this method does actually exist).
 
 ~~~ts
 const myStr = "hello world!";
@@ -43,7 +43,7 @@ For point 2, the result of combing two (or more) strings, yields yet another str
 
 That's requirements 1 and 2. What about point 3?
 
-Associativity means \`(a + b) + c\` is equivalent to \`a + (b + c)\`.
+Associativity means `(a + b) + c` is equivalent to `a + (b + c)`.
 
 ~~~ts
 const myStr = "hello";
@@ -114,7 +114,7 @@ const vals = [1, 2, 3];
 const myOtherVals = vals.map(x => x * 2); // => [2, 4, 6]
 ~~~
 
-The result of the \`map\` call is an Array, and the function passed to the map method maps strings to numbers (our two categories). The end result is the same type that we started with while the containing values have changed and been mapped from one cateogry to another.
+The result of the `map` call is an Array, and the function passed to the map method maps strings to numbers (our two categories). The end result is the same type that we started with while the containing values have changed and been mapped from one cateogry to another.
 
 ~~~ts
 const vals = [1, 2, 3];
@@ -133,11 +133,11 @@ const double = (val) => val + val;
 
 const ten = double(5);
 ~~~
-\`double\` is a function that maps numbers to numbers making it an endofunctor. The return value has the same type as the input value.
+`double` is a function that maps numbers to numbers making it an endofunctor. The return value has the same type as the input value.
 
-Another interesting note is that the mapping function can only accept one argument. If it accepted more than one argument, the type of the function wouldn't be \`number => number\` but rather \`(number, number) => number\`.
+Another interesting note is that the mapping function can only accept one argument. If it accepted more than one argument, the type of the function wouldn't be `number => number` but rather `(number, number) => number`.
 
-A function like \`numToStr\` is *not* an endofucntor. The return type differs from the consumed type. It instead is a plain 'ol functor.
+A function like `numToStr` is *not* an endofucntor. The return type differs from the consumed type. It instead is a plain 'ol functor.
 
 ## Coming Together
 Repeating the mantra again. Monads are monoids in the category of endofunctors.
@@ -160,16 +160,16 @@ const b = [3, 4];
 const c = [5];
 
 const resultOne = [
-    ...[...a, ...b], // combine the result of joining \`a\` and \`b\`
-    ...c             // with \`c\`
+    ...[...a, ...b], // combine the result of joining `a` and `b`
+    ...c             // with `c`
 ]; // => [1, 2, 3, 4, 5]
 
 const resultTwo = [
-    ...a,           // combine \`a\` with
-    ...[...b, ...c] // the result of first combining \`b\` and \`c\`
+    ...a,           // combine `a` with
+    ...[...b, ...c] // the result of first combining `b` and `c`
 ]; // => [1, 2, 3, 4, 5]
 ~~~
-Of course, as we saw above, Arrays support a \`map\` method which allow us to transform the values of the array but do so in a way that returns an Array (the same type as the starting type), making them endofunctors.
+Of course, as we saw above, Arrays support a `map` method which allow us to transform the values of the array but do so in a way that returns an Array (the same type as the starting type), making them endofunctors.
 
 ~~~ts
 const vals = [1, 2, 3];
