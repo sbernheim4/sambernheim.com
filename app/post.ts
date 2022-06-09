@@ -7,8 +7,6 @@ import * as ThePartyMathTrick from './components/Articles/the-party-math-trick.m
 export type Post = {
 	slug: string;
 	title: string;
-	id: number;
-	html: string;
 	description: string;
 };
 
@@ -16,13 +14,13 @@ export type PostMarkdownAttributes = {
 	title: string;
 };
 
-const postFromModule = (mod) => {
+const postFromModule = (mod): Post => {
 	return {
 		...mod.attributes.meta,
 	};
 };
 
-const getArticleName = (x) => x.slug;
+const getArticleName = (x: Post) => x.slug;
 
 const mdxArticles = [
 	DebugDrivenDevelopment,

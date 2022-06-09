@@ -29,7 +29,7 @@ export default function Posts() {
 		<div className='blog'>
 
 			<div className='article-container'>
-				{posts.map((post: Post) => <ArticleItem {...post} />)}
+				{posts.map((post: Post) => <ArticleItem key={post.slug} {...post} />)}
 			</div>
 
 		</div>
