@@ -1,6 +1,12 @@
-import { md } from './highlightingHelpers';
+---
+meta:
+  title: The Party Math Trick
+  description: A Math Trick with Some Interesting Properties
+  slug: the-party-math-trick
+headers:
+  Cache-Control: max-age=60000
+---
 
-const markdown = `
 # The Party Math Trick
 
 You're bored talking to someone at a party and thinking about what to discuss next. This is the party trick for that moment.
@@ -112,6 +118,4 @@ Of course, this only works using modulo 9 in our base 10 counting system. This p
 If we did this in base 7 (representing numbers as digits 0 through 6 multiplied by 7 raised to some power), we'd have to use do this trick with mod 6 and multiples of 6.
 
 It's an interesting property of number systems, and all the more interesting as it holds under the rule that the modulus has to be 1 less than the base.
-`
 
-export const ThePartyMathTrick = md.render(markdown);

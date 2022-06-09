@@ -4,15 +4,7 @@ import { Post, getPosts } from '~/post'
 import blogStyles from './../../styles/blog.css'
 
 export const loader: LoaderFunction = async () => {
-	const posts = getPosts();
-
-    const headers = new Headers();
-    headers.set("Cache-Control", "max-age=60000");
-
-	return json({
-        posts,
-        headers
-	});
+	return json(getPosts());
 };
 
 export const links: LinksFunction = () => {
@@ -29,19 +21,17 @@ export const meta: MetaFunction = () => {
 };
 
 export default function Posts() {
-	const { posts: loadedPosts } = useLoaderData<{ posts: Post[] }>();
+	const posts = useLoaderData<Post[]>();
 
 	return (
 		<div className='blog'>
 
 			<div className='article-container'>
-				{loadedPosts.map(post => (
-					<ArticleItem key={post.id} {...post} />
-				))}
+				{posts.map((post: Post) => <ArticleItem {...post} />)}
 			</div>
 
 		</div>
-   );
+	);
 }
 
 const ArticleItem = (props: Post) => {
@@ -54,5 +44,5 @@ const ArticleItem = (props: Post) => {
 			<p>{description}</p>
 		</Link>
 
-   )
+	)
 };
