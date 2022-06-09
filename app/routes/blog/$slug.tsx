@@ -1,6 +1,5 @@
-import { useLoaderData } from "remix";
-import type { LoaderFunction, LinksFunction, MetaFunction } from "remix";
-import invariant from "tiny-invariant";
+import type { LinksFunction, LoaderFunction, MetaFunction } from "@remix-run/cloudflare";
+import { useLoaderData } from "@remix-run/react";
 import { getPost, Post } from "~/post";
 import blogStyles from './../../article.css'
 
@@ -24,9 +23,7 @@ export const meta: MetaFunction = (x) => {
 }
 
 export const loader: LoaderFunction = async ({ params }) => {
-	invariant(params.slug, "expected params.slug");
-
-	return getPost(params.slug);
+	return getPost(params.slug || '');
 };
 
 export default function PostSlug() {

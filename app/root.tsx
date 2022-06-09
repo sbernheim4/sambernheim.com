@@ -1,17 +1,19 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
+import { LinksFunction } from "@remix-run/cloudflare";
+
 import {
-  Links,
   Link,
+  Links,
   LiveReload,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
   useCatch,
-  LinksFunction,
-  useLocation
-} from "remix";
+  useLocation,
+} from "@remix-run/react";
+
 import { useProgress } from "./hooks/useProgress";
 
 import globalStyles from './styles/globals.css';

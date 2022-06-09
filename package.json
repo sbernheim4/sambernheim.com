@@ -1,44 +1,35 @@
 {
   "private": true,
-  "name": "remix-app-template",
-  "description": "",
-  "license": "",
+  "sideEffects": false,
   "scripts": {
-    "build": "npm run sass && cross-env NODE_ENV=production remix build",
-    "dev": "cross-env NODE_ENV=development run-p dev:*",
-    "postinstall": "remix setup cloudflare-pages",
+    "build": "remix build",
     "dev:remix": "remix watch",
-    "dev:wrangler": "wrangler pages dev ./public --watch ./build",
-    "sass": "sass app/:app/",
-    "sass:watch": "sass --watch app/:app/",
-    "start": "npm run dev:wrangler"
+    "dev:wrangler": "cross-env NODE_ENV=development wrangler pages dev ./public",
+    "dev": "remix build && run-p dev:*",
+    "start": "cross-env NODE_ENV=production npm run dev:wrangler"
   },
   "dependencies": {
-    "@remix-run/cloudflare-pages": "^1.1.1",
-    "@remix-run/react": "^1.1.1",
-    "highlight.js": "^11.3.1",
+    "@remix-run/cloudflare": "^1.5.1",
+    "@remix-run/cloudflare-pages": "^1.5.1",
+    "@remix-run/react": "^1.5.1",
+    "cross-env": "^7.0.3",
+    "highlight.js": "^11.5.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "remarkable": "^2.0.1",
-    "remix": "^1.1.1",
-    "tiny-invariant": "^1.2.0"
+    "remarkable": "^2.0.1"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^3.2.0",
-    "@remix-run/dev": "^1.1.1",
-    "@types/react": "^17.0.24",
-    "@types/react-dom": "^17.0.9",
-    "@types/react-syntax-highlighter": "^13.5.2",
-    "cross-env": "^7.0.3",
-    "esbuild": "0.13.14",
+    "@cloudflare/workers-types": "^3.10.0",
+    "@remix-run/dev": "^1.5.1",
+    "@remix-run/eslint-config": "^1.5.1",
+    "@types/react": "^17.0.45",
+    "@types/react-dom": "^17.0.17",
+    "eslint": "^8.15.0",
     "npm-run-all": "^4.1.5",
-    "sass": "^1.43.4",
-    "typescript": "^4.1.2",
-    "wrangler": "2.0.8"
+    "typescript": "^4.6.4",
+    "wrangler": "beta"
   },
   "engines": {
     "node": ">=14"
-  },
-  "sideEffects": false,
-  "main": "dist/worker.js"
+  }
 }

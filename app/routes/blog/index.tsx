@@ -1,4 +1,5 @@
-import { json, Link, LinksFunction, LoaderFunction, MetaFunction, useLoaderData } from "remix";
+import { json, LinksFunction, LoaderFunction, MetaFunction } from "@remix-run/cloudflare";
+import { Link, useLoaderData } from "@remix-run/react";
 import { Post, getPosts } from '~/post'
 import blogStyles from './../../styles/blog.css'
 
@@ -41,7 +42,7 @@ export default function Posts() {
 
 		</div>
    );
-};
+}
 
 const ArticleItem = (props: Post) => {
 	const { slug, title, description } = props;
