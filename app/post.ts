@@ -14,13 +14,12 @@ export type PostMarkdownAttributes = {
 	title: string;
 };
 
-const postFromModule = (mod): Post => {
-	return {
-		...mod.attributes.meta,
-	};
-};
-
-const getArticleName = (x: Post) => x.slug;
+type MDX =
+	typeof DebugDrivenDevelopment |
+	typeof ThePartyMathTrick |
+	typeof BuildingAMonad |
+	typeof MonadsAreMonoidsInTheCategoryOfEndofunctors |
+	typeof EngineersSchrodingersCat
 
 const mdxArticles = [
 	DebugDrivenDevelopment,
@@ -30,20 +29,33 @@ const mdxArticles = [
 	EngineersSchrodingersCat
 ];
 
+const postFromModule = (mod): Post => {
+	return {
+		...mod.attributes.meta,
+	};
+};
+
+const getArticleSlug = (x: Post) => x.slug;
+
 const articleData = mdxArticles.map((x) => postFromModule(x));
+
 const articleMap = mdxArticles.reduce((acc, curr) => {
 	return {
 		...acc,
-		[getArticleName(postFromModule(curr))]: curr
+		[getArticleSlug(postFromModule(curr))]: curr
 	};
-}, {});
+}, {} as Record<string, MDX>);
 
 export const getPosts = (): Post[] => {
 	return articleData;
 };
 
-export const getPost = (slug: string) => {
-	// @ts-ignore
+export const getPost = (slug: string | undefined): null | MDX => {
+	if (!slug) {
+		return null;
+	}
+
 	const article = articleMap[slug];
+
 	return article;
 };
