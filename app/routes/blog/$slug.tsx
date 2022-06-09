@@ -36,9 +36,10 @@ export const loader: LoaderFunction = async ({ params }) => {
 
 	} catch (err) {
 
-		return new Response("No article found with name " + params.slug, {
-			status: 404,
-		});
+		return new Response(
+			"No article found with name " + params.slug,
+			{ status: 404 }
+		);
 
 	}
 };
