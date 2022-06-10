@@ -15,8 +15,8 @@ Development. I have a new phrase: Debug Driven Development(™).
 ## What is Debug Driven Development
 
 Consider the following two code samples. Which would you rather face when
-locating a bug, adding new business requirements, and leaving for your
-future self or coworker.
+locating a bug or adding new business requirements. Which would you prefer to
+leave for your future self or coworker.
 
 ```ts
 // Option 1.
@@ -76,25 +76,27 @@ following:
 * Tests
 
 In each of those techniques inspecting the intermediate states of data
-transformations is essential to narrow in on a bug and validate changes.
-
-Debug Driven Development optimizes for future debugging by provide lots of
-opportunities for breakpoints, console logs, scratch work and whatever
-other techniques you leverage when working in code.
+transformations is essential to narrow in on a bug or validate changes. Debug
+Driven Development optimizes for debugging by writing code to provide
+opportunities for these and any other techniques you use.
 
 Hopefully you're building up an intuition for debug driven development.
 
-## How to Leverage Debug Driven Development
+## Leveraging Debug Driven Development
 
-Debug Driven Development might sound similar to KISS: Keep It Simple Stupid.
-The two are related, but Debug Driven Development takes it a bit further.
-Phrases like KISS focus on readability whereas Debug Driven Development focuses
-on writing code so that it is as easy to debug as possible in the future.
+Debug Driven Development might sound similar to `KISS`: Keep It Simple Stupid.
+The two are related, but Debug Driven Development goes further. Phrases like
+KISS focus on readability whereas Debug Driven Development focuses on writing
+code so that it is as easy to debug as possible.
 
 This principle manifests most concretely by storing intermediate states of
-computation in their own variables, avoiding combining logic of chained method
-calls, and inlining function calls as the arguments to other functions:
+computation in their own variables, avoiding complex logic in method calls, and
+avoiding inlining function calls as the arguments to other functions:
 `getName(getUserObjectFromDB(getDBConnection()))`.
+
+
+Of the two snippets below, which would be easier to debug or modify? If you say
+the snippet below, well, I'm thankful you're still reading.
 
 ```ts
 const myArr = getArrayOfData();
@@ -108,9 +110,6 @@ const filteredResults = myArr.filter(entry => {
 });
 ```
 
-Is the snippet above or the one below easier to debug and modify. If you say the
-snippet below, I'm thankful you're still reading.
-
 ```ts
 const myArr = getArrayOfData();
 
@@ -119,10 +118,12 @@ const filteredResults = myArr.filter(entry => {
 });
 ```
 
-You're probably bulking that the first example loops through the array 3 times
+You're probably bulking at how the first example loops through the array 3 times
 (3 times!) instead of just once. Totally unnecessary and a performance hit. And
 you're right. But it's still a lot more readable and easier to debug than the
-second. There is a middle ground of course. We could write the 2nd example as
+second example. Both are easy to debug, but the second would require some
+rewriting to inspect specific conditions or add in new ones. There is a middle
+ground of course. We could write this as
 
 ```ts
 const myArr = getArrayOfData();
@@ -148,10 +149,10 @@ const filterFunction = compose(isNotEmpty, nameIsMoreThan5Characters, isOver21);
 const filteredResults = myArr.filter(filterFunction);
 ```
 
-Depending on how comfortable you are with composition or trying to reuse utility
-functions, you may prefer one over the other but both qualify as code written
+Depending on how comfortable you are with composition (or trying to reuse utility
+functions), you may prefer one over the other but both qualify as code written
 optimizing for debugability (they both are also easy to read as writing easy to
-debug code often requires writing readable code).
+debug code necessitates writing readable code).
 
 And that's Debug Driven Development
 
