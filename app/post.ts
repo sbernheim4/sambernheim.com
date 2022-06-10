@@ -10,16 +10,21 @@ export type Post = {
 	description: string;
 };
 
-export type PostMarkdownAttributes = {
-	title: string;
+type MDX = {
+	attributes: {
+		meta: {
+			title: string;
+			description: string;
+			slug: string;
+		};
+		headers: Headers;
+	};
+	default: () => JSX.Element;
+	filename: string;
+	headers: Headers
+	links: Record<string, string>;
+	meta: Record<'title' | 'description' | 'slug', string>;
 };
-
-type MDX =
-	typeof DebugDrivenDevelopment |
-	typeof ThePartyMathTrick |
-	typeof BuildingAMonad |
-	typeof MonadsAreMonoidsInTheCategoryOfEndofunctors |
-	typeof EngineersSchrodingersCat
 
 const mdxArticles = [
 	DebugDrivenDevelopment,
@@ -27,9 +32,9 @@ const mdxArticles = [
 	BuildingAMonad,
 	MonadsAreMonoidsInTheCategoryOfEndofunctors,
 	EngineersSchrodingersCat
-];
+] as MDX[];
 
-const postFromModule = (mod): Post => {
+const getPostMetadata = (mod: MDX): Post => {
 	return {
 		...mod.attributes.meta,
 	};
@@ -37,14 +42,14 @@ const postFromModule = (mod): Post => {
 
 const getArticleSlug = (x: Post) => x.slug;
 
-const articleData = mdxArticles.map((x) => postFromModule(x));
+const articleData = mdxArticles.map((x) => getPostMetadata(x));
 
 const articleMap = mdxArticles.reduce((acc, curr) => {
 	return {
 		...acc,
-		[getArticleSlug(postFromModule(curr))]: curr
+		[getArticleSlug(getPostMetadata(curr))]: curr
 	};
-}, {} as Record<string, MDX>);
+}, {} as Record<string, MDX | undefined>);
 
 export const getPosts = (): Post[] => {
 	return articleData;
@@ -55,7 +60,7 @@ export const getPost = (slug: string | undefined): undefined | MDX => {
 		return undefined;
 	}
 
-	const article = articleMap[slug] as MDX | undefined;
+	const article = articleMap[slug]
 
 	return article;
 };
