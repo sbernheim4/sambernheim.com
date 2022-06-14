@@ -9,11 +9,14 @@ const run = () => {
 		/* @ts-ignore */
 		window.dataLayer = window.dataLayer || []
 		/* @ts-ignore */
-		window.gtag = () => window.dataLayer.push(arguments)
+		function gtag() {
+			console.log(arguments)
+			dataLayer.push(arguments);
+		}
 		/* @ts-ignore */
-		window.gtag('js', new Date())
+		gtag('js', new Date())
 		/* @ts-ignore */
-		window.gtag('config', 'G-JTP26ECD1K')
+		gtag('config', 'G-JTP26ECD1K')
 	})
 };
 hydrate(
