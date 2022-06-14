@@ -9,13 +9,13 @@ headers:
 
 # Debug Driven Development
 
-You've likely heard of Test Driven Development, or maybe Behavrioal Driven
+You've likely heard of Test Driven Development, or maybe even Behavrioal Driven
 Development. I have a new phrase: Debug Driven Development(™).
 
 ## What is Debug Driven Development
 
 Consider the following two code samples. Which would you rather face when
-locating a bug or adding new business requirements. Which would you prefer to
+locating a bug or generally modifying. Which would you prefer to
 leave for your future self or coworker.
 
 ```ts
@@ -64,76 +64,113 @@ export const getNameFrequency = (myObj) => {
     return userNamesToFrequency;
 };
 ```
-The first snippet is readable though I wouldn't call it simple. In both we get a
-value out of an object that is an array of objects with a name property that we
-extract and count the frequency of.
+The first snippet is readable but I wouldn't call it simple. The logic is
+straightforward and you figure out we're counting the frequency of the keys of a
+given object pretty quickly but I think you'll agree one is far easier to read
+(and work in) than the other.
 
 For any work in one of the snippets, you'll likely use some if not all of the
-following:
+following techniques.
+
 * `console.log()`
 * `debugger;`
 * Breakpoints
 * Tests
 
-In each of those techniques inspecting the intermediate states of data
-transformations is essential to narrow in on a bug or validate changes. Debug
-Driven Development optimizes for debugging by writing code to provide
-opportunities for these and any other techniques you use.
+Regardless of which method we use, we'll want to inspect the intermediate state
+of our data at various points. Seeing the intermediate transformations of our
+data is essential to narrow in on a bug or validate a change. **Debug Driven
+Development optimizes writing code to provide opportunities for future
+debugging and maintenance.**
 
 Hopefully you're building up an intuition for debug driven development.
 
-## Leveraging Debug Driven Development
+## Is Debug Driven Development Really a New Idea?
+
+I don't know but I haven't heard of it before though I'm sure some of the ideas
+in here have been codified and are part of other strategies for writing
+maintainable code (perhaps in Clean Code or similar places).
 
 Debug Driven Development might sound similar to `KISS`: Keep It Simple Stupid.
 The two are related, but Debug Driven Development goes further. Phrases like
-KISS focus on readability whereas Debug Driven Development focuses on writing
-code so that it is as easy to debug as possible.
+KISS (and I'd argue Clean Code too) have their focus on readability whereas
+Debug Driven Development focuses on writing code so that it is as easy to debug
+as possible.
 
 This principle manifests most concretely by storing intermediate states of
-computation in their own variables, avoiding complex logic in method calls, and
-avoiding inlining function calls as the arguments to other functions:
-`getName(getUserObjectFromDB(getDBConnection()))`.
-
-
-Of the two snippets below, which would be easier to debug or modify? If you say
-the snippet below, well, I'm thankful you're still reading.
+computation in their own variables, avoiding nesting of logic, and avoiding
+inlining function calls as the arguments to other functions:
 
 ```ts
+// Nesting of logic:
+
+const data = myObj[!!key ? key : 'fallbackKey'];
+
+// or
+
+const config = {
+	name: name > 5 ? name.slice(0, 5) : name,
+}
+
+// Inlining Function Calls as Arguments
+
+const name = getName(getUserObjectFromDB(getDBConnection()));
+```
+
+Now these are mostly obvious but I'd be surprised if you couldn't find examples
+in any project you work in regularly and they're for illustration of an extreme
+(writing fake code is hard!).
+
+Another obvious example where this can manifest is Array method chains. Of the
+two examples below, which would be easier to debug or modify? If you say the 2nd
+one, well, I'm at least thankful you're still reading.
+
+> You can imagine that the filter conditions contain more gnarly predicates than
+> these trivial examples but these examples are enough to convey the broader
+> point.
+
+```ts
+// Example 1
 const myArr = getArrayOfData();
 
 const filteredResults = myArr.filter(entry => {
-    entry !== null && entry !== undefined;
+	const isNotEmpty = entry !== null && entry !== undefined;
+	return isNotEmpty;
 }).filter(entry => {
-    entry.name.length > 5;
+	const entryIsLongEnough = entry.name.length > 5;
+	return entryIsLongEnough;
 }).filter(entry => {
-    entry.age > 21
+	const entryIsOldEnought = entry.age > 21
+	return entryIsOldEnought;
+});
+
+// -----------------------------------------------------------------------------
+
+// Example 2
+const filteredResults = getArrayOfData().filter(entry => {
+    entry !== null &&
+	entry !== undefined &&
+	entry.name.length > 5 &&
+	entry.age 21
 });
 ```
 
-```ts
-const myArr = getArrayOfData();
+You're probably bulking at the 3 repeated loops and just begging to refactor the
+example. While the 2 extra loops is certainly not great it's still a lot more
+readable and easier to debug than the second example.
 
-const filteredResults = myArr.filter(entry => {
-    entry !== null && entry !== undefined && entry.name.length > 5 && entry.age 21
-});
-```
-
-You're probably bulking at how the first example loops through the array 3 times
-(3 times!) instead of just once. Totally unnecessary and a performance hit. And
-you're right. But it's still a lot more readable and easier to debug than the
-second example. Both are easy to debug, but the second would require some
-rewriting to inspect specific conditions or add in new ones. There is a middle
-ground of course. We could write this as
+Both are easy to debug, but the second would require some rewriting to specific
+conditions or add in new ones. There is a middle ground of course.
 
 ```ts
 const myArr = getArrayOfData();
 
 const filteredResults = myArr.filter(entry => {
     const isNotEmpty = entry !== null && entry !== undefined
-    const nameIsMoreThan5Characters = entry.name.length > 5
+    const entryIsLongEnough = entry.name.length > 5
     const isOver21 = entry.age 21
 
-    return isNotEmpty && nameIsMoreThan5Characters && isOver21;
+    return isNotEmpty && entryIsLongEnough && isOver21;
 });
 ```
 
@@ -141,24 +178,40 @@ And that would indeed be easy to debug! Another approach could be:
 
 ```ts
 const isNotEmpty = entry => !== null && entry !== undefined
-const nameIsMoreThan5Characters = entry => entry.name.length > 5
+const entryIsLongEnough = entry => entry.name.length > 5
 const isOver21 = entry => entry.age 21
 
-const filterFunction = compose(isNotEmpty, nameIsMoreThan5Characters, isOver21);
+const filterFunction = compose(isNotEmpty, entryIsLongEnough, isOver21);
 
 const filteredResults = myArr.filter(filterFunction);
 ```
 
-Depending on how comfortable you are with composition (or trying to reuse utility
-functions), you may prefer one over the other but both qualify as code written
-optimizing for debugability (they both are also easy to read as writing easy to
-debug code necessitates writing readable code).
+Depending on how comfortable you are with composition (or trying to reuse
+utility functions), you may prefer one over the other but both qualify as code
+written optimizing for debugability. Both are easy to read as writing easy to
+debug code often necessitates writing readable code. Debuggable code however
+goes further.
 
-And that's Debug Driven Development
+## Other Forms of Debug Driven Development
+
+Depending on the language or tools you're using another form of debug driven
+development manifests when using types! Types help make your code debuggable
+especially when abiding by the make impossible states impossible principle by
+designing your types so that an illegal state is not representable through your
+type system.
+
+Fundamentally one reason types are so powerful is they allow you to embed logic
+in an environment where a compiler can validate your logic and guarantee you
+something cannot happen (assuming all types are correct). Debugging an error and
+working in a typed project is significantly easier and can save you a few
+`console.log` and `debugger;` cycles to try and understand the exact shape of
+your data, a function call's arguments, or a class instance.
+
+And that's Debug Driven Development!
 
 ## Wrapping Up
 
 Debug Driven Development is entirely compatible with other methodologies (like
-TDD or BDD). Focusing on any of these will often include partly focusing on the
-others. Debug Driven Development is just another technique to improve your
-ability to be effective in writing code.
+TDD, BDD, Clean Code etc). Focusing on any of these will often include partly
+focusing on the others. Debug Driven Development is just another approach to
+be effective in writing code.
