@@ -15,11 +15,12 @@ Development. I have a new phrase: Debug Driven Development(™).
 ## What is Debug Driven Development
 
 Consider the following two code samples. Which would you rather face when
-locating a bug or generally modifying. Which would you prefer to
+locating a bug or making an update for a new feature. Which would you prefer to
 leave for your future self or coworker.
 
 ```ts
 // Option 1.
+
 export const getNameFrequency = (myObj) => {
     return myObj["prop"].map(res => res.name).reduce((acc, curr) => {
 
@@ -34,9 +35,12 @@ export const getNameFrequency = (myObj) => {
             }
         };
 
-    }};
+    }, {});
+
+// --------------------------------------------------------
 
 // Option 2.
+
 export const getNameFrequency = (myObj) => {
 
     const users = myObj["prop"]
@@ -59,7 +63,7 @@ export const getNameFrequency = (myObj) => {
 
         return updatedAccumulator;
 
-    });
+    }, {});
 
     return userNamesToFrequency;
 };
@@ -99,7 +103,10 @@ as possible.
 
 This principle manifests most concretely by storing intermediate states of
 computation in their own variables, avoiding nesting of logic, and avoiding
-inlining function calls as the arguments to other functions:
+inlining function calls as the arguments to other functions. Avoiding these
+styles makes it easy to throw in a console.log, add a breakpoint between two
+function calls and modify existing code to add or remove intermediate steps as
+part of new requirements.
 
 ```ts
 // Nesting of logic:
@@ -117,36 +124,43 @@ const config = {
 const name = getName(getUserObjectFromDB(getDBConnection()));
 ```
 
-Now these are mostly obvious but I'd be surprised if you couldn't find examples
-in any project you work in regularly and they're for illustration of an extreme
-(writing fake code is hard!).
+These examples above are mostly obvious but I'd be surprised if you couldn't
+find similar ones in any project you work in regularly (and please keep in mind,
+it's an illustration of the principle - writing fake code is hard!).
 
-Another obvious example where this can manifest is Array method chains. Of the
-two examples below, which would be easier to debug or modify? If you say the 2nd
-one, well, I'm at least thankful you're still reading.
+Another obvious example where this can manifest is Array method chains (and
+broadly chainable method calls). Of the two examples below, which would be
+easier to debug or modify? If you say the 2nd one, well, I'm at least thankful
+you're still reading.
 
-> You can imagine that the filter conditions contain more gnarly predicates than
+> You can imagine the filter predicates contain more gnarly conditionals than
 > these trivial examples but these examples are enough to convey the broader
 > point.
 
 ```ts
 // Example 1
+
 const myArr = getArrayOfData();
 
-const filteredResults = myArr.filter(entry => {
+const nonEmptyValues = myArr.filter(entry => {
 	const isNotEmpty = entry !== null && entry !== undefined;
 	return isNotEmpty;
-}).filter(entry => {
+});
+
+const lengthNames = nonEmptyValues.filter(entry => {
 	const entryIsLongEnough = entry.name.length > 5;
 	return entryIsLongEnough;
-}).filter(entry => {
+});
+
+const over21 = lengthNames.filter(entry => {
 	const entryIsOldEnought = entry.age > 21
 	return entryIsOldEnought;
 });
 
-// -----------------------------------------------------------------------------
+// --------------------------------------------------------
 
 // Example 2
+
 const filteredResults = getArrayOfData().filter(entry => {
     entry !== null &&
 	entry !== undefined &&
@@ -155,12 +169,18 @@ const filteredResults = getArrayOfData().filter(entry => {
 });
 ```
 
-You're probably bulking at the 3 repeated loops and just begging to refactor the
-example. While the 2 extra loops is certainly not great it's still a lot more
-readable and easier to debug than the second example.
+You're probably bulking at the 3 repeated loops in the first example and just
+begging to refactor it to be closer to the 2nd example. While the 2 extra loops
+is certainly not great, the first is more debuggable than the second. If there
+were an issue with the end result of the array, it would be due to one of the
+conditions being off. Having three separate filter calls allows us to easily go
+in and inspect which predicates(s) are wrong through any technique at any
+intermediate step.
 
 Both are easy to debug, but the second would require some rewriting to specific
-conditions or add in new ones. There is a middle ground of course.
+conditions or add in new ones. There is a middle ground of course, though it
+still fails to allow us to inspect the value of the entire array between each
+predicate.
 
 ```ts
 const myArr = getArrayOfData();
@@ -174,35 +194,24 @@ const filteredResults = myArr.filter(entry => {
 });
 ```
 
-And that would indeed be easy to debug! Another approach could be:
+So which one do we use? The middle ground option or the clean single loop. This
+is where the rubber meets the road so to speak and where you have to discern and
+weigh the options. Does the array have under 1,000 values? If so I'd probably
+opt for the 3 filter calls, otherwise I may select the more optimized approach.
 
-```ts
-const isNotEmpty = entry => !== null && entry !== undefined
-const entryIsLongEnough = entry => entry.name.length > 5
-const isOver21 = entry => entry.age 21
-
-const filterFunction = compose(isNotEmpty, entryIsLongEnough, isOver21);
-
-const filteredResults = myArr.filter(filterFunction);
-```
-
-Depending on how comfortable you are with composition (or trying to reuse
-utility functions), you may prefer one over the other but both qualify as code
-written optimizing for debugability. Both are easy to read as writing easy to
-debug code often necessitates writing readable code. Debuggable code however
-goes further.
+It doesn't matter which you choose (to a degree, measure performance and adapt
+code as needed), so long as your choice is debuggable.
 
 ## Other Forms of Debug Driven Development
 
 Depending on the language or tools you're using another form of debug driven
-development manifests when using types! Types help make your code debuggable
+development manifests in a type system! Types help make your code debuggable
 especially when abiding by the make impossible states impossible principle by
-designing your types so that an illegal state is not representable through your
+designing your types so that illegal states are not representable in your
 type system.
 
-Fundamentally one reason types are so powerful is they allow you to embed logic
-in an environment where a compiler can validate your logic and guarantee you
-something cannot happen (assuming all types are correct). Debugging an error and
+Fundamentally types are powerful as they let us embed logic that is verified and
+provable by a compiler (assuming all types are correct). Debugging an error when
 working in a typed project is significantly easier and can save you a few
 `console.log` and `debugger;` cycles to try and understand the exact shape of
 your data, a function call's arguments, or a class instance.
@@ -211,7 +220,9 @@ And that's Debug Driven Development!
 
 ## Wrapping Up
 
-Debug Driven Development is entirely compatible with other methodologies (like
-TDD, BDD, Clean Code etc). Focusing on any of these will often include partly
-focusing on the others. Debug Driven Development is just another approach to
-be effective in writing code.
+Debug Driven Development is obviously compatible with other methodologies (like
+TDD, BDD, Clean Code etc). We do aim for composition oriented solutions as
+engineers after all.
+
+Focusing on any code writing strategy will often include partly focusing on the
+others. Debug Driven Development is just another approach to writing code.

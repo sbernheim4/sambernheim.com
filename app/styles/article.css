@@ -24,7 +24,7 @@ body, .navbar {
 }
 
 .article > blockquote {
-    margin: 0 auto !important;
+    margin: 15px auto !important;
     font-style: italic;
     width: 80%;
     font-size: 1em;
