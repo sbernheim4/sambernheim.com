@@ -5,20 +5,11 @@ import blogStyles from "./../../styles/blog.css"
 import articleStyles from "./../../styles/article.css"
 
 export const loader: LoaderFunction = async (): Promise<Post[]> => {
-	try {
 
-		const posts = getPosts();
+	const posts = getPosts();
 
-		console.log(posts);
+	return posts;
 
-		return posts;
-
-	} catch (err) {
-
-		console.log('error caught in blog loader', err);
-
-		return getPosts();
-	}
 };
 
 export const links: LinksFunction = () => {
