@@ -37,6 +37,7 @@ export default function Posts() {
 				{posts.map((post: Post) => <ArticleItem key={post.slug} {...post} />)}
 			</div>
 
+			<p className="secret">2</p>
 		</div>
 	);
 }
