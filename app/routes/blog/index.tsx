@@ -22,6 +22,11 @@ export const meta: MetaFunction = () => {
 	};
 };
 
+
+export const ErrorBoundary = ({ error }) => {
+	window.location.href = "https://www.sambernheim.com/blog";
+};
+
 export default function Posts() {
 	const posts = useLoaderData<Post[]>();
 

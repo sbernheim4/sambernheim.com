@@ -23,6 +23,11 @@ export const meta: MetaFunction = (x) => {
 	}
 };
 
+export const ErrorBoundary = ({ error }) => {
+	const url = window.location.href;
+	window.location.href = url;
+};
+
 export const loader: LoaderFunction = async ({ params }) => {
 	try {
 
