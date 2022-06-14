@@ -5,25 +5,21 @@ import * as MonadsAreMonoidsInTheCategoryOfEndofunctors from './components/Artic
 import * as ThePartyMathTrick from './components/Articles/the-party-math-trick.mdx';
 
 export type Post = {
+	description: string;
 	slug: string;
 	title: string;
-	description: string;
 };
 
 type MDX = {
 	attributes: {
-		meta: {
-			title: string;
-			description: string;
-			slug: string;
-		};
+		meta: Post;
 		headers: Headers;
 	};
 	default: () => JSX.Element;
 	filename: string;
 	headers: Headers
 	links: Record<string, string>;
-	meta: Record<'title' | 'description' | 'slug', string>;
+	meta: Post
 };
 
 const mdxArticles = [
