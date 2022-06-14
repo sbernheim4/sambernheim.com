@@ -8,9 +8,8 @@ const run = () => {
 		eval(blob)
 		/* @ts-ignore */
 		window.dataLayer = window.dataLayer || []
-		/* @ts-ignore */
 		function gtag() {
-			console.log(arguments)
+			/* @ts-ignore */
 			dataLayer.push(arguments);
 		}
 		/* @ts-ignore */
