@@ -4,8 +4,21 @@ import { Post, getPosts } from "~/post"
 import blogStyles from "./../../styles/blog.css"
 import articleStyles from "./../../styles/article.css"
 
-export const loader: LoaderFunction = async () => {
-	return getPosts();
+export const loader: LoaderFunction = async (): Promise<Post[]> => {
+	try {
+
+		const posts = getPosts();
+
+		console.log(posts);
+
+		return posts;
+
+	} catch (err) {
+
+		console.log('error caught in blog loader', err);
+
+		return getPosts();
+	}
 };
 
 export const links: LinksFunction = () => {
@@ -20,11 +33,6 @@ export const meta: MetaFunction = () => {
 		title: "My Blog",
 		description: "I often write about functional programming and TypeScript"
 	};
-};
-
-
-export const ErrorBoundary = ({ error }) => {
-	window.location.href = "https://www.sambernheim.com/blog";
 };
 
 export default function Posts() {
