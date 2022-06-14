@@ -13,6 +13,7 @@ import {
 
 import globalStyles from './styles/globals.css';
 import { Navbar, links as navbarLinks } from "./components/Navbar";
+// import { GAnalytics } from "./components/GAnalytics.client";
 
 export const links: LinksFunction = () => {
 	return [
@@ -52,14 +53,6 @@ const Document = ({
 				{title ? <title>{title}</title> : null}
 				<Meta />
 				<Links />
-				<script async src="https://www.googletagmanager.com/gtag/js?id=G-JTP26ECD1K"></script>
-				<script>
-					window.dataLayer = window.dataLayer || [];
-					function gtag(){dataLayer.push(arguments);}
-					gtag('js', new Date());
-
-					gtag('config', 'G-JTP26ECD1K');
-				</script>
 			</head>
 
 			<body>
