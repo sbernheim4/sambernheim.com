@@ -1,8 +1,9 @@
 import { json, LinksFunction, LoaderFunction, MetaFunction } from "@remix-run/cloudflare";
-import { Link, useLoaderData, useParams } from "@remix-run/react";
+import { meta as blogMetaFunction } from './index';
+import { useLoaderData } from "@remix-run/react";
 import { useEffect } from "react";
 import ReactDOMServer from "react-dom/server";
-import { getPost, Post } from "~/post";
+import { articleMap, getPost, getPostMetadata } from "~/post";
 import articleStyles from './../../styles/article.css'
 
 export const links: LinksFunction = () => {
@@ -14,12 +15,23 @@ export const links: LinksFunction = () => {
 	]
 };
 
-export const meta: MetaFunction = (x) => {
-	const postData = x.data as Post;
+export const meta: MetaFunction = (args) => {
+	try {
 
-	return {
-		title: postData.title,
-		description: postData.description
+		// @ts-ignore
+		const postData = getPostMetadata(articleMap[args.params.slug])
+
+		const metadata = {
+			title: postData.title,
+			description: postData.description
+		}
+
+		return metadata;
+
+	} catch (error) {
+
+		return blogMetaFunction(args)
+
 	}
 };
 
@@ -37,7 +49,9 @@ export const loader: LoaderFunction = async ({ params }) => {
 	} catch (err) {
 
 		return new Response(
-			"No article found with name " + params.slug,
+			"<h1>404 - Uh Oh :( <br /> No article found with name " +
+			params.slug +
+			"</h1><br /><h1><a href='/blog'>Back to Blog</a></h1>",
 			{ status: 404 }
 		);
 

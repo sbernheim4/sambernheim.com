@@ -30,7 +30,7 @@ const mdxArticles = [
 	EngineersSchrodingersCat
 ] as MDX[];
 
-const getPostMetadata = (mod: MDX): Post => {
+export const getPostMetadata = (mod: MDX): Post => {
 	return {
 		...mod.attributes.meta,
 	};
@@ -40,7 +40,7 @@ const getArticleSlug = (x: Post) => x.slug;
 
 const articleData = mdxArticles.map((x) => getPostMetadata(x));
 
-const articleMap = mdxArticles.reduce((acc, curr) => {
+export const articleMap = mdxArticles.reduce((acc, curr) => {
 	return {
 		...acc,
 		[getArticleSlug(getPostMetadata(curr))]: curr
