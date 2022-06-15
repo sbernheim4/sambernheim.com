@@ -14,7 +14,7 @@
     transform: translatey(0);
   }
   100% {
-    color: rgb(80, 152, 196);
+    color: #5098c4;
     text-shadow: 2px 3px 9px black;
   }
 }
@@ -22,7 +22,7 @@
   --overlay: 0.75;
   position: relative;
   height: 100vh;
-  background: linear-gradient(rgb(0, 0, 0), rgba(0, 0, 0, var(--overlay)), rgb(0, 0, 0)), url("https://d2rx8thx7xqki2.cloudfront.net/background-image.jpg") center no-repeat;
+  background: linear-gradient(black, rgba(0, 0, 0, var(--overlay)), black), url("https://d2rx8thx7xqki2.cloudfront.net/background-image.jpg") center no-repeat;
   background-size: cover;
   background-attachment: fixed;
   background-repeat: no-repeat;
@@ -38,7 +38,7 @@
   animation: text 1.3s;
   animation-fill-mode: both;
   animation-delay: 0.5s;
-  color: rgb(80, 152, 196);
+  color: #5098c4;
 }
 @media all and (max-width: 410px) {
   .landing--text h1 {
