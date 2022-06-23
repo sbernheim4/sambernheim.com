@@ -1,10 +1,10 @@
-import { json, LinksFunction, LoaderFunction, MetaFunction } from "@remix-run/cloudflare";
 import { meta as blogMetaFunction } from './index';
 import { useLoaderData } from "@remix-run/react";
 import { useEffect } from "react";
 import ReactDOMServer from "react-dom/server";
 import { articleMap, getPost, getPostMetadata } from "~/post";
 import articleStyles from './../../styles/article.css'
+import { json, LinksFunction, LoaderFunction, MetaFunction } from '@remix-run/node';
 
 export const links: LinksFunction = () => {
 	return [

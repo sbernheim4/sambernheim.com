@@ -1,7 +1,6 @@
-import { renderToString } from "react-dom/server";
-import type { EntryContext } from "@remix-run/cloudflare";
+import type { EntryContext } from "@remix-run/node";
 import { RemixServer } from "@remix-run/react";
-import { sitemap } from "./sitemap";
+import { renderToString } from "react-dom/server";
 
 export default function handleRequest(
   request: Request,
@@ -9,17 +8,7 @@ export default function handleRequest(
   responseHeaders: Headers,
   remixContext: EntryContext
 ) {
-
-  if (request.url.includes("sitemap.xml")) {
-    responseHeaders.set("Content-Type", "text/xml");
-
-    return new Response(sitemap, {
-      status: 200,
-      headers: responseHeaders
-    });
-  }
-
-  const markup = renderToString(
+  let markup = renderToString(
     <RemixServer context={remixContext} url={request.url} />
   );
 
@@ -27,6 +16,6 @@ export default function handleRequest(
 
   return new Response("<!DOCTYPE html>" + markup, {
     status: responseStatusCode,
-    headers: responseHeaders
+    headers: responseHeaders,
   });
 }
