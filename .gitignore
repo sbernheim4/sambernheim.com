@@ -9,4 +9,5 @@ functions/\[\[path\]\].js
 functions/\[\[path\]\].js.map
 /public/build
 dist/
-
+*.css
+*.css.map
