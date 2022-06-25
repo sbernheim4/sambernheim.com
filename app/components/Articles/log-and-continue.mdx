@@ -56,7 +56,7 @@ Array.prototype.logAndContinue = function() {
 	console.log(this);
 	return this;
 }
-```ts
+```
 
 A lot simpler than you were expecting right. Here's how we use it.
 
@@ -141,8 +141,8 @@ const arrayLoggerOne = (array) => {
 
 // Log only the first element of the array.
 const arrayLoggerTwo = (array) => {
-	return `The array has ${array.length} elements and after mapping, the first
-value of the array is ${array[0].toString()}`;
+	return `The array has ${array.length} elements and after mapping, the
+first value of the array is ${array[0].toString()}`;
 };
 
 const myData = myArr.filter(filterFn)
