@@ -1,0 +1,168 @@
+---
+meta:
+  title: Log and Continue
+  description: The Missing JavaScript Array Method
+  slug: log-and-continue
+headers:
+  Cache-Control: max-age=60000
+---
+
+# Log and Continue
+
+We often write and modify code that looks like this
+
+```this
+const getApiResults = () => {
+
+	const myArr = getApiResults();
+
+	const normalizedApiResults = myArr.filter(filterFn)
+		.map(mappingFn)
+		.reduce(reducingFn)
+		.sort(sortingFn);
+
+	return normalizedApiResults;
+
+};
+```
+
+We can condense this even further by either composing the three transformational
+steps into a single `flatMap` invocation and pass through but I find the
+readability of keeping each step separate helpful as per my [Debug Driven
+Development](sambernheim.com/blog/debug-driven-development) methodology.
+
+Often when coding we'll want to inspect the array between these steps. It's easy
+enough to refactor the snippet storing each step's intermediate value in its own
+variable, adding console logs between or debugger statements at each line.
+
+```ts
+const filteredData = myArr.filter(filterFn);
+const transformedData = filteredData.map(mappingFn);
+const reducedData = transformedData.reduce(reducingFn);
+const sortedData = reducedData.sort(sortingFn);
+
+console.log(sortedData);
+```
+
+Having to go through this refactoring just for a console log though is
+frustrating. We can create a better world.
+
+## Log And Continue
+`logAndContinue` is the solution to realizing this better world. Here's the
+code:
+
+```ts
+Array.prototype.logAndContinue = function() {
+	console.log(this);
+	return this;
+}
+```ts
+
+A lot simpler than you were expecting right. Here's how we use it.
+
+```ts
+const myData = myArr.filter(filterFn)
+	.logAndContinue()
+	.map(mappingFn)
+	.logAndContinue()
+	.reduce(reducingFn)
+	.logAndContinue()
+	.sort(sortingFn);
+```
+
+> INSERT IMAGE OR COPY RESULT TEXT AS CODE SNIPPET
+
+We could decide to be done here - but where's the fun in that.
+
+## Even Better Logging
+
+What if we parameterize a logging string so that when the array is logged, a
+prefix and postfix string is included around the array value:
+
+```ts
+Array.prototype.logAndContinue = function(prefixString, postfixString) {
+	console.log(prefixString + this + postfixString);
+	return this;
+}
+```
+
+Now we can decorate the array logging with whatever strings we want:
+
+```ts
+const myData = myArr.filter(filterFn)
+	.logAndContinue('Filtered Array:', 'fin')
+	.map(mappingFn)
+	.logAndContinue('Mapped Array', 'fin')
+	.reduce(reducingFn)
+	.logAndContinue('Reduced Array', 'fin')
+	.sort(sortingFn);
+```
+
+> INSERT IMAGE OR COPY RESULT TEXT AS CODE SNIPPET
+
+We have a bit more control and can log generally better but passing around
+strings doesn't feel quite right. The most powerful control we can leverage
+would be through some inversion of control. Instead of passing in a couple of
+string values to `logAndContinue`, we can have it accept a function that
+receives as its argument the array, and returns a string. By default this
+function will return the array as a string.
+
+## Maximum Logging
+We can achieve maximal logging nirvana with the following implementation.
+
+```ts
+Array.prototype.logAndContinue = function(fn = (array) => array.toString()) {
+	const array = this;
+	const stringToLog = fn(array);
+	console.log(stringToLog);
+	return this;
+}
+```
+
+I know, still very simple. We can continue using this array method minimally.
+
+```ts
+const myData = myArr.filter(filterFn)
+	.logAndContinue()
+	.map(mappingFn)
+	.logAndContinue()
+	.reduce(reducingFn)
+	.logAndContinue()
+	.sort(sortingFn);
+```
+> INSERT IMAGE OR COPY RESULT TEXT AS CODE SNIPPET
+
+We can also functionalize the string that gets logged:
+
+```ts
+const arrayLoggerOne = (array) => {
+	return 'After filtering the array value is ' + array.toString() + ' fin';
+};
+
+// Log only the first element of the array.
+const arrayLoggerTwo = (array) => {
+	return `The array has ${array.length} elements and after mapping, the first
+value of the array is ${array[0].toString()}`;
+};
+
+const myData = myArr.filter(filterFn)
+	.logAndContinue(arrayLoggerOne)
+	.map(mappingFn)
+	.logAndContinue(arrayLoggerTwo)
+	.reduce(reducingFn)
+	.logAndContinue()
+	.sort(sortingFn);
+
+```
+
+> INSERT IMAGE OR COPY RESULT TEXT AS CODE snippet
+
+This provides a lot of power to our logging capabilities for arrays through a
+still easy to use interface.
+
+##
+With an `Array.logAndContinue` method, we get a far better debugging and array
+helper method than we otherwise would. Is it always going to be the easiest way
+to log arrays, no. But when we have a chain of array methods that we just want
+to inspect, it becomes a lot easier to hop in and hop out with minimal
+refactoring.

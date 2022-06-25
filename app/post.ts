@@ -3,6 +3,7 @@ import * as DebugDrivenDevelopment from './components/Articles/debug-driven-deve
 import * as EngineersSchrodingersCat from './components/Articles/the-engineers-schrodingers-cat.mdx';
 import * as MonadsAreMonoidsInTheCategoryOfEndofunctors from './components/Articles/monads-are-monoids-in-the-category-of-endofunctors.mdx';
 import * as ThePartyMathTrick from './components/Articles/the-party-math-trick.mdx';
+import * as LogAndContinue from './components/Articles/log-and-continue.mdx';
 
 export type Post = {
 	description: string;
@@ -23,6 +24,7 @@ type MDX = {
 };
 
 const mdxArticles = [
+	LogAndContinue,
 	DebugDrivenDevelopment,
 	ThePartyMathTrick,
 	BuildingAMonad,
