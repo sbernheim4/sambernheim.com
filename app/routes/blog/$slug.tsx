@@ -2,9 +2,10 @@ import { meta as blogMetaFunction } from './index';
 import { useLoaderData } from "@remix-run/react";
 import { useEffect } from "react";
 import ReactDOMServer from "react-dom/server";
-import { articleMap, getPost, getPostMetadata } from "~/post";
 import articleStyles from './../../styles/article.css'
-import { json, LinksFunction, LoaderFunction, MetaFunction } from '@remix-run/cloudflare';
+import { json } from '@remix-run/cloudflare';
+import type { LinksFunction, LoaderFunction, MetaFunction } from '@remix-run/cloudflare';
+import { getArticleMap, getPost, getPostMetadata } from '~/utils/articles';
 
 export const links: LinksFunction = () => {
 	return [
@@ -18,8 +19,14 @@ export const links: LinksFunction = () => {
 export const meta: MetaFunction = (args) => {
 	try {
 
-		// @ts-ignore
-		const postData = getPostMetadata(articleMap[args.params.slug])
+		const articleMap = getArticleMap();
+
+		const slug = args.params.slug as keyof typeof articleMap;
+
+		const postData = getPostMetadata(
+			// ts-ignore
+			articleMap[slug]
+		)
 
 		const metadata = {
 			title: postData.title,

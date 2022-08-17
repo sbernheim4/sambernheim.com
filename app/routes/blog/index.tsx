@@ -1,8 +1,8 @@
 import { Link, useLoaderData } from "@remix-run/react";
-import { Post, getPosts } from "~/post"
 import blogStyles from "./../../styles/blog.css"
 import articleStyles from "./../../styles/article.css"
-import { LinksFunction, LoaderFunction, MetaFunction } from "@remix-run/cloudflare";
+import type { LinksFunction, LoaderFunction, MetaFunction } from "@remix-run/cloudflare";
+import { getPosts, Post } from "~/utils/articles";
 
 export const loader: LoaderFunction = async (): Promise<Post[]> => {
 

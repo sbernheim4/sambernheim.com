@@ -4,7 +4,24 @@ import * as EngineersSchrodingersCat from './../components/Articles/the-engineer
 import * as MonadsAreMonoidsInTheCategoryOfEndofunctors from './../components/Articles/monads-are-monoids-in-the-category-of-endofunctors.mdx';
 import * as ThePartyMathTrick from './../components/Articles/the-party-math-trick.mdx';
 import * as LogAndContinue from './../components/Articles/log-and-continue.mdx';
-import type { MDX, Post } from '~/post';
+
+export type Post = {
+	description: string;
+	slug: string;
+	title: string;
+};
+
+export type MDX = {
+	attributes: {
+		meta: Post;
+		headers: Headers;
+	};
+	default: () => JSX.Element;
+	filename: string;
+	headers: Headers
+	links: Record<string, string>;
+	meta: Post
+};
 
 // ts-ignore
 export const getArticles: () => MDX[] = () => {
@@ -30,5 +47,34 @@ export const getArticleData = () => {
 	const articleData = mdxArticles.map((x) => getPostMetadata(x));
 
 	return articleData;
+};
+
+export const getPosts = () => {
+
+	return getArticles().map((x) => getPostMetadata(x));
+
+};
+
+const getArticleSlug = (x: Post) => x.slug;
+
+export const getPost = (slug: string | undefined): undefined | MDX => {
+	if (!slug) {
+		return undefined;
+	}
+
+	const articleMap = getArticleMap();
+
+	const article = articleMap[slug]
+
+	return article;
+};
+
+export const getArticleMap = () => {
+	return getArticles().reduce((acc, curr) => {
+		return {
+			...acc,
+			[getArticleSlug(getPostMetadata(curr))]: curr
+		};
+	}, {} as Record<string, MDX | undefined>);
 };
 
