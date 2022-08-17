@@ -192,12 +192,11 @@ const filteredResults = myArr.filter(entry => {
 });
 ```
 
-So which do we use? The middle ground option or the triple loop. This is where
-the rubber meets the road so to speak and where you have to discern and weigh
-the options. Does the array have under 1,000 values? If so I'd probably opt for
-the 3 filter calls, otherwise I may select the more optimized approach.
+So which do we use? The middle ground option or the triple loop. Does the array
+have under 1,000 values? If so I'd probably opt for the 3 filter calls,
+otherwise I may select the more optimized approach.
 
-It doesn't matter which you choose (to a degree, measure performance and adapt
+It doesn't matter which you choose (to a degree - measure performance and adapt
 code as needed), so long as you make your choice debuggable.
 
 ## Other Forms of Debug Driven Development
@@ -209,18 +208,18 @@ designing your types so that illegal states are not representable in your
 type system.
 
 Fundamentally types are powerful as they let us embed logic that is verified and
-provable by a compiler (assuming all types are correct). Debugging an error when
-working in a typed project is significantly easier and can save you a few
-`console.log` and `debugger;` cycles to try and understand the exact shape of
-your data, a function call's arguments, or a class instance.
+provable by a compiler. Debugging an error when working in a typed project is
+significantly easier and can save you a few `console.log` and `debugger;` cycles
+to try and understand the exact shape of your data, a function call's arguments,
+or a class instance.
 
 And that's Debug Driven Development!
 
 ## Wrapping Up
 
-Debug Driven Development is obviously compatible with other methodologies (like
-TDD, BDD, Clean Code etc). We do aim for composition oriented solutions as
-engineers after all.
+Debug Driven Development is compatible with other methodologies like TDD, BDD,
+or Clean Code. We do aim for composition oriented solutions as engineers after
+all.
 
 Focusing on any code writing strategy will often include partly focusing on the
-others. Debug Driven Development is just another approach to writing code.
+others. Debug Driven Development is just another tool to help write better code.
