@@ -52,7 +52,7 @@ frustrating. We can create a better world.
 code:
 
 ```ts
-Array.prototype.logAndContinue = function() {
+Array.prototype.logAndContinue = () => {
 	console.log(this);
 	return this;
 }
@@ -65,12 +65,8 @@ const myData = myArr.filter(filterFn)
 	.logAndContinue()
 	.map(mappingFn)
 	.logAndContinue()
-	.reduce(reducingFn)
-	.logAndContinue()
 	.sort(sortingFn);
 ```
-
-> INSERT IMAGE OR COPY RESULT TEXT AS CODE SNIPPET
 
 We could decide to be done here - but where's the fun in that.
 
@@ -93,12 +89,8 @@ const myData = myArr.filter(filterFn)
 	.logAndContinue('Filtered Array:', 'fin')
 	.map(mappingFn)
 	.logAndContinue('Mapped Array', 'fin')
-	.reduce(reducingFn)
-	.logAndContinue('Reduced Array', 'fin')
 	.sort(sortingFn);
 ```
-
-> INSERT IMAGE OR COPY RESULT TEXT AS CODE SNIPPET
 
 We have a bit more control and can log generally better but passing around
 strings doesn't feel quite right. The most powerful control we can leverage
@@ -130,7 +122,6 @@ const myData = myArr.filter(filterFn)
 	.logAndContinue()
 	.sort(sortingFn);
 ```
-> INSERT IMAGE OR COPY RESULT TEXT AS CODE SNIPPET
 
 We can also functionalize the string that gets logged:
 
@@ -149,13 +140,9 @@ const myData = myArr.filter(filterFn)
 	.logAndContinue(arrayLoggerOne)
 	.map(mappingFn)
 	.logAndContinue(arrayLoggerTwo)
-	.reduce(reducingFn)
-	.logAndContinue()
 	.sort(sortingFn);
 
 ```
-
-> INSERT IMAGE OR COPY RESULT TEXT AS CODE snippet
 
 This provides a lot of power to our logging capabilities for arrays through a
 still easy to use interface.
