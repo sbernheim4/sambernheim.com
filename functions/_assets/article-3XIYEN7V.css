@@ -1,0 +1,89 @@
+.navbar #main {
+	color: #bcbfc9;
+}
+
+.navbar a {
+	color: #bcbfc9;
+}
+
+.navbar__line-container > hr {
+	background-color: #bcbfc9;
+	border-radius: 5px;
+}
+
+body, .navbar {
+    background: #1e2427;
+}
+
+.article {
+    padding: 10px;
+    margin: 0 auto;
+    max-width: 680px;
+    color: #bcbfc9;
+    --main-bg-color: rgb(59 77 86);
+}
+
+.article > blockquote {
+    margin: 15px auto !important;
+    font-style: italic;
+    width: 80%;
+    font-size: 1em;
+    margin: 2rem 0;
+    line-height: 1.75em;
+    font-family: 'Lato'
+}
+
+.article > ul, li {
+    font-family: 'Lato'
+}
+
+.article > blockquote > p {
+    margin: 0 auto;
+}
+
+.article > p, ul {
+    font-size: 1em;
+    margin: 2rem 0;
+    line-height: 1.75em;
+    font-family: 'Lato'
+}
+
+.article > p > code:before, code:after {
+    content: '';
+    background: var(--main-bg-color);
+}
+
+.article > p > code {
+    padding: 0 3px;
+    border-radius: 3px;
+    background: var(--main-bg-color);
+    font-size: 16px;
+}
+
+.article > ul > li > code {
+    padding: 0 3px;
+    border-radius: 3px;
+    background: var(--main-bg-color);
+    font-size: 16px;
+}
+
+.article > p > a {
+    color: #bcbfc9;
+    text-decoration: underline;
+}
+
+.article > p > a:hover {
+    color: #bcbfc9;
+    filter: brightness(85%);
+    text-decoration: underline;
+}
+
+.article > h1, h2, h3, h4, h5, h6 {
+    margin-top: 30px;
+    font-family: 'Lato';
+}
+
+.article > h1 {
+    text-align: center;
+    margin: 60px 0;
+}

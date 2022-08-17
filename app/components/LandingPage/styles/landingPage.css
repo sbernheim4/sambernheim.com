@@ -1,0 +1,58 @@
+@font-face {
+  font-family: "verlag";
+  src: url("./../../../styles/verlag.woff2");
+}
+@keyframes text {
+  0% {
+    transform: translatey(-40vh);
+    color: white;
+  }
+  50% {
+    color: white;
+  }
+  90% {
+    transform: translatey(0);
+  }
+  100% {
+    color: rgb(80, 152, 196);
+    text-shadow: 2px 3px 9px black;
+  }
+}
+.landing {
+  --overlay: 0.75;
+  position: relative;
+  height: 100vh;
+  background: linear-gradient(rgb(0, 0, 0), rgba(0, 0, 0, var(--overlay)), rgb(0, 0, 0)), url("https://d2rx8thx7xqki2.cloudfront.net/background-image.jpg") center no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+}
+.landing--text {
+  position: fixed;
+}
+.landing--text h1 {
+  margin: 30px 0 15px 30px;
+  font-family: "verlag", "Lato", sans-serif;
+  font-weight: 300;
+  font-size: 80px;
+  animation: text 1.3s;
+  animation-fill-mode: both;
+  animation-delay: 0.5s;
+  color: rgb(80, 152, 196);
+}
+@media all and (max-width: 410px) {
+  .landing--text h1 {
+    font-size: 63px;
+  }
+}
+.landing--text h2 {
+  font-family: "Lato", "sans-serif";
+}
+.landing--text p {
+  font-family: "Lato", "sans-serif";
+  margin: 15px 0 0 30px;
+  font-size: 18px;
+  color: white;
+}
+
+/*# sourceMappingURL=landingPage.css.map */
