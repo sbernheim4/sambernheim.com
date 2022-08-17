@@ -1,9 +1,9 @@
-import * as BuildingAMonad from './components/Articles/building-a-monad.mdx';
-import * as DebugDrivenDevelopment from './components/Articles/debug-driven-development.mdx';
-import * as EngineersSchrodingersCat from './components/Articles/the-engineers-schrodingers-cat.mdx';
-import * as MonadsAreMonoidsInTheCategoryOfEndofunctors from './components/Articles/monads-are-monoids-in-the-category-of-endofunctors.mdx';
-import * as ThePartyMathTrick from './components/Articles/the-party-math-trick.mdx';
-import * as LogAndContinue from './components/Articles/log-and-continue.mdx';
+import * as BuildingAMonad from './../components/Articles/building-a-monad.mdx';
+import * as DebugDrivenDevelopment from './../components/Articles/debug-driven-development.mdx';
+import * as EngineersSchrodingersCat from './../components/Articles/the-engineers-schrodingers-cat.mdx';
+import * as MonadsAreMonoidsInTheCategoryOfEndofunctors from './../components/Articles/monads-are-monoids-in-the-category-of-endofunctors.mdx';
+import * as ThePartyMathTrick from './../components/Articles/the-party-math-trick.mdx';
+import * as LogAndContinue from './../components/Articles/log-and-continue.mdx';
 import type { MDX, Post } from '~/post';
 
 // ts-ignore
