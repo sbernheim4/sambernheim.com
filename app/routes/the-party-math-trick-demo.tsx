@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useActionData, useSubmit } from "@remix-run/react";
-import { ActionFunction, json } from "@remix-run/node";
+import { ActionFunction, json } from "@remix-run/cloudflare";
 
 export const action: ActionFunction = async (args) => {
 

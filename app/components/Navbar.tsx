@@ -1,4 +1,4 @@
-import { LinksFunction } from "@remix-run/node";
+import { LinksFunction } from "@remix-run/cloudflare";
 import { Link, useLocation } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import { useProgress } from "~/hooks/useProgress";
