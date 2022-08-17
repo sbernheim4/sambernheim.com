@@ -1,9 +1,4 @@
-import * as BuildingAMonad from './components/Articles/building-a-monad.mdx';
-import * as DebugDrivenDevelopment from './components/Articles/debug-driven-development.mdx';
-import * as EngineersSchrodingersCat from './components/Articles/the-engineers-schrodingers-cat.mdx';
-import * as MonadsAreMonoidsInTheCategoryOfEndofunctors from './components/Articles/monads-are-monoids-in-the-category-of-endofunctors.mdx';
-import * as ThePartyMathTrick from './components/Articles/the-party-math-trick.mdx';
-import * as LogAndContinue from './components/Articles/log-and-continue.mdx';
+import { getArticles } from './utils/articles';
 
 export type Post = {
 	description: string;
@@ -11,7 +6,7 @@ export type Post = {
 	title: string;
 };
 
-type MDX = {
+export type MDX = {
 	attributes: {
 		meta: Post;
 		headers: Headers;
@@ -23,15 +18,6 @@ type MDX = {
 	meta: Post
 };
 
-const mdxArticles = [
-	LogAndContinue,
-	DebugDrivenDevelopment,
-	ThePartyMathTrick,
-	BuildingAMonad,
-	MonadsAreMonoidsInTheCategoryOfEndofunctors,
-	EngineersSchrodingersCat
-] as MDX[];
-
 export const getPostMetadata = (mod: MDX): Post => {
 	return {
 		...mod.attributes.meta,
@@ -40,9 +26,9 @@ export const getPostMetadata = (mod: MDX): Post => {
 
 const getArticleSlug = (x: Post) => x.slug;
 
-const articleData = mdxArticles.map((x) => getPostMetadata(x));
+const articleData = getArticles().map((x) => getPostMetadata(x));
 
-export const articleMap = mdxArticles.reduce((acc, curr) => {
+export const articleMap = getArticles().reduce((acc, curr) => {
 	return {
 		...acc,
 		[getArticleSlug(getPostMetadata(curr))]: curr
