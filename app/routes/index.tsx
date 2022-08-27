@@ -1,4 +1,4 @@
-import { LinksFunction, MetaFunction } from "@remix-run/cloudflare";
+import type { LinksFunction, MetaFunction } from "@remix-run/cloudflare";
 import { About } from "~/components/About/About";
 import { LandingPage } from "~/components/LandingPage/LandingPage";
 import aboutStyles from './../components/About/styles/about.css';

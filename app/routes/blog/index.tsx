@@ -1,15 +1,13 @@
-import { Link, useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData, Links, Meta, Scripts, } from "@remix-run/react";
 import blogStyles from "./../../styles/blog.css"
 import articleStyles from "./../../styles/article.css"
 import type { LinksFunction, LoaderFunction, MetaFunction } from "@remix-run/cloudflare";
-import { getPosts, Post } from "~/utils/articles";
+import { getPosts } from "~/utils/articles";
+import type { Post } from "~/utils/articles";
 
 export const loader: LoaderFunction = async (): Promise<Post[]> => {
-
 	const posts = getPosts();
-
 	return posts;
-
 };
 
 export const links: LinksFunction = () => {

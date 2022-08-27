@@ -12,7 +12,7 @@ import {
 
 import globalStyles from './styles/globals.css';
 import { Navbar, links as navbarLinks } from "./components/Navbar";
-import { LinksFunction } from "@remix-run/react/routeModules";
+import type { LinksFunction } from "@remix-run/cloudflare";
 // import { GAnalytics } from "./components/GAnalytics.client";
 
 export const links: LinksFunction = () => {

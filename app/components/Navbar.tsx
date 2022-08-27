@@ -1,4 +1,4 @@
-import { LinksFunction } from "@remix-run/cloudflare";
+import type { LinksFunction } from "@remix-run/cloudflare";
 import { Link, useLocation } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import { useProgress } from "~/hooks/useProgress";
@@ -12,7 +12,7 @@ export const links: LinksFunction = () => {
 
 export const Navbar = () => {
 
-	const [ overrideStyle, setOverrideStyle ] = useState({});
+	const [overrideStyle, setOverrideStyle] = useState({});
 	const { pathname } = useLocation();
 	const progress = useProgress();
 
@@ -31,7 +31,7 @@ export const Navbar = () => {
 			<Link id="main" to='/'>Home</Link>
 
 			<div className='navbar__line-container'>
-				<hr style={overrideStyle}/>
+				<hr style={overrideStyle} />
 			</div>
 
 			<Link to='/blog'>Blog</Link>

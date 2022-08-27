@@ -23,37 +23,25 @@ export type MDX = {
 	meta: Post
 };
 
-// ts-ignore
 export const getArticles: () => MDX[] = () => {
 
-	return [
+	const articles = [
 		LogAndContinue,
 		DebugDrivenDevelopment,
 		ThePartyMathTrick,
 		BuildingAMonad,
 		MonadsAreMonoidsInTheCategoryOfEndofunctors,
 		EngineersSchrodingersCat
-	];
+	] as MDX[];
+
+	return articles;
 };
 
 export const getPostMetadata = (mod: MDX): Post => {
-	return {
-		...mod.attributes.meta,
-	};
+	return mod.meta;
 };
 
-export const getArticleData = () => {
-	const mdxArticles = getArticles();
-	const articleData = mdxArticles.map((x) => getPostMetadata(x));
-
-	return articleData;
-};
-
-export const getPosts = () => {
-
-	return getArticles().map((x) => getPostMetadata(x));
-
-};
+export const getPosts = () => getArticles().map(getPostMetadata);
 
 const getArticleSlug = (x: Post) => x.slug;
 
