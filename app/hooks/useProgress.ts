@@ -7,8 +7,8 @@ const getWindow = () => {
 		return {
 			scrollY: 0,
 			innerHeight: 0,
-			addEventListener: () => {},
-			removeEventListener: () => {}
+			addEventListener: () => { },
+			removeEventListener: () => { }
 		};
 	}
 }
@@ -30,7 +30,7 @@ export const useProgress = () => {
 	const shadowWindow = getWindow();
 	const shadowDocument = getDocument();
 
-	const initialHeight = !!shadowWindow ?
+	const initialHeight = shadowWindow ?
 		shadowWindow.scrollY + shadowWindow.innerHeight :
 		0;
 	const [currentHeight, setCurrentHeight] = useState(initialHeight);
@@ -39,16 +39,18 @@ export const useProgress = () => {
 	useEffect(() => {
 
 		const onScroll = () => {
-			const newHeight = shadowWindow ? shadowWindow.scrollY + shadowWindow.innerHeight : 0;
+			const newHeight = shadowWindow ?
+				shadowWindow.scrollY + shadowWindow.innerHeight :
+				0;
 
 			setCurrentHeight(newHeight);
 		};
 
-		shadowWindow ? shadowWindow.addEventListener('scroll', onScroll) : () => {};
+		shadowWindow.addEventListener('scroll', onScroll);
 
 		return () => shadowWindow.removeEventListener('scroll', onScroll);
 
-	}, []);
+	}, [shadowWindow]);
 
 	return currentHeight / totalHeight;
 
