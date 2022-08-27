@@ -1,11 +1,10 @@
-import { meta as blogMetaFunction } from './index';
-import { useLoaderData } from "@remix-run/react";
-import { useEffect } from "react";
 import ReactDOMServer from "react-dom/server";
 import articleStyles from './../../styles/article.css'
-import { json } from '@remix-run/cloudflare';
 import type { LinksFunction, LoaderFunction, MetaFunction } from '@remix-run/cloudflare';
+import { Option } from 'excoptional';
 import { getArticleMap, getPost, getPostMetadata } from '~/utils/articles';
+import { useEffect } from "react";
+import { useLoaderData } from "@remix-run/react";
 
 export const links: LinksFunction = () => {
 	return [
@@ -17,52 +16,37 @@ export const links: LinksFunction = () => {
 };
 
 export const meta: MetaFunction = (args) => {
-	try {
 
-		const articleMap = getArticleMap();
+	const articleMap = getArticleMap();
 
-		const slug = args.params.slug as keyof typeof articleMap;
+	const { slug } = args.params;
 
-		const postData = getPostMetadata(
-			// ts-ignore
-			articleMap[slug]
-		)
+	const metadata = Option.of(slug)
+		.map((slug) => articleMap[slug])
+		.flatMap(Option.of)
+		.map(getPostMetadata)
+		.getOrElse({
+			title: 'Blog post not found :(',
+			description: 'I often write about functional programming and TypeScript'
+		});
 
-		const metadata = {
-			title: postData.title,
-			description: postData.description
-		}
+	return metadata;
 
-		return metadata;
-
-	} catch (error) {
-
-		return blogMetaFunction(args)
-
-	}
 };
 
 export const loader: LoaderFunction = async ({ params }) => {
-	try {
 
-		const post = getPost(params.slug);
-
-		// @ts-ignore
-		const article = post.default()
-		const html = ReactDOMServer.renderToString(article)
-
-		return json(html);
-
-	} catch (err) {
-
-		return new Response(
-			"<h1>404 - Uh Oh :( <br /> No article found with name " +
-			params.slug +
-			"</h1><br /><h1><a href='/blog'>Back to Blog</a></h1>",
-			{ status: 404 }
+	const response = Option.of(getPost(params.slug))
+		.map(post => post.default())
+		.map(ReactDOMServer.renderToString)
+		.map(html => new Response(html, { status: 200 }))
+		.getOrElse(new Response(
+			"<h1>404 - Uh Oh :( <br /> No article found with name " + params.slug + "</h1><br /><h1><a href='/blog'>Back to Blog</a></h1>",
+			{ status: 404 })
 		);
 
-	}
+	return response;
+
 };
 
 export default function PostSlug() {
