@@ -25,6 +25,7 @@ export const meta: MetaFunction = (args) => {
 		.map((slug) => articleMap[slug])
 		.flatMap(Option.of)
 		.map(getPostMetadata)
+		.map(x => ({ title: x.title, description: x.description }))
 		.getOrElse({
 			title: 'Blog post not found :(',
 			description: 'I often write about functional programming and TypeScript'
@@ -39,10 +40,16 @@ export const loader: LoaderFunction = async ({ params }) => {
 	const response = Option.of(getPost(params.slug))
 		.map(post => post.default())
 		.map(ReactDOMServer.renderToString)
-		.map(html => new Response(html, { status: 200 }))
+		.map(html => new Response(
+			html,
+			{
+				status: 200,
+				headers: { 'Cache-Control': 'public, max-age=31536000' }
+			}
+		))
 		.getOrElse(new Response(
 			"<h1>404 - Uh Oh :( <br /> No article found with name " + params.slug + "</h1><br /><h1><a href='/blog'>Back to Blog</a></h1>",
-			{ status: 404 })
+			{ status: 404, headers: { 'Cache-Control': 'no-store' } })
 		);
 
 	return response;
