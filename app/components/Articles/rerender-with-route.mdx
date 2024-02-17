@@ -16,10 +16,10 @@ individual components especially when building a component library. Other times
 we want to test our entire application to validate complex flows continue to
 work as we iterate.
 
-What's best is to test our real application connected to its real redux store,
-as it makes real HTTP requests to an actual server (via Mock Service Worker).
+What's best is to test our "real" application connected to its "real" redux store,
+as it makes "real" HTTP requests to an actual server (via Mock Service Worker).
 
-Everything in our test should be "real" without any mocking. This also means we want the "real" router from our routing library. I use React-Router and tests will often force you to use a MemoryRouter. But that isn't "real". I want my "real" BrowserRouter.
+Everything in our test should be "real" without any mocking. This also means we want the "real" router from our routing library. I use React-Router and tests will often lead you to MemoryRouter. But that isn't "real". I want my "real" BrowserRouter.
 
 Let's start with this test helper:
 
