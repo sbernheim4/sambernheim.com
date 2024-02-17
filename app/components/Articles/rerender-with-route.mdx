@@ -1,0 +1,153 @@
+---
+meta:
+  title: ReRender With Router
+  description: Simpler Integration Testing for React and Testing Library
+  slug: rerender-with-router
+headers:
+  Cache-Control: max-age=60000
+---
+
+# Rerender With Router
+
+We test our front end applications with testing-library. Sometimes we test
+individual components especially when building a component library. Other times
+we want to test our entire application to validate complex flows continue to
+work as we iterate.
+
+What's best is to test our real application connected to its real redux store,
+as it makes real HTTP requests to an actual server (via Mock Service Worker).
+
+Everything in our test should be "real" without any mocking. This also means we want the "real" router from our routing library. I use React-Router and tests will often force you to use a MemoryRouter. But that isn't "real". I want my "real" BrowserRouter.
+
+Let's start with this test helper:
+
+~~~ts
+
+import { App } from 'src/index.ts';
+
+export const renderWithRoute = (url: string) => {
+
+  window.history.pushState({}, "", url);
+  const renderResult = render(App);
+
+  return renderResult;
+
+};
+
+~~~
+
+Yay! Now we can write tests to assert on our entire application where everything is wired up and "real"! Imagine the following:
+
+~~~ts
+describe("navigation in my app", () => {
+
+  test("clicking on links takes me to new pages", () => {
+
+    const screen = renderWithRouter('/about');
+    const user = userEvent.setup();
+
+    const aboutMeText = screen.getByText("Welcome to our website! Learn more about us below");
+    expect(aboutMeText).toBeInTheDocument();
+
+    const productsLink = screen.getByText("Products");
+
+    user.click(productsLink)
+
+    const productsText = screen.getByText("See all our products below");
+    expect(productsText).toBeInTheDocument();
+
+    // ...
+
+    // We can keep testing clicking on links, taking actions on
+    // different pages, validating entire flows!
+
+  });
+
+});
+~~~
+
+This is great. We can write full integration tests across our entire "real"
+application.
+
+Unfortunately we have a small problem.
+
+## Navigating Between Pages
+
+What if we need to test a flow where the page to go to doesn't have a link on the page where we are coming from?
+
+We can't click on an element in the page - it doesn't exist.
+
+We can't use `rerender` because we would need to pass in our application again
+which wouldn't have the actions we already ran as it'd be a separate instance.
+
+We need a new helper.
+
+## ReRenderWithRoute
+
+`rerenderWithRoute` is that helper:
+
+~~~ts
+export const renderWithRoute = (url: string) => {
+
+  window.history.pushState({}, "", url);
+  const renderResult = render(App);
+
+  + // This function is new!
+  + const rerenderWithRoute = (path2: string) => {
+  +
+  +   window.history.pushState({}, "", path2);
+  +
+  +   renderResult.rerender(App)
+  +
+  + };
+
+  + return {
+  +   ...renderResult,
+  +  // Augment the return type with our new function!
+  +  rerenderWithRoute,
+  };
+
+};
+~~~
+
+Hooray!
+
+Now we can do stuff like:
+
+
+~~~ts
+
+describe("navigation in my app", () => {
+
+  test("taking actions on one page can be persisted for another", () => {
+
+    const user = userEvent.setup();
+
+    // Our application will store the last viewed item id in localStorage to
+    // track for future uses.
+
+    const screen = renderWithRouter('/products/3829432/wash-care');
+
+    // And lets also say we want to be nice and if a user tries to visit
+    // the `/products/wash-care` page, we redirect them to the wash-care
+    // page for the last product item they viewed instead of a 404 page.
+
+    // But there's no link on the `/products/:productId/wash-care` page to
+    // the route `/products/wash-care`.
+
+    // `rerenderWithRoute` to the rescue!
+    screen.rerenderWithRoute("/products/wash-care");
+
+    // Assert our redirect took place!
+    expect(window.location.href).toBe("https://localhost.com/products/3829432/wash-care");
+
+  });
+
+});
+~~~
+
+We can test complex redirect and application behavior! It doesn't matter what takes place where on a page. We'll be able to hop around the entire application in our test and preserve all user actions between routes.
+
+I think this utility function further bridges the gap between these integration tests and tests done via cypress or playwright. We can more easily test happy, sad, and in between paths and user flows.
+
+Hope this helps!
