@@ -4,7 +4,7 @@ import * as EngineersSchrodingersCat from './../components/Articles/the-engineer
 import * as MonadsAreMonoidsInTheCategoryOfEndofunctors from './../components/Articles/monads-are-monoids-in-the-category-of-endofunctors.mdx';
 import * as ThePartyMathTrick from './../components/Articles/the-party-math-trick.mdx';
 import * as LogAndContinue from './../components/Articles/log-and-continue.mdx';
-import * as rerenderWithRoute from './../components/Articles/rerender-with-route.mdx';
+import * as ReRenderWithRoute from './../components/Articles/rerender-with-route.mdx';
 
 export type Post = {
 	description: string;
@@ -27,7 +27,7 @@ export type MDX = {
 export const getArticles: () => MDX[] = () => {
 
 	const articles = [
-		rerenderWithRoute,
+		ReRenderWithRoute,
 		LogAndContinue,
 		DebugDrivenDevelopment,
 		ThePartyMathTrick,
