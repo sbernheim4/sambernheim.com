@@ -578,7 +578,7 @@ const addThreeAndRandom = (val) => {
 };
 
 const res = addThreeAndRandom(2) // addThreeAndRandom: number -> Trackable
-    .map(subtractSeven)          // subtractSevent:    number -> number
+    .map(subtractSeven)          // subtractSeven:     number -> number
     .flatMap(addThreeAndRandom)  // addThreeAndRandom: number -> Trackable
     .run(); // Fire all queued track events, returning the underlying value
 
@@ -649,7 +649,7 @@ const addThreeAndRandom = (val) => {
 
 With this final improvement, we've achieved a complete solution for our goal. The analytics code and application code are decoupled. At the same time, we have an easy means for capturing analytics events that expose both the return value and internally constructed data to our analytics code. Our class provides various mechanisms to easily manipulate the underlying value while maintaining the list of analytics events.
 
-This approcah also enables the ability to drop all the captured analytics events should we need if something goes wrong or should the requirements do so - perhaps through a method like `forgetAndReturn`:
+This approcah also enables the ability to drop all the captured analytics events should we need if something goes wrong or should the requirements dictate - perhaps through a method like `forgetAndReturn`:
 
 ~~~ts
 class Trackable {
@@ -665,5 +665,4 @@ class Trackable {
     }
 }
 ~~~
-This method may be useful for when a given flow should only report all the built up analytics events once a specific point in a user flow is reached. If that point is never reached (or bypassed or not relevant) there's no need to fire off the events. It provides a transactional like approach to our system.
-
+This method may be useful for when a given flow should only report all the built up analytics events once a specific point in a user flow is reached (compliance laws and user opt in is an easy first example). If that point is never reached (or bypassed or not relevant) there's no need to fire off the events. It provides a transactional like approach to our system.
