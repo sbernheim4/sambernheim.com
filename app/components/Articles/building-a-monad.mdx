@@ -37,7 +37,7 @@ const addThree = (val) => {
 
 This implementation allows us to track what function was called and with what argument(s). We aren't however including the result of the function call. We're also mixing application code with analytics code.
 
-This works well for simple cases but can quickly grow out of hand, containing cluttered conditionals as requirements change and eventually becoming a tangled mess as the two concerns grow and deviate.
+This works well for simple cases but can quickly grow out of hand, containing cluttered conditionals as requirements change eventually becoming a tangled mess as the two concerns grow and deviate.
 
 ## With Higher Ordered Functions
 
@@ -300,7 +300,7 @@ To enable this behavior requires a more formal abstratction than the functions w
 
 To enable the described behavior we need a better abstraction beyond `withTracking`.
 
-We already have a pseudo special type - objects with a `__trackingInfo` property - and we want to add something like this `.then` method, even if we're not quire sure how it should work yet. We're also storing some stateful information, the value returned by these functions and their associated analytics events from each additional function invocation. We can formalize these relationships and capabilties in a class.
+We already have a pseudo special type - objects with a `__trackingInfo` property - and we want to add something like this `.then` method, even if we're not quite sure how it should work yet. We're also storing some stateful information, the value returned by these functions and their associated analytics events from each additional function invocation. We can formalize these relationships and capabilties in a class.
 
 ~~~ts
 class Trackable {
