@@ -5,29 +5,29 @@ import aboutStyles from './../components/About/styles/about.css';
 import landingStyles from './../components/LandingPage/styles/landingPage.css';
 
 export const meta: MetaFunction = () => {
-	return {
-		title: "Samuel Bernheim - Software Engineer @ Wunderkind",
-		description: "Software engineer @ Wunderkind"
-	};
+    return {
+        title: "Samuel Bernheim - Software Engineer @ Balyasny",
+        description: "Software engineer @ Balyasny"
+    };
 };
 
 export const links: LinksFunction = () => {
-	return [
-		{ rel: "stylesheet", href: landingStyles },
-		{ rel: "stylesheet", href: aboutStyles }
-	];
+    return [
+        { rel: "stylesheet", href: landingStyles },
+        { rel: "stylesheet", href: aboutStyles }
+    ];
 };
 
 export default function Index() {
-	return (
+    return (
 
-		<section className="home">
+        <section className="home">
 
-			<LandingPage />
+            <LandingPage />
 
-			<About />
+            <About />
 
-		</section>
+        </section>
 
-	);
+    );
 }
