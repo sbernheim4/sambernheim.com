@@ -1,0 +1,207 @@
+---
+meta:
+    title: Cool Tools For Full Stack Development
+    description: "Some cool full stack development tools"
+    slug: "cool-tools-for-full-stack-development"
+headers:
+  Cache-Control: max-age=60000
+---
+
+# Cool Tools For Full Stack Development
+
+Within the first couple of weeks of a job I was performing some basic (though new to me) database work. I hadn't interacted directly with databases professionally and the last time I did personally was my undergraduate databases class.
+
+Despite this I got my changes done thanks to a some pair programming, googling, and lots of iterations. I merged my work and deployed the changes.
+
+What was more interesting was learning how my team interacts with the database from our client application. It's not a REST API on top of the Database or a server that returns the result of a pre-written SQL statement. No, that would be too ordinary.
+
+Instead we have a GraphQL API that proxies the entire Database. We achieve this with [Postgraphile](https://postgraphile.org).
+
+Immediately I was hooked.
+
+The ability to modify the database via SQL and have any and all those changes (functions, rules, user permissions, tables, relationships etc) transparently reflected in a GraphQL API is powerful.
+
+Our front end application is a React app that interacts with GraphQL via [Apollo's hooks](https://www.apollographql.com/docs/react/development-testing/static-typing#usequery). Unfortunately, we have to type and write the hooks. And that is annoying:
+
+```ts
+type User = {
+    name: string;
+    age?: number;
+    email?: string;
+    // ...
+}
+const MyUserQuery: TypedDocumentNode<User> = gql`
+query MyUsers {
+    users {
+        name
+    }
+}
+`;
+```
+
+This feels silly - the GraphQL server already knows the types from the database schema. When manually writing these its also all too easy to incorrectly type a property as required when its really optional or forget that a column has been renamed.
+
+But there's more than just types out in these waters. The real value is in automatically generating hooks to query our DB via GraphQL from `.gql` files.
+
+So lets get to that!
+
+The database is running on port `5432` in a docker container via docker-compose.
+
+Another container will host the GraphQL API via Postgraphile. In a new folder at the root, create a `graphile.config.mjs` file:
+
+```ts
+import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
+
+const preset = {
+	grafserv: {
+		dangerouslyAllowAllCORSRequests: true,
+	},
+	extends: [PostGraphileAmberPreset],
+};
+
+export default preset;
+```
+
+and in a `Dockerfile` at the same location:
+
+
+```bash
+FROM node:alpine
+
+WORKDIR /app
+
+COPY package.json ./
+RUN npm install --production
+
+COPY ./graphile.config.mjs ./graphile.config.mjs
+```
+
+We only need 2 npm packages:
+
+`npm install --save graphql postgraphile`
+
+Postgraphile runs on port `5678` and can be started with the command:
+
+`"npx postgraphile --config graphile.config.mjs -c ${DATABASE_URL}"`
+
+> DATABASE_URL is going to be something like: `postgresql://root:example@db:5432/mydatabase`. Store this in your .env file.
+
+Update the `docker-compose` file with this new service:
+
+```
+  # PostgreSQL DB service above ...
+
+  graphql-server:
+    restart: always
+    volumes:
+      - ./postgraphile/presets:/app/presets
+    build:
+      context: ./postgraphile
+    env_file:
+      - .env
+    depends_on:
+      - db
+    networks:
+      - network
+    ports:
+      - 5433:5433
+      - 5678:5678
+    command:
+      "npx postgraphile --config graphile.config.mjs -c ${DATABASE_URL}"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -X POST 'http://localhost:5678/graphql' -H 'Content-Type: application/json' --data '{\"query\":\"query Healthcheck { __typename }\",\"operationName\":\"Healthcheck\"}' || exit 1"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+
+```
+
+Congrats - you now have a GraphQL API that fronts your entire DB. Visit `localhost:5678/graphql` to use the GraphiQL playground.
+
+## Generating React Hooks
+We want to generate types and hooks to use in our frontend application.
+
+We can do this with [CodeGen](https://the-guild.dev/graphql/codegen/docs/getting-started).
+
+Like everything good in the world, code generation is configuration driven via a file named `codegen.ts`
+
+Point the generator at your GraphQL server - `localhost:5678/graphql` - and provide:
+
+- Its inputs - our `.gql` files that contain the queries AND mutations we want
+- Where to put the generated files - the hooks and types it will create
+- The tools to use for the code generation
+
+```ts
+import type { CodegenConfig } from "@graphql-codegen/cli";
+
+const config: CodegenConfig = {
+    schema: "http://localhost:5678/graphql",
+    documents: "./app/queries/**/*.gql",
+    generates: {
+        "./app/generated/gqlQueries.ts": {
+            presetConfig: {
+                gqlTagName: 'gql',
+            },
+            plugins: [
+                "typescript",
+                "typescript-resolvers",
+                "typescript-operations",
+                "typescript-react-apollo",
+            ],
+            config: {
+                gqlImport: 'graphql-tag#gql',
+                useTypeImports: true,
+                fetcher: {
+                    endpoint: "http://localhost:5678/graphql"
+                }
+            }
+        },
+    },
+};
+
+export default config;
+```
+
+I had trouble getting the `gql` function from Apollo working in the generated code, so I use the npm package `graphql-tag` instead and use the `config` section to specify that the `gql` function should come from this package. There was also an issue in how types were imported in the generated file. They were imported without the `type` keyword. So we configure the generator to import all types with that keyword.
+
+The plugins section is the magic.
+
+- typescript
+- typescript-resolvers
+- typescript-operations
+- typescript-react-apollo
+
+These packages transform the queries in our .gql files to hooks that use apollo-query. I tried using @tanstack/query too - but that was less successful.
+
+These are the core NPM packages:
+
+```bash
+npm i --save-dev \
+    @graphql-codegen/cli @graphql-codegen/client-preset \
+    @graphql-codegen/introspection \
+    @graphql-codegen/schema-ast \
+    @graphql-codegen/typescript \
+    @graphql-codegen/typescript-operations \
+    @graphql-codegen/typescript-react-apollo \
+    @graphql-codegen/typescript-resolvers
+```
+
+With a couple of new npm scripts to simplify our workflow, we're off.
+
+```json
+"gen": "rm -rf app/generated && graphql-codegen",
+"gen:dev": "rm -rf app/generated && graphql-codegen --watch"
+```
+
+Our last and final step is to write a query in a `.gql` file in `app/queries/` for the generator to consume and create a hook.
+
+Fire up your database and bring up the GraphQL wrapper (`docker-compose up`), and in a separate tab run either of the npm commands for your client application. You'll be rewarded with a file that contains the generated hook with all the type information matching your database.
+
+Use it in one of your components and wait for the magic.
+
+## Conclusion
+
+We've bridged the gap between our backend and frontend. Our entire database is transparently and safely accessible via GraphQL through generated hooks that are fully and accurately typed from `.gql` files. The GraphQL server maintains all permission related controls on tables and rows, exposes SQL functions as GQL queries, indexes for look up by requests, types, and most everything else.
+
+Postgraphile can be run as a [NodeJS server via Express to handle requests](https://postgraphile.org/postgraphile/next/usage-library). Inject any middleware you want before it serves the request.

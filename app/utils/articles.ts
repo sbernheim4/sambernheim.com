@@ -5,6 +5,7 @@ import * as MonadsAreMonoidsInTheCategoryOfEndofunctors from './../components/Ar
 import * as ThePartyMathTrick from './../components/Articles/the-party-math-trick.mdx';
 import * as LogAndContinue from './../components/Articles/log-and-continue.mdx';
 import * as ReRenderWithRoute from './../components/Articles/rerender-with-route.mdx';
+import * as Tools from './../components/Articles/tools.mdx';
 
 export type Post = {
 	description: string;
@@ -27,6 +28,7 @@ export type MDX = {
 export const getArticles: () => MDX[] = () => {
 
 	const articles = [
+		Tools,
 		ReRenderWithRoute,
 		LogAndContinue,
 		DebugDrivenDevelopment,
