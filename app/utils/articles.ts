@@ -6,6 +6,7 @@ import * as ThePartyMathTrick from './../components/Articles/the-party-math-tric
 import * as LogAndContinue from './../components/Articles/log-and-continue.mdx';
 import * as ReRenderWithRoute from './../components/Articles/rerender-with-route.mdx';
 import * as Tools from './../components/Articles/tools.mdx';
+import * as ReactHookPattern from './../components/Articles/react-patterns.mdx'
 
 export type Post = {
 	description: string;
@@ -28,7 +29,8 @@ export type MDX = {
 export const getArticles: () => MDX[] = () => {
 
 	const articles = [
-		Tools,
+		ReactHookPattern,
+		// Tools,
 		ReRenderWithRoute,
 		LogAndContinue,
 		DebugDrivenDevelopment,

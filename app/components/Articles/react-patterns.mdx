@@ -1,0 +1,220 @@
+---
+meta:
+  title: A React Component and Hook Design Pattern
+  description: A Powerful Composition in React betweeen Components and Hooks
+  slug: react-patterns
+headers:
+  Cache-Control: max-age=60000
+---
+
+# React Component and Hook Design Pattern
+#### Published on Jan 14, 2025
+
+I've noticed a common and exceptionally useful pattern in React - a composition
+between a component and a purpose specific associated hook.
+
+## Building a Select Form
+
+An example to demonstrate this with a select element that we'll continue building up.
+
+Let's start here:
+
+~~~tsx
+type Option = {
+	displayName: string
+	value: stirng;
+};
+
+type Options = Array<Option>;
+
+const heros: Options = [
+	{ displayName: 'Batman' value: 'batman', },
+	{ displayName: 'Robin', value: 'robin' },
+	{ displayName: 'Green Lantern', value: 'green-lantern' },
+	// ...
+];
+
+const MyForm = () => {
+
+	const [selected, setSelected] = useState(options.at(0).value)
+
+	const handleChange = (e) => {
+		const newSelected = e.target.value
+		const match = heros.find(x => x.value === newSelected);
+		setSelected(match.value);
+	};
+
+	const submit = () => {
+		console.log(selected);
+	};
+
+	<form onSubmit={handleSubmit}>
+		<select value={selected} onChange={handleChange}>
+			{
+				heros.map(hero => <option value={hero.value}>{hero.displayName}</option>)
+			}
+		</select>
+	</form>
+
+}
+~~~
+
+The state management for any `select` element is nearly always the same. We can
+abstract it into a nice hook called `useOptions`. The hook will be used in the
+component that renders the `select` element and exposes the currently selected
+value along with a change handler function.
+
+## Building the Hook
+
+The hook needs to expose the `selected` value and the `handleChange` function:
+
+~~~tsx
+export const useOptions = (options: Options) => {
+	const [selected, setSelected] = useState(options.at(0));
+
+	const handleChange = (e) => {
+		const newSelected = e.target.value
+		const match = heros.find(x => x.value === newSelected);
+		setSelected(match.value);
+	};
+
+	return [selected, handleChange] as const;
+};
+~~~
+
+Great. One improvement with this implementation is the `selected` state variable
+is no longer just the `value` property from our list of heros but is the entire
+object: `{displayName: 'Batman', value: 'batman'}`. Any additional fields in the
+object would all easily accessible as well. The updated component using the hook
+now looks like this:
+
+~~~tsx
+export const MyForm = () => {
+
+	// `selected` is now the entire object!
+	const [selected, handleChange] = useOptions(heros);
+
+	const submit = () => {
+		console.log(selected);
+	};
+
+	return (
+		<form onSubmit={handleSubmit}>
+			<select value={selected.value} onChange={handleChange}>
+				{
+					heros.map(hero => <option value={hero.value}>{hero.displayName}</option>)
+				}
+			</select>
+		</form>
+	);
+
+};
+~~~
+
+## Building the Component
+
+We could end there and be content... but why stop. In the example above, the
+props, `value` and `onChange`, are effectively fixed and we have a component
+that is like a curried function that has been partially applied with those
+props. That partial application can be formalized into a `ManagedSelect`
+component:
+
+~~~tsx
+export const ManagedSelect = (props: { options: Options, ...selectProps }) => {
+
+	const { options, ...selectProps } = props;
+
+	const [selected, handleChange] = useOptions(heros);
+
+	return (
+		<select value={selected} onChange={handleChange} {...selectProps}>
+			{
+				options.map(opt => <option value={opt.value}>{opt.displayName}</option>)
+			}
+		</select>
+	);
+};
+~~~
+
+Using this in our form:
+
+~~~tsx
+export const MyForm = () => {
+
+	const submit = () => {
+		console.log(selected);
+	};
+
+	return (
+		<form onSubmit={handleSubmit}>
+			<ManagedSelect options={heros} name="hero-selection" />
+		</form>
+	);
+};
+~~~
+
+Better! But now we have lost access to the selected value in the MyForm
+component. This works perfectly though for traditional forms that submit a POST
+request with a `FormData` object to a server (or a Remix/React Router 7 `action`
+function), but it won't work for forms that are highly dynamic with lots of
+client side interactions; the selected value needs to be exposed to the MyForm
+component for any number of tasks. Some common examples are:
+
+* Validation
+* Derived state
+* Passing the selected value to other components
+
+## Marrying the Two
+
+Its like we want the `ManagedSelect` component to have 2 return values, the JSX
+and the result of the `useOptions` hook the component invokes internally...
+
+Included but not mentioned is the spreading of `selectProps`. This is the key
+that enables a beautiful form of composition between the hook and component for
+use in the parent component.
+
+~~~tsx
+export const MyForm = () => {
+
+	const [selected, handleChange] = useOptions(heros);
+
+	const submit = () => {
+		console.log(selected);
+	};
+
+	return (
+		<form onSubmit={handleSubmit}>
+			<ManagedSelect value={selected} onChange={handleChange} options={heros} name="hero-selection" />
+		</form>
+	);
+};
+~~~;
+
+Now we have arrived at the beginning of the complete solution a Component and
+associated Hook built for composition.
+
+The props passed to ManagedSelect override the props set by the component
+internally because `...selectProps` is spread at the end.
+
+One downside to this implementation is the double invocation of `useOptions`,
+first in MyForm and secondly internally in `ManagedSelect`. We can of course
+continue to be clever and update `useOptions` to include a `skip` parameter
+which the invocation in `ManagedSelect` can pass when it detects the `value` and
+`onChange` props are passed directly. That is left as an exercise to the reader
+:).
+
+## Closing Thoughts
+
+I find this pattern cropping up frequently. A component needs some state
+management that is common and repetitive along with functions to act on that
+state. The user of that component sometimes (but not always) needs access to
+that state along with associated functions that have a closure around that
+state.
+
+This pattern is a perfect match for those situations.
+
+The power of this is the component can manage itself or be controlled by its props
+but in either case is managed by the same hook.
+
+Often we see this when a hook with certain behaviors is tied to some type of UI
+- IE using the Hook only makes sense when using a specific component.
