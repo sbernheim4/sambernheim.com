@@ -138,6 +138,7 @@ Using this in our form:
 export const MyForm = () => {
 
 	const submit = () => {
+		// ❌ We no longer have access to the `selected` value :(
 		console.log(selected);
 	};
 
