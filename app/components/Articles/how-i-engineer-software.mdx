@@ -1,0 +1,122 @@
+---
+meta:
+  title: How I Engineer Software
+  description: Concrete examples for abstract advice
+  slug: how-i-engineer-software
+headers:
+  Cache-Control: max-age=60000
+---
+# How I Engineer Software
+
+These are some of my software engineering principles.
+
+* Give yourself options when faced with ambiguity
+* Make impossible states impossible
+* Write cohesive code
+
+These are abstract. Concrete examples are elusive. Mine are below.
+
+### Options reduce ambiguity
+
+Having and maintaining options for as long as possible is a winning strategy
+especially for type 1 decisions. Committing to a decision too early can be
+painful if you didn't have enough information or do enough testing.
+
+You are building a new feature. front end, or back end it doesn't matter: an
+authentication system, an updated navigation bar who cares. You have no
+requirements from your manager except to make it better. Better could be faster,
+or simpler, or more ergonomic or something else entirely. You don't know what
+you're looking for and maybe your manager doesn't know either; just better.
+
+Build a few different options.
+
+Build a few different options that balance competing qualities. Faster but a
+less ergonomic design, slower but more technically correct. Highly available,
+exceptionally fast but eventually... consistent. When you can present and see
+the differences in outcomes between competing designs, that ambiguity tends to
+reduce as the actual use case will become more clear.
+
+I did this for a navigation bar UI and built 4 different versions so my manager could
+pick their favorite. All were easy to build and seeing all variants side by side
+brought clarity and made the decision significantly easier.
+
+I also did this for an API design. I didn't know exactly what functionality I
+would actually want to expose, so I built a bunch of endpoints so I could delay
+that decision until we learned what was actually going to be used.
+
+### Making impossible states impossible
+
+You have a form on your page to create some noun for your system and because we
+want to have as little friction as possible we decide the noun can be created
+without any fields having to be filled out.
+
+You have just made an impossible state possible. Don't allow storing of invalid
+state in your DB. At worst have a separate drafts table or a drafts column but
+even this will often lead to function coloring that will infect your call stack.
+If nouns can reference each other and incomplete nouns can be referenced by
+completed or other invalid nouns, well, that is one tangled dependency graph
+that separately also now has to be validated at run time.
+
+Only store a new row in your DB if the required columns are included, don't make
+everything optional for convenience.
+
+### Write cohesive code
+
+Cohesive code is code that can be easily compose, reused, and evolved. Evolved
+is the interesting piece; reuse and composition are well discussed. When related
+code is grouped together it is easier to evolve in sync.
+
+In your application you have a bunch of nouns. Those nouns can take some action.
+Sometimes even against other nouns.
+
+```tsx
+<div>
+	<button onClick={() => testDBConnection()}>Test connection</button>
+	<button onClick={() => removeMostRecentRecordFromDB()}>Remove most recent entry</button>
+	<button onClick={() => removeOldestRecordFromDB()}>Remove oldest entry</button>
+	<button onClick={() => triggerSev1ForMyLeastFavoriteCoworker()}>Choose chaos</button>
+</div>
+```
+
+It is easy to think buttons in a div is sufficient. This would be a missed
+opportunity.
+
+We want the list of actions across all our nouns to look the same as each other
+and distinct from other lists of buttons we may have elsewhere on the page. We
+also want them to evolve with one another.
+
+We actually want:
+
+```tsx
+<Actions>
+	<Action onClick={() => testDBConnection()}>Test connection</Action>
+	<Action onClick={() => removeMostRecentRecordFromDB()}>Remove most recent entry</Action>
+	<Action onClick={() => removeOldestRecordFromDB() }>Remove oldest entry</Action>
+	<Action onClick={() => triggerSev1ForMyLeastFavoriteCoworker() }>Choose chaos</Action>
+</Actions>
+```
+
+That looks the same. An initial implementation may just be:
+
+```tsx
+export const Actions = ({ children, ...props }) => <div {...props}>{children}</div>
+export const Action = ({ children, ...props }) => <button {...props}>{children}</button>
+```
+
+BUT! As the application evolves and these actions become more complex, we will
+want to change how they behave. They should be more prominent, less prominent.
+They may have more complex UI - forms, structured output to display on success.
+Someone also may just want a different design.
+
+Domain specific components can be updated and evolved far more easily than the
+perfectly generic ones. You are one generic implementation picker component from
+unlimited user preference control. Now you have a cohesive system that is easy
+to maintain and evolve.
+
+
+### Conclusion
+
+The goal is maintainable code. These principles facilitate that goal.
+
+The engineering in software engineering is meaningful; systems should be stable
+and flexible such that each layer can be improved with minimal disruption.
