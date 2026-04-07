@@ -40,9 +40,10 @@ I did this for a navigation bar UI and built 4 different versions so my manager 
 pick their favorite. All were easy to build and seeing all variants side by side
 brought clarity and made the decision significantly easier.
 
-I also did this for an API design. I didn't know exactly what functionality I
-would actually want to expose, so I built a bunch of endpoints so I could delay
-that decision until we learned what was actually going to be used.
+I also did this for an API design. I didn't know what functionality would
+actually be needed, so I built a bunch of endpoints to delay that decision until
+we knew what was necessary without blocking development. Your downstream
+consumers inherit this flexibility.
 
 ### Making impossible states impossible
 
@@ -50,21 +51,22 @@ You have a form on your page to create some noun for your system and because we
 want to have as little friction as possible we decide the noun can be created
 without any fields having to be filled out.
 
-You have just made an impossible state possible. Don't allow storing of invalid
-state in your DB. At worst have a separate drafts table or a drafts column but
-even this will often lead to function coloring that will infect your call stack.
-If nouns can reference each other and incomplete nouns can be referenced by
-completed or other invalid nouns, well, that is one tangled dependency graph
-that separately also now has to be validated at run time.
+You have just made an impossible state possible. Please reconsider.
+
+At most have a separate drafts table or a drafts column but even this will often
+lead to function coloring that will infect your call stack. If nouns can
+reference each other and invalid nouns can be referenced by completed or other
+invalid nouns, well, that is one tangled dependency graph that separately also
+now has to be validated at run time.
 
 Only store a new row in your DB if the required columns are included, don't make
 everything optional for convenience.
 
 ### Write cohesive code
 
-Cohesive code is code that can be easily compose, reused, and evolved. Evolved
-is the interesting piece; reuse and composition are well discussed. When related
-code is grouped together it is easier to evolve in sync.
+Cohesive code is code that can be easily composed, reused, and evolved together.
+Evolved is the interesting piece; reuse and composition are well discussed. When
+related code is grouped together it is easier to evolve as a unit.
 
 In your application you have a bunch of nouns. Those nouns can take some action.
 Sometimes even against other nouns.
