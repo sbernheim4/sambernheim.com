@@ -33,6 +33,7 @@ export type TyMonacoSession = {
   handleMount: OnMount;
   resetSource: () => void;
   diagnostics: TyDiagnostic[];
+  revealDiagnostic: (diagnostic: TyDiagnostic) => void;
 };
 
 export function useTyMonacoSession({
@@ -60,6 +61,7 @@ export function useTyMonacoSession({
   const providersDisposeRef = useRef<(() => void) | null>(null);
   const languageDisposeRef = useRef<{ dispose: () => void } | null>(null);
   const signatureDecorationsRef = useRef<string[]>([]);
+  const commandKeyRef = useRef(false);
   const mountTokenRef = useRef(0);
   const normalizedPrelude = predefinedPython.endsWith("\n")
     ? predefinedPython
@@ -157,6 +159,10 @@ export function useTyMonacoSession({
     };
     updateSignatureDecorations();
     const keydownListener = editorInstance.onKeyDown((event) => {
+      if (event.browserEvent.key === "Meta") {
+        commandKeyRef.current = true;
+      }
+
       const selection = editorInstance.getSelection();
 
       if (
@@ -167,6 +173,14 @@ export function useTyMonacoSession({
         event.browserEvent.preventDefault();
         event.browserEvent.stopPropagation();
       }
+    });
+    const keyupListener = editorInstance.onKeyUp((event) => {
+      if (event.browserEvent.key === "Meta") {
+        commandKeyRef.current = false;
+      }
+    });
+    const blurListener = editorInstance.onDidBlurEditorText(() => {
+      commandKeyRef.current = false;
     });
     contentListenerRef.current = model.onDidChangeContent(() => {
       if (restoringRef.current) {
@@ -205,6 +219,8 @@ export function useTyMonacoSession({
     contentListenerRef.current = {
       dispose() {
         keydownListener.dispose();
+        keyupListener.dispose();
+        blurListener.dispose();
         previousContentListener?.dispose();
       },
     };
@@ -220,7 +236,12 @@ export function useTyMonacoSession({
       }
 
       sessionRef.current = session;
-      const disposeProviders = registerTyProviders(monaco, sessionRef, hiddenLineCount);
+      const disposeProviders = registerTyProviders(
+        monaco,
+        sessionRef,
+        hiddenLineCount,
+        commandKeyRef,
+      );
       providersDisposeRef.current = disposeProviders;
       editorInstance.onDidDispose(() => {
         disposeProviders();
@@ -261,6 +282,20 @@ export function useTyMonacoSession({
     }
   };
 
+  const revealDiagnostic = (diagnostic: TyDiagnostic) => {
+    const editorInstance = editorRef.current;
+    if (editorInstance == null) {
+      return;
+    }
+
+    editorInstance.revealLineInCenter(diagnostic.startLineNumber);
+    editorInstance.setPosition({
+      lineNumber: diagnostic.startLineNumber,
+      column: diagnostic.startColumn,
+    });
+    editorInstance.focus();
+  };
+
   return {
     source,
     tyState,
@@ -269,6 +304,7 @@ export function useTyMonacoSession({
     handleMount,
     resetSource,
     diagnostics,
+    revealDiagnostic,
   };
 }
 
