@@ -85,6 +85,21 @@ export async function handleApiRequest(
   try {
     const path = new URL(request.url ?? '/', 'http://localhost').pathname
     const editMatch = path.match(/^\/api\/(organizations|projects|tasks)\/([^/]+)$/)
+    if (request.method === 'GET') {
+      if (editMatch) {
+        const collection = editMatch[1] as keyof Store
+        const entity = readStore[collection].find((item) => item.id === decodeURIComponent(editMatch[2]))
+        return sendJson(response, entity ?? { message: 'Resource not found.' }, entity ? 200 : 404)
+      }
+      const list = path.match(/^\/api\/(organizations|projects|tasks)$/)
+      if (list) return sendJson(response, readStore[list[1] as keyof Store])
+      const children = path.match(/^\/api\/(organizations|projects)\/([^/]+)\/(projects|tasks)$/)
+      if (children) {
+        const id = decodeURIComponent(children[2])
+        if (children[1] === 'organizations' && children[3] === 'projects') return sendJson(response, readStore.projects.filter((item) => item.organizationId === id))
+        if (children[1] === 'projects' && children[3] === 'tasks') return sendJson(response, readStore.tasks.filter((item) => item.projectId === id))
+      }
+    }
     if (request.method === 'PATCH' && editMatch) {
       const collection = editMatch[1] as keyof Store
       const entity = writeStore[collection].find((item) => item.id === editMatch[2])

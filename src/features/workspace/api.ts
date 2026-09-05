@@ -1,4 +1,4 @@
-import type { BootstrapData, SaveOrganizationInput, SaveProjectInput, SaveTaskInput, SaveOrganizationResponse, SaveProjectResponse, SaveTaskResponse } from './types'
+import type { BootstrapData, Organization, Project, Task, SaveOrganizationInput, SaveProjectInput, SaveTaskInput, SaveOrganizationResponse, SaveProjectResponse, SaveTaskResponse } from './types'
 
 const jsonHeaders = {
   'Content-Type': 'application/json',
@@ -58,8 +58,25 @@ async function request<T>(url: string, init?: RequestInit) {
   const response = await fetch(url, init)
 
   if (!response.ok) {
-    throw new Error(await response.text())
+    throw new ApiError(response.status, await response.text())
   }
 
   return response.json() as Promise<T>
 }
+
+export class ApiError extends Error {
+  readonly status: number
+  constructor(status: number, message: string) {
+    super(message)
+    this.name = 'ApiError'
+    this.status = status
+  }
+}
+export const fetchOrganizations = () => request<Organization[]>('/api/organizations')
+export const fetchOrganization = (id: string) => request<Organization>(`/api/organizations/${encodeURIComponent(id)}`)
+export const fetchProjects = () => request<Project[]>('/api/projects')
+export const fetchOrganizationProjects = (id: string) => request<Project[]>(`/api/organizations/${encodeURIComponent(id)}/projects`)
+export const fetchProject = (id: string) => request<Project>(`/api/projects/${encodeURIComponent(id)}`)
+export const fetchTasks = () => request<Task[]>('/api/tasks')
+export const fetchProjectTasks = (id: string) => request<Task[]>(`/api/projects/${encodeURIComponent(id)}/tasks`)
+export const fetchTask = (id: string) => request<Task>(`/api/tasks/${encodeURIComponent(id)}`)

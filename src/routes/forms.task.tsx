@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useQuery } from '@tanstack/react-query'
+import { useWorkspaceResources } from '../features/workspace/hooks/useWorkspaceResources'
+import { useCreateOrganization, useCreateProject, useCreateTask } from '../features/workspace/hooks/mutations'
 import { useEffect, useState } from 'react'
 
 import { ActivityPanel, createActivity } from '../features/form-demos/ActivityPanel'
@@ -24,10 +25,10 @@ function TaskFormRoute() {
   const [activity, setActivity] = useState<
     Array<ReturnType<typeof createActivity>>
   >([])
-  const bootstrap = useQuery({
-    queryKey: bootstrapKey,
-    queryFn: fetchBootstrap,
-  })
+  const createOrganization = useCreateOrganization()
+  const createProject = useCreateProject()
+  const createTask = useCreateTask()
+  const bootstrap = useWorkspaceResources()
   const firstProject = bootstrap.data?.projects[0]
 
   const appendActivity = (text: string) => {
@@ -45,7 +46,7 @@ function TaskFormRoute() {
     },
     endpoint: {
       mutationKey: ['forms-example', 'save-task'],
-      mutationFn: saveTask,
+      mutationFn: createTask.mutateAsync,
       refetchPolicy: {
         refetchQueries: [bootstrapKey],
       },
