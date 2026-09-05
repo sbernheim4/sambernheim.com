@@ -75,8 +75,18 @@ test('child reads, independent ownership, legacy projection, initialization and 
       })
     ).data.organization
     assert.equal(legacy.name, 'Legacy')
+    assert.equal(
+      (await api.request('POST', '/api/organizations', { name: 'New Org' }))
+        .status,
+      400,
+    )
     const created = (
-      await api.request('POST', '/api/organizations', { name: 'New Org' })
+      await api.request('POST', '/api/organizations', {
+        name: 'New Org',
+        sector: 'finance',
+        status: 'paused',
+        region: 'west',
+      })
     ).data.organization
     await new Promise((r) => setTimeout(r, 15))
     assert.equal(

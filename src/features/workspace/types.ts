@@ -42,6 +42,7 @@ export type SaveOrganizationInput = {
   status: Organization['status']
   region: Organization['region']
 }
+export type UpdateOrganizationInput = Partial<SaveOrganizationInput>
 
 export type SaveProjectInput = {
   organizationId: string
@@ -50,6 +51,9 @@ export type SaveProjectInput = {
   phase: Project['phase']
   budget: string
 }
+export type UpdateProjectInput = Partial<
+  Omit<SaveProjectInput, 'organizationId'>
+>
 
 export type SaveTaskInput = {
   organizationId: string
@@ -59,6 +63,9 @@ export type SaveTaskInput = {
   status: Task['status']
   dueWindow: Task['dueWindow']
 }
+export type UpdateTaskInput = Partial<
+  Omit<SaveTaskInput, 'organizationId' | 'projectId'>
+>
 
 export type SaveOrganizationResponse = {
   organization: Organization
@@ -84,7 +91,9 @@ export type OrganizationOperations = Pick<
   'status' | 'region' | 'updatedAt'
 > & { organizationId: string }
 export type ProfileInput = Pick<OrganizationProfile, 'name' | 'sector'>
+export type UpdateProfileInput = Partial<ProfileInput>
 export type OperationsInput = Pick<OrganizationOperations, 'status' | 'region'>
+export type UpdateOperationsInput = Partial<OperationsInput>
 export type ProfileResponse = {
   profile: OrganizationProfile
   readModelLagMs: number

@@ -6,6 +6,11 @@ import type {
   Task,
   OrganizationProfile,
   OrganizationOperations,
+  UpdateOrganizationInput,
+  UpdateProjectInput,
+  UpdateTaskInput,
+  UpdateProfileInput,
+  UpdateOperationsInput,
 } from '../src/features/workspace/types.ts'
 type Store = {
   organizations: { id: string }[]
@@ -160,8 +165,8 @@ export function createExampleApi({
         )
         if (!entity)
           return sendJson(response, { message: 'Resource not found.' }, 404)
-        const body = await readJson(request)
         if (collection === 'organizations') {
+          const body = (await readJson(request)) as UpdateOrganizationInput
           const profile = writeStore.profiles.find(
             (item) => item.organizationId === entity.id,
           )!
@@ -175,6 +180,7 @@ export function createExampleApi({
           return sendJson(response, { organization, readModelLagMs })
         }
         if (collection === 'projects') {
+          const body = (await readJson(request)) as UpdateProjectInput
           const project = entity as Project
           Object.assign(project, {
             name: cleanString(body.name, project.name),
@@ -194,6 +200,7 @@ export function createExampleApi({
           scheduleReplicaSync()
           return sendJson(response, { project, readModelLagMs })
         }
+        const body = (await readJson(request)) as UpdateTaskInput
         const task = entity as Task
         Object.assign(task, {
           title: cleanString(body.title, task.title),
@@ -232,16 +239,31 @@ export function createExampleApi({
 
       if (request.method === 'POST' && request.url === '/api/organizations') {
         const body = await readJson(request)
+        const name = requiredString(body, 'name')
+        const sector = requiredOption(
+          body,
+          'sector',
+          ['healthcare', 'finance', 'education'] as const,
+        )
+        const status = requiredOption(
+          body,
+          'status',
+          ['active', 'paused'] as const,
+        )
+        const region = requiredOption(
+          body,
+          'region',
+          ['east', 'central', 'west'] as const,
+        )
+        if (!name || !sector || !status || !region) {
+          return sendJson(response, { message: 'Missing organization fields.' }, 400)
+        }
         const organization = {
           id: `org-${nextId++}`,
-          name: cleanString(body.name, 'Untitled organization'),
-          sector: oneOf(
-            body.sector,
-            ['healthcare', 'finance', 'education'],
-            'healthcare',
-          ),
-          status: oneOf(body.status, ['active', 'paused'], 'active'),
-          region: oneOf(body.region, ['east', 'central', 'west'], 'east'),
+          name,
+          sector,
+          status,
+          region,
           updatedAt: now(),
         }
 
@@ -265,9 +287,25 @@ export function createExampleApi({
 
       if (request.method === 'POST' && request.url === '/api/projects') {
         const body = await readJson(request)
+        const organizationId = requiredString(body, 'organizationId')
+        const name = requiredString(body, 'name')
+        const priority = requiredOption(
+          body,
+          'priority',
+          ['low', 'medium', 'high'] as const,
+        )
+        const phase = requiredOption(
+          body,
+          'phase',
+          ['planning', 'implementation', 'launched'] as const,
+        )
+        const budget = requiredString(body, 'budget')
+        if (!organizationId || !name || !priority || !phase || !budget) {
+          return sendJson(response, { message: 'Missing project fields.' }, 400)
+        }
         if (
           !writeStore.organizations.some(
-            (item) => item.id === body.organizationId,
+            (item) => item.id === organizationId,
           )
         ) {
           return sendJson(
@@ -278,15 +316,11 @@ export function createExampleApi({
         }
         const project = {
           id: `project-${nextId++}`,
-          organizationId: cleanString(body.organizationId, ''),
-          name: cleanString(body.name, 'Untitled project'),
-          priority: oneOf(body.priority, ['low', 'medium', 'high'], 'medium'),
-          phase: oneOf(
-            body.phase,
-            ['planning', 'implementation', 'launched'],
-            'planning',
-          ),
-          budget: cleanString(body.budget, '$50k'),
+          organizationId,
+          name,
+          priority,
+          phase,
+          budget,
           updatedAt: now(),
         }
 
@@ -298,10 +332,38 @@ export function createExampleApi({
 
       if (request.method === 'POST' && request.url === '/api/tasks') {
         const body = await readJson(request)
-        const parent = writeStore.projects.find(
-          (item) => item.id === body.projectId,
+        const organizationId = requiredString(body, 'organizationId')
+        const projectId = requiredString(body, 'projectId')
+        const title = requiredString(body, 'title')
+        const owner = requiredOption(
+          body,
+          'owner',
+          ['alex', 'jordan', 'morgan'] as const,
         )
-        if (!parent || parent.organizationId !== body.organizationId) {
+        const status = requiredOption(
+          body,
+          'status',
+          ['todo', 'in-progress', 'blocked'] as const,
+        )
+        const dueWindow = requiredOption(
+          body,
+          'dueWindow',
+          ['this-week', 'next-week', 'this-month'] as const,
+        )
+        if (
+          !organizationId ||
+          !projectId ||
+          !title ||
+          !owner ||
+          !status ||
+          !dueWindow
+        ) {
+          return sendJson(response, { message: 'Missing task fields.' }, 400)
+        }
+        const parent = writeStore.projects.find(
+          (item) => item.id === projectId,
+        )
+        if (!parent || parent.organizationId !== organizationId) {
           return sendJson(
             response,
             { message: 'Choose a project belonging to this organization.' },
@@ -310,20 +372,12 @@ export function createExampleApi({
         }
         const task = {
           id: `task-${nextId++}`,
-          organizationId: cleanString(body.organizationId, ''),
-          projectId: cleanString(body.projectId, ''),
-          title: cleanString(body.title, 'Untitled task'),
-          owner: oneOf(body.owner, ['alex', 'jordan', 'morgan'], 'alex'),
-          status: oneOf(
-            body.status,
-            ['todo', 'in-progress', 'blocked'],
-            'todo',
-          ),
-          dueWindow: oneOf(
-            body.dueWindow,
-            ['this-week', 'next-week', 'this-month'],
-            'this-week',
-          ),
+          organizationId,
+          projectId,
+          title,
+          owner,
+          status,
+          dueWindow,
           updatedAt: now(),
         }
 
@@ -349,7 +403,7 @@ export function createExampleApi({
     timer.unref()
     timers.add(timer)
   }
-  function updateProfile(profile: OrganizationProfile, body: RequestBody) {
+  function updateProfile(profile: OrganizationProfile, body: UpdateProfileInput) {
     Object.assign(profile, {
       name: cleanString(body.name, profile.name),
       sector: oneOf(
@@ -362,7 +416,7 @@ export function createExampleApi({
   }
   function updateOperations(
     operations: OrganizationOperations,
-    body: RequestBody,
+    body: UpdateOperationsInput,
   ) {
     Object.assign(operations, {
       status: oneOf(body.status, ['active', 'paused'], operations.status),
@@ -410,6 +464,20 @@ function bootstrap(store: Store) {
     projects: store.projects,
     tasks: store.tasks,
   }
+}
+function requiredString(body: RequestBody, key: string) {
+  const value = body[key]
+  return typeof value === 'string' && value.trim() ? value.trim() : undefined
+}
+function requiredOption<T extends string>(
+  body: RequestBody,
+  key: string,
+  values: readonly T[],
+) {
+  const value = body[key]
+  return typeof value === 'string' && (values as readonly string[]).includes(value)
+    ? (value as T)
+    : undefined
 }
 export const { handleApiRequest } = createExampleApi()
 

@@ -4,8 +4,8 @@ import type {
   Organization,
   OrganizationProfile,
   OrganizationOperations,
-  ProfileInput,
-  OperationsInput,
+  UpdateProfileInput,
+  UpdateOperationsInput,
   ProfileResponse,
   OperationsResponse,
 } from './types'
@@ -62,14 +62,18 @@ function summaryTargets<R, I, Child extends { organizationId: string }>(
 }
 export function profileCacheUpdates(
   organization?: Organization,
-): CacheUpdate<ProfileResponse, ProfileInput>[] {
+): CacheUpdate<ProfileResponse, UpdateProfileInput>[] {
   return [
     {
       queryKey: ({ response }) =>
         keys.organizationProfiles.detail(response.profile.organizationId),
       getData: (response) => response.profile,
     },
-    ...summaryTargets<ProfileResponse, ProfileInput, OrganizationProfile>(
+    ...summaryTargets<
+      ProfileResponse,
+      UpdateProfileInput,
+      OrganizationProfile
+    >(
       (response) => response.profile,
       mergeProfile,
       organization,
@@ -78,7 +82,7 @@ export function profileCacheUpdates(
 }
 export function operationsCacheUpdates(
   organization?: Organization,
-): CacheUpdate<OperationsResponse, OperationsInput>[] {
+): CacheUpdate<OperationsResponse, UpdateOperationsInput>[] {
   return [
     {
       queryKey: ({ response }) =>
@@ -87,7 +91,7 @@ export function operationsCacheUpdates(
     },
     ...summaryTargets<
       OperationsResponse,
-      OperationsInput,
+      UpdateOperationsInput,
       OrganizationOperations
     >((response) => response.operations, mergeOperations, organization),
   ]

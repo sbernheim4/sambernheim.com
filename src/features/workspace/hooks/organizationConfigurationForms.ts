@@ -3,8 +3,9 @@ import type { OutcomeCallbacks } from '../../../forms/orchestration/contracts'
 import type {
   OrganizationProfile,
   OrganizationOperations,
-  ProfileInput,
   OperationsInput,
+  UpdateProfileInput,
+  UpdateOperationsInput,
   ProfileResponse,
   OperationsResponse,
 } from '../types'
@@ -36,7 +37,7 @@ export function useOrganizationProfileForm({
   ...callbacks
 }: { organizationId: string } & OutcomeCallbacks<
   ProfileValues,
-  ProfileInput,
+  UpdateProfileInput,
   ProfileResponse
 >) {
   const query = useOrganizationProfile(organizationId)
@@ -71,7 +72,7 @@ export function useOrganizationOperationsForm({
   ...callbacks
 }: { organizationId: string } & OutcomeCallbacks<
   OperationsValues,
-  OperationsInput,
+  UpdateOperationsInput,
   OperationsResponse
 >) {
   const query = useOrganizationOperations(organizationId)
