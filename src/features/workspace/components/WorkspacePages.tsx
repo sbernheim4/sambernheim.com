@@ -24,6 +24,7 @@ export function OrganizationPage({ id }: { id: string }) {
       {organization && query.data && <div className="workspace-columns">
         <Details title="Organization details" id={organization.id} updatedAt={organization.updatedAt}>
           <OrganizationEditor key={organization.id} resource={organization} />
+          <Link to="/organizations/$organizationId/configuration" params={{ organizationId: organization.id }}>Configure Profile and Operations</Link>
         </Details>
         <EntityList title="Projects" kind="projects" data={query.data}
           items={query.data.projects.filter((item) => item.organizationId === organization.id)}
@@ -78,7 +79,7 @@ export function TaskPage({ id }: { id: string }) {
   </Workspace>
 }
 
-function Workspace({ title, description, children, organization, project, task }: {
+export function Workspace({ title, description, children, organization, project, task }: {
   title: string; description: string; children: ReactNode
   organization?: Organization; project?: Project; task?: Task
 }) {
@@ -104,7 +105,7 @@ function Details({ title, id, updatedAt, children }: { title: string; id: string
   </section>
 }
 
-function QueryState({ query, missing, children }: {
+export function QueryState({ query, missing, children }: {
   query: ReturnType<typeof useOrganizationsWorkspace>; missing?: boolean; children: ReactNode
 }) {
   if (query.isPending) return <p className="workspace-empty" role="status">Loading resources...</p>
@@ -118,7 +119,7 @@ function QueryState({ query, missing, children }: {
   return children
 }
 
-function EntityList({ title, kind, items, data, create }: {
+export function EntityList({ title, kind, items, data, create }: {
   title: string; kind: keyof BootstrapData; items: Array<Organization | Project | Task>; data: BootstrapData
   create: (close: () => void) => ReactNode
 }) {

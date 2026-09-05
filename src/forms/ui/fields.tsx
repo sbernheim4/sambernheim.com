@@ -24,12 +24,14 @@ export function TextField({
     <label className="app-field">
       <span>{label}</span>
       <input
+        aria-invalid={field.state.meta.errors.length > 0}
         required={required}
         value={field.state.value ?? ''}
         placeholder={placeholder}
         onBlur={field.handleBlur}
         onChange={(event) => field.handleChange(event.target.value)}
       />
+      {field.state.meta.errors.length > 0 && <span className="form-error" role="alert">{field.state.meta.errors.map(String).join(', ')}</span>}
     </label>
   )
 }

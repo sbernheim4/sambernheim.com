@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 
+import { useOrganizations } from '../features/workspace/hooks/useWorkspaceResources'
 import { WorkspaceLayout } from '../features/workspace/components/WorkspaceLayout'
 
 export const Route = createFileRoute('/forms/')({
@@ -8,6 +9,8 @@ export const Route = createFileRoute('/forms/')({
 })
 
 function FormsIndex() {
+  const organizations = useOrganizations()
+  const firstOrganization = organizations.data?.[0]
   return (
     <WorkspaceLayout
       title="Query-Backed Form Examples"
@@ -18,6 +21,9 @@ function FormsIndex() {
           <span>Organization Workspace</span>
           <p>Manage organizations, their projects, and assigned tasks.</p>
         </Link>
+        {firstOrganization && <Link to="/organizations/$organizationId/configuration" params={{ organizationId: firstOrganization.id }} className="route-card">
+          <span>Organization Configuration</span><p>Save Profile and Operations together with one action.</p>
+        </Link>}
         <Link to="/forms/organization" className="route-card">
           <span>Organization Form</span>
           <p>Single endpoint save with response-backed cache reconciliation.</p>
