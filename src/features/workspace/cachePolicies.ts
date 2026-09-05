@@ -7,8 +7,8 @@ import type {
   SaveProjectResponse,
   SaveTaskResponse,
 } from "./types";
-import { upsertBootstrap } from "./cache";
-import { workspaceKeys as keys, bootstrapKey } from "./queries";
+import { reconcileWorkspaceRead, upsertBootstrap } from "./cache.ts";
+import { workspaceKeys as keys, bootstrapKey } from "./queries.ts";
 
 export function organizationCacheUpdates<I>(): CacheUpdate<SaveOrganizationResponse, I>[] {
   return [
@@ -24,6 +24,24 @@ export function organizationCacheUpdates<I>(): CacheUpdate<SaveOrganizationRespo
     {
       queryKey: ({ response }) => keys.organizations.detail(response.organization.id),
       getData: (response) => response.organization,
+    },
+    {
+      queryKey: ({ response }) => keys.organizationProfiles.detail(response.organization.id),
+      getData: ({ organization: o }) => ({
+        organizationId: o.id,
+        name: o.name,
+        sector: o.sector,
+        updatedAt: o.profileUpdatedAt ?? o.updatedAt,
+      }),
+    },
+    {
+      queryKey: ({ response }) => keys.organizationOperations.detail(response.organization.id),
+      getData: ({ organization: o }) => ({
+        organizationId: o.id,
+        status: o.status,
+        region: o.region,
+        updatedAt: o.operationsUpdatedAt ?? o.updatedAt,
+      }),
     },
   ];
 }
@@ -73,5 +91,5 @@ export function upsertList<T extends Organization | Project | Task>(
   resource: T,
 ): T[] {
   const current = (previous as T[] | undefined) ?? [];
-  return [...current.filter((item) => item.id !== resource.id), resource];
+  return reconcileWorkspaceRead(current, [resource]) as T[];
 }

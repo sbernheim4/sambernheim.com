@@ -45,3 +45,18 @@ export const useClearWorkspaceMutation = () =>
     mutationFn: api.clearEntities,
     retry: false,
   });
+
+export const useUpdateOrganizationProfile = (id: string) =>
+  useMutation({
+    mutationKey: [...workspaceKeys.organizationProfiles.detail(id), "update"],
+    mutationFn: (input: Parameters<typeof api.updateOrganizationProfile>[1]) =>
+      api.updateOrganizationProfile(id, input),
+    retry: false,
+  });
+export const useUpdateOrganizationOperations = (id: string) =>
+  useMutation({
+    mutationKey: [...workspaceKeys.organizationOperations.detail(id), "update"],
+    mutationFn: (input: Parameters<typeof api.updateOrganizationOperations>[1]) =>
+      api.updateOrganizationOperations(id, input),
+    retry: false,
+  });
