@@ -9,7 +9,7 @@ notes remain historical context.
 - [x] Resource list/detail reads, keys, structured API errors, request-only domain mutations.
 - [x] Migrate demo query calls and requests to domain hooks.
 - [x] Typed opaque participants, mappings, cache targets, lifecycle callbacks, type-test configuration.
-- [ ] Ordered executor: validation, snapshots, dependencies, retries, partial results, refresh/cache/effects.
+- [x] Ordered executor: validation, snapshots, dependencies, retries, partial results, refresh/cache/effects.
 - [ ] React bindings and standalone CRUD compatibility; query initialization and saved baselines.
 - [ ] Extract resource/demo domain form hooks and migrate workspace resource reads.
 - [ ] Profile/Operations backend ownership, reads, writes, initialization, clear-all.
@@ -25,6 +25,10 @@ notes remain historical context.
   uses a one-argument wrapper to avoid passing flow context as mutateAsync options.
 - `zzouoqmm`: typed participants and lifecycle contracts. `npx tsc -p
   tsconfig.tests.json` passed, including negative inference fixtures.
+- `lvpoyyzk`: ordered executor and shared lifecycle helpers. Type fixtures and
+  all 8 Node tests passed (including existing reconciliation tests). Tests cover
+  overlap, preflight errors, partial saves, delayed/rejected refreshes, callback
+  failures, retry safety, dependencies, and lifecycle exclusion of clear-all.
 - No browser automation or server startup; user owns browser verification.
 
 ### Working Notes / Open Issues
