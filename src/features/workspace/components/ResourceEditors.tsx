@@ -68,7 +68,7 @@ function ResourceEditor({
   editor: Pick<
     ReturnType<typeof useOrganizationForm>,
     "form" | "fields" | "isReady" | "isSaving" | "error"
-  > & { save: { result?: { outcome: string } } };
+  > & { result?: { outcome: string } };
   creating: boolean;
   saved: boolean;
   setSaved: (value: boolean) => void;
@@ -107,7 +107,7 @@ function ResourceEditor({
           {String(editor.error)}
         </p>
       )}
-      {editor.save.result?.outcome === "saved-with-follow-up-errors" && (
+      {editor.result?.outcome === "saved-with-follow-up-errors" && (
         <p role="status">Saved, but a follow-up action failed.</p>
       )}
       {saved && (

@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { QueryClient } from "@tanstack/react-query";
-import { reconcileTargets } from "../src/forms/orchestration/lifecycle.ts";
+import { updateCacheWithMutationResponse } from "../src/forms/orchestration/orchestrator.ts";
 import {
   profileCacheUpdates,
   operationsCacheUpdates,
@@ -13,7 +13,7 @@ import {
 } from "../src/features/workspace/cachePolicies.ts";
 import { reconcileWorkspaceRead } from "../src/features/workspace/cache.ts";
 import { clearWorkspace } from "../src/features/workspace/clearWorkspace.ts";
-import { lifecycleCoordinator } from "../src/forms/orchestration/coordinator.ts";
+import { getSaveGuard } from "../src/forms/orchestration/orchestrator.ts";
 import { workspaceKeys as keys, bootstrapKey } from "../src/features/workspace/queries.ts";
 import type { Organization } from "../src/features/workspace/types.ts";
 const organization: Organization = {
@@ -40,7 +40,7 @@ const client = () =>
 test("two children merge owned fields into every summary and later stale navigation reads retain both", async () => {
   const qc = client();
   const context = { queryClient: qc, results: {} };
-  reconcileTargets(
+  updateCacheWithMutationResponse(
     {
       ...context,
       response: { organization, readModelLagMs: 2500 },
@@ -61,7 +61,7 @@ test("two children merge owned fields into every summary and later stale navigat
     updatedAt: "3",
   };
   assert.deepEqual(
-    reconcileTargets(
+    updateCacheWithMutationResponse(
       {
         ...context,
         response: { profile, readModelLagMs: 2500 },
@@ -72,7 +72,7 @@ test("two children merge owned fields into every summary and later stale navigat
     [],
   );
   assert.deepEqual(
-    reconcileTargets(
+    updateCacheWithMutationResponse(
       {
         ...context,
         response: { operations, readModelLagMs: 2500 },
@@ -148,11 +148,14 @@ test("project/task saves populate parent lists, detail caches, and bootstrap", (
     dueWindow: "this-week" as const,
     updatedAt: "1",
   };
-  reconcileTargets(
+  updateCacheWithMutationResponse(
     { ...context, response: { project, readModelLagMs: 2500 } },
     projectCacheUpdates(),
   );
-  reconcileTargets({ ...context, response: { task, readModelLagMs: 2500 } }, taskCacheUpdates());
+  updateCacheWithMutationResponse(
+    { ...context, response: { task, readModelLagMs: 2500 } },
+    taskCacheUpdates(),
+  );
   assert.deepEqual(qc.getQueryData(keys.projects.forOrganization("org-1")), [project]);
   assert.deepEqual(qc.getQueryData(keys.tasks.forProject("p")), [task]);
   assert.deepEqual(qc.getQueryData(keys.projects.detail("p")), project);
@@ -162,11 +165,11 @@ test("project/task saves populate parent lists, detail caches, and bootstrap", (
 test("clear-all waits for lifecycle exclusion, removes resource caches, and blocks new saves during clear", async () => {
   const qc = client();
   qc.setQueryData(keys.organizationProfiles.detail("org-1"), { name: "saved" });
-  const release = lifecycleCoordinator(qc).begin();
+  const release = getSaveGuard(qc).begin();
   let calls = 0;
   const request = async () => {
     calls++;
-    assert.throws(() => lifecycleCoordinator(qc).begin(), /cleared/);
+    assert.throws(() => getSaveGuard(qc).begin(), /cleared/);
     return { organizations: [], projects: [], tasks: [] };
   };
   assert.equal(await clearWorkspace(qc, request), false);

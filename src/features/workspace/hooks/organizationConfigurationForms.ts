@@ -1,5 +1,5 @@
-import { useComposableForm } from "../../../forms/bindings/useComposableForm";
-import type { OutcomeCallbacks } from "../../../forms/orchestration/contracts";
+import { useComposableForm } from "../../../forms/hooks/useComposableForm";
+import type { OutcomeCallbacks } from "../../../forms/orchestration/types";
 import type {
   OrganizationProfile,
   OrganizationOperations,
@@ -39,6 +39,10 @@ export function useOrganizationProfileForm({
   const mutation = useUpdateOrganizationProfile(organizationId);
   const binding = useComposableForm({
     id: "profile",
+    defaultValues: {
+      displayName: "",
+      selectedSector: "healthcare",
+    } as ProfileValues,
     query,
     ...callbacks,
     toFormData: (profile): ProfileValues => ({
@@ -74,6 +78,7 @@ export function useOrganizationOperationsForm({
   const mutation = useUpdateOrganizationOperations(organizationId);
   const binding = useComposableForm({
     id: "operations",
+    defaultValues: { isActive: false, region: "east" } as OperationsValues,
     query,
     ...callbacks,
     toFormData: (operations): OperationsValues => ({

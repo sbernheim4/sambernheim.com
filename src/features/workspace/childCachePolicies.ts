@@ -1,4 +1,4 @@
-import type { CacheUpdate } from "../../forms/orchestration/contracts";
+import type { CacheUpdate } from "../../forms/orchestration/types";
 import type {
   BootstrapData,
   Organization,

@@ -1,9 +1,9 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { QueryClient, QueryObserver } from "@tanstack/react-query";
-import { createParticipant } from "../src/forms/orchestration/participant.ts";
-import { createOrchestrator } from "../src/forms/orchestration/executor.ts";
-import { lifecycleCoordinator } from "../src/forms/orchestration/coordinator.ts";
+import { defineForm } from "./formConfig";
+import { createOrchestrator } from "../src/forms/orchestration/orchestrator.ts";
+import { getSaveGuard } from "../src/forms/orchestration/orchestrator.ts";
 const client = () =>
   new QueryClient({
     defaultOptions: { queries: { retry: false, gcTime: Infinity } },
@@ -23,7 +23,7 @@ test("snapshots all children, validates before writes, maps once and retries ord
   const values = { name: "initial" };
   let tries = 0;
   let maps = 0;
-  const a = createParticipant({
+  const a = defineForm({
     id: "a",
     snapshot: () => values,
     validate: async (snapshot) => {
@@ -44,7 +44,7 @@ test("snapshots all children, validates before writes, maps once and retries ord
       },
     },
   });
-  const b = createParticipant({
+  const b = defineForm({
     id: "b",
     dependencies: [a],
     snapshot: () => values,
@@ -70,13 +70,13 @@ test("snapshots all children, validates before writes, maps once and retries ord
   assert.equal(result.outcome, "success");
   assert.equal(maps, 1);
   assert.deepEqual(log, ["a:initial", "a:initial", "b:initial:initial"]);
-  assert.equal(result.participants.a.attempts, 2);
+  assert.equal(result.forms.a.attempts, 2);
 });
 
 test("validation and independent mapping failures issue no writes or refreshes, callbacks once", async () => {
   for (const phase of ["validation", "mapping"] as const) {
     const log: string[] = [];
-    const a = createParticipant({
+    const a = defineForm({
       id: "a",
       snapshot: () => 1,
       validate: valid,
@@ -90,7 +90,7 @@ test("validation and independent mapping failures issue no writes or refreshes, 
         log.push("a success");
       },
     });
-    const b = createParticipant({
+    const b = defineForm({
       id: "b",
       snapshot: () => 1,
       validate: () => (phase === "validation" ? { valid: false, error: "invalid" } : valid()),
@@ -116,7 +116,7 @@ test("validation and independent mapping failures issue no writes or refreshes, 
     });
     assert.equal(result.outcome, "validation-failed");
     assert.deepEqual(log, ["b failure", "group failure"]);
-    assert.equal(result.participants.a.status, "skipped");
+    assert.equal(result.forms.a.status, "skipped");
   }
 });
 
@@ -126,7 +126,7 @@ test("partial failure retains persistence, waits for every refresh, reconciles t
   const log: string[] = [];
   let tries = 0;
   qc.setQueryData(["summary"], { old: true });
-  const a = createParticipant({
+  const a = defineForm({
     id: "a",
     snapshot: () => "submitted",
     validate: valid,
@@ -164,7 +164,7 @@ test("partial failure retains persistence, waits for every refresh, reconciles t
       throw Error("effect");
     },
   });
-  const b = createParticipant({
+  const b = defineForm({
     id: "b",
     snapshot: () => 2,
     validate: valid,
@@ -179,7 +179,7 @@ test("partial failure retains persistence, waits for every refresh, reconciles t
       log.push("b failure");
     },
   });
-  const c = createParticipant({
+  const c = defineForm({
     id: "c",
     snapshot: () => 3,
     validate: valid,
@@ -202,14 +202,14 @@ test("partial failure retains persistence, waits for every refresh, reconciles t
     },
   });
   await new Promise((r) => setTimeout(r, 15));
-  assert.equal(lifecycleCoordinator(qc).getSnapshot(), 1);
-  assert.equal(lifecycleCoordinator(qc).beginClear(), undefined);
+  assert.equal(getSaveGuard(qc).getSnapshot(), 1);
+  assert.equal(getSaveGuard(qc).beginClear(), undefined);
   assert.deepEqual(log, ["write a"]);
   gate.resolve();
   const result = await pending;
   assert.equal(tries, 2);
   assert.equal(result.outcome, "partial-failure");
-  assert.equal(result.participants.c.status, "skipped");
+  assert.equal(result.forms.c.status, "skipped");
   assert.equal(result.followUpErrors.length, 3);
   assert.deepEqual(log, [
     "write a",
@@ -219,7 +219,7 @@ test("partial failure retains persistence, waits for every refresh, reconciles t
     "b failure",
     "group failure",
   ]);
-  assert.equal(lifecycleCoordinator(qc).getSnapshot(), 0);
+  assert.equal(getSaveGuard(qc).getSnapshot(), 0);
 });
 
 test("invalidation and direct refetch settle before injection; successful writes never retry for follow-up failures", async () => {
@@ -237,7 +237,7 @@ test("invalidation and direct refetch settle before injection; successful writes
   const unsub = observer.subscribe(() => {});
   await observer.refetch();
   saving = true;
-  const p = createParticipant({
+  const p = defineForm({
     id: "p",
     snapshot: () => 1,
     validate: valid,
@@ -282,14 +282,14 @@ test("invalidation and direct refetch settle before injection; successful writes
 
 test("duplicate IDs, reversed dependencies and clear lock reject before writes", async () => {
   const qc = client();
-  const p = createParticipant({
+  const p = defineForm({
     id: "p",
     snapshot: () => 1,
     validate: valid,
     endpoint: { mutationFn: async (_v: number) => assert.fail("no writes") },
   });
   await assert.rejects(createOrchestrator(qc).submit({ forms: [p, p] }), /Duplicate/);
-  const dependent = createParticipant({
+  const dependent = defineForm({
     id: "q",
     dependencies: [p],
     snapshot: () => 1,
@@ -297,7 +297,7 @@ test("duplicate IDs, reversed dependencies and clear lock reject before writes",
     endpoint: { mutationFn: async (_v: number) => 1 },
   });
   await assert.rejects(createOrchestrator(qc).submit({ forms: [dependent, p] }), /precede/);
-  const release = lifecycleCoordinator(qc).beginClear()!;
+  const release = getSaveGuard(qc).beginClear()!;
   await assert.rejects(createOrchestrator(qc).submit({ forms: [p] }), /cleared/);
   release();
 });
@@ -308,7 +308,7 @@ test("permanent errors and non-idempotent creates never automatically retry", as
     [false, 503],
   ] as const) {
     let writes = 0;
-    const p = createParticipant({
+    const p = defineForm({
       id: "p",
       snapshot: () => 1,
       validate: valid,
@@ -325,7 +325,7 @@ test("permanent errors and non-idempotent creates never automatically retry", as
       retry: { delayMs: 0 },
     });
     assert.equal(writes, 1);
-    assert.equal(result.participants.p.failure?.phase, "save");
+    assert.equal(result.forms.p.failure?.phase, "save");
   }
 });
 
@@ -334,7 +334,7 @@ test("active runs retain callback definitions; group cache targets follow childr
   const wait = deferred();
   const log: string[] = [];
   qc.setQueryData(["keep"], 1);
-  const first = createParticipant({
+  const first = defineForm({
     id: "first",
     snapshot: () => 5,
     validate: valid,
@@ -385,6 +385,10 @@ test("active runs retain callback definitions; group cache targets follow childr
     log.push("replacement callback");
   };
   config.refetchFunctions.length = 0;
+  first.onSuccess = () => {
+    log.push("replacement child callback");
+  };
+  first.endpoint.cacheUpdates = [];
   wait.resolve();
   const result = await pending;
   assert.equal(result.outcome, "success");
@@ -400,7 +404,7 @@ test("active runs retain callback definitions; group cache targets follow childr
 
 test("dependency mapping errors skip their request, preserve successful parents and notify failure once", async () => {
   const log: string[] = [];
-  const parent = createParticipant({
+  const parent = defineForm({
     id: "parent",
     snapshot: () => 1,
     validate: valid,
@@ -409,7 +413,7 @@ test("dependency mapping errors skip their request, preserve successful parents 
       log.push("parent saved");
     },
   });
-  const child = createParticipant({
+  const child = defineForm({
     id: "child",
     dependencies: [parent],
     snapshot: () => 1,

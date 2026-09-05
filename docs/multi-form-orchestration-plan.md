@@ -1,6 +1,6 @@
 # Domain Form Hooks And Multi-Form Orchestration
 
-Status: implemented and automatically verified on 2026-09-05. Browser
+Status: implemented and automatically verified on 2026-09-06. Browser
 verification remains user-managed. The handoff notes below are historical context.
 
 ## Live Implementation Checklist (2026-09-05)
@@ -24,11 +24,69 @@ verification remains user-managed. The handoff notes below are historical contex
 
 ### Revision And Verification Log
 
+- [x] Simplify forms to plain bindings passed directly to `createOrchestrator`;
+      remove the participant factory, wrapper, symbol and separate runtime shape.
+      Dependencies reference forms directly; results use `forms` and `formId`.
+- [x] Keep the `createOrchestrator` name. Consolidate execution, cache refreshes,
+      response updates and the Clear All guard in `orchestration/orchestrator.ts`.
+      Remove separate coordinator/lifecycle modules; move React code to `hooks/`.
+- [x] Replace hook overloads and `useComposableFormImpl` with single typed
+      definitions. Require typed defaults, retain mapped query initialization, and
+      extract initialization/validation helpers outside `useComposableForm`.
+- [x] Align standalone saving with the current `save()` function API and expose
+      `result` directly. Extend type fixtures for field values, callbacks, and direct
+      form dependencies; extend active-run tests to cover form callback/cache changes.
+- [x] Verified the simplification before the user's subsequent helper extraction:
+      both type checks, 27 tests, language-server diagnostics, and build passed.
+      Query synchronization now lives in `useQueryFormSync`; readiness is an
+      external `isFormReady` function. Effect remains explicitly deferred.
+- [x] Fixed the user's orchestrator helper extraction while retaining the smaller
+      functions: await validation and ordered saves, prepare independent payloads
+      before writes, pass the caught error to `getRetryable`, and update the
+      cache-helper test imports. Renamed runners to `saveFormWithRetry` and
+      `saveFormsInOrder`; `preflightPassed` clarifies partial-save follow-ups.
+      Both type checks, all 27 tests, and orchestrator language-server diagnostics
+      pass. Existing tests cover delayed validation, dependent saves, retries,
+      independent mapping failures, and partial-save cache/callback ordering.
+
+- [x] Remove the unused endpoint API (`useSaveEndpoint`, `effects`,
+      `cacheReconciliation`, `types.ts`) and its obsolete replay-helper tests.
+- [x] Remove the three orphaned standalone entity demo hooks, `useEndpointForm`
+      alias, and unused `useQueryBackedForm.endpoint` mutation-shaped result wrapper.
+- [x] Move `useFormOrchestrator` to `bindings/` and remove its old raw-participant
+      input option. React callers compose bindings; the core executor still consumes
+      participants internally. The `query/` folder is no longer part of the form API.
+- [x] Verified obsolete form code removal on 2026-09-06: application/test type
+      checks, all 27 remaining tests, production build, and TypeScript server
+      diagnostics for both changed hooks pass. Two tests for the removed replay
+      helper were deleted; current lifecycle/cache regression coverage remains.
+
+- [x] Replace the launch demo's single flow form with Organization, Project, and
+      Task composable forms coordinated by `useFormOrchestrator`; keep `/forms/flow`.
+- [x] Remove `useFlowForm`, `useSaveFlow`, `flowAdapter`, their types and adapter
+      tests. Add mounted launch coverage for dependent IDs, pristine creates, partial
+      failure, skipped children, callbacks, and successful response cache updates.
+- [x] Verified flow API removal: application/test type checks, all 29 form tests,
+      and production build pass. Existing build chunk/dependency warnings remain.
+      TypeScript server references confirmed the single launch-demo caller before
+      migration; source/test searches confirm the removed flow API has no references.
+- Folder clarification: `orchestration/` is the save engine; `query/` mixes its
+  React hook with older endpoint helpers. The older `useSaveEndpoint`, `effects`,
+  `cacheReconciliation`, and `types.ts` remain outside this flow-removal change.
+
+- [x] Remove `legacyFormConfig` and the obsolete `EndpointFormConfig` overload/type;
+      `useQueryBackedForm` now passes configuration directly to `useComposableForm`.
+- [x] Replace legacy facade coverage with a create-mode regression using response-
+      and variable-dependent cache keys, flat refreshes, and one success callback.
+- [x] Verified adapter removal: `npm run typecheck`, `npm run typecheck:tests`,
+      and all 29 tests via `npm run test:forms` pass. Used the existing TypeScript
+      language-server reference tool to confirm the adapter's application caller.
+
 - `uvowqtsv`: domain query and mutation hooks. `npm run typecheck` passed.
   Resource-editor migration follows the new binding implementation. Demo flow
   uses a one-argument wrapper to avoid passing flow context as mutateAsync options.
 - `zzouoqmm`: typed participants and lifecycle contracts. `npx tsc -p
-  tsconfig.tests.json` passed, including negative inference fixtures.
+tsconfig.tests.json` passed, including negative inference fixtures.
 - `lvpoyyzk`: ordered executor and shared lifecycle helpers. Type fixtures and
   all 8 Node tests passed (including existing reconciliation tests). Tests cover
   overlap, preflight errors, partial saves, delayed/rejected refreshes, callback
@@ -104,7 +162,6 @@ verification remains user-managed. The handoff notes below are historical contex
 - Workspace queries now merge versions, including separate Profile/Operations
   summary timestamps. This protects later replica reads while caches survive; it
   is not a global monotonic-read guarantee across eviction, clients, or reloads.
-
 
 ## Session Handoff And jj Workflow
 
@@ -465,9 +522,9 @@ options at the group level. Both can be supplied together:
 
 ```ts
 type RefreshOptions = {
-  refetchFunctions?: Array<() => unknown>
-  invalidateQueryKeys?: QueryKey[]
-}
+  refetchFunctions?: Array<() => unknown>;
+  invalidateQueryKeys?: QueryKey[];
+};
 ```
 
 `refetchFunctions` accepts query-hook `refetch` methods directly, ordinary
@@ -512,12 +569,9 @@ Expose two independent, synchronous, pure mapping functions through both
 
 ```ts
 type FormTransforms<TQueryData, TFormValues, TMutationInput, TResults = {}> = {
-  toFormData: (queryData: TQueryData) => TFormValues
-  toMutationPayload: (
-    formValues: TFormValues,
-    context: { results: TResults },
-  ) => TMutationInput
-}
+  toFormData: (queryData: TQueryData) => TFormValues;
+  toMutationPayload: (formValues: TFormValues, context: { results: TResults }) => TMutationInput;
+};
 ```
 
 `toFormData` receives the successful data exposed by the domain query hook (after
@@ -584,12 +638,12 @@ available through both `useComposableForm` and the simpler `useQueryBackedForm`.
 ```ts
 type CacheTarget<TResponse, TVariables, TData = TResponse, TResults = {}> = {
   queryKey: (context: {
-    response: TResponse
-    variables: TVariables
-    results: TResults
-  }) => QueryKey
-  getData?: (response: TResponse) => TData
-}
+    response: TResponse;
+    variables: TVariables;
+    results: TResults;
+  }) => QueryKey;
+  getData?: (response: TResponse) => TData;
+};
 ```
 
 This illustrates the callback contract; the public implementation must infer
@@ -624,21 +678,25 @@ For example, if `updateOrganizationProfile` returns
 `Promise<{ profile: OrganizationProfile; readModelLagMs: number }>`, then:
 
 ```ts
-cacheUpdates: [{
-  queryKey: ({ response }) =>
-    workspaceKeys.organizationProfiles.detail(response.profile.organizationId),
-  getData: (response) => response.profile,
-  // response is inferred as { profile: OrganizationProfile; readModelLagMs: number }.
-}]
+cacheUpdates: [
+  {
+    queryKey: ({ response }) =>
+      workspaceKeys.organizationProfiles.detail(response.profile.organizationId),
+    getData: (response) => response.profile,
+    // response is inferred as { profile: OrganizationProfile; readModelLagMs: number }.
+  },
+];
 ```
 
 When an endpoint already returns precisely the desired cached resource:
 
 ```ts
-cacheUpdates: [{
-  queryKey: ({ variables }) => ['resource', variables.id],
-  // No getData: cache the entire mutation response.
-}]
+cacheUpdates: [
+  {
+    queryKey: ({ variables }) => ["resource", variables.id],
+    // No getData: cache the entire mutation response.
+  },
+];
 ```
 
 Selector/key failures are cache-reconciliation errors. Retain the successful
@@ -830,20 +888,18 @@ typed response envelopes:
 ```tsx
 function useUpdateOrganizationProfile(organizationId: string) {
   return useMutation({
-    mutationKey: ['organization-profile', organizationId, 'update'],
-    mutationFn: (input: ProfileInput) =>
-      updateOrganizationProfile(organizationId, input),
+    mutationKey: ["organization-profile", organizationId, "update"],
+    mutationFn: (input: ProfileInput) => updateOrganizationProfile(organizationId, input),
     retry: false,
-  })
+  });
 }
 
 function useUpdateOrganizationOperations(organizationId: string) {
   return useMutation({
-    mutationKey: ['organization-operations', organizationId, 'update'],
-    mutationFn: (input: OperationsInput) =>
-      updateOrganizationOperations(organizationId, input),
+    mutationKey: ["organization-operations", organizationId, "update"],
+    mutationFn: (input: OperationsInput) => updateOrganizationOperations(organizationId, input),
     retry: false,
-  })
+  });
 }
 ```
 
@@ -852,11 +908,11 @@ and cache policies:
 
 ```tsx
 function useOrganizationProfileForm({ organizationId, onSuccess, onFailure }) {
-  const query = useOrganizationProfile(organizationId)
-  const mutation = useUpdateOrganizationProfile(organizationId)
+  const query = useOrganizationProfile(organizationId);
+  const mutation = useUpdateOrganizationProfile(organizationId);
 
   return useComposableForm({
-    id: 'profile',
+    id: "profile",
     query,
     onSuccess,
     onFailure,
@@ -872,42 +928,46 @@ function useOrganizationProfileForm({ organizationId, onSuccess, onFailure }) {
       mutationFn: mutation.mutateAsync,
       refetchFunctions: [query.refetch],
       invalidateQueryKeys: [workspaceKeys.organizations.detail(organizationId)],
-      cacheUpdates: [{
-        queryKey: ({ response }) =>
-          workspaceKeys.organizationProfiles.detail(response.profile.organizationId),
-        getData: (response) => response.profile,
-      }],
+      cacheUpdates: [
+        {
+          queryKey: ({ response }) =>
+            workspaceKeys.organizationProfiles.detail(response.profile.organizationId),
+          getData: (response) => response.profile,
+        },
+      ],
     },
-  })
+  });
 }
 
 function useOrganizationOperationsForm({ organizationId, onSuccess, onFailure }) {
-  const query = useOrganizationOperations(organizationId)
-  const mutation = useUpdateOrganizationOperations(organizationId)
+  const query = useOrganizationOperations(organizationId);
+  const mutation = useUpdateOrganizationOperations(organizationId);
 
   return useComposableForm({
-    id: 'operations',
+    id: "operations",
     query,
     onSuccess,
     onFailure,
     toFormData: (operations) => ({
-      isActive: operations.status === 'active',
+      isActive: operations.status === "active",
       region: operations.region,
     }),
     toMutationPayload: (values) => ({
-      status: values.isActive ? 'active' : 'paused',
+      status: values.isActive ? "active" : "paused",
       region: values.region,
     }),
     endpoint: {
       mutationFn: mutation.mutateAsync,
       refetchFunctions: [query.refetch],
       invalidateQueryKeys: [workspaceKeys.organizations.detail(organizationId)],
-      cacheUpdates: [{
-        queryKey: () => workspaceKeys.organizationOperations.detail(organizationId),
-        getData: (response) => response.operations,
-      }],
+      cacheUpdates: [
+        {
+          queryKey: () => workspaceKeys.organizationOperations.detail(organizationId),
+          getData: (response) => response.operations,
+        },
+      ],
     },
-  })
+  });
 }
 ```
 
@@ -931,32 +991,34 @@ const profile = useOrganizationProfileForm({
   organizationId,
   onSuccess: ({ response }) => markProfileSaved(response.profile),
   onFailure: ({ error }) => showProfileError(error),
-})
+});
 const operations = useOrganizationOperationsForm({
   organizationId,
   onSuccess: ({ response }) => markOperationsSaved(response.operations),
   onFailure: ({ error }) => showOperationsError(error),
-})
+});
 
 const save = useFormOrchestrator({
   forms: [profile.participant, operations.participant],
   retry: { maxRetries: 1, delayMs: 500 },
   onSuccess: ({ result }) => showSaveNotification(result),
   onFailure: ({ result }) => showConfigurationFailure(result),
-})
+});
 
 return (
-  <form onSubmit={(event) => {
-    event.preventDefault()
-    void save.submit()
-  }}>
+  <form
+    onSubmit={(event) => {
+      event.preventDefault();
+      void save.submit();
+    }}
+  >
     <fieldset disabled={save.isSaving || !profile.isReady || !operations.isReady}>
       <ProfileFields form={profile.form} />
       <OperationsFields form={operations.form} />
       <button type="submit">Save all changes</button>
     </fieldset>
   </form>
-)
+);
 ```
 
 For this page the actual sequence is:

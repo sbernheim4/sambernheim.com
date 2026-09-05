@@ -1,14 +1,14 @@
 import type { QueryClient } from "@tanstack/react-query";
 import type { BootstrapData } from "./types";
 import { bootstrapKey, workspaceKeys } from "./queries.ts";
-import { lifecycleCoordinator } from "../../forms/orchestration/coordinator.ts";
+import { getSaveGuard } from "../../forms/orchestration/orchestrator.ts";
 
 export async function clearWorkspace(
   queryClient: QueryClient,
   request: () => Promise<BootstrapData>,
 ) {
   if (queryClient.isMutating()) return false;
-  const release = lifecycleCoordinator(queryClient).beginClear();
+  const release = getSaveGuard(queryClient).beginClear();
   if (!release) return false;
   try {
     const data = await request();

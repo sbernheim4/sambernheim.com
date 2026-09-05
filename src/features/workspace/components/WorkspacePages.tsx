@@ -25,7 +25,7 @@ import {
   useOrganizationOperationsForm,
   useOrganizationProfileForm,
 } from "../hooks/organizationConfigurationForms";
-import { useFormOrchestrator } from "../../../forms/query/useFormOrchestrator";
+import { useFormOrchestrator } from "../../../forms/hooks/useFormOrchestrator";
 import { regionOptions, sectorOptions } from "../fieldOptions";
 
 export function OrganizationsPage() {
@@ -101,17 +101,22 @@ function OrganizationWorkspaceForm({
   const core = useOrganizationForm({ resource: organization });
   const profile = useOrganizationProfileForm({ organizationId });
   const operations = useOrganizationOperationsForm({ organizationId });
+
   const coreDirty = useStore(core.form.store, (state) => state.isDirty);
   const profileDirty = useStore(profile.form.store, (state) => state.isDirty);
   const operationsDirty = useStore(operations.form.store, (state) => state.isDirty);
+
   const save = useFormOrchestrator({
     forms: [core, profile, operations] as const,
     retry: { maxRetries: 1, delayMs: 500 },
   });
+
   const [submitError, setSubmitError] = useState<unknown>();
+
   const ready = core.isReady && profile.isReady && operations.isReady;
   const readError = core.readError || profile.readError || operations.readError;
   const dirtyCount = [coreDirty, profileDirty, operationsDirty].filter(Boolean).length;
+
   return (
     <section className="workspace-section">
       <div className="workspace-section-heading">
@@ -122,8 +127,11 @@ function OrganizationWorkspaceForm({
         onSubmit={(event) => {
           event.preventDefault();
           setSubmitError(undefined);
-          if (!dirtyCount) return;
-          void save.submit().catch(setSubmitError);
+          if (!dirtyCount) {
+            return;
+          }
+
+          save.submit().catch(setSubmitError);
         }}
       >
         {readError ? (
@@ -174,14 +182,14 @@ function OrganizationWorkspaceForm({
                 : outcomeMessage(save.result?.outcome)}
             </p>
             <ul>
-              {(["resource", "profile", "operations"] as const).map((participantId) => {
-                const state = save.participants?.[participantId];
+              {(["resource", "profile", "operations"] as const).map((formId) => {
+                const state = save.result?.forms[formId];
                 const status = state?.status ?? "unchanged";
                 return (
-                  <li key={participantId}>
-                    {participantId === "resource"
+                  <li key={formId}>
+                    {formId === "resource"
                       ? "Organization"
-                      : participantId === "profile"
+                      : formId === "profile"
                         ? "Profile"
                         : "Operations"}
                     : {status}

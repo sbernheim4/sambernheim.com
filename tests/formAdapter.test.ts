@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { FormApi, FieldApi } from "@tanstack/form-core";
-import { validateSnapshot, acceptSavedBaseline } from "../src/forms/bindings/formAdapter.ts";
+import { validateSnapshot, acceptSavedBaseline } from "../src/forms/hooks/formState.ts";
 
 test("snapshot adapter awaits field and form validators, maps errors without submitting", async () => {
   let submits = 0;

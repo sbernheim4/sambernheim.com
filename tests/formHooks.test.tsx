@@ -2,14 +2,15 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { act, create, type ReactTestRenderer } from "react-test-renderer";
 import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
-import { useQueryBackedForm } from "../src/forms/bindings/useQueryBackedForm";
-import { useFormOrchestrator } from "../src/forms/query/useFormOrchestrator";
+import { useQueryBackedForm } from "../src/forms/hooks/useQueryBackedForm";
+import { useFormOrchestrator } from "../src/forms/hooks/useFormOrchestrator";
 import { useOrganizationForm } from "../src/features/workspace/hooks/forms";
 import {
   useOrganizationProfileForm,
   useOrganizationOperationsForm,
 } from "../src/features/workspace/hooks/organizationConfigurationForms";
 import { useCreateOrganization } from "../src/features/workspace/hooks/mutations";
+import { useWorkspaceLaunchForms } from "../src/features/workspace/hooks/useWorkspaceLaunchForms";
 import { workspaceKeys } from "../src/features/workspace/queries";
 import { clearWorkspace } from "../src/features/workspace/clearWorkspace";
 
@@ -76,6 +77,7 @@ test("CRUD query selection initializes mapped values, preserves dirty edits and 
       select: (data) => data.envelope,
     });
     current = useQueryBackedForm({
+      defaultValues: { display: "" },
       query,
       toFormData: (data) => ({ display: data.name }),
       toMutationPayload: (v) => ({ name: v.display }),
@@ -249,7 +251,7 @@ test("composed domain forms retry only Operations, keep Profile success and pres
       },
     });
     const save = useFormOrchestrator({
-      forms: [profile.participant, operations.participant],
+      forms: [profile, operations],
       retry: { delayMs: 0 },
       onFailure: () => {
         log.push("group failure");
@@ -288,7 +290,7 @@ test("composed domain forms retry only Operations, keep Profile success and pres
   }
 });
 
-test("organization page orchestrator skips clean participants and only submits dirty forms", async () => {
+test("organization page orchestrator skips clean forms and only submits dirty forms", async () => {
   const qc = client();
   const original = globalThis.fetch;
   const requests: string[] = [];
@@ -423,39 +425,46 @@ test("organization page orchestrator skips clean participants and only submits d
   }
 });
 
-test("legacy facade callbacks run once and default-values create mode remains ready", async () => {
+test("query-backed creates resolve dynamic cache keys and run success after refresh and cache updates", async () => {
   const qc = client();
   const log: string[] = [];
   let current: any;
   const harness = await mount(qc, () => {
     current = useQueryBackedForm({
-      defaultValues: { name: "A" },
+      defaultValues: { name: "A", organizationId: "org-1" },
       endpoint: {
-        mutationFn: async (v) => v,
-        refetchPolicy: {
-          refetchFns: [
-            async () => {
-              log.push("refresh");
-            },
-          ],
-        },
-        cacheUpdates: [
-          {
-            queryKey: ["legacy"],
-            update: (_previous, { response }) => response,
+        mutationFn: async (v: { name: string; organizationId: string }) => ({
+          id: "created-1",
+          name: v.name,
+        }),
+        refetchFunctions: [
+          async () => {
+            log.push("refresh");
           },
         ],
-        afterEffects: [
-          () => {
-            log.push("endpoint");
+        cacheUpdates: [
+          {
+            queryKey: ({ response, variables }) => [
+              "organizations",
+              variables.organizationId,
+              "resources",
+              response.id,
+            ],
           },
         ],
       },
-      afterEffects: [
-        () => {
-          log.push("form");
-        },
-      ],
+      onSuccess: ({ response, variables, queryClient }) => {
+        assert.deepEqual(
+          queryClient.getQueryData([
+            "organizations",
+            variables.organizationId,
+            "resources",
+            response.id,
+          ]),
+          response,
+        );
+        log.push("success");
+      },
     });
     return null;
   });
@@ -464,8 +473,11 @@ test("legacy facade callbacks run once and default-values create mode remains re
     await act(async () => {
       await current.form.handleSubmit();
     });
-    assert.deepEqual(log, ["refresh", "endpoint", "form"]);
-    assert.deepEqual(qc.getQueryData(["legacy"]), { name: "A" });
+    assert.deepEqual(log, ["refresh", "success"]);
+    assert.deepEqual(qc.getQueryData(["organizations", "org-1", "resources", "created-1"]), {
+      id: "created-1",
+      name: "A",
+    });
   } finally {
     await harness.dispose();
   }
@@ -486,6 +498,7 @@ test("read errors and query mapping errors block writes and release the submissi
         },
       });
       current = useQueryBackedForm({
+        defaultValues: { name: "" },
         query,
         toFormData: (data) => {
           maps++;
@@ -507,7 +520,7 @@ test("read errors and query mapping errors block writes and release the submissi
       await act(async () => {
         await current.submit();
       });
-      assert.equal(current.save.result.outcome, "validation-failed");
+      assert.equal(current.result.outcome, "validation-failed");
       assert.equal(current.isSaving, false);
       assert.equal(failures, 1);
       if (!mappingError) assert.equal(maps, 0);
@@ -517,25 +530,96 @@ test("read errors and query mapping errors block writes and release the submissi
   }
 });
 
-import { legacyFormConfig } from "../src/forms/bindings/legacyFormConfig";
-test("compatibility adapter rejects mixed callback styles", () => {
-  assert.throws(
-    () =>
-      legacyFormConfig({
-        defaultValues: {},
-        endpoint: { mutationFn: async () => ({}), afterEffects: [] },
-        onSuccess: () => {},
-      }),
-    /not both/,
-  );
-  assert.throws(
-    () =>
-      legacyFormConfig({
-        defaultValues: {},
-        endpoint: { mutationFn: async () => ({}) },
-        afterEffects: [],
-        onFailure: () => {},
-      }),
-    /not both/,
-  );
-});
+for (const failProject of [false, true]) {
+  test(`workspace launch composes entity forms with dependent IDs (${failProject ? "partial failure" : "success"})`, async () => {
+    const qc = client();
+    const original = globalThis.fetch;
+    const writes: Array<{ path: string; input: Record<string, unknown> }> = [];
+    const activity: string[] = [];
+    let current!: ReturnType<typeof useWorkspaceLaunchForms>;
+    globalThis.fetch = async (url, options) => {
+      const path = String(url);
+      if (options?.method !== "POST")
+        return Response.json({ organizations: [], projects: [], tasks: [] });
+      const input = JSON.parse(String(options.body));
+      writes.push({ path, input });
+      if (failProject && path === "/api/projects")
+        return new Response("Project creation failed", { status: 500 });
+      const entity =
+        path === "/api/organizations"
+          ? "organization"
+          : path === "/api/projects"
+            ? "project"
+            : "task";
+      return Response.json({
+        [entity]: {
+          ...input,
+          id: `${entity}-new`,
+          updatedAt: "2026-09-05T12:00:00Z",
+        },
+        readModelLagMs: 2500,
+      });
+    };
+    const harness = await mount(qc, () => {
+      current = useWorkspaceLaunchForms((text) => activity.push(text));
+      return null;
+    });
+    try {
+      assert.notEqual(current.organization.form, current.project.form);
+      assert.notEqual(current.project.form, current.task.form);
+      assert.equal(current.organization.form.state.isDirty, false);
+      if (failProject) {
+        await act(async () => {
+          current.project.form.setFieldValue("name", "Edited project");
+          current.task.form.setFieldValue("title", "Edited task");
+        });
+      }
+      await act(async () => {
+        await current.save.submit();
+      });
+      const result = current.save.result!;
+      assert.deepEqual(
+        writes.map(({ path }) => path),
+        failProject
+          ? ["/api/organizations", "/api/projects"]
+          : ["/api/organizations", "/api/projects", "/api/tasks"],
+      );
+      assert.equal(writes[1].input.organizationId, "organization-new");
+      assert.equal(result.forms.organization.status, "saved");
+      assert.equal(
+        qc.getQueryData<{ id: string }>(workspaceKeys.organizations.detail("organization-new"))?.id,
+        "organization-new",
+      );
+      assert.equal(current.save.isSaving, false);
+      if (failProject) {
+        assert.equal(result.outcome, "partial-failure");
+        assert.equal(result.forms.project.attempts, 1);
+        assert.equal(result.forms.project.status, "failed");
+        assert.equal(result.forms.task.status, "skipped");
+        assert.equal(current.project.form.state.isDirty, true);
+        assert.equal(current.task.form.state.values.title, "Edited task");
+        assert.deepEqual(activity, [
+          "Saved organization: Acme Health",
+          "Workspace creation failed. See the save results.",
+        ]);
+      } else {
+        assert.equal(result.outcome, "success");
+        assert.equal(writes[2].input.organizationId, "organization-new");
+        assert.equal(writes[2].input.projectId, "project-new");
+        assert.equal(
+          qc.getQueryData<{ id: string }>(workspaceKeys.tasks.detail("task-new"))?.id,
+          "task-new",
+        );
+        assert.deepEqual(activity, [
+          "Saved organization: Acme Health",
+          "Saved project: Patient Intake",
+          "Saved task: Provision workspace",
+          "Workspace created: Acme Health",
+        ]);
+      }
+    } finally {
+      globalThis.fetch = original;
+      await harness.dispose();
+    }
+  });
+}

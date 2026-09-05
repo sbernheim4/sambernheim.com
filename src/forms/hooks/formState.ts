@@ -1,5 +1,5 @@
 import { FormApi, FieldApi, evaluate, type AnyFormApi } from "@tanstack/form-core";
-import type { ValidationResult } from "../orchestration/contracts.ts";
+import type { ValidationResult } from "../orchestration/types.ts";
 
 /** Validate a detached snapshot, so async validators cannot observe later edits. */
 export async function validateSnapshot(
@@ -55,9 +55,14 @@ export function acceptSavedBaseline(form: AnyFormApi, values: unknown) {
   const meta = form.baseStore.state.fieldMetaBase;
   const changed = !evaluate(current, values);
   form.reset(structuredClone(values));
+
   // React exposes a shallow FormApi facade; reset updates the core options.
   // Keep the facade's public defaults in sync as well.
-  form.options = { ...form.options, defaultValues: structuredClone(values) };
+  form.options = {
+    ...form.options,
+    defaultValues: structuredClone(values),
+  };
+
   if (changed)
     form.baseStore.setState((state) => ({
       ...state,

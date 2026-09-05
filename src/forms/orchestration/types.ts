@@ -36,11 +36,11 @@ export type CacheUpdate<R, I, Results = {}> =
     };
 export type FollowUpError = {
   phase: "refresh" | "cache" | "baseline" | "effect";
-  participantId?: string;
+  formId?: string;
   error: unknown;
 };
 export type FailureContext<V, I> = {
-  participantId: string;
+  formId: string;
   formValues: V;
   variables?: I;
   attempts: number;
@@ -48,7 +48,7 @@ export type FailureContext<V, I> = {
   error: unknown;
 };
 export type SuccessContext<V, I, R, Results = {}> = CacheContext<R, I, Results> & {
-  participantId: string;
+  formId: string;
   formValues: V;
   attempts: number;
   followUpErrors: readonly FollowUpError[];
@@ -68,49 +68,49 @@ export type PayloadMapping<V, I, Results> = [V] extends [I]
   ? { toMutationPayload?: (values: V, context: { results: Results }) => I }
   : { toMutationPayload: (values: V, context: { results: Results }) => I };
 
-export const participantDefinition = Symbol("form participant");
-export type AnyParticipant = Participant<string, any, any, any>;
-export type ResponsesOf<P extends readonly AnyParticipant[]> = {
-  [F in P[number] as F["id"]]: F extends Participant<string, any, any, infer R> ? R : never;
+/** Common shape consumed by the save loop; callbacks retain their types at declaration. */
+export type AnyForm = {
+  id: string;
+  dependencies?: readonly { id: string }[];
+  snapshot: () => any;
+  validate: (...args: any[]) => ValidationResult | Promise<ValidationResult>;
+  toMutationPayload?: (...args: any[]) => any;
+  acceptBaseline?: (...args: any[]) => void | Promise<void>;
+  finish?: () => void;
+  onSuccess?: (...args: any[]) => void | Promise<void>;
+  onFailure?: (...args: any[]) => void | Promise<void>;
+  retry?: RetryPolicy;
+  endpoint: RefreshOptions & {
+    mutationFn: AsyncMutation;
+    retrySafe?: boolean;
+    cacheUpdates?: readonly ({ queryKey: (...args: any[]) => QueryKey } & (
+      | { getData?: (...args: any[]) => unknown; update?: never }
+      | { getData?: never; update: (...args: any[]) => unknown }
+    ))[];
+  };
 };
-export type Participant<Id extends string, V, I, R> = {
-  readonly id: Id;
-  /** Internal adapter; no UI or FormApi is exposed by a participant. */
-  readonly [participantDefinition]: RuntimeParticipant;
-  readonly types?: { values: V; input: I; response: R };
+export type ResponsesOf<F extends readonly AnyForm[]> = {
+  [Form in F[number] as Form["id"]]: Response<Form["endpoint"]["mutationFn"]>;
 };
-export type ParticipantConfig<
+export type FormConfig<
   Id extends string,
   V,
   M extends AsyncMutation,
-  D extends readonly AnyParticipant[] = readonly [],
+  D extends readonly AnyForm[] = readonly [],
 > = OutcomeCallbacks<V, Input<NoInfer<M>>, Response<NoInfer<M>>, Partial<ResponsesOf<D>>> &
   PayloadMapping<V, Input<NoInfer<M>>, Partial<ResponsesOf<D>>> & {
     id: Id;
     dependencies?: D;
     snapshot: () => V;
     validate: (values: V) => ValidationResult | Promise<ValidationResult>;
-    finish?: () => void;
     acceptBaseline?: (values: V) => void | Promise<void>;
+    finish?: () => void;
     endpoint: Endpoint<M, Partial<ResponsesOf<D>>>;
     retry?: RetryPolicy;
   };
 
-// Heterogeneous execution is erased only inside the adapter, after inference.
-export type RuntimeParticipant = {
-  id: string;
-  dependencies: readonly string[];
-  snapshot: () => any;
-  validate: (values: any) => ValidationResult | Promise<ValidationResult>;
-  map: (values: any, context: { results: any }) => any;
-  finish?: () => void;
-  acceptBaseline?: (values: any) => void | Promise<void>;
-  endpoint: Endpoint<AsyncMutation, any>;
-  retry?: RetryPolicy;
-} & OutcomeCallbacks<any, any, any, any>;
-
-export type ParticipantState<V = unknown, I = unknown, R = unknown> = {
-  participantId: string;
+export type FormSaveState<V = unknown, I = unknown, R = unknown> = {
+  formId: string;
   status:
     | "pending"
     | "validating"
@@ -127,12 +127,14 @@ export type ParticipantState<V = unknown, I = unknown, R = unknown> = {
   response?: R;
   failure?: FailureContext<V, I>;
 };
-export type OrchestrationResult<P extends readonly AnyParticipant[]> = {
+export type SaveResult<P extends readonly AnyForm[]> = {
   outcome: "validation-failed" | "success" | "partial-failure" | "saved-with-follow-up-errors";
-  participants: {
-    [F in P[number] as F["id"]]: F extends Participant<string, infer V, infer I, infer R>
-      ? ParticipantState<V, I, R>
-      : never;
+  forms: {
+    [F in P[number] as F["id"]]: FormSaveState<
+      ReturnType<F["snapshot"]>,
+      Input<F["endpoint"]["mutationFn"]>,
+      Response<F["endpoint"]["mutationFn"]>
+    >;
   };
   responses: Partial<ResponsesOf<P>>;
   followUpErrors: FollowUpError[];
@@ -145,7 +147,8 @@ export type Phase =
   | "reconciling"
   | "effects"
   | "complete";
-export type OrchestratorConfig<P extends readonly AnyParticipant[]> = RefreshOptions & {
+
+export type SaveConfig<P extends readonly AnyForm[]> = RefreshOptions & {
   forms: P;
   retry?: RetryPolicy;
   cacheUpdates?: readonly CacheUpdate<
@@ -153,6 +156,6 @@ export type OrchestratorConfig<P extends readonly AnyParticipant[]> = RefreshOpt
     undefined,
     Partial<ResponsesOf<P>>
   >[];
-  onSuccess?: (context: { result: OrchestrationResult<P> }) => void | Promise<void>;
-  onFailure?: (context: { result: OrchestrationResult<P> }) => void | Promise<void>;
+  onSuccess?: (context: { result: SaveResult<P> }) => void | Promise<void>;
+  onFailure?: (context: { result: SaveResult<P> }) => void | Promise<void>;
 };
