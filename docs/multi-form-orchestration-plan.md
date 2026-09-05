@@ -12,8 +12,8 @@ notes remain historical context.
 - [x] Ordered executor: validation, snapshots, dependencies, retries, partial results, refresh/cache/effects.
 - [x] React bindings and standalone CRUD compatibility; query initialization and saved baselines.
 - [x] Extract resource/demo domain form hooks and migrate workspace resource reads.
-- [ ] Profile/Operations backend ownership, reads, writes, initialization, clear-all.
-- [ ] Resource cache projections and clear-all lifecycle coordination.
+- [x] Profile/Operations backend ownership, reads, writes, initialization, clear-all.
+- [x] Resource cache projections and clear-all lifecycle coordination.
 - [ ] Composed configuration page, navigation, per-child/aggregate feedback, projects.
 - [ ] Focused executor, binding, cache, API and compile-time regression coverage.
 - [ ] Shared dependent-flow lifecycle, boundary documentation, final build and review.
@@ -40,19 +40,22 @@ notes remain historical context.
   resource queries. New CRUD hooks use flat refreshes and outcome callbacks, and
   reconcile list, detail, parent-list, and bootstrap caches. Full type checks pass;
   tsserver reference lookup confirms form ownership moved out of route views.
+- `oslqrotm`: independent Profile/Operations owners and API factory, version-aware
+  summary/list/detail policies, and clear-all lifecycle exclusion. Type checks and
+  6 focused API/cache tests pass in isolated state. The read merge policy retains
+  acknowledged versions while the cache exists; clear-all removes that state.
 - No browser automation or server startup; user owns browser verification.
 
 ### Working Notes / Open Issues
 
 - Domain extraction is moved after the new binding to avoid migrating resource
   forms twice. Each validated unit still receives its own jj revision.
-- Clear-all currently has its request hook; lifecycle locking and all-resource
-  cache removal remain pending.
+- Clear-all now excludes active full lifecycles and removes all workspace caches.
 - Need explicit coverage for snapshot validation (both field and form validators),
   overlapping refreshes, post-save edits, and independent child summary merges.
-- Consistency guarantee covers the coordinated lifecycle. Later uncoordinated
-  replica reads need a documented limit or separate protection; staleTime alone
-  does not provide it.
+- Workspace queries now merge versions, including separate Profile/Operations
+  summary timestamps. This protects later replica reads while caches survive; it
+  is not a global monotonic-read guarantee across eviction, clients, or reloads.
 
 
 ## Session Handoff And jj Workflow

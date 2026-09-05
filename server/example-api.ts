@@ -1,57 +1,19 @@
 import type { IncomingMessage, ServerResponse } from 'node:http'
 
-const readModelLagMs = 2500
-
-type Organization = {
-  id: string
-  name: string
-  sector: 'healthcare' | 'finance' | 'education'
-  status: 'active' | 'paused'
-  region: 'east' | 'central' | 'west'
-  updatedAt: string
-}
-
-type Project = {
-  id: string
-  organizationId: string
-  name: string
-  priority: 'low' | 'medium' | 'high'
-  phase: 'planning' | 'implementation' | 'launched'
-  budget: string
-  updatedAt: string
-}
-
-type Task = {
-  id: string
-  organizationId: string
-  projectId: string
-  title: string
-  owner: 'alex' | 'jordan' | 'morgan'
-  status: 'todo' | 'in-progress' | 'blocked'
-  dueWindow: 'this-week' | 'next-week' | 'this-month'
-  updatedAt: string
-}
-
-type Store = {
-  organizations: Organization[]
-  projects: Project[]
-  tasks: Task[]
-}
+import type { Organization, Project, Task, OrganizationProfile, OrganizationOperations } from '../src/features/workspace/types.ts'
+type Store = { organizations: { id: string }[]; profiles: OrganizationProfile[]; operations: OrganizationOperations[]; projects: Project[]; tasks: Task[] }
 
 type RequestBody = Record<string, unknown>
 
+export function createExampleApi({ readModelLagMs = 2500 }: { readModelLagMs?: number } = {}) {
 let nextId = 2
+let lastTimestamp = 0
+const now = () => { lastTimestamp = Math.max(Date.now(), lastTimestamp + 1); return new Date(lastTimestamp).toISOString() }
+const timers = new Set<ReturnType<typeof setTimeout>>()
 const writeStore: Store = {
-  organizations: [
-    {
-      id: 'org-1',
-      name: 'Existing Clinic',
-      sector: 'healthcare',
-      status: 'active',
-      region: 'east',
-      updatedAt: new Date().toISOString(),
-    },
-  ],
+  organizations: [{ id: 'org-1' }],
+  profiles: [{ organizationId: 'org-1', name: 'Existing Clinic', sector: 'healthcare', updatedAt: now() }],
+  operations: [{ organizationId: 'org-1', status: 'active', region: 'east', updatedAt: now() }],
   projects: [
     {
       id: 'project-1',
@@ -60,7 +22,7 @@ const writeStore: Store = {
       priority: 'high',
       phase: 'implementation',
       budget: '$125k',
-      updatedAt: new Date().toISOString(),
+      updatedAt: now(),
     },
   ],
   tasks: [
@@ -72,27 +34,42 @@ const writeStore: Store = {
       owner: 'alex',
       status: 'in-progress',
       dueWindow: 'this-week',
-      updatedAt: new Date().toISOString(),
+      updatedAt: now(),
     },
   ],
 }
 let readStore: Store = structuredClone(writeStore)
 
-export async function handleApiRequest(
+async function handleApiRequest(
   request: IncomingMessage,
   response: ServerResponse,
 ) {
   try {
     const path = new URL(request.url ?? '/', 'http://localhost').pathname
+    const childMatch = path.match(/^\/api\/organizations\/([^/]+)\/(profile|operations)$/)
+    if (childMatch && (request.method === 'GET' || request.method === 'PATCH')) {
+      const store = request.method === 'GET' ? readStore : writeStore
+      const id = decodeURIComponent(childMatch[1])
+      const parent = store.organizations.find((item) => item.id === id)
+      if (!parent) return sendJson(response, { message: 'Organization not found.' }, 404)
+      const profile = store.profiles.find((item) => item.organizationId === id)!
+      const operations = store.operations.find((item) => item.organizationId === id)!
+      if (request.method === 'GET') return sendJson(response, childMatch[2] === 'profile' ? profile : operations)
+      const body = await readJson(request)
+      if (childMatch[2] === 'profile') updateProfile(profile, body)
+      else updateOperations(operations, body)
+      scheduleReplicaSync()
+      return sendJson(response, childMatch[2] === 'profile' ? { profile, readModelLagMs } : { operations, readModelLagMs })
+    }
     const editMatch = path.match(/^\/api\/(organizations|projects|tasks)\/([^/]+)$/)
     if (request.method === 'GET') {
       if (editMatch) {
-        const collection = editMatch[1] as keyof Store
-        const entity = readStore[collection].find((item) => item.id === decodeURIComponent(editMatch[2]))
+        const collection = editMatch[1] as 'organizations' | 'projects' | 'tasks'
+        const entity = bootstrap(readStore)[collection].find((item) => item.id === decodeURIComponent(editMatch[2]))
         return sendJson(response, entity ?? { message: 'Resource not found.' }, entity ? 200 : 404)
       }
       const list = path.match(/^\/api\/(organizations|projects|tasks)$/)
-      if (list) return sendJson(response, readStore[list[1] as keyof Store])
+      if (list) return sendJson(response, bootstrap(readStore)[list[1] as 'organizations' | 'projects' | 'tasks'])
       const children = path.match(/^\/api\/(organizations|projects)\/([^/]+)\/(projects|tasks)$/)
       if (children) {
         const id = decodeURIComponent(children[2])
@@ -101,19 +78,16 @@ export async function handleApiRequest(
       }
     }
     if (request.method === 'PATCH' && editMatch) {
-      const collection = editMatch[1] as keyof Store
+      const collection = editMatch[1] as 'organizations' | 'projects' | 'tasks'
       const entity = writeStore[collection].find((item) => item.id === editMatch[2])
       if (!entity) return sendJson(response, { message: 'Resource not found.' }, 404)
       const body = await readJson(request)
       if (collection === 'organizations') {
-        const organization = entity as Organization
-        Object.assign(organization, {
-          name: cleanString(body.name, organization.name),
-          sector: oneOf(body.sector, ['healthcare', 'finance', 'education'], organization.sector),
-          status: oneOf(body.status, ['active', 'paused'], organization.status),
-          region: oneOf(body.region, ['east', 'central', 'west'], organization.region),
-          updatedAt: new Date().toISOString(),
-        })
+        const profile = writeStore.profiles.find((item) => item.organizationId === entity.id)!
+        const operations = writeStore.operations.find((item) => item.organizationId === entity.id)!
+        updateProfile(profile, body)
+        updateOperations(operations, body)
+        const organization = projectOrganization(writeStore, entity.id)
         scheduleReplicaSync()
         return sendJson(response, { organization, readModelLagMs })
       }
@@ -124,7 +98,7 @@ export async function handleApiRequest(
           priority: oneOf(body.priority, ['low', 'medium', 'high'], project.priority),
           phase: oneOf(body.phase, ['planning', 'implementation', 'launched'], project.phase),
           budget: cleanString(body.budget, project.budget),
-          updatedAt: new Date().toISOString(),
+          updatedAt: now(),
         })
         scheduleReplicaSync()
         return sendJson(response, { project, readModelLagMs })
@@ -135,7 +109,7 @@ export async function handleApiRequest(
         owner: oneOf(body.owner, ['alex', 'jordan', 'morgan'], task.owner),
         status: oneOf(body.status, ['todo', 'in-progress', 'blocked'], task.status),
         dueWindow: oneOf(body.dueWindow, ['this-week', 'next-week', 'this-month'], task.dueWindow),
-        updatedAt: new Date().toISOString(),
+        updatedAt: now(),
       })
       scheduleReplicaSync()
       return sendJson(response, { task, readModelLagMs })
@@ -145,12 +119,16 @@ export async function handleApiRequest(
       writeStore.tasks = []
       writeStore.projects = []
       writeStore.organizations = []
+      writeStore.profiles = []
+      writeStore.operations = []
+      for (const timer of timers) clearTimeout(timer)
+      timers.clear()
       readStore = structuredClone(writeStore)
-      return sendJson(response, readStore)
+      return sendJson(response, bootstrap(readStore))
     }
 
     if (request.method === 'GET' && request.url === '/api/bootstrap') {
-      return sendJson(response, readStore)
+      return sendJson(response, bootstrap(readStore))
     }
 
     if (request.method === 'POST' && request.url === '/api/organizations') {
@@ -161,10 +139,12 @@ export async function handleApiRequest(
         sector: oneOf(body.sector, ['healthcare', 'finance', 'education'], 'healthcare'),
         status: oneOf(body.status, ['active', 'paused'], 'active'),
         region: oneOf(body.region, ['east', 'central', 'west'], 'east'),
-        updatedAt: new Date().toISOString(),
+        updatedAt: now(),
       }
 
-      writeStore.organizations.push(organization)
+      writeStore.organizations.push({ id: organization.id })
+      writeStore.profiles.push({ organizationId: organization.id, name: organization.name, sector: organization.sector, updatedAt: organization.updatedAt })
+      writeStore.operations.push({ organizationId: organization.id, status: organization.status, region: organization.region, updatedAt: organization.updatedAt })
       scheduleReplicaSync()
 
       return sendJson(response, { organization, readModelLagMs })
@@ -182,7 +162,7 @@ export async function handleApiRequest(
         priority: oneOf(body.priority, ['low', 'medium', 'high'], 'medium'),
         phase: oneOf(body.phase, ['planning', 'implementation', 'launched'], 'planning'),
         budget: cleanString(body.budget, '$50k'),
-        updatedAt: new Date().toISOString(),
+        updatedAt: now(),
       }
 
       writeStore.projects.push(project)
@@ -205,7 +185,7 @@ export async function handleApiRequest(
         owner: oneOf(body.owner, ['alex', 'jordan', 'morgan'], 'alex'),
         status: oneOf(body.status, ['todo', 'in-progress', 'blocked'], 'todo'),
         dueWindow: oneOf(body.dueWindow, ['this-week', 'next-week', 'this-month'], 'this-week'),
-        updatedAt: new Date().toISOString(),
+        updatedAt: now(),
       }
 
       writeStore.tasks.push(task)
@@ -223,10 +203,30 @@ export async function handleApiRequest(
 }
 
 function scheduleReplicaSync() {
-  setTimeout(() => {
-    readStore = structuredClone(writeStore)
-  }, readModelLagMs)
+  const timer = setTimeout(() => { timers.delete(timer); readStore = structuredClone(writeStore) }, readModelLagMs)
+  timer.unref()
+  timers.add(timer)
 }
+function updateProfile(profile: OrganizationProfile, body: RequestBody) {
+  Object.assign(profile, { name: cleanString(body.name, profile.name), sector: oneOf(body.sector, ['healthcare', 'finance', 'education'], profile.sector), updatedAt: now() })
+}
+function updateOperations(operations: OrganizationOperations, body: RequestBody) {
+  Object.assign(operations, { status: oneOf(body.status, ['active', 'paused'], operations.status), region: oneOf(body.region, ['east', 'central', 'west'], operations.region), updatedAt: now() })
+}
+return { handleApiRequest, dispose: () => { for (const timer of timers) clearTimeout(timer); timers.clear() } }
+}
+
+function projectOrganization(store: Store, id: string): Organization {
+  const profile = store.profiles.find((item) => item.organizationId === id)!
+  const operations = store.operations.find((item) => item.organizationId === id)!
+  return { id, name: profile.name, sector: profile.sector, status: operations.status, region: operations.region,
+    updatedAt: profile.updatedAt > operations.updatedAt ? profile.updatedAt : operations.updatedAt,
+    profileUpdatedAt: profile.updatedAt, operationsUpdatedAt: operations.updatedAt }
+}
+function bootstrap(store: Store) {
+  return { organizations: store.organizations.map((item) => projectOrganization(store, item.id)), projects: store.projects, tasks: store.tasks }
+}
+export const { handleApiRequest } = createExampleApi()
 
 function sendJson(response: ServerResponse, value: unknown, status = 200) {
   response.writeHead(status, {

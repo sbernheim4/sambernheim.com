@@ -1,4 +1,6 @@
 export type Organization = {
+  profileUpdatedAt?: string
+  operationsUpdatedAt?: string
   id: string
   name: string
   sector: 'healthcare' | 'finance' | 'education'
@@ -72,3 +74,10 @@ export type SaveTaskResponse = {
   task: Task
   readModelLagMs: number
 }
+
+export type OrganizationProfile = Pick<Organization, 'name' | 'sector' | 'updatedAt'> & { organizationId: string }
+export type OrganizationOperations = Pick<Organization, 'status' | 'region' | 'updatedAt'> & { organizationId: string }
+export type ProfileInput = Pick<OrganizationProfile, 'name' | 'sector'>
+export type OperationsInput = Pick<OrganizationOperations, 'status' | 'region'>
+export type ProfileResponse = { profile: OrganizationProfile; readModelLagMs: number }
+export type OperationsResponse = { operations: OrganizationOperations; readModelLagMs: number }
