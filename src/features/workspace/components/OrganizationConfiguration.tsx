@@ -17,6 +17,7 @@ export function OrganizationConfiguration({ id }: { id: string }) {
     <Workspace
       title="Organization configuration"
       description="Edit the profile and operations together."
+      entity="organization"
       organization={organization}
     >
       <QueryState query={query}>
@@ -127,7 +128,9 @@ function ProfileFields({ form }: { form: ReturnType<typeof useOrganizationProfil
     <>
       <form.AppField
         name="displayName"
-        validators={{ onSubmit: ({ value }) => (!value.trim() ? "Name is required." : undefined) }}
+        validators={{
+          onSubmit: ({ value }) => (!value.trim() ? "Name is required." : undefined),
+        }}
       >
         {(field) => <field.TextField label="Name" required />}
       </form.AppField>

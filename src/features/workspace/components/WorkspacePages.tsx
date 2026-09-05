@@ -49,6 +49,7 @@ export function OrganizationPage({ id }: { id: string }) {
     <Workspace
       title={organization?.name ?? "Organization"}
       description="Account details and projects."
+      entity="organization"
       organization={organization}
     >
       <QueryState query={query} missing={!!query.data && !organization}>
@@ -93,6 +94,7 @@ export function ProjectPage({ id }: { id: string }) {
     <Workspace
       title={project?.name ?? "Project"}
       description="Project settings and assigned work."
+      entity="project"
       organization={organization}
       project={project}
     >
@@ -129,6 +131,7 @@ export function TaskPage({ id }: { id: string }) {
     <Workspace
       title={task?.title ?? "Task"}
       description="Ownership, status, and delivery."
+      entity="task"
       organization={organization}
       project={project}
       task={task}
@@ -176,6 +179,7 @@ export function Workspace({
   title,
   description,
   children,
+  entity,
   organization,
   project,
   task,
@@ -183,12 +187,13 @@ export function Workspace({
   title: string;
   description: string;
   children: ReactNode;
+  entity?: "organization" | "project" | "task";
   organization?: Organization;
   project?: Project;
   task?: Task;
 }) {
   return (
-    <WorkspaceLayout title={title} description={description}>
+    <WorkspaceLayout title={title} description={description} entity={entity}>
       <div className="workspace-body">
         <nav className="workspace-breadcrumbs" aria-label="Breadcrumb">
           <Link to="/organizations">Organizations</Link>

@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useQueryBackedForm } from "../../../forms/bindings/useQueryBackedForm";
 import { useWorkspaceResources } from "./useWorkspaceResources";
 import { useCreateOrganization } from "./mutations";

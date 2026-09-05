@@ -1,7 +1,9 @@
 import { reconcileWorkspaceRead } from "../cache";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient, type QueryKey } from "@tanstack/react-query";
+import { readReplicaResource } from "../replicaRead";
 import { fetchBootstrap } from "../api";
-import { bootstrapKey } from "../queries";
+import * as api from "../api";
+import { bootstrapKey, workspaceKeys as keys } from "../queries";
 
 export function useWorkspaceResources() {
   return useQuery({
@@ -12,8 +14,6 @@ export function useWorkspaceResources() {
   });
 }
 
-import * as api from "../api";
-import { workspaceKeys as keys } from "../queries";
 export const useOrganizations = () =>
   useQuery({
     structuralSharing: reconcileWorkspaceRead,
@@ -21,12 +21,7 @@ export const useOrganizations = () =>
     queryFn: api.fetchOrganizations,
   });
 export const useOrganization = (id: string) =>
-  useQuery({
-    structuralSharing: reconcileWorkspaceRead,
-    queryKey: keys.organizations.detail(id),
-    queryFn: () => api.fetchOrganization(id),
-    enabled: !!id,
-  });
+  useResourceQuery(keys.organizations.detail(id), () => api.fetchOrganization(id), !!id);
 export const useProjects = () =>
   useQuery({
     structuralSharing: reconcileWorkspaceRead,
@@ -41,12 +36,7 @@ export const useOrganizationProjects = (id: string) =>
     enabled: !!id,
   });
 export const useProject = (id: string) =>
-  useQuery({
-    structuralSharing: reconcileWorkspaceRead,
-    queryKey: keys.projects.detail(id),
-    queryFn: () => api.fetchProject(id),
-    enabled: !!id,
-  });
+  useResourceQuery(keys.projects.detail(id), () => api.fetchProject(id), !!id);
 export const useTasks = () =>
   useQuery({
     structuralSharing: reconcileWorkspaceRead,
@@ -61,12 +51,7 @@ export const useProjectTasks = (id: string) =>
     enabled: !!id,
   });
 export const useTask = (id: string) =>
-  useQuery({
-    structuralSharing: reconcileWorkspaceRead,
-    queryKey: keys.tasks.detail(id),
-    queryFn: () => api.fetchTask(id),
-    enabled: !!id,
-  });
+  useResourceQuery(keys.tasks.detail(id), () => api.fetchTask(id), !!id);
 
 // Page-level read composition keeps resource ownership in domain queries.
 export function useOrganizationsWorkspace() {
@@ -109,7 +94,11 @@ export function useTaskWorkspace(id: string) {
   });
 }
 function workspaceRead(
-  queries: Array<{ isPending: boolean; isError: boolean; refetch: () => unknown }>,
+  queries: Array<{
+    isPending: boolean;
+    isError: boolean;
+    refetch: () => unknown;
+  }>,
   data: import("../types").BootstrapData,
 ) {
   return {
@@ -121,16 +110,26 @@ function workspaceRead(
 }
 
 export const useOrganizationProfile = (id: string) =>
-  useQuery({
-    structuralSharing: reconcileWorkspaceRead,
-    queryKey: keys.organizationProfiles.detail(id),
-    queryFn: () => api.fetchOrganizationProfile(id),
-    enabled: !!id,
-  });
+  useResourceQuery(
+    keys.organizationProfiles.detail(id),
+    () => api.fetchOrganizationProfile(id),
+    !!id,
+  );
 export const useOrganizationOperations = (id: string) =>
-  useQuery({
+  useResourceQuery(
+    keys.organizationOperations.detail(id),
+    () => api.fetchOrganizationOperations(id),
+    !!id,
+  );
+
+function useResourceQuery<T>(queryKey: QueryKey, request: () => Promise<T>, enabled: boolean) {
+  const client = useQueryClient();
+  return useQuery({
+    queryKey,
+    queryFn: () => readReplicaResource(client, queryKey, request),
+    enabled,
     structuralSharing: reconcileWorkspaceRead,
-    queryKey: keys.organizationOperations.detail(id),
-    queryFn: () => api.fetchOrganizationOperations(id),
-    enabled: !!id,
+    retry: (attempt, error) =>
+      !(error instanceof api.ApiError && error.status < 500) && attempt < 1,
   });
+}

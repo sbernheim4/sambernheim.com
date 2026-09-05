@@ -5,7 +5,9 @@ import { createParticipant } from "../src/forms/orchestration/participant.ts";
 import { createOrchestrator } from "../src/forms/orchestration/executor.ts";
 import { lifecycleCoordinator } from "../src/forms/orchestration/coordinator.ts";
 const client = () =>
-  new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: Infinity } } });
+  new QueryClient({
+    defaultOptions: { queries: { retry: false, gcTime: Infinity } },
+  });
 const deferred = () => {
   let resolve!: () => void;
   const promise = new Promise<void>((r) => {
@@ -47,7 +49,9 @@ test("snapshots all children, validates before writes, maps once and retries ord
     dependencies: [a],
     snapshot: () => values,
     validate: valid,
-    toMutationPayload: (v, { results }) => ({ name: `${results.a!.id}:${v.name}` }),
+    toMutationPayload: (v, { results }) => ({
+      name: `${results.a!.id}:${v.name}`,
+    }),
     endpoint: {
       mutationFn: async (v: { name: string }) => {
         log.push(`b:${v.name}`);
@@ -323,4 +327,110 @@ test("permanent errors and non-idempotent creates never automatically retry", as
     assert.equal(writes, 1);
     assert.equal(result.participants.p.failure?.phase, "save");
   }
+});
+
+test("active runs retain callback definitions; group cache targets follow children and undefined selectors do not delete", async () => {
+  const qc = client();
+  const wait = deferred();
+  const log: string[] = [];
+  qc.setQueryData(["keep"], 1);
+  const first = createParticipant({
+    id: "first",
+    snapshot: () => 5,
+    validate: valid,
+    endpoint: {
+      mutationFn: async (v: number) => {
+        await wait.promise;
+        return { value: v };
+      },
+      cacheUpdates: [
+        {
+          queryKey: ({ variables }) => ["child", variables],
+          getData: (response) => {
+            log.push("child cache");
+            return response.value;
+          },
+        },
+        { queryKey: () => ["keep"], getData: () => undefined },
+      ],
+    },
+    onSuccess: async () => {
+      await Promise.resolve();
+      log.push("child callback");
+    },
+  });
+  const config = {
+    forms: [first] as const,
+    refetchFunctions: [
+      () => {
+        log.push("group refresh");
+      },
+    ],
+    cacheUpdates: [
+      {
+        queryKey: () => ["group"],
+        getData: (response: { first?: { value: number } }) => {
+          log.push("group cache");
+          return response.first?.value;
+        },
+      },
+    ],
+    onSuccess: async () => {
+      log.push("original group callback");
+    },
+  };
+  const runner = createOrchestrator<readonly [typeof first]>(qc);
+  const pending = runner.submit(config);
+  config.onSuccess = async () => {
+    log.push("replacement callback");
+  };
+  config.refetchFunctions.length = 0;
+  wait.resolve();
+  const result = await pending;
+  assert.equal(result.outcome, "success");
+  assert.equal(qc.getQueryData(["keep"]), 1);
+  assert.deepEqual(log, [
+    "group refresh",
+    "child cache",
+    "group cache",
+    "child callback",
+    "original group callback",
+  ]);
+});
+
+test("dependency mapping errors skip their request, preserve successful parents and notify failure once", async () => {
+  const log: string[] = [];
+  const parent = createParticipant({
+    id: "parent",
+    snapshot: () => 1,
+    validate: valid,
+    endpoint: { mutationFn: async (v: number) => v },
+    onSuccess: () => {
+      log.push("parent saved");
+    },
+  });
+  const child = createParticipant({
+    id: "child",
+    dependencies: [parent],
+    snapshot: () => 1,
+    validate: valid,
+    toMutationPayload: (_values, { results }) => {
+      assert.equal(results.parent, 1);
+      throw new Error("invalid derived input");
+    },
+    endpoint: {
+      mutationFn: async (_v: number) => assert.fail("no child request"),
+    },
+    onFailure: ({ phase, attempts }) => {
+      assert.equal(phase, "mapping");
+      assert.equal(attempts, 0);
+      log.push("child failed");
+    },
+  });
+  const result = await createOrchestrator<readonly [typeof parent, typeof child]>(client()).submit({
+    forms: [parent, child],
+  });
+  assert.equal(result.outcome, "partial-failure");
+  assert.equal(result.responses.parent, 1);
+  assert.deepEqual(log, ["parent saved", "child failed"]);
 });

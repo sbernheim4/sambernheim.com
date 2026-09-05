@@ -28,6 +28,7 @@ function FlowFormRoute() {
     <WorkspaceLayout
       title="Dependent Save Flow"
       description="A guided resource creation workflow that saves three related records across separate endpoints."
+      entity="flow"
     >
       <section className="forms-workspace app-workspace">
         <form

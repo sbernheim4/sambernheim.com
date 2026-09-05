@@ -1,3 +1,4 @@
+import type { OutcomeCallbacks } from "../../../forms/orchestration/contracts";
 import { useQueryBackedForm } from "../../../forms/bindings/useQueryBackedForm";
 import type {
   Organization,
@@ -6,6 +7,9 @@ import type {
   SaveOrganizationInput,
   SaveProjectInput,
   SaveTaskInput,
+  SaveOrganizationResponse,
+  SaveProjectResponse,
+  SaveTaskResponse,
 } from "../types";
 import { useOrganization, useProject, useTask } from "./useWorkspaceResources";
 import {
@@ -44,32 +48,50 @@ const organizationFields: EditorField[] = [
 ];
 const projectFields: EditorField[] = [
   { name: "name", label: "Project name" },
-  { name: "priority", label: "Priority", mode: "radio", options: priorityOptions },
+  {
+    name: "priority",
+    label: "Priority",
+    mode: "radio",
+    options: priorityOptions,
+  },
   { name: "phase", label: "Phase", mode: "select", options: phaseOptions },
   { name: "budget", label: "Budget", mode: "select", options: budgetOptions },
 ];
 const taskFields: EditorField[] = [
   { name: "title", label: "Task title" },
   { name: "owner", label: "Owner", mode: "select", options: ownerOptions },
-  { name: "status", label: "Status", mode: "radio", options: taskStatusOptions },
-  { name: "dueWindow", label: "Due", mode: "select", options: dueWindowOptions },
+  {
+    name: "status",
+    label: "Status",
+    mode: "radio",
+    options: taskStatusOptions,
+  },
+  {
+    name: "dueWindow",
+    label: "Due",
+    mode: "select",
+    options: dueWindowOptions,
+  },
 ];
 export function useOrganizationForm({
   resource,
-  onSuccess,
-}: {
-  resource?: Organization;
-  onSuccess?: () => void;
-}) {
+  ...callbacks
+}: { resource?: Organization } & OutcomeCallbacks<
+  Record<string, string>,
+  SaveOrganizationInput,
+  SaveOrganizationResponse
+>) {
   const query = useOrganization(resource?.id ?? "");
   const create = useCreateOrganization();
   const update = useUpdateOrganization(resource?.id ?? "");
   const form = useQueryBackedForm({
     query: resource ? query : undefined,
-    defaultValues: { name: "", sector: "healthcare", status: "active", region: "east" } as Record<
-      string,
-      string
-    >,
+    defaultValues: {
+      name: "",
+      sector: "healthcare",
+      status: "active",
+      region: "east",
+    } as Record<string, string>,
     toFormData: (data: Organization): Record<string, string> => ({
       name: data.name,
       sector: data.sector,
@@ -89,28 +111,30 @@ export function useOrganizationForm({
       invalidateQueryKeys: [workspaceKeys.all],
       cacheUpdates: organizationCacheUpdates(),
     },
-    onSuccess,
+    ...callbacks,
   });
   return { ...form, fields: organizationFields };
 }
 export function useProjectForm({
   resource,
   organizationId,
-  onSuccess,
-}: {
-  resource?: Project;
-  organizationId: string;
-  onSuccess?: () => void;
-}) {
+  ...callbacks
+}: { resource?: Project; organizationId: string } & OutcomeCallbacks<
+  Record<string, string>,
+  Omit<SaveProjectInput, "organizationId">,
+  SaveProjectResponse
+>) {
   const query = useProject(resource?.id ?? "");
   const create = useCreateProject();
   const update = useUpdateProject(resource?.id ?? "");
   const form = useQueryBackedForm({
     query: resource ? query : undefined,
-    defaultValues: { name: "", priority: "medium", phase: "planning", budget: "$50k" } as Record<
-      string,
-      string
-    >,
+    defaultValues: {
+      name: "",
+      priority: "medium",
+      phase: "planning",
+      budget: "$50k",
+    } as Record<string, string>,
     toFormData: (data: Project): Record<string, string> => ({
       name: data.name,
       priority: data.priority,
@@ -131,28 +155,30 @@ export function useProjectForm({
       invalidateQueryKeys: [workspaceKeys.all],
       cacheUpdates: projectCacheUpdates(),
     },
-    onSuccess,
+    ...callbacks,
   });
   return { ...form, fields: projectFields };
 }
 export function useTaskForm({
   resource,
   project,
-  onSuccess,
-}: {
-  resource?: Task;
-  project: Project;
-  onSuccess?: () => void;
-}) {
+  ...callbacks
+}: { resource?: Task; project: Project } & OutcomeCallbacks<
+  Record<string, string>,
+  Omit<SaveTaskInput, "organizationId" | "projectId">,
+  SaveTaskResponse
+>) {
   const query = useTask(resource?.id ?? "");
   const create = useCreateTask();
   const update = useUpdateTask(resource?.id ?? "");
   const form = useQueryBackedForm({
     query: resource ? query : undefined,
-    defaultValues: { title: "", owner: "alex", status: "todo", dueWindow: "this-week" } as Record<
-      string,
-      string
-    >,
+    defaultValues: {
+      title: "",
+      owner: "alex",
+      status: "todo",
+      dueWindow: "this-week",
+    } as Record<string, string>,
     toFormData: (data: Task): Record<string, string> => ({
       title: data.title,
       owner: data.owner,
@@ -174,7 +200,7 @@ export function useTaskForm({
       invalidateQueryKeys: [workspaceKeys.all],
       cacheUpdates: taskCacheUpdates(),
     },
-    onSuccess,
+    ...callbacks,
   });
   return { ...form, fields: taskFields };
 }

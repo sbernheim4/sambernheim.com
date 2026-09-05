@@ -21,6 +21,7 @@ function ProjectFormRoute() {
     <WorkspaceLayout
       title="Project Form"
       description="Plan a project resource with priority, lifecycle phase, and budget metadata."
+      entity="project"
     >
       <section className="forms-workspace app-workspace">
         <form

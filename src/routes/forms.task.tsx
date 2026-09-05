@@ -25,6 +25,7 @@ function TaskFormRoute() {
     <WorkspaceLayout
       title="Task Form"
       description="Create an execution task with owner, status, and a constrained delivery window."
+      entity="task"
     >
       <section className="forms-workspace app-workspace">
         <form

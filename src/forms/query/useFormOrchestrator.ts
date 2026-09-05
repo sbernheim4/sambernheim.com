@@ -7,7 +7,10 @@ export function useFormOrchestrator<const P extends readonly AnyParticipant[]>(
   config: OrchestratorConfig<P>,
 ) {
   const client = useQueryClient();
-  const [state, setState] = useState<ExecutionState<P>>({ phase: "idle", isSaving: false });
+  const [state, setState] = useState<ExecutionState<P>>({
+    phase: "idle",
+    isSaving: false,
+  });
   const [executor] = useState(() => createOrchestrator<P>(client, setState));
   const latest = useRef(config);
   latest.current = config;

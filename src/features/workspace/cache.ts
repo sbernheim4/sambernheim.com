@@ -1,3 +1,4 @@
+import { replaceEqualDeep } from "@tanstack/query-core";
 import type { BootstrapData } from "./types";
 
 export function upsertBootstrap(previous: unknown, patch: Partial<BootstrapData>): BootstrapData {
@@ -29,7 +30,6 @@ function upsertById<TItem extends { id: string; updatedAt: string }>(
   return Array.from(next.values());
 }
 
-import { replaceEqualDeep } from "@tanstack/query-core";
 import type { Organization, OrganizationProfile, OrganizationOperations } from "./types";
 
 export function mergeOrganization(

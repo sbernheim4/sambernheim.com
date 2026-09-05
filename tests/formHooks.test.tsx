@@ -9,7 +9,6 @@ import {
   useOrganizationOperationsForm,
 } from "../src/features/workspace/hooks/organizationConfigurationForms";
 import { useCreateOrganization } from "../src/features/workspace/hooks/mutations";
-import { useOrganizationForm } from "../src/features/workspace/hooks/forms";
 import { workspaceKeys } from "../src/features/workspace/queries";
 import { clearWorkspace } from "../src/features/workspace/clearWorkspace";
 
@@ -152,7 +151,10 @@ test("domain create mutateAsync owns one mutation, overrides inherited retries a
         status: "active" as const,
         region: "east" as const,
       },
-      endpoint: { mutationFn: mutation.mutateAsync, refetchFunctions: [() => refresh.promise] },
+      endpoint: {
+        mutationFn: mutation.mutateAsync,
+        refetchFunctions: [() => refresh.promise],
+      },
       onSuccess: () => {
         successes++;
       },
@@ -208,7 +210,11 @@ test("composed domain forms retry only Operations, keep Profile success and pres
       log.push(path.endsWith("profile") ? "profile request" : "operations request");
       if (path.endsWith("operations")) return new Response("Unavailable", { status: 503 });
       return Response.json({
-        profile: { organizationId: "org-1", ...JSON.parse(String(options.body)), updatedAt: "2" },
+        profile: {
+          organizationId: "org-1",
+          ...JSON.parse(String(options.body)),
+          updatedAt: "2",
+        },
         readModelLagMs: 2500,
       });
     }
@@ -297,7 +303,12 @@ test("legacy facade callbacks run once and default-values create mode remains re
             },
           ],
         },
-        cacheUpdates: [{ queryKey: ["legacy"], update: (_previous, { response }) => response }],
+        cacheUpdates: [
+          {
+            queryKey: ["legacy"],
+            update: (_previous, { response }) => response,
+          },
+        ],
         afterEffects: [
           () => {
             log.push("endpoint");
@@ -322,4 +333,73 @@ test("legacy facade callbacks run once and default-values create mode remains re
   } finally {
     await harness.dispose();
   }
+});
+
+test("read errors and query mapping errors block writes and release the submission lock", async () => {
+  for (const mappingError of [false, true]) {
+    const qc = client();
+    let current: any;
+    let failures = 0;
+    let maps = 0;
+    const harness = await mount(qc, () => {
+      const query = useQuery({
+        queryKey: ["read-error"],
+        queryFn: async () => {
+          if (!mappingError) throw new Error("read failed");
+          return { name: "A" };
+        },
+      });
+      current = useQueryBackedForm({
+        query,
+        toFormData: (data) => {
+          maps++;
+          if (mappingError) throw new Error("mapping failed");
+          return { name: data.name };
+        },
+        endpoint: {
+          mutationFn: async (_input: { name: string }) => assert.fail("no writes"),
+        },
+        onFailure: () => {
+          failures++;
+        },
+      });
+      return null;
+    });
+    try {
+      await act(delay);
+      assert.equal(current.isReady, false);
+      await act(async () => {
+        await current.submit();
+      });
+      assert.equal(current.save.result.outcome, "validation-failed");
+      assert.equal(current.isSaving, false);
+      assert.equal(failures, 1);
+      if (!mappingError) assert.equal(maps, 0);
+    } finally {
+      await harness.dispose();
+    }
+  }
+});
+
+import { legacyFormConfig } from "../src/forms/bindings/legacyFormConfig";
+test("compatibility adapter rejects mixed callback styles", () => {
+  assert.throws(
+    () =>
+      legacyFormConfig({
+        defaultValues: {},
+        endpoint: { mutationFn: async () => ({}), afterEffects: [] },
+        onSuccess: () => {},
+      }),
+    /not both/,
+  );
+  assert.throws(
+    () =>
+      legacyFormConfig({
+        defaultValues: {},
+        endpoint: { mutationFn: async () => ({}) },
+        afterEffects: [],
+        onFailure: () => {},
+      }),
+    /not both/,
+  );
 });

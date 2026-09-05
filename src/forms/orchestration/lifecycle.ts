@@ -11,7 +11,10 @@ export async function settleRefreshes(
       run: () =>
         queryClient.invalidateQueries({ queryKey }, { cancelRefetch: false, throwOnError: true }),
     })),
-    ...(source.refetchFunctions ?? []).map((run) => ({ participantId: source.participantId, run })),
+    ...(source.refetchFunctions ?? []).map((run) => ({
+      participantId: source.participantId,
+      run,
+    })),
   ]);
   const settled = await Promise.allSettled(
     jobs.map(async ({ run }) => {

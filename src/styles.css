@@ -323,9 +323,26 @@ textarea {
 }
 
 .forms-shell {
+  --forms-shell-bg: #f4f6f8;
   min-height: 100vh;
-  background: #f4f6f8;
+  background: var(--forms-shell-bg);
   color: #19202a;
+}
+
+.forms-shell--organization {
+  --forms-shell-bg: #eef6f2;
+}
+
+.forms-shell--project {
+  --forms-shell-bg: #f1f4fb;
+}
+
+.forms-shell--task {
+  --forms-shell-bg: #f7f2ec;
+}
+
+.forms-shell--flow {
+  --forms-shell-bg: #eef3f8;
 }
 
 .forms-topbar {

@@ -28,9 +28,21 @@ export function createExampleApi({ readModelLagMs = 2500 }: { readModelLagMs?: n
   const writeStore: Store = {
     organizations: [{ id: "org-1" }],
     profiles: [
-      { organizationId: "org-1", name: "Existing Clinic", sector: "healthcare", updatedAt: now() },
+      {
+        organizationId: "org-1",
+        name: "Existing Clinic",
+        sector: "healthcare",
+        updatedAt: now(),
+      },
     ],
-    operations: [{ organizationId: "org-1", status: "active", region: "east", updatedAt: now() }],
+    operations: [
+      {
+        organizationId: "org-1",
+        status: "active",
+        region: "east",
+        updatedAt: now(),
+      },
+    ],
     projects: [
       {
         id: "project-1",

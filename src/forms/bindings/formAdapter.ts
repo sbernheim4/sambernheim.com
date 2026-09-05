@@ -41,7 +41,10 @@ export async function validateSnapshot(
     }
     return shadow.state.isValid
       ? { valid: true }
-      : { valid: false, error: new Error("Please correct the highlighted fields.") };
+      : {
+          valid: false,
+          error: new Error("Please correct the highlighted fields."),
+        };
   } finally {
     for (const unmount of unmounts.reverse()) unmount();
   }
@@ -56,5 +59,9 @@ export function acceptSavedBaseline(form: AnyFormApi, values: unknown) {
   // Keep the facade's public defaults in sync as well.
   form.options = { ...form.options, defaultValues: structuredClone(values) };
   if (changed)
-    form.baseStore.setState((state) => ({ ...state, values: current, fieldMetaBase: meta }));
+    form.baseStore.setState((state) => ({
+      ...state,
+      values: current,
+      fieldMetaBase: meta,
+    }));
 }

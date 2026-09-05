@@ -20,11 +20,9 @@ export type ComposableFormConfig<
   D extends readonly AnyParticipant[] = readonly [],
 > = Omit<ParticipantConfig<Id, V, M, D>, "snapshot" | "validate" | "acceptBaseline"> &
   QueryMapping<Q, V> & {
-    query?: QuerySource<Q>;
-    defaultValues?: V;
     /** Snapshot-level form validation, in addition to registered field validators. */
     validate?: (values: V) => string | undefined | Promise<string | undefined>;
-  };
+  } & ({ query: QuerySource<Q>; defaultValues?: V } | { query?: QuerySource<Q>; defaultValues: V });
 
 type BindingReturn<Id extends string, V, M extends AsyncMutation> = ReturnType<
   typeof useComposableFormImpl<Id, V, V, M>
@@ -112,6 +110,7 @@ function useComposableFormImpl<
       (!config.query.isPending && !config.query.isError && config.query.data !== undefined));
   const participant = createParticipant<Id, V, M, D>({
     ...config,
+    // Skipped children must release their submission lock too.
     finish: () => {
       inFlight.current = false;
     },
@@ -149,7 +148,10 @@ function useComposableFormImpl<
       }
     },
   } as unknown as ParticipantConfig<Id, V, M, D>);
-  // Skipped children also need their submission lock released.
-
-  return { form, participant, isReady, readError: readError ?? config.query?.error };
+  return {
+    form,
+    participant,
+    isReady,
+    readError: readError ?? config.query?.error,
+  };
 }

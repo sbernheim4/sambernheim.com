@@ -29,7 +29,11 @@ const organization: Organization = {
 const client = () =>
   new QueryClient({
     defaultOptions: {
-      queries: { gcTime: Infinity, retry: false, structuralSharing: reconcileWorkspaceRead },
+      queries: {
+        gcTime: Infinity,
+        retry: false,
+        structuralSharing: reconcileWorkspaceRead,
+      },
     },
   });
 
@@ -37,7 +41,11 @@ test("two children merge owned fields into every summary and later stale navigat
   const qc = client();
   const context = { queryClient: qc, results: {} };
   reconcileTargets(
-    { ...context, response: { organization, readModelLagMs: 2500 }, variables: undefined },
+    {
+      ...context,
+      response: { organization, readModelLagMs: 2500 },
+      variables: undefined,
+    },
     organizationCacheUpdates(),
   );
   const profile = {
@@ -54,14 +62,22 @@ test("two children merge owned fields into every summary and later stale navigat
   };
   assert.deepEqual(
     reconcileTargets(
-      { ...context, response: { profile, readModelLagMs: 2500 }, variables: profile },
+      {
+        ...context,
+        response: { profile, readModelLagMs: 2500 },
+        variables: profile,
+      },
       profileCacheUpdates(organization),
     ),
     [],
   );
   assert.deepEqual(
     reconcileTargets(
-      { ...context, response: { operations, readModelLagMs: 2500 }, variables: operations },
+      {
+        ...context,
+        response: { operations, readModelLagMs: 2500 },
+        variables: operations,
+      },
       operationsCacheUpdates(organization),
     ),
     [],
@@ -80,7 +96,10 @@ test("two children merge owned fields into every summary and later stale navigat
     queryKey: keys.organizations.detail("org-1"),
     queryFn: async () => organization,
   });
-  await qc.fetchQuery({ queryKey: keys.organizations.list(), queryFn: async () => [] });
+  await qc.fetchQuery({
+    queryKey: keys.organizations.list(),
+    queryFn: async () => [],
+  });
   const summary = qc.getQueryData<Organization>(keys.organizations.detail("org-1"))!;
   assert.equal(summary.name, "New");
   assert.equal(summary.status, "paused");
@@ -156,4 +175,57 @@ test("clear-all waits for lifecycle exclusion, removes resource caches, and bloc
   assert.equal(calls, 1);
   assert.equal(qc.getQueryData(keys.organizationProfiles.detail("org-1")), undefined);
   assert.deepEqual(qc.getQueryData(keys.organizations.list()), []);
+});
+
+import { QueryObserver } from "@tanstack/react-query";
+import { readReplicaResource } from "../src/features/workspace/replicaRead.ts";
+import { ApiError } from "../src/features/workspace/api.ts";
+
+test("clear resets mounted list/detail observers, including version-aware query caches", async () => {
+  const qc = client();
+  let cleared = false;
+  const list = new QueryObserver(qc, {
+    queryKey: keys.organizations.list(),
+    queryFn: async () => (cleared ? [] : [organization]),
+  });
+  const detail = new QueryObserver(qc, {
+    queryKey: keys.organizations.detail("org-1"),
+    queryFn: () =>
+      readReplicaResource(qc, keys.organizations.detail("org-1"), async () => {
+        if (cleared) throw new ApiError(404, "missing");
+        return organization;
+      }),
+  });
+  const unsubscribeList = list.subscribe(() => {});
+  const unsubscribeDetail = detail.subscribe(() => {});
+  await Promise.all([list.refetch(), detail.refetch()]);
+  await clearWorkspace(qc, async () => {
+    cleared = true;
+    return { organizations: [], projects: [], tasks: [] };
+  });
+  assert.deepEqual(list.getCurrentResult().data, []);
+  assert.equal(detail.getCurrentResult().data, undefined);
+  assert.equal(detail.getCurrentResult().isError, true);
+  unsubscribeList();
+  unsubscribeDetail();
+  qc.clear();
+});
+
+test("new resource navigation tolerates replica 404 only while an acknowledged cache value exists", async () => {
+  const qc = client();
+  const key = keys.organizations.detail("new");
+  const missing = async (): Promise<Organization> => {
+    throw new ApiError(404, "replica has not caught up");
+  };
+  await assert.rejects(readReplicaResource(qc, key, missing), /caught up/);
+  qc.setQueryData(key, organization);
+  assert.deepEqual(await readReplicaResource(qc, key, missing), organization);
+  await assert.rejects(
+    readReplicaResource(qc, key, async () => {
+      throw new ApiError(503, "unavailable");
+    }),
+    /unavailable/,
+  );
+  qc.removeQueries({ queryKey: key });
+  await assert.rejects(readReplicaResource(qc, key, missing), /caught up/);
 });

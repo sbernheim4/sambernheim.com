@@ -21,6 +21,7 @@ function OrganizationFormRoute() {
     <WorkspaceLayout
       title="Organization Form"
       description="Create an account record with controlled sector, status, and regional ownership."
+      entity="organization"
     >
       <section className="forms-workspace app-workspace">
         <form

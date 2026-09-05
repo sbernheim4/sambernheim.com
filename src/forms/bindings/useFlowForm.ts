@@ -8,7 +8,9 @@ export function useFlowForm<TFlowValues, TContext>(config: FlowFormConfig<TFlowV
     () => ({
       ...config.flow,
       ...(config.flow.afterEffects || config.afterEffects
-        ? { afterEffects: [...(config.flow.afterEffects ?? []), ...(config.afterEffects ?? [])] }
+        ? {
+            afterEffects: [...(config.flow.afterEffects ?? []), ...(config.afterEffects ?? [])],
+          }
         : {}),
       ...(config.flow.onSuccess || config.onSuccess
         ? {

@@ -61,7 +61,11 @@ export type FlowStepSuccessContext<TResponse, TInput, TContext> = SaveSuccessCon
 };
 
 export type SaveFlowConfig<TFlowValues, TContext> = RefreshOptions & {
-  onSuccess?: AfterEffect<{ queryClient: QueryClient; values: TFlowValues; flowContext: TContext }>;
+  onSuccess?: AfterEffect<{
+    queryClient: QueryClient;
+    values: TFlowValues;
+    flowContext: TContext;
+  }>;
   onFailure?: AfterEffect<{
     error: unknown;
     flowContext: TContext;

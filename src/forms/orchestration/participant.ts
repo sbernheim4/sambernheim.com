@@ -23,7 +23,9 @@ export function createParticipant<
       retry: config.retry && { ...config.retry },
       endpoint: {
         ...config.endpoint,
-        cacheUpdates: config.endpoint.cacheUpdates?.map((target) => ({ ...target })),
+        cacheUpdates: config.endpoint.cacheUpdates?.map((target) => ({
+          ...target,
+        })),
         refetchFunctions: config.endpoint.refetchFunctions?.slice(),
         invalidateQueryKeys: config.endpoint.invalidateQueryKeys?.map((key) => [...key]),
       },

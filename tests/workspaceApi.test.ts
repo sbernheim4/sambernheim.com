@@ -109,7 +109,9 @@ test("missing parents fail, clear removes children and pending replica timers ca
         404,
       );
     }
-    await api.request("PATCH", "/api/organizations/org-1/profile", { name: "Pending" });
+    await api.request("PATCH", "/api/organizations/org-1/profile", {
+      name: "Pending",
+    });
     assert.deepEqual((await api.request("DELETE", "/api/entities")).data, {
       organizations: [],
       projects: [],

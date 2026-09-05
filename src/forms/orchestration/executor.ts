@@ -111,7 +111,11 @@ export function createOrchestrator<P extends readonly AnyParticipant[]>(
     };
     // Snapshot every child before awaiting validation in any child.
     for (const form of forms) {
-      states[form.id] = { participantId: form.id, status: "validating", attempts: 0 };
+      states[form.id] = {
+        participantId: form.id,
+        status: "validating",
+        attempts: 0,
+      };
       try {
         states[form.id].formValues = structuredClone(form.snapshot());
       } catch (error) {
@@ -136,7 +140,9 @@ export function createOrchestrator<P extends readonly AnyParticipant[]>(
       for (const form of forms.filter((form) => !form.dependencies.length)) {
         try {
           states[form.id].variables = structuredClone(
-            form.map(structuredClone(states[form.id].formValues), { results: {} }),
+            form.map(structuredClone(states[form.id].formValues), {
+              results: {},
+            }),
           );
         } catch (error) {
           fail(form, "mapping", error);
@@ -150,7 +156,9 @@ export function createOrchestrator<P extends readonly AnyParticipant[]>(
         if (form.dependencies.length) {
           try {
             state.variables = structuredClone(
-              form.map(structuredClone(state.formValues), { results: structuredClone(responses) }),
+              form.map(structuredClone(state.formValues), {
+                results: structuredClone(responses),
+              }),
             );
           } catch (error) {
             fail(form, "mapping", error);
@@ -230,7 +238,10 @@ export function createOrchestrator<P extends readonly AnyParticipant[]>(
       emit("refreshing");
       result.followUpErrors.push(
         ...(await settleRefreshes(queryClient, [
-          ...successful.map((form) => ({ ...form.endpoint, participantId: form.id })),
+          ...successful.map((form) => ({
+            ...form.endpoint,
+            participantId: form.id,
+          })),
           config,
         ])),
       );
@@ -254,7 +265,11 @@ export function createOrchestrator<P extends readonly AnyParticipant[]>(
         try {
           await form.acceptBaseline?.(structuredClone(states[form.id].formValues));
         } catch (error) {
-          result.followUpErrors.push({ phase: "baseline", participantId: form.id, error });
+          result.followUpErrors.push({
+            phase: "baseline",
+            participantId: form.id,
+            error,
+          });
         }
       }
     }
@@ -264,7 +279,11 @@ export function createOrchestrator<P extends readonly AnyParticipant[]>(
         if (states[form.id].status === "saved") await form.onSuccess?.(context(form));
         else if (states[form.id].failure) await form.onFailure?.(states[form.id].failure!);
       } catch (error) {
-        result.followUpErrors.push({ phase: "effect", participantId: form.id, error });
+        result.followUpErrors.push({
+          phase: "effect",
+          participantId: form.id,
+          error,
+        });
       }
     }
     if (allSaved && result.followUpErrors.length) result.outcome = "saved-with-follow-up-errors";
@@ -278,7 +297,11 @@ export function createOrchestrator<P extends readonly AnyParticipant[]>(
       try {
         form.finish?.();
       } catch (error) {
-        result.followUpErrors.push({ phase: "baseline", participantId: form.id, error });
+        result.followUpErrors.push({
+          phase: "baseline",
+          participantId: form.id,
+          error,
+        });
       }
     }
     if (allSaved && result.followUpErrors.length) result.outcome = "saved-with-follow-up-errors";

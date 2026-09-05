@@ -45,11 +45,12 @@ export function adaptFlow<V, C>(queryClient: QueryClient, config: SaveFlowConfig
             saved[step.id] = { response, variables: input };
             return response;
           },
-          ...legacyRefresh(step.refetchPolicy, () => ({ queryClient, ...saved[step.id] })),
           refetchFunctions: [
             ...(step.refetchFunctions ?? []),
-            ...legacyRefresh(step.refetchPolicy, () => ({ queryClient, ...saved[step.id] }))
-              .refetchFunctions,
+            ...legacyRefresh(step.refetchPolicy, () => ({
+              queryClient,
+              ...saved[step.id],
+            })).refetchFunctions,
           ],
           invalidateQueryKeys: step.invalidateQueryKeys,
           cacheUpdates: step.cacheUpdates?.map((target) => ({
@@ -102,7 +103,11 @@ export function adaptFlow<V, C>(queryClient: QueryClient, config: SaveFlowConfig
           try {
             await step.compensate(flowContext);
           } catch (error) {
-            result.followUpErrors.push({ phase: "effect", participantId: step.id, error });
+            result.followUpErrors.push({
+              phase: "effect",
+              participantId: step.id,
+              error,
+            });
           }
         }
       }
@@ -114,7 +119,9 @@ function legacyRefresh<R, I>(
   policy: RefetchPolicy<R, I> | undefined,
   getContext: () => SaveSuccessContext<R, I>,
 ) {
-  return { refetchFunctions: policy ? [() => runRefetchPolicy(getContext(), policy)] : [] };
+  return {
+    refetchFunctions: policy ? [() => runRefetchPolicy(getContext(), policy)] : [],
+  };
 }
 export class FlowSaveError<C> extends Error {
   readonly result: OrchestrationResult<readonly AnyParticipant[]>;

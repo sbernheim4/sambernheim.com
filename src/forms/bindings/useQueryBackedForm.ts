@@ -1,6 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import type { EndpointFormConfig } from "../types";
-import type { AsyncMutation, Input, Response } from "../orchestration/contracts";
+import type { AsyncMutation, Response } from "../orchestration/contracts";
 import { useFormOrchestrator } from "../query/useFormOrchestrator";
 import {
   useComposableForm,
@@ -17,7 +17,7 @@ type Binding<V, M extends AsyncMutation> = ReturnType<typeof useComposableForm<"
 type CrudReturn<V, M extends AsyncMutation> = Binding<V, M> & {
   save: ReturnType<typeof useFormOrchestrator<readonly [Binding<V, M>["participant"]]>>;
   endpoint: {
-    mutateAsync: (values?: Input<M>) => Promise<Response<M> | undefined>;
+    mutateAsync: () => Promise<Response<M> | undefined>;
     isPending: boolean;
     error: Error | null;
   };
@@ -42,7 +42,10 @@ export function useQueryBackedForm<V, R>(
   config: EndpointFormConfig<V, R>,
 ): CrudReturn<V, (values: V) => Promise<R>>;
 export function useQueryBackedForm(config: any): any {
-  const normalized = legacyFormConfig({ ...config, queryClient: useQueryClient() });
+  const normalized = legacyFormConfig({
+    ...config,
+    queryClient: useQueryClient(),
+  });
   const binding = useComposableForm({ ...normalized, id: "resource" });
   const save = useFormOrchestrator({ forms: [binding.participant] });
   const submit = save.submit;

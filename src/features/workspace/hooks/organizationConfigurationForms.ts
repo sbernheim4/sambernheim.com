@@ -17,8 +17,14 @@ import { useUpdateOrganizationProfile, useUpdateOrganizationOperations } from ".
 import { profileCacheUpdates, operationsCacheUpdates } from "../childCachePolicies";
 import { workspaceKeys } from "../queries";
 
-type ProfileValues = { displayName: string; selectedSector: OrganizationProfile["sector"] };
-type OperationsValues = { isActive: boolean; region: OrganizationOperations["region"] };
+type ProfileValues = {
+  displayName: string;
+  selectedSector: OrganizationProfile["sector"];
+};
+type OperationsValues = {
+  isActive: boolean;
+  region: OrganizationOperations["region"];
+};
 export function useOrganizationProfileForm({
   organizationId,
   ...callbacks

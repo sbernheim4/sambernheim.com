@@ -13,7 +13,11 @@ export function legacyFormConfig(config: any): any {
   }
   // Legacy refetch policies can depend on the response. Capture their context
   // on request completion, then execute them only in the shared refresh phase.
-  let context: { response: unknown; variables: unknown; queryClient: QueryClient };
+  let context: {
+    response: unknown;
+    variables: unknown;
+    queryClient: QueryClient;
+  };
   return {
     ...config,
     endpoint: {

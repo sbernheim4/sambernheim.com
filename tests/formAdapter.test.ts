@@ -22,7 +22,9 @@ test("snapshot adapter awaits field and form validators, maps errors without sub
   const field = new FieldApi({
     form,
     name: "name",
-    validators: { onSubmitAsync: async ({ value }) => (!value ? "field error" : undefined) },
+    validators: {
+      onSubmitAsync: async ({ value }) => (!value ? "field error" : undefined),
+    },
   });
   const disposeField = field.mount();
   assert.equal((await validateSnapshot(form, { name: "" })).valid, false);
@@ -60,7 +62,10 @@ test("validation observes detached values during asynchronous edits", async () =
 });
 
 test("successful baseline retains form shape and subsequent dirty edits", () => {
-  const form = new FormApi({ defaultValues: { displayName: "old" }, onSubmitMeta: undefined });
+  const form = new FormApi({
+    defaultValues: { displayName: "old" },
+    onSubmitMeta: undefined,
+  });
   const dispose = form.mount();
   const field = new FieldApi({ form, name: "displayName" });
   const disposeField = field.mount();

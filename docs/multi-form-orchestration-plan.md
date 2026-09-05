@@ -1,7 +1,7 @@
 # Domain Form Hooks And Multi-Form Orchestration
 
-Status: implementation in progress. See the live checklist below; the handoff
-notes remain historical context.
+Status: implemented and automatically verified on 2026-09-05. Browser
+verification remains user-managed. The handoff notes below are historical context.
 
 ## Live Implementation Checklist (2026-09-05)
 
@@ -15,8 +15,9 @@ notes remain historical context.
 - [x] Profile/Operations backend ownership, reads, writes, initialization, clear-all.
 - [x] Resource cache projections and clear-all lifecycle coordination.
 - [x] Composed configuration page, navigation, per-child/aggregate feedback, projects.
-- [ ] Focused executor, binding, cache, API and compile-time regression coverage.
-- [ ] Shared dependent-flow lifecycle, boundary documentation, final build and review.
+- [x] Focused executor, binding, cache, API and compile-time regression coverage.
+- [x] Shared dependent-flow lifecycle, boundary documentation, final build and review.
+- [x] Subtle entity-tinted shells for form and entity pages using CSS modifier variables.
 
 ### Revision And Verification Log
 
@@ -57,16 +58,37 @@ notes remain historical context.
   legacy callback compatibility. Its upstream deprecation notice is expected.
   Mounted testing caught and fixed stale public defaults on the React FormApi
   facade after a save.
-- No browser automation or server startup; user owns browser verification.
+- `zqltupnm`: final lifecycle/navigation edge cases, domain callbacks, formatting,
+  and boundary documentation. Final verification: `npm run typecheck`,
+  `npm run typecheck:tests`, all **29** tests via `npm run test:forms`, and
+  `npm run build` passed. tsserver diagnostics for both form bindings, the
+  executor, and configuration page are clean. Build warnings remain Monaco's
+  large chunks and dependency unused imports. The generated (ignored) route tree
+  was inspected: configuration has the root route as parent and the intended URL.
+- Nine focused implementation revisions follow `trzpnmmy`; preserved checkpoint
+  `otryutsq` and bookmarks were not rewritten or moved. Current completed revision
+  is `zqltupnm`. No push, browser automation, or development-server startup.
+- User browser entry point: `/organizations/org-1/configuration` for the seeded
+  organization, also linked from its detail page and Forms Index. Browser checks
+  should exercise Save All, invalid name, partial failure via a failed Operations
+  request, navigation during replica lag, and clear-all after saving.
 
-### Working Notes / Open Issues
+### Resolved Findings And Remaining Limits
 
-- Domain extraction is moved after the new binding to avoid migrating resource
-  forms twice. Each validated unit still receives its own jj revision.
+- Final review fixes: reset active query observers during clear-all (removal alone
+  can leave their old rendered result visible); allow acknowledged cached resources
+  during replica 404s on immediate navigation. Both have focused regression tests.
+- New scripts: `npm run test:forms`, `npm run typecheck:tests`, and
+  `npm run tsserver -- <command> ...`. The test runner bundles TSX using existing
+  esbuild and never starts a browser or user-facing development server.
+
+- Domain extraction followed the new binding to avoid migrating resource forms
+  twice. Each validated unit received its own jj revision.
 - Clear-all now excludes active full lifecycles and removes all workspace caches.
-- Snapshot validation, overlapping refreshes, post-save edits, and independent
-  child summary merges now have automated coverage. Final edge-case review and
-  documentation remain.
+- Snapshot validation, overlapping refreshes, post-save edits, independent
+  child summary merges, read/mapping errors, mixed legacy callbacks and lifecycle
+  exclusion have automated regression coverage. No known implementation blockers
+  remain. API deployment remains the existing separate development-only limitation.
 - Workspace queries now merge versions, including separate Profile/Operations
   summary timestamps. This protects later replica reads while caches survive; it
   is not a global monotonic-read guarantee across eviction, clients, or reloads.

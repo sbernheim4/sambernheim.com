@@ -83,5 +83,11 @@ export type OrganizationOperations = Pick<Organization, "status" | "region" | "u
 };
 export type ProfileInput = Pick<OrganizationProfile, "name" | "sector">;
 export type OperationsInput = Pick<OrganizationOperations, "status" | "region">;
-export type ProfileResponse = { profile: OrganizationProfile; readModelLagMs: number };
-export type OperationsResponse = { operations: OrganizationOperations; readModelLagMs: number };
+export type ProfileResponse = {
+  profile: OrganizationProfile;
+  readModelLagMs: number;
+};
+export type OperationsResponse = {
+  operations: OrganizationOperations;
+  readModelLagMs: number;
+};

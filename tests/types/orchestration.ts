@@ -15,7 +15,10 @@ const profile = createParticipant({
         queryKey: ({ response, variables }) => [response.profile.id, variables.name],
         getData: (response) => response.profile,
       },
-      { queryKey: () => ["name"], getData: (response) => response.profile.name },
+      {
+        queryKey: () => ["name"],
+        getData: (response) => response.profile.name,
+      },
       { queryKey: () => ["envelope"] },
     ],
   },
@@ -64,9 +67,13 @@ createParticipant({
     mutationFn: (_input: { name: string }) => {},
   },
 });
-const identity: CacheTarget<{ name: string }, {}> = { queryKey: () => ["identity"] };
+const identity: CacheTarget<{ name: string }, {}> = {
+  queryKey: () => ["identity"],
+};
 // @ts-expect-error unrelated cache data requires selector
-const incorrect: CacheTarget<{ name: string }, {}, number> = { queryKey: () => ["incorrect"] };
+const incorrect: CacheTarget<{ name: string }, {}, number> = {
+  queryKey: () => ["incorrect"],
+};
 declare const result: OrchestrationResult<readonly [typeof profile]>;
 result.responses.profile?.profile.name satisfies string | undefined;
 // @ts-expect-error response keyed by literal participant ID
@@ -76,7 +83,11 @@ void incorrect;
 
 import { useComposableForm } from "../../src/forms/bindings/useComposableForm";
 import { useQueryBackedForm } from "../../src/forms/bindings/useQueryBackedForm";
-const query = { data: { name: "A", nested: { active: true } }, isPending: false, isError: false };
+const query = {
+  data: { name: "A", nested: { active: true } },
+  isPending: false,
+  isError: false,
+};
 const binding = useComposableForm({
   id: "profile",
   query,
