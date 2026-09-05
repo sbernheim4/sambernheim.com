@@ -1,3 +1,9 @@
+import type {
+  RefreshOptions,
+  OrchestrationResult,
+  AnyParticipant,
+  CacheUpdate as ModernCacheUpdate,
+} from "./orchestration/contracts";
 import type { QueryClient, QueryKey } from "@tanstack/react-query";
 
 export type AfterEffect<TContext> = (context: TContext) => void | Promise<void>;
@@ -35,12 +41,13 @@ export type EndpointFormConfig<TValues, TResponse> = {
   afterEffects?: AfterEffect<SaveSuccessContext<TResponse, TValues>>[];
 };
 
-export type FlowStep<TFlowValues, TInput, TResponse, TContext> = {
+export type FlowStep<TFlowValues, TInput, TResponse, TContext> = RefreshOptions & {
+  onSuccess?: AfterEffect<FlowStepSuccessContext<TResponse, TInput, TContext>>;
   id: string;
   buildInput: (context: TContext, values: TFlowValues) => TInput;
   mutationFn: (input: TInput, context: TContext) => Promise<TResponse>;
   refetchPolicy?: RefetchPolicy<TResponse, TInput>;
-  cacheUpdates?: CacheUpdate<TResponse, TInput>[];
+  cacheUpdates?: Array<CacheUpdate<TResponse, TInput> | ModernCacheUpdate<TResponse, TInput>>;
   assign?: (context: TContext, response: TResponse, input: TInput) => TContext;
   afterEffects?: AfterEffect<FlowStepSuccessContext<TResponse, TInput, TContext>>[];
   compensate?: (context: TContext) => Promise<void>;
@@ -53,7 +60,13 @@ export type FlowStepSuccessContext<TResponse, TInput, TContext> = SaveSuccessCon
   flowContext: TContext;
 };
 
-export type SaveFlowConfig<TFlowValues, TContext> = {
+export type SaveFlowConfig<TFlowValues, TContext> = RefreshOptions & {
+  onSuccess?: AfterEffect<{ queryClient: QueryClient; values: TFlowValues; flowContext: TContext }>;
+  onFailure?: AfterEffect<{
+    error: unknown;
+    flowContext: TContext;
+    result: OrchestrationResult<readonly AnyParticipant[]>;
+  }>;
   mutationKey?: QueryKey;
   buildInitialContext: (values: TFlowValues) => TContext;
   steps: Array<FlowStep<TFlowValues, any, any, TContext>>;
@@ -68,6 +81,7 @@ export type SaveFlowConfig<TFlowValues, TContext> = {
 
 export type FlowFormConfig<TFlowValues, TContext> = {
   defaultValues: TFlowValues;
+  onSuccess?: SaveFlowConfig<TFlowValues, TContext>["onSuccess"];
   flow: SaveFlowConfig<TFlowValues, TContext>;
   afterEffects?: SaveFlowConfig<TFlowValues, TContext>["afterEffects"];
 };
