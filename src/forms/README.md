@@ -115,6 +115,8 @@ Operations record per organization. Name/sector belong to Profile; status/region
 belong to Operations. Organization responses project both. Legacy organization
 writes delegate to the child owners. Creation initializes both children; clear-all
 removes them. API handler factories make tests independent of the user's server.
+Create endpoints require the full payload for a new record, while edit endpoints
+accept partial bodies and keep missing fields unchanged.
 
 Child save policies inject the detail resource and merge owned fields into every
 organization summary. Workspace queries preserve acknowledged versions on later

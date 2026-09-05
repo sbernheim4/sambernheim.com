@@ -6,9 +6,16 @@ import type {
   SaveOrganizationInput,
   SaveProjectInput,
   SaveTaskInput,
+  UpdateOrganizationInput,
+  UpdateProjectInput,
+  UpdateTaskInput,
+  UpdateProfileInput,
+  UpdateOperationsInput,
   SaveOrganizationResponse,
   SaveProjectResponse,
   SaveTaskResponse,
+  ProfileResponse,
+  OperationsResponse,
 } from "./types";
 
 const jsonHeaders = {
@@ -47,15 +54,15 @@ export async function saveTask(input: SaveTaskInput) {
   });
 }
 
-export function updateOrganization(id: string, input: SaveOrganizationInput) {
+export function updateOrganization(id: string, input: UpdateOrganizationInput) {
   return patch<SaveOrganizationResponse>("organizations", id, input);
 }
 
-export function updateProject(id: string, input: Omit<SaveProjectInput, "organizationId">) {
+export function updateProject(id: string, input: UpdateProjectInput) {
   return patch<SaveProjectResponse>("projects", id, input);
 }
 
-export function updateTask(id: string, input: Omit<SaveTaskInput, "organizationId" | "projectId">) {
+export function updateTask(id: string, input: UpdateTaskInput) {
   return patch<SaveTaskResponse>("tasks", id, input);
 }
 
@@ -106,9 +113,7 @@ export const fetchOrganizationOperations = (id: string) =>
   request<import("./types").OrganizationOperations>(
     `/api/organizations/${encodeURIComponent(id)}/operations`,
   );
-export const updateOrganizationProfile = (id: string, input: import("./types").ProfileInput) =>
-  patch<import("./types").ProfileResponse>("organizations", id, input, "profile");
-export const updateOrganizationOperations = (
-  id: string,
-  input: import("./types").OperationsInput,
-) => patch<import("./types").OperationsResponse>("organizations", id, input, "operations");
+export const updateOrganizationProfile = (id: string, input: UpdateProfileInput) =>
+  patch<ProfileResponse>("organizations", id, input, "profile");
+export const updateOrganizationOperations = (id: string, input: UpdateOperationsInput) =>
+  patch<OperationsResponse>("organizations", id, input, "operations");

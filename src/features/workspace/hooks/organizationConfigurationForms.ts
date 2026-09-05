@@ -3,8 +3,9 @@ import type { OutcomeCallbacks } from "../../../forms/orchestration/contracts";
 import type {
   OrganizationProfile,
   OrganizationOperations,
-  ProfileInput,
   OperationsInput,
+  UpdateProfileInput,
+  UpdateOperationsInput,
   ProfileResponse,
   OperationsResponse,
 } from "../types";
@@ -28,7 +29,11 @@ type OperationsValues = {
 export function useOrganizationProfileForm({
   organizationId,
   ...callbacks
-}: { organizationId: string } & OutcomeCallbacks<ProfileValues, ProfileInput, ProfileResponse>) {
+}: { organizationId: string } & OutcomeCallbacks<
+  ProfileValues,
+  UpdateProfileInput,
+  ProfileResponse
+>) {
   const query = useOrganizationProfile(organizationId);
   const organization = useOrganization(organizationId);
   const mutation = useUpdateOrganizationProfile(organizationId);
@@ -61,7 +66,7 @@ export function useOrganizationOperationsForm({
   ...callbacks
 }: { organizationId: string } & OutcomeCallbacks<
   OperationsValues,
-  OperationsInput,
+  UpdateOperationsInput,
   OperationsResponse
 >) {
   const query = useOrganizationOperations(organizationId);
