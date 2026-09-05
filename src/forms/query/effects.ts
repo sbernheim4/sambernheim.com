@@ -1,5 +1,5 @@
 import type { QueryKey } from '@tanstack/react-query'
-import type { AfterEffect, CacheUpdate, RefetchPolicy, SaveSuccessContext } from '../types'
+import type { AfterEffect, CacheUpdate, RefetchPolicy, SaveSuccessContext } from '../types.ts'
 
 export async function runRefetchPolicy<TResponse, TVariables>(
   context: SaveSuccessContext<TResponse, TVariables>,

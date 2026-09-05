@@ -49,6 +49,14 @@ notes remain historical context.
   TypeScript. Only existing Monaco chunk-size and dependency unused-import
   warnings appeared. Generated route uses the non-nested convention, so the
   existing detail page cannot hide it.
+- `lyxusrry`: dependent flows now use the ordered executor, with request-only
+  domain mutations, flat refreshes and outcome callbacks. All 23 tests and full
+  type checks pass. Added a small react-test-renderer harness (no browser) to
+  verify selected-query mapping, dirty edits, saved baselines, request ownership,
+  inherited retry suppression, aggregate busy state, partial child saves, and
+  legacy callback compatibility. Its upstream deprecation notice is expected.
+  Mounted testing caught and fixed stale public defaults on the React FormApi
+  facade after a save.
 - No browser automation or server startup; user owns browser verification.
 
 ### Working Notes / Open Issues
@@ -56,8 +64,9 @@ notes remain historical context.
 - Domain extraction is moved after the new binding to avoid migrating resource
   forms twice. Each validated unit still receives its own jj revision.
 - Clear-all now excludes active full lifecycles and removes all workspace caches.
-- Need explicit coverage for snapshot validation (both field and form validators),
-  overlapping refreshes, post-save edits, and independent child summary merges.
+- Snapshot validation, overlapping refreshes, post-save edits, and independent
+  child summary merges now have automated coverage. Final edge-case review and
+  documentation remain.
 - Workspace queries now merge versions, including separate Profile/Operations
   summary timestamps. This protects later replica reads while caches survive; it
   is not a global monotonic-read guarantee across eviction, clients, or reloads.

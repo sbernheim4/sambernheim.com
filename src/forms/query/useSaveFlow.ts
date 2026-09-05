@@ -1,65 +1,30 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import type { SaveFlowConfig, FlowStep } from '../types'
-import { createCacheReconciliation } from './cacheReconciliation'
-import { runRefetchPolicy, applyCacheUpdates, runAfterEffects } from './effects'
+import { useRef, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
+import type { SaveFlowConfig } from '../types'
+import type { AnyParticipant } from '../orchestration/contracts'
+import { createOrchestrator, type ExecutionState } from '../orchestration/executor'
+import { adaptFlow, FlowSaveError } from '../orchestration/flowAdapter'
 
-export function useSaveFlow<TFlowValues, TContext>(
-  config: SaveFlowConfig<TFlowValues, TContext>,
-) {
+export function useSaveFlow<V, C>(config: SaveFlowConfig<V, C>) {
   const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationKey: config.mutationKey,
-    mutationFn: async (values: TFlowValues) => {
-      let flowContext = config.buildInitialContext(values)
-      const reconcile = createCacheReconciliation()
-      const completed: Array<FlowStep<TFlowValues, any, any, TContext>> =
-        []
-
-      try {
-        for (const step of config.steps) {
-          const input = step.buildInput(flowContext, values)
-          const response = await step.mutationFn(input, flowContext)
-          const context = { queryClient, response, variables: input }
-
-          await reconcile(
-            () => runRefetchPolicy(context, step.refetchPolicy),
-            () => applyCacheUpdates(context, step.cacheUpdates),
-          )
-
-          flowContext =
-            step.assign?.(flowContext, response, input) ?? flowContext
-
-          await runAfterEffects(
-            { ...context, flowContext },
-            step.afterEffects,
-          )
-          completed.push(step)
-        }
-
-        await reconcile(
-          () => runRefetchPolicy(
-            { queryClient, response: flowContext, variables: values },
-            config.refetchPolicy,
-          ),
-          () => {},
-        )
-
-        await runAfterEffects(
-          { queryClient, values, flowContext },
-          config.afterEffects,
-        )
-
-        return flowContext
-      } catch (error) {
-        await config.onPartialFailure?.(error, flowContext)
-
-        for (const step of completed.reverse()) {
-          await step.compensate?.(flowContext)
-        }
-
-        throw error
-      }
-    },
-  })
+  const latest = useRef(config); latest.current = config
+  const [state, setState] = useState<ExecutionState<readonly AnyParticipant[]>>({ phase: 'idle', isSaving: false })
+  const [executor] = useState(() => createOrchestrator<readonly AnyParticipant[]>(queryClient, setState))
+  const [data, setData] = useState<C>()
+  const [error, setError] = useState<Error | null>(null)
+  const active = useRef<Promise<C> | undefined>(undefined)
+  const mutateAsync = (values: V): Promise<C> => {
+    if (active.current) return active.current
+    setError(null)
+    active.current = (async () => {
+      const flow = adaptFlow(queryClient, latest.current, values)
+      const result = await executor.submit(flow.config)
+      const context = flow.getContext()
+      if (result.outcome === 'partial-failure' || result.outcome === 'validation-failed') throw new FlowSaveError(result, context)
+      setData(context)
+      return context
+    })().catch((cause) => { const error = cause instanceof Error ? cause : new Error(String(cause)); setError(error); throw error }).finally(() => { active.current = undefined })
+    return active.current
+  }
+  return { ...state, data, error, isPending: state.isSaving, mutateAsync, mutate: (values: V) => { void mutateAsync(values).catch(() => {}) }, reset: () => { if (executor.reset()) { setData(undefined); setError(null) } } }
 }

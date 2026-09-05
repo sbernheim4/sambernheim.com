@@ -1,25 +1,9 @@
-import type { SaveOrganizationResponse } from '../types'
+import type { SaveOrganizationResponse, SaveProjectResponse } from '../types'
 import { useWorkspaceResources } from '../hooks/useWorkspaceResources'
 import { useCreateOrganization, useCreateProject, useCreateTask } from '../hooks/mutations'
-import { useMemo } from 'react'
 
-import {
-  fetchBootstrap,
-  saveOrganization,
-  saveProject,
-  saveTask,
-} from '../api'
-import { bootstrapKey } from '../queries'
-import { upsertBootstrap } from '../cache'
-import {
-  budgetOptions,
-  dueWindowOptions,
-  ownerOptions,
-  priorityOptions,
-  regionOptions,
-  sectorOptions,
-} from '../fieldOptions'
-import type { CacheUpdate } from '../../../forms/types'
+import { workspaceKeys } from '../queries'
+import { organizationCacheUpdates, projectCacheUpdates, taskCacheUpdates } from '../cachePolicies'
 import { useFlowForm } from '../../../forms/bindings/useFlowForm'
 
 
@@ -37,7 +21,7 @@ type LaunchValues = {
 
 type LaunchContext = {
   organization?: SaveOrganizationResponse['organization']
-  project?: Awaited<ReturnType<typeof saveProject>>['project']
+  project?: SaveProjectResponse['project']
 }
 
 export function useFlowDemoForm(appendActivity: (text: string) => void) {
@@ -47,21 +31,6 @@ export function useFlowDemoForm(appendActivity: (text: string) => void) {
   const bootstrap = useWorkspaceResources()
 
 
-
-  const organizationCacheUpdate = useMemo(
-    () =>
-      ({
-        queryKey: bootstrapKey,
-        update: (previous, context) =>
-          upsertBootstrap(previous, {
-            organizations: [context.response.organization],
-          }),
-      }) satisfies CacheUpdate<
-        SaveOrganizationResponse,
-        Parameters<typeof saveOrganization>[0]
-      >,
-    [],
-  )
 
   const launchForm = useFlowForm<LaunchValues, LaunchContext>({
     defaultValues: {
@@ -78,7 +47,7 @@ export function useFlowDemoForm(appendActivity: (text: string) => void) {
     flow: {
       mutationKey: ['forms-example', 'launch-workspace'],
       buildInitialContext: () => ({}),
-      refetchPolicy: { invalidate: [bootstrapKey] },
+      invalidateQueryKeys: [workspaceKeys.all],
       steps: [
         {
           id: 'save-organization',
@@ -89,18 +58,13 @@ export function useFlowDemoForm(appendActivity: (text: string) => void) {
             status: 'active',
           }),
           mutationFn: (input) => createOrganization.mutateAsync(input),
-          refetchPolicy: {
-            refetchQueries: [bootstrapKey],
-          },
-          cacheUpdates: [organizationCacheUpdate],
+          cacheUpdates: organizationCacheUpdates(),
           assign: (context, response) => ({
             ...context,
             organization: response.organization,
           }),
-          afterEffects: [
-            ({ response }) =>
+          onSuccess: ({ response }) =>
               appendActivity(`Step A: saved ${response.organization.name}`),
-          ],
         },
         {
           id: 'save-project',
@@ -113,26 +77,13 @@ export function useFlowDemoForm(appendActivity: (text: string) => void) {
             budget: values.projectBudget,
           }),
           mutationFn: (input) => createProject.mutateAsync(input),
-          refetchPolicy: {
-            refetchQueries: [bootstrapKey],
-          },
-          cacheUpdates: [
-            {
-              queryKey: bootstrapKey,
-              update: (previous, context) =>
-                upsertBootstrap(previous, {
-                  projects: [context.response.project],
-                }),
-            },
-          ],
+          cacheUpdates: projectCacheUpdates(),
           assign: (context, response) => ({
             ...context,
             project: response.project,
           }),
-          afterEffects: [
-            ({ response }) =>
+          onSuccess: ({ response }) =>
               appendActivity(`Step B: saved ${response.project.name}`),
-          ],
         },
         {
           id: 'save-task',
@@ -153,36 +104,19 @@ export function useFlowDemoForm(appendActivity: (text: string) => void) {
             }
           },
           mutationFn: (input) => createTask.mutateAsync(input),
-          refetchPolicy: {
-            refetchQueries: [bootstrapKey],
-          },
-          cacheUpdates: [
-            {
-              queryKey: bootstrapKey,
-              update: (previous, context) =>
-                upsertBootstrap(previous, {
-                  tasks: [context.response.task],
-                }),
-            },
-          ],
-          afterEffects: [
-            ({ response }) => appendActivity(`Step C: saved ${response.task.title}`),
-          ],
+          cacheUpdates: taskCacheUpdates(),
+          onSuccess: ({ response }) => appendActivity(`Step C: saved ${response.task.title}`),
         },
       ],
-      afterEffects: [
-        ({ flowContext }) =>
+      onSuccess: ({ flowContext }) =>
           appendActivity(
             `Flow effect: completed ${flowContext.organization?.name}`,
           ),
-      ],
-      onPartialFailure: (error) =>
+      onFailure: ({ error }) =>
         appendActivity(`Partial failure: ${String(error)}`),
     },
-    afterEffects: [
-      ({ flowContext }) =>
+    onSuccess: ({ flowContext }) =>
         appendActivity(`Form effect: reconciled ${flowContext.project?.name}`),
-    ],
   })
 
   return { launchForm, bootstrap }

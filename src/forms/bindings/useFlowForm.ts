@@ -9,10 +9,14 @@ export function useFlowForm<TFlowValues, TContext>(
   const flowConfig = useMemo(
     () => ({
       ...config.flow,
-      afterEffects: [
+      ...(config.flow.afterEffects || config.afterEffects ? { afterEffects: [
         ...(config.flow.afterEffects ?? []),
         ...(config.afterEffects ?? []),
-      ],
+      ] } : {}),
+      ...(config.flow.onSuccess || config.onSuccess ? { onSuccess: async (context: Parameters<NonNullable<typeof config.onSuccess>>[0]) => {
+        await config.flow.onSuccess?.(context)
+        await config.onSuccess?.(context)
+      } } : {}),
     }),
     [config],
   )
