@@ -14,7 +14,7 @@ notes remain historical context.
 - [x] Extract resource/demo domain form hooks and migrate workspace resource reads.
 - [x] Profile/Operations backend ownership, reads, writes, initialization, clear-all.
 - [x] Resource cache projections and clear-all lifecycle coordination.
-- [ ] Composed configuration page, navigation, per-child/aggregate feedback, projects.
+- [x] Composed configuration page, navigation, per-child/aggregate feedback, projects.
 - [ ] Focused executor, binding, cache, API and compile-time regression coverage.
 - [ ] Shared dependent-flow lifecycle, boundary documentation, final build and review.
 
@@ -44,6 +44,11 @@ notes remain historical context.
   summary/list/detail policies, and clear-all lifecycle exclusion. Type checks and
   6 focused API/cache tests pass in isolated state. The read merge policy retains
   acknowledged versions while the cache exists; clear-all removes that state.
+- `npumzqvr`: composed configuration page, typed domain child forms, navigation,
+  and per-child status. `npm run build` passed, including route generation and
+  TypeScript. Only existing Monaco chunk-size and dependency unused-import
+  warnings appeared. Generated route uses the non-nested convention, so the
+  existing detail page cannot hide it.
 - No browser automation or server startup; user owns browser verification.
 
 ### Working Notes / Open Issues

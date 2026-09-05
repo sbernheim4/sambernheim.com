@@ -60,6 +60,12 @@ export function OrganizationPage({ id }: { id: string }) {
               updatedAt={organization.updatedAt}
             >
               <OrganizationEditor key={organization.id} resource={organization} />
+              <Link
+                to="/organizations/$organizationId/configuration"
+                params={{ organizationId: organization.id }}
+              >
+                Configure Profile and Operations
+              </Link>
             </Details>
             <EntityList
               title="Projects"
@@ -166,7 +172,7 @@ export function TaskPage({ id }: { id: string }) {
   );
 }
 
-function Workspace({
+export function Workspace({
   title,
   description,
   children,
@@ -239,7 +245,7 @@ function Details({
   );
 }
 
-function QueryState({
+export function QueryState({
   query,
   missing,
   children,
@@ -275,7 +281,7 @@ function QueryState({
   return children;
 }
 
-function EntityList({
+export function EntityList({
   title,
   kind,
   items,
