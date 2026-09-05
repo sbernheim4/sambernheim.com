@@ -274,6 +274,14 @@ export function createOrchestrator<P extends readonly AnyParticipant[]>(
       result.followUpErrors.push({ phase: "effect", error });
     }
     if (allSaved && result.followUpErrors.length) result.outcome = "saved-with-follow-up-errors";
+    for (const form of forms) {
+      try {
+        form.finish?.();
+      } catch (error) {
+        result.followUpErrors.push({ phase: "baseline", participantId: form.id, error });
+      }
+    }
+    if (allSaved && result.followUpErrors.length) result.outcome = "saved-with-follow-up-errors";
     emit("complete");
     return result;
   }
