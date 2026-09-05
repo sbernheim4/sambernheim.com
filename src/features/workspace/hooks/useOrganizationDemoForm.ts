@@ -1,11 +1,12 @@
-import { useEffect } from 'react'
 import { useQueryBackedForm } from '../../../forms/bindings/useQueryBackedForm'
 import { useWorkspaceResources } from './useWorkspaceResources'
 import { useCreateOrganization } from './mutations'
 import { organizationCacheUpdates } from '../cachePolicies'
 import { workspaceKeys } from '../queries'
 
-export function useOrganizationDemoForm(appendActivity: (text: string) => void) {
+export function useOrganizationDemoForm(
+  appendActivity: (text: string) => void,
+) {
   const mutation = useCreateOrganization()
   const bootstrap = useWorkspaceResources()
   const organizationForm = useQueryBackedForm({

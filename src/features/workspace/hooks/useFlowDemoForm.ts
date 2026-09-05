@@ -1,11 +1,18 @@
 import type { SaveOrganizationResponse, SaveProjectResponse } from '../types'
 import { useWorkspaceResources } from '../hooks/useWorkspaceResources'
-import { useCreateOrganization, useCreateProject, useCreateTask } from '../hooks/mutations'
+import {
+  useCreateOrganization,
+  useCreateProject,
+  useCreateTask,
+} from '../hooks/mutations'
 
 import { workspaceKeys } from '../queries'
-import { organizationCacheUpdates, projectCacheUpdates, taskCacheUpdates } from '../cachePolicies'
+import {
+  organizationCacheUpdates,
+  projectCacheUpdates,
+  taskCacheUpdates,
+} from '../cachePolicies'
 import { useFlowForm } from '../../../forms/bindings/useFlowForm'
-
 
 type LaunchValues = {
   organizationName: string
@@ -29,8 +36,6 @@ export function useFlowDemoForm(appendActivity: (text: string) => void) {
   const createProject = useCreateProject()
   const createTask = useCreateTask()
   const bootstrap = useWorkspaceResources()
-
-
 
   const launchForm = useFlowForm<LaunchValues, LaunchContext>({
     defaultValues: {
@@ -64,7 +69,7 @@ export function useFlowDemoForm(appendActivity: (text: string) => void) {
             organization: response.organization,
           }),
           onSuccess: ({ response }) =>
-              appendActivity(`Step A: saved ${response.organization.name}`),
+            appendActivity(`Step A: saved ${response.organization.name}`),
         },
         {
           id: 'save-project',
@@ -83,7 +88,7 @@ export function useFlowDemoForm(appendActivity: (text: string) => void) {
             project: response.project,
           }),
           onSuccess: ({ response }) =>
-              appendActivity(`Step B: saved ${response.project.name}`),
+            appendActivity(`Step B: saved ${response.project.name}`),
         },
         {
           id: 'save-task',
@@ -105,18 +110,19 @@ export function useFlowDemoForm(appendActivity: (text: string) => void) {
           },
           mutationFn: (input) => createTask.mutateAsync(input),
           cacheUpdates: taskCacheUpdates(),
-          onSuccess: ({ response }) => appendActivity(`Step C: saved ${response.task.title}`),
+          onSuccess: ({ response }) =>
+            appendActivity(`Step C: saved ${response.task.title}`),
         },
       ],
       onSuccess: ({ flowContext }) =>
-          appendActivity(
-            `Flow effect: completed ${flowContext.organization?.name}`,
-          ),
+        appendActivity(
+          `Flow effect: completed ${flowContext.organization?.name}`,
+        ),
       onFailure: ({ error }) =>
         appendActivity(`Partial failure: ${String(error)}`),
     },
     onSuccess: ({ flowContext }) =>
-        appendActivity(`Form effect: reconciled ${flowContext.project?.name}`),
+      appendActivity(`Form effect: reconciled ${flowContext.project?.name}`),
   })
 
   return { launchForm, bootstrap }

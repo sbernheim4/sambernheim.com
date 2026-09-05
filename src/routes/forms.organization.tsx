@@ -1,6 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
-import { ActivityPanel, createActivity } from '../features/form-demos/ActivityPanel'
+import {
+  ActivityPanel,
+  createActivity,
+} from '../features/form-demos/ActivityPanel'
 import { WorkspaceLayout } from '../features/workspace/components/WorkspaceLayout'
 import { ResourceDataPanel } from '../features/workspace/components/ResourceDataPanel'
 import { useOrganizationDemoForm } from '../features/workspace/hooks/useOrganizationDemoForm'
@@ -19,12 +22,15 @@ function OrganizationFormRoute() {
   const [activity, setActivity] = useState<
     Array<ReturnType<typeof createActivity>>
   >([])
-  const { organizationForm, bootstrap } = useOrganizationDemoForm((text) => { setActivity((items) => [createActivity(text), ...items]) })
+  const { organizationForm, bootstrap } = useOrganizationDemoForm((text) => {
+    setActivity((items) => [createActivity(text), ...items])
+  })
 
   return (
     <WorkspaceLayout
       title="Organization Form"
       description="Create an account record with controlled sector, status, and regional ownership."
+      entity="organization"
     >
       <section className="forms-workspace app-workspace">
         <form

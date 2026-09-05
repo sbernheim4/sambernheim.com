@@ -1,6 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
-import { ActivityPanel, createActivity } from '../features/form-demos/ActivityPanel'
+import {
+  ActivityPanel,
+  createActivity,
+} from '../features/form-demos/ActivityPanel'
 import { WorkspaceLayout } from '../features/workspace/components/WorkspaceLayout'
 import { ResourceDataPanel } from '../features/workspace/components/ResourceDataPanel'
 import { useTaskDemoForm } from '../features/workspace/hooks/useTaskDemoForm'
@@ -19,12 +22,15 @@ function TaskFormRoute() {
   const [activity, setActivity] = useState<
     Array<ReturnType<typeof createActivity>>
   >([])
-  const { taskForm, bootstrap } = useTaskDemoForm((text) => { setActivity((items) => [createActivity(text), ...items]) })
+  const { taskForm, bootstrap } = useTaskDemoForm((text) => {
+    setActivity((items) => [createActivity(text), ...items])
+  })
 
   return (
     <WorkspaceLayout
       title="Task Form"
       description="Create an execution task with owner, status, and a constrained delivery window."
+      entity="task"
     >
       <section className="forms-workspace app-workspace">
         <form
@@ -71,7 +77,10 @@ function TaskFormRoute() {
           </taskForm.form.AppField>
           <taskForm.form.AppField name="title">
             {(field) => (
-              <field.TextField label="Task title" placeholder="Provision workspace" />
+              <field.TextField
+                label="Task title"
+                placeholder="Provision workspace"
+              />
             )}
           </taskForm.form.AppField>
           <div className="inline-fields">

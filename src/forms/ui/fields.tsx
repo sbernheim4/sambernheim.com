@@ -31,7 +31,11 @@ export function TextField({
         onBlur={field.handleBlur}
         onChange={(event) => field.handleChange(event.target.value)}
       />
-      {field.state.meta.errors.length > 0 && <span className="form-error" role="alert">{field.state.meta.errors.map(String).join(', ')}</span>}
+      {field.state.meta.errors.length > 0 && (
+        <span className="form-error" role="alert">
+          {field.state.meta.errors.map(String).join(', ')}
+        </span>
+      )}
     </label>
   )
 }
@@ -60,12 +64,22 @@ export function SelectField<TValue extends string>({
           onValueChange?.(value as TValue)
         }}
       >
-        <Select.Trigger aria-labelledby={labelId} className="app-select-trigger" onBlur={field.handleBlur}>
+        <Select.Trigger
+          aria-labelledby={labelId}
+          className="app-select-trigger"
+          onBlur={field.handleBlur}
+        >
           <Select.Value placeholder={placeholder} />
-          <Select.Icon className="app-select-icon"><ChevronDown size={16} /></Select.Icon>
+          <Select.Icon className="app-select-icon">
+            <ChevronDown size={16} />
+          </Select.Icon>
         </Select.Trigger>
         <Select.Portal>
-          <Select.Content className="app-select-content" position="popper" sideOffset={4}>
+          <Select.Content
+            className="app-select-content"
+            position="popper"
+            sideOffset={4}
+          >
             <Select.Viewport>
               {options.map((option) => (
                 <Select.Item

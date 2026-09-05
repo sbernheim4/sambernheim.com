@@ -1,6 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
-import { ActivityPanel, createActivity } from '../features/form-demos/ActivityPanel'
+import {
+  ActivityPanel,
+  createActivity,
+} from '../features/form-demos/ActivityPanel'
 import { WorkspaceLayout } from '../features/workspace/components/WorkspaceLayout'
 import { ResourceDataPanel } from '../features/workspace/components/ResourceDataPanel'
 import { useFlowDemoForm } from '../features/workspace/hooks/useFlowDemoForm'
@@ -22,12 +25,15 @@ function FlowFormRoute() {
   const [activity, setActivity] = useState<
     Array<ReturnType<typeof createActivity>>
   >([])
-  const { launchForm, bootstrap } = useFlowDemoForm((text) => { setActivity((items) => [createActivity(text), ...items]) })
+  const { launchForm, bootstrap } = useFlowDemoForm((text) => {
+    setActivity((items) => [createActivity(text), ...items])
+  })
 
   return (
     <WorkspaceLayout
       title="Dependent Save Flow"
       description="A guided resource creation workflow that saves three related records across separate endpoints."
+      entity="flow"
     >
       <section className="forms-workspace app-workspace">
         <form
@@ -47,10 +53,7 @@ function FlowFormRoute() {
           <div className="form-section-label">Organization</div>
           <launchForm.form.AppField name="organizationName">
             {(field) => (
-              <field.TextField
-                label="Organization"
-                placeholder="Acme Health"
-              />
+              <field.TextField label="Organization" placeholder="Acme Health" />
             )}
           </launchForm.form.AppField>
           <div className="inline-fields">
@@ -89,10 +92,7 @@ function FlowFormRoute() {
           <div className="form-section-label">Task</div>
           <launchForm.form.AppField name="taskTitle">
             {(field) => (
-              <field.TextField
-                label="Task"
-                placeholder="Provision workspace"
-              />
+              <field.TextField label="Task" placeholder="Provision workspace" />
             )}
           </launchForm.form.AppField>
           <div className="inline-fields">

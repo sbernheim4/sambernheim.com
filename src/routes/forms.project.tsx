@@ -1,6 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
-import { ActivityPanel, createActivity } from '../features/form-demos/ActivityPanel'
+import {
+  ActivityPanel,
+  createActivity,
+} from '../features/form-demos/ActivityPanel'
 import { WorkspaceLayout } from '../features/workspace/components/WorkspaceLayout'
 import { ResourceDataPanel } from '../features/workspace/components/ResourceDataPanel'
 import { useProjectDemoForm } from '../features/workspace/hooks/useProjectDemoForm'
@@ -19,12 +22,15 @@ function ProjectFormRoute() {
   const [activity, setActivity] = useState<
     Array<ReturnType<typeof createActivity>>
   >([])
-  const { projectForm, bootstrap } = useProjectDemoForm((text) => { setActivity((items) => [createActivity(text), ...items]) })
+  const { projectForm, bootstrap } = useProjectDemoForm((text) => {
+    setActivity((items) => [createActivity(text), ...items])
+  })
 
   return (
     <WorkspaceLayout
       title="Project Form"
       description="Plan a project resource with priority, lifecycle phase, and budget metadata."
+      entity="project"
     >
       <section className="forms-workspace app-workspace">
         <form
@@ -57,7 +63,10 @@ function ProjectFormRoute() {
           </projectForm.form.AppField>
           <projectForm.form.AppField name="name">
             {(field) => (
-              <field.TextField label="Project name" placeholder="Patient Intake" />
+              <field.TextField
+                label="Project name"
+                placeholder="Patient Intake"
+              />
             )}
           </projectForm.form.AppField>
           <projectForm.form.AppField name="priority">

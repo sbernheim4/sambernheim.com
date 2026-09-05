@@ -6,15 +6,19 @@ export function WorkspaceLayout({
   title,
   description,
   children,
+  entity,
 }: {
   title: string
   description: string
   children: ReactNode
+  entity?: 'organization' | 'project' | 'task' | 'flow'
 }) {
   const clear = useClearEntities()
 
   return (
-    <main className="forms-shell">
+    <main
+      className={`forms-shell${entity ? ` forms-shell--${entity}` : ''}`}
+    >
       <header className="forms-topbar">
         <div>
           <h1>{title}</h1>

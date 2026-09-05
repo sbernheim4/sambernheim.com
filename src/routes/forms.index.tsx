@@ -16,14 +16,24 @@ function FormsIndex() {
       title="Query-Backed Form Examples"
       description="Each route owns one form and renders the resource data from TanStack Query."
     >
-      <section className="home-routes forms-index-routes" aria-label="Form routes">
+      <section
+        className="home-routes forms-index-routes"
+        aria-label="Form routes"
+      >
         <Link to="/organizations" className="route-card">
           <span>Organization Workspace</span>
           <p>Manage organizations, their projects, and assigned tasks.</p>
         </Link>
-        {firstOrganization && <Link to="/organizations/$organizationId/configuration" params={{ organizationId: firstOrganization.id }} className="route-card">
-          <span>Organization Configuration</span><p>Save Profile and Operations together with one action.</p>
-        </Link>}
+        {firstOrganization && (
+          <Link
+            to="/organizations/$organizationId/configuration"
+            params={{ organizationId: firstOrganization.id }}
+            className="route-card"
+          >
+            <span>Organization Configuration</span>
+            <p>Save Profile and Operations together with one action.</p>
+          </Link>
+        )}
         <Link to="/forms/organization" className="route-card">
           <span>Organization Form</span>
           <p>Single endpoint save with response-backed cache reconciliation.</p>

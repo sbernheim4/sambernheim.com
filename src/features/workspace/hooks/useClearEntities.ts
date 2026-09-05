@@ -8,9 +8,17 @@ export function useClearEntities() {
   const queryClient = useQueryClient()
   const activeMutations = useIsMutating()
   const coordinator = lifecycleCoordinator(queryClient)
-  const activeLifecycles = useSyncExternalStore(coordinator.subscribe, coordinator.getSnapshot, coordinator.getSnapshot)
+  const activeLifecycles = useSyncExternalStore(
+    coordinator.subscribe,
+    coordinator.getSnapshot,
+    coordinator.getSnapshot,
+  )
   const mutation = useClearWorkspaceMutation()
-  return { ...mutation, isDisabled: activeMutations > 0 || activeLifecycles > 0,
-    clear: () => { void clearWorkspace(queryClient, mutation.mutateAsync).catch(() => {}) },
+  return {
+    ...mutation,
+    isDisabled: activeMutations > 0 || activeLifecycles > 0,
+    clear: () => {
+      void clearWorkspace(queryClient, mutation.mutateAsync).catch(() => {})
+    },
   }
 }
