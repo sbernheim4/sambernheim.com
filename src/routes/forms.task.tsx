@@ -1,20 +1,14 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useWorkspaceResources } from '../features/workspace/hooks/useWorkspaceResources'
-import { useCreateOrganization, useCreateProject, useCreateTask } from '../features/workspace/hooks/mutations'
-import { useEffect, useState } from 'react'
-
+import { useState } from 'react'
 import { ActivityPanel, createActivity } from '../features/form-demos/ActivityPanel'
 import { WorkspaceLayout } from '../features/workspace/components/WorkspaceLayout'
 import { ResourceDataPanel } from '../features/workspace/components/ResourceDataPanel'
-import { fetchBootstrap, saveTask } from '../features/workspace/api'
-import { bootstrapKey } from '../features/workspace/queries'
-import { upsertBootstrap } from '../features/workspace/cache'
+import { useTaskDemoForm } from '../features/workspace/hooks/useTaskDemoForm'
 import {
   dueWindowOptions,
   ownerOptions,
   taskStatusOptions,
 } from '../features/workspace/fieldOptions'
-import { useQueryBackedForm } from '../forms/bindings/useQueryBackedForm'
 
 export const Route = createFileRoute('/forms/task')({
   ssr: false,
@@ -25,66 +19,7 @@ function TaskFormRoute() {
   const [activity, setActivity] = useState<
     Array<ReturnType<typeof createActivity>>
   >([])
-  const createOrganization = useCreateOrganization()
-  const createProject = useCreateProject()
-  const createTask = useCreateTask()
-  const bootstrap = useWorkspaceResources()
-  const firstProject = bootstrap.data?.projects[0]
-
-  const appendActivity = (text: string) => {
-    setActivity((items) => [createActivity(text), ...items])
-  }
-
-  const taskForm = useQueryBackedForm({
-    defaultValues: {
-      organizationId: firstProject?.organizationId ?? '',
-      projectId: firstProject?.id ?? '',
-      title: 'Provision workspace',
-      owner: 'alex' as const,
-      status: 'todo' as const,
-      dueWindow: 'this-week' as const,
-    },
-    endpoint: {
-      mutationKey: ['forms-example', 'save-task'],
-      mutationFn: createTask.mutateAsync,
-      refetchPolicy: {
-        refetchQueries: [bootstrapKey],
-      },
-      cacheUpdates: [
-        {
-          queryKey: bootstrapKey,
-          update: (previous, context) =>
-            upsertBootstrap(previous, {
-              tasks: [context.response.task],
-            }),
-        },
-      ],
-      afterEffects: [
-        ({ response }) =>
-          appendActivity(`Endpoint effect: saved ${response.task.title}`),
-      ],
-    },
-    afterEffects: [
-      ({ response }) =>
-        appendActivity(`Form effect: reconciled ${response.task.id}`),
-    ],
-  })
-
-  useEffect(() => {
-    if (!firstProject) {
-      taskForm.form.setFieldValue('projectId', '')
-      taskForm.form.setFieldValue('organizationId', '')
-      return
-    }
-
-    if (!taskForm.form.state.values.projectId) {
-      taskForm.form.setFieldValue('projectId', firstProject.id)
-    }
-
-    if (!taskForm.form.state.values.organizationId) {
-      taskForm.form.setFieldValue('organizationId', firstProject.organizationId)
-    }
-  }, [firstProject, taskForm.form])
+  const { taskForm, bootstrap } = useTaskDemoForm((text) => { setActivity((items) => [createActivity(text), ...items]) })
 
   return (
     <WorkspaceLayout

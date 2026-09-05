@@ -1,20 +1,14 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useWorkspaceResources } from '../features/workspace/hooks/useWorkspaceResources'
-import { useCreateOrganization, useCreateProject, useCreateTask } from '../features/workspace/hooks/mutations'
-import { useEffect, useState } from 'react'
-
+import { useState } from 'react'
 import { ActivityPanel, createActivity } from '../features/form-demos/ActivityPanel'
 import { WorkspaceLayout } from '../features/workspace/components/WorkspaceLayout'
 import { ResourceDataPanel } from '../features/workspace/components/ResourceDataPanel'
-import { fetchBootstrap, saveProject } from '../features/workspace/api'
-import { bootstrapKey } from '../features/workspace/queries'
-import { upsertBootstrap } from '../features/workspace/cache'
+import { useProjectDemoForm } from '../features/workspace/hooks/useProjectDemoForm'
 import {
   budgetOptions,
   phaseOptions,
   priorityOptions,
 } from '../features/workspace/fieldOptions'
-import { useQueryBackedForm } from '../forms/bindings/useQueryBackedForm'
 
 export const Route = createFileRoute('/forms/project')({
   ssr: false,
@@ -25,59 +19,7 @@ function ProjectFormRoute() {
   const [activity, setActivity] = useState<
     Array<ReturnType<typeof createActivity>>
   >([])
-  const createOrganization = useCreateOrganization()
-  const createProject = useCreateProject()
-  const createTask = useCreateTask()
-  const bootstrap = useWorkspaceResources()
-  const firstOrganizationId = bootstrap.data?.organizations[0]?.id ?? ''
-
-  const appendActivity = (text: string) => {
-    setActivity((items) => [createActivity(text), ...items])
-  }
-
-  const projectForm = useQueryBackedForm({
-    defaultValues: {
-      organizationId: firstOrganizationId,
-      name: 'Patient Intake',
-      priority: 'high' as const,
-      phase: 'implementation' as const,
-      budget: '$125k',
-    },
-    endpoint: {
-      mutationKey: ['forms-example', 'save-project'],
-      mutationFn: createProject.mutateAsync,
-      refetchPolicy: {
-        refetchQueries: [bootstrapKey],
-      },
-      cacheUpdates: [
-        {
-          queryKey: bootstrapKey,
-          update: (previous, context) =>
-            upsertBootstrap(previous, {
-              projects: [context.response.project],
-            }),
-        },
-      ],
-      afterEffects: [
-        ({ response }) =>
-          appendActivity(`Endpoint effect: saved ${response.project.name}`),
-      ],
-    },
-    afterEffects: [
-      ({ response }) =>
-        appendActivity(`Form effect: reconciled ${response.project.id}`),
-    ],
-  })
-
-  useEffect(() => {
-    if (!firstOrganizationId) {
-      projectForm.form.setFieldValue('organizationId', '')
-      return
-    }
-    if (!projectForm.form.state.values.organizationId && firstOrganizationId) {
-      projectForm.form.setFieldValue('organizationId', firstOrganizationId)
-    }
-  }, [firstOrganizationId, projectForm.form])
+  const { projectForm, bootstrap } = useProjectDemoForm((text) => { setActivity((items) => [createActivity(text), ...items]) })
 
   return (
     <WorkspaceLayout

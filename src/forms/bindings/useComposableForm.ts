@@ -17,7 +17,7 @@ export type ComposableFormConfig<Id extends string, Q, V, M extends AsyncMutatio
 
 type BindingReturn<Id extends string, V, M extends AsyncMutation> = ReturnType<typeof useComposableFormImpl<Id, V, V, M>>
 export function useComposableForm<const Id extends string, Q, F extends (data: Q) => any, M extends AsyncMutation, const D extends readonly AnyParticipant[] = readonly []>(
-  config: Omit<ComposableFormConfig<Id, Q, NoInfer<ReturnType<F>>, M, D>, 'toFormData'> & { query: QuerySource<Q>; toFormData: F },
+  config: Omit<ComposableFormConfig<Id, Q, NoInfer<ReturnType<F>>, M, D>, 'toFormData'> & { query?: QuerySource<Q>; toFormData: F },
 ): BindingReturn<Id, ReturnType<F>, M>
 export function useComposableForm<const Id extends string, V, M extends AsyncMutation, const D extends readonly AnyParticipant[] = readonly []>(
   config: ComposableFormConfig<Id, V, V, M, D> & { toFormData?: never },

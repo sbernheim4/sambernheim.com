@@ -15,7 +15,7 @@ type CrudReturn<V, M extends AsyncMutation> = Binding<V, M> & {
   error: Error | null
 }
 
-export function useQueryBackedForm<Q, F extends (data: Q) => any, M extends AsyncMutation>(config: Omit<CrudConfig<Q, NoInfer<ReturnType<F>>, M>, 'toFormData'> & { query: QuerySource<Q>; toFormData: F }): CrudReturn<ReturnType<F>, M>
+export function useQueryBackedForm<Q, F extends (data: Q) => any, M extends AsyncMutation>(config: Omit<CrudConfig<Q, NoInfer<ReturnType<F>>, M>, 'toFormData'> & { query?: QuerySource<Q>; toFormData: F }): CrudReturn<ReturnType<F>, M>
 export function useQueryBackedForm<V, M extends AsyncMutation>(config: CrudConfig<V, V, M> & { toFormData?: never }): CrudReturn<V, M>
 /** @deprecated Default-values compatibility for the original endpoint API. */
 export function useQueryBackedForm<V, R>(config: EndpointFormConfig<V, R>): CrudReturn<V, (values: V) => Promise<R>>

@@ -3,11 +3,11 @@ import { Link } from '@tanstack/react-router'
 import { ArrowRight, Building2, ChevronRight, Folder, ListTodo, Plus, Search, X } from 'lucide-react'
 import { WorkspaceLayout } from './WorkspaceLayout'
 import type { BootstrapData, Organization, Project, Task } from '../types'
-import { useWorkspaceResources } from '../hooks/useWorkspaceResources'
+import { useOrganizationsWorkspace, useOrganizationWorkspace, useProjectWorkspace, useTaskWorkspace } from '../hooks/useWorkspaceResources'
 import { OrganizationEditor, ProjectEditor, TaskEditor } from './ResourceEditors'
 
 export function OrganizationsPage() {
-  const query = useWorkspaceResources()
+  const query = useOrganizationsWorkspace()
   return <Workspace title="Organizations" description="Manage your accounts, projects, and day-to-day work.">
     <QueryState query={query}>
       {query.data && <EntityList title="All organizations" kind="organizations" items={query.data.organizations}
@@ -17,7 +17,7 @@ export function OrganizationsPage() {
 }
 
 export function OrganizationPage({ id }: { id: string }) {
-  const query = useWorkspaceResources()
+  const query = useOrganizationWorkspace(id)
   const organization = query.data?.organizations.find((item) => item.id === id)
   return <Workspace title={organization?.name ?? 'Organization'} description="Account details and projects." organization={organization}>
     <QueryState query={query} missing={!!query.data && !organization}>
@@ -34,7 +34,7 @@ export function OrganizationPage({ id }: { id: string }) {
 }
 
 export function ProjectPage({ id }: { id: string }) {
-  const query = useWorkspaceResources()
+  const query = useProjectWorkspace(id)
   const project = query.data?.projects.find((item) => item.id === id)
   const organization = query.data?.organizations.find((item) => item.id === project?.organizationId)
   return <Workspace title={project?.name ?? 'Project'} description="Project settings and assigned work." organization={organization} project={project}>
@@ -52,7 +52,7 @@ export function ProjectPage({ id }: { id: string }) {
 }
 
 export function TaskPage({ id }: { id: string }) {
-  const query = useWorkspaceResources()
+  const query = useTaskWorkspace(id)
   const task = query.data?.tasks.find((item) => item.id === id)
   const project = query.data?.projects.find((item) => item.id === task?.projectId)
   const organization = query.data?.organizations.find((item) => item.id === task?.organizationId)
@@ -105,7 +105,7 @@ function Details({ title, id, updatedAt, children }: { title: string; id: string
 }
 
 function QueryState({ query, missing, children }: {
-  query: ReturnType<typeof useWorkspaceResources>; missing?: boolean; children: ReactNode
+  query: ReturnType<typeof useOrganizationsWorkspace>; missing?: boolean; children: ReactNode
 }) {
   if (query.isPending) return <p className="workspace-empty" role="status">Loading resources...</p>
   if (query.isError) return <div className="workspace-empty" role="alert">

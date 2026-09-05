@@ -1,22 +1,14 @@
-import type { SaveOrganizationResponse } from '../features/workspace/types'
 import { createFileRoute } from '@tanstack/react-router'
-import { useWorkspaceResources } from '../features/workspace/hooks/useWorkspaceResources'
-import { useCreateOrganization, useCreateProject, useCreateTask } from '../features/workspace/hooks/mutations'
-import { useMemo, useState } from 'react'
-
+import { useState } from 'react'
 import { ActivityPanel, createActivity } from '../features/form-demos/ActivityPanel'
 import { WorkspaceLayout } from '../features/workspace/components/WorkspaceLayout'
 import { ResourceDataPanel } from '../features/workspace/components/ResourceDataPanel'
-import {  fetchBootstrap, saveOrganization } from '../features/workspace/api'
-import { bootstrapKey } from '../features/workspace/queries'
-import { upsertBootstrap } from '../features/workspace/cache'
+import { useOrganizationDemoForm } from '../features/workspace/hooks/useOrganizationDemoForm'
 import {
   regionOptions,
   sectorOptions,
   statusOptions,
 } from '../features/workspace/fieldOptions'
-import type { CacheUpdate } from '../forms/types'
-import { useQueryBackedForm } from '../forms/bindings/useQueryBackedForm'
 
 export const Route = createFileRoute('/forms/organization')({
   ssr: false,
@@ -27,54 +19,7 @@ function OrganizationFormRoute() {
   const [activity, setActivity] = useState<
     Array<ReturnType<typeof createActivity>>
   >([])
-  const createOrganization = useCreateOrganization()
-  const createProject = useCreateProject()
-  const createTask = useCreateTask()
-  const bootstrap = useWorkspaceResources()
-
-  const appendActivity = (text: string) => {
-    setActivity((items) => [createActivity(text), ...items])
-  }
-
-  const organizationCacheUpdate = useMemo(
-    () =>
-      ({
-        queryKey: bootstrapKey,
-        update: (previous, context) =>
-          upsertBootstrap(previous, {
-            organizations: [context.response.organization],
-          }),
-      }) satisfies CacheUpdate<
-        SaveOrganizationResponse,
-        Parameters<typeof saveOrganization>[0]
-      >,
-    [],
-  )
-
-  const organizationForm = useQueryBackedForm({
-    defaultValues: {
-      name: 'Northstar Labs',
-      sector: 'healthcare' as const,
-      status: 'active' as const,
-      region: 'east' as const,
-    },
-    endpoint: {
-      mutationKey: ['forms-example', 'save-organization'],
-      mutationFn: createOrganization.mutateAsync,
-      refetchPolicy: {
-        refetchQueries: [bootstrapKey],
-      },
-      cacheUpdates: [organizationCacheUpdate],
-      afterEffects: [
-        ({ response }) =>
-          appendActivity(`Endpoint effect: saved ${response.organization.name}`),
-      ],
-    },
-    afterEffects: [
-      ({ response }) =>
-        appendActivity(`Form effect: reconciled ${response.organization.id}`),
-    ],
-  })
+  const { organizationForm, bootstrap } = useOrganizationDemoForm((text) => { setActivity((items) => [createActivity(text), ...items]) })
 
   return (
     <WorkspaceLayout
