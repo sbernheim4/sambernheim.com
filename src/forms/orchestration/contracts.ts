@@ -72,6 +72,7 @@ export type ParticipantConfig<Id extends string, V, M extends AsyncMutation, D e
     dependencies?: D
     snapshot: () => V
     validate: (values: V) => ValidationResult | Promise<ValidationResult>
+    finish?: () => void
     acceptBaseline?: (values: V) => void | Promise<void>
     endpoint: Endpoint<M, Partial<ResponsesOf<D>>>
     retry?: RetryPolicy
@@ -84,6 +85,7 @@ export type RuntimeParticipant = {
   snapshot: () => any
   validate: (values: any) => ValidationResult | Promise<ValidationResult>
   map: (values: any, context: { results: any }) => any
+  finish?: () => void
   acceptBaseline?: (values: any) => void | Promise<void>
   endpoint: Endpoint<AsyncMutation, any>
   retry?: RetryPolicy

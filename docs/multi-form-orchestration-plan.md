@@ -10,7 +10,7 @@ notes remain historical context.
 - [x] Migrate demo query calls and requests to domain hooks.
 - [x] Typed opaque participants, mappings, cache targets, lifecycle callbacks, type-test configuration.
 - [x] Ordered executor: validation, snapshots, dependencies, retries, partial results, refresh/cache/effects.
-- [ ] React bindings and standalone CRUD compatibility; query initialization and saved baselines.
+- [x] React bindings and standalone CRUD compatibility; query initialization and saved baselines.
 - [ ] Extract resource/demo domain form hooks and migrate workspace resource reads.
 - [ ] Profile/Operations backend ownership, reads, writes, initialization, clear-all.
 - [ ] Resource cache projections and clear-all lifecycle coordination.
@@ -29,6 +29,13 @@ notes remain historical context.
   all 8 Node tests passed (including existing reconciliation tests). Tests cover
   overlap, preflight errors, partial saves, delayed/rejected refreshes, callback
   failures, retry safety, dependencies, and lifecycle exclusion of clear-all.
+- `lyynnrko`: bindings and CRUD facade. Type fixtures and 11 Node tests pass;
+  detached TanStack Form/Field instances validate snapshots without child submits,
+  and saved-baseline tests preserve subsequent edits. Semantic TypeScript server
+  diagnostics pass for both bindings. Mounted hook integration remains for final
+  verification.
+- Added `scripts/tsserver-tools.mjs` using installed tsserver for semantic references,
+  rename locations, definitions, hover types, symbol lookup and diagnostics.
 - No browser automation or server startup; user owns browser verification.
 
 ### Working Notes / Open Issues

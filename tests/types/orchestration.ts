@@ -39,3 +39,21 @@ result.responses.profile?.profile.name satisfies string | undefined
 // @ts-expect-error response keyed by literal participant ID
 result.responses.operations
 void identity; void incorrect
+
+import { useComposableForm } from '../../src/forms/bindings/useComposableForm'
+import { useQueryBackedForm } from '../../src/forms/bindings/useQueryBackedForm'
+const query = { data: { name: 'A', nested: { active: true } }, isPending: false, isError: false }
+const binding = useComposableForm({ id: 'profile', query, toFormData: (data) => ({ display: data.name, active: data.nested.active }),
+  toMutationPayload: (v) => ({ name: v.display }), endpoint: { mutationFn: mutateAsync },
+})
+binding.form.state.values.display satisfies string
+binding.form.state.values.active satisfies boolean
+// @ts-expect-error query fields are not form fields
+binding.form.state.values.nested
+useQueryBackedForm({ query, endpoint: { mutationFn: mutateAsync }, onSuccess: ({ response }) => { response.profile.name satisfies string } })
+useComposableForm({ id: 'bad', query, toFormData: (data) => ({ display: data.name }),
+  // @ts-expect-error incorrect mutation payload type
+  toMutationPayload: () => ({ name: 12 }), endpoint: { mutationFn: mutateAsync },
+})
+// @ts-expect-error renamed form requires a payload mapper
+useComposableForm({ id: 'bad', query, toFormData: (data) => ({ display: data.name }), endpoint: { mutationFn: mutateAsync } })
