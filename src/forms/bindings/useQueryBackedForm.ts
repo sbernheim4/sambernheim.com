@@ -18,7 +18,7 @@ type Binding<V, M extends AsyncMutation> = ReturnType<
 >
 type CrudReturn<V, M extends AsyncMutation> = Binding<V, M> & {
   save: ReturnType<
-    typeof useFormOrchestrator<readonly [Binding<V, M>['participant']]>
+    typeof useFormOrchestrator<readonly [Binding<V, M>]>
   >
   endpoint: {
     mutateAsync: () => Promise<Response<M> | undefined>
@@ -27,7 +27,7 @@ type CrudReturn<V, M extends AsyncMutation> = Binding<V, M> & {
   }
   submit: () => ReturnType<
     ReturnType<
-      typeof useFormOrchestrator<readonly [Binding<V, M>['participant']]>
+      typeof useFormOrchestrator<readonly [Binding<V, M>]>
     >['submit']
   >
   isSaving: boolean
@@ -57,7 +57,10 @@ export function useQueryBackedForm(config: any): any {
     queryClient: useQueryClient(),
   })
   const binding = useComposableForm({ ...normalized, id: 'resource' })
-  const save = useFormOrchestrator({ forms: [binding.participant] })
+  const save = useFormOrchestrator({
+    forms: [binding] as const,
+    includePristine: true,
+  })
   const submit = save.submit
   // handleSubmit enters the same executor directly; validation belongs to the
   // snapshot adapter, avoiding TanStack's resolved-without-writing ambiguity.
@@ -81,7 +84,7 @@ export function useQueryBackedForm(config: any): any {
     endpoint: {
       isPending: save.isSaving,
       error,
-      mutateAsync: async () => (await submit()).responses.resource,
+      mutateAsync: async () => (await submit())?.responses.resource,
     },
   }
 }

@@ -14,7 +14,7 @@ function FormsIndex() {
   return (
     <WorkspaceLayout
       title="Query-Backed Form Examples"
-      description="The remaining routes show the composed edit flow and the dependent create flow."
+      description="The remaining routes show the organization page with embedded editing and the dependent create flow."
     >
       <section
         className="home-routes forms-index-routes"
@@ -26,12 +26,12 @@ function FormsIndex() {
         </Link>
         {firstOrganization && (
           <Link
-            to="/organizations/$organizationId/configuration"
+            to="/organizations/$organizationId"
             params={{ organizationId: firstOrganization.id }}
             className="route-card"
           >
-            <span>Organization Configuration</span>
-            <p>Save Profile and Operations together with one action.</p>
+            <span>Organization Page</span>
+            <p>Details, projects, and embedded Profile and Operations editing.</p>
           </Link>
         )}
         <Link to="/forms/flow" className="route-card">

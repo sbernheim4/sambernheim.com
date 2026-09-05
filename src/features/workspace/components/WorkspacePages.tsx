@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from 'react'
+import { useStore } from '@tanstack/react-form'
 import { Link } from '@tanstack/react-router'
 import {
   ArrowRight,
@@ -23,6 +24,13 @@ import {
   ProjectEditor,
   TaskEditor,
 } from './ResourceEditors'
+import { useOrganizationForm } from '../hooks/forms'
+import {
+  useOrganizationOperationsForm,
+  useOrganizationProfileForm,
+} from '../hooks/organizationConfigurationForms'
+import { useFormOrchestrator } from '../../../forms/query/useFormOrchestrator'
+import { regionOptions, sectorOptions } from '../fieldOptions'
 
 export function OrganizationsPage() {
   const query = useOrganizationsWorkspace()
@@ -64,17 +72,14 @@ export function OrganizationPage({ id }: { id: string }) {
               id={organization.id}
               updatedAt={organization.updatedAt}
             >
-              <OrganizationEditor
-                key={organization.id}
-                resource={organization}
-              />
-              <Link
-                to="/organizations/$organizationId/configuration"
-                params={{ organizationId: organization.id }}
-              >
-                Configure Profile and Operations
-              </Link>
+              <p className="workspace-edit-hint">
+                Edit the organization, profile, and operations together below.
+              </p>
             </Details>
+            <OrganizationWorkspaceForm
+              organization={organization}
+              organizationId={organization.id}
+            />
             <EntityList
               title="Projects"
               kind="projects"
@@ -94,6 +99,243 @@ export function OrganizationPage({ id }: { id: string }) {
       </QueryState>
     </Workspace>
   )
+}
+function OrganizationWorkspaceForm({
+  organization,
+  organizationId,
+}: {
+  organization: Organization
+  organizationId: string
+}) {
+  const core = useOrganizationForm({ resource: organization })
+  const profile = useOrganizationProfileForm({ organizationId })
+  const operations = useOrganizationOperationsForm({ organizationId })
+  const coreDirty = useStore(core.form.store, (state) => state.isDirty)
+  const profileDirty = useStore(profile.form.store, (state) => state.isDirty)
+  const operationsDirty = useStore(
+    operations.form.store,
+    (state) => state.isDirty,
+  )
+  const save = useFormOrchestrator({
+    forms: [core, profile, operations] as const,
+    retry: { maxRetries: 1, delayMs: 500 },
+  })
+  const [submitError, setSubmitError] = useState<unknown>()
+  const ready = core.isReady && profile.isReady && operations.isReady
+  const readError = core.readError || profile.readError || operations.readError
+  const dirtyCount = [coreDirty, profileDirty, operationsDirty].filter(Boolean)
+    .length
+  return (
+    <section className="workspace-section">
+      <div className="workspace-section-heading">
+        <h2>Organization, Profile, and Operations</h2>
+      </div>
+      <form
+        className="resource-editor configuration-form"
+        onSubmit={(event) => {
+          event.preventDefault()
+          setSubmitError(undefined)
+          if (!dirtyCount) return
+          void save.submit().catch(setSubmitError)
+        }}
+      >
+        {readError ? (
+          <p className="form-error" role="alert">
+            Unable to load configuration.{' '}
+            <button
+              type="button"
+              onClick={() => {
+                void profile.retryRead()
+                void operations.retryRead()
+              }}
+            >
+              Retry
+            </button>
+          </p>
+        ) : (
+          !ready && <p role="status">Loading configuration...</p>
+        )}
+        <fieldset disabled={save.isSaving || !ready} className="editor-fields">
+          <section className="workspace-details">
+            <h3>Organization</h3>
+            <OrganizationFields form={core.form} fields={core.fields} />
+            <p className="resource-updated">
+              Updated {new Date(organization.updatedAt).toLocaleString()}
+            </p>
+          </section>
+          <section className="workspace-details">
+            <h3>Profile</h3>
+            <ProfileFields form={profile.form} />
+          </section>
+          <section className="workspace-details">
+            <h3>Operations</h3>
+            <OperationsFields form={operations.form} />
+          </section>
+          <button
+            className="primary-action"
+            type="submit"
+            disabled={save.isSaving || !dirtyCount}
+          >
+            {save.isSaving
+              ? 'Saving changes...'
+              : dirtyCount
+                ? 'Save changes'
+                : 'No changes to save'}
+          </button>
+        </fieldset>
+        {save.phase !== 'idle' && (
+          <div role="status" aria-live="polite">
+            <p>
+              {save.isSaving
+                ? `Save progress: ${save.phase}`
+                : outcomeMessage(save.result?.outcome)}
+            </p>
+            <ul>
+              {(['resource', 'profile', 'operations'] as const).map(
+                (participantId) => {
+                  const state = save.participants?.[participantId]
+                  const status = state?.status ?? 'unchanged'
+                  return (
+                    <li key={participantId}>
+                      {participantId === 'resource'
+                        ? 'Organization'
+                        : participantId === 'profile'
+                          ? 'Profile'
+                          : 'Operations'}
+                      : {status}
+                      {state?.attempts
+                        ? ` (${state.attempts} ${state.attempts === 1 ? 'attempt' : 'attempts'})`
+                        : ''}
+                      {state?.failure && (
+                        <span className="form-error">
+                          {' '}
+                          — {String(state.failure.error)}
+                        </span>
+                      )}
+                    </li>
+                  )
+                },
+              )}
+            </ul>
+          </div>
+        )}
+        {!!submitError && (
+          <p className="form-error" role="alert">
+            {String(submitError)}
+          </p>
+        )}
+      </form>
+    </section>
+  )
+}
+
+function OrganizationFields({
+  form,
+  fields,
+}: {
+  form: ReturnType<typeof useOrganizationForm>['form']
+  fields: ReturnType<typeof useOrganizationForm>['fields']
+}) {
+  return (
+    <>
+      {fields.map((item) => (
+        <form.AppField key={item.name} name={item.name}>
+          {(field) =>
+            item.mode === 'radio' ? (
+              <field.RadioGroupField
+                label={item.label}
+                options={item.options ?? []}
+              />
+            ) : item.mode === 'select' ? (
+              <field.SelectField
+                label={item.label}
+                options={item.options ?? []}
+              />
+            ) : (
+              <field.TextField label={item.label} required />
+            )
+          }
+        </form.AppField>
+      ))}
+    </>
+  )
+}
+
+function ProfileFields({
+  form,
+}: {
+  form: ReturnType<typeof useOrganizationProfileForm>['form']
+}) {
+  return (
+    <>
+      <form.AppField
+        name="displayName"
+        validators={{
+          onSubmit: ({ value }) =>
+            !value.trim() ? 'Name is required.' : undefined,
+        }}
+      >
+        {(field) => <field.TextField label="Name" required />}
+      </form.AppField>
+      <form.AppField name="selectedSector">
+        {(field) => (
+          <field.SelectField label="Sector" options={sectorOptions} />
+        )}
+      </form.AppField>
+    </>
+  )
+}
+
+function OperationsFields({
+  form,
+}: {
+  form: ReturnType<typeof useOrganizationOperationsForm>['form']
+}) {
+  return (
+    <>
+      <form.AppField name="isActive">
+        {(field) => (
+          <fieldset className="app-radio-group">
+            <legend>Status</legend>
+            <label>
+              <input
+                type="radio"
+                name="operations-status"
+                checked={field.state.value === true}
+                onChange={() => field.handleChange(true)}
+                onBlur={field.handleBlur}
+              />{' '}
+              Active
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="operations-status"
+                checked={field.state.value === false}
+                onChange={() => field.handleChange(false)}
+                onBlur={field.handleBlur}
+              />{' '}
+              Paused
+            </label>
+          </fieldset>
+        )}
+      </form.AppField>
+      <form.AppField name="region">
+        {(field) => (
+          <field.SelectField label="Region" options={regionOptions} />
+        )}
+      </form.AppField>
+    </>
+  )
+}
+
+function outcomeMessage(outcome?: string) {
+  if (outcome === 'success') return 'All changes saved.'
+  if (outcome === 'saved-with-follow-up-errors')
+    return 'All changes saved, but a follow-up action failed. The saved changes do not need to be submitted again.'
+  if (outcome === 'partial-failure')
+    return 'The save stopped. Saved sections remain persisted; failed and skipped sections retain their edits.'
+  return 'Please correct the form errors. No changes were saved.'
 }
 
 export function ProjectPage({ id }: { id: string }) {

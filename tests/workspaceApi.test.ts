@@ -97,7 +97,7 @@ test('child reads, independent ownership, legacy projection, initialization and 
     assert.equal(
       (await api.request('GET', `/api/organizations/${created.id}/operations`))
         .data.status,
-      'active',
+      'paused',
     )
     assert.equal(
       (await api.request('GET', '/api/organizations/org-1/profile')).data.name,

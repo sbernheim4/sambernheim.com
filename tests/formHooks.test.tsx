@@ -8,6 +8,7 @@ import {
 } from '@tanstack/react-query'
 import { useQueryBackedForm } from '../src/forms/bindings/useQueryBackedForm'
 import { useFormOrchestrator } from '../src/forms/query/useFormOrchestrator'
+import { useOrganizationForm } from '../src/features/workspace/hooks/forms'
 import {
   useOrganizationProfileForm,
   useOrganizationOperationsForm,
@@ -296,6 +297,146 @@ test('composed domain forms retry only Operations, keep Profile success and pres
     assert.equal(
       qc.getQueryData<any>(workspaceKeys.organizations.detail('org-1')).name,
       'Saved',
+    )
+  } finally {
+    globalThis.fetch = original
+    await harness.dispose()
+  }
+})
+
+test('organization page orchestrator skips clean participants and only submits dirty forms', async () => {
+  const qc = client()
+  const original = globalThis.fetch
+  const requests: string[] = []
+  let current: any
+  globalThis.fetch = async (url, options) => {
+    const path = String(url)
+    const method = options?.method ?? 'GET'
+    if (path.endsWith('/organizations/org-1/profile') && method === 'GET')
+      return Response.json({
+        organizationId: 'org-1',
+        name: 'Existing Clinic',
+        sector: 'healthcare',
+        updatedAt: '1',
+      })
+    if (path.endsWith('/organizations/org-1/operations') && method === 'GET')
+      return Response.json({
+        organizationId: 'org-1',
+        status: 'active',
+        region: 'east',
+        updatedAt: '1',
+      })
+    if (path.endsWith('/organizations/org-1') && method === 'GET')
+      return Response.json({
+        id: 'org-1',
+        name: 'Existing Clinic',
+        sector: 'healthcare',
+        status: 'active',
+        region: 'east',
+        updatedAt: '1',
+        profileUpdatedAt: '1',
+        operationsUpdatedAt: '1',
+      })
+    if (path.endsWith('/organizations/org-1') && method === 'PATCH') {
+      requests.push('organization patch')
+      return Response.json({
+        organization: {
+          id: 'org-1',
+          name: 'Existing Clinic',
+          sector: 'healthcare',
+          status: 'active',
+          region: 'east',
+          updatedAt: '2',
+          profileUpdatedAt: '1',
+          operationsUpdatedAt: '1',
+        },
+        readModelLagMs: 2500,
+      })
+    }
+    if (path.endsWith('/organizations/org-1/profile') && method === 'PATCH') {
+      requests.push('profile patch')
+      return Response.json({
+        profile: {
+          organizationId: 'org-1',
+          ...JSON.parse(String(options?.body)),
+          updatedAt: '2',
+        },
+        readModelLagMs: 2500,
+      })
+    }
+    if (path.endsWith('/organizations/org-1/operations') && method === 'PATCH') {
+      requests.push('operations patch')
+      return Response.json({
+        operations: {
+          organizationId: 'org-1',
+          status: 'active',
+          region: 'east',
+          updatedAt: '2',
+        },
+        readModelLagMs: 2500,
+      })
+    }
+    throw new Error(`Unexpected request: ${method} ${path}`)
+  }
+  const harness = await mount(qc, () => {
+    const organization = useOrganizationForm({
+      resource: {
+        id: 'org-1',
+        name: 'Existing Clinic',
+        sector: 'healthcare',
+        status: 'active',
+        region: 'east',
+        updatedAt: '1',
+        profileUpdatedAt: '1',
+        operationsUpdatedAt: '1',
+      },
+    })
+    const profile = useOrganizationProfileForm({
+      organizationId: 'org-1',
+      onSuccess: () => {
+        requests.push('profile success')
+      },
+    })
+    const operations = useOrganizationOperationsForm({
+      organizationId: 'org-1',
+      onSuccess: () => {
+        requests.push('operations success')
+      },
+    })
+    const save = useFormOrchestrator({
+      forms: [organization, profile, operations] as const,
+      retry: { delayMs: 0 },
+      onSuccess: () => {
+        requests.push('group success')
+      },
+    })
+    current = { organization, profile, operations, save }
+    return null
+  })
+  try {
+    await act(delay)
+    await act(async () => {
+      current.profile.form.setFieldValue('displayName', 'Renamed Clinic')
+      await delay()
+    })
+    assert.equal(current.profile.form.state.isDirty, true)
+    await act(async () => {
+      await current.save.submit()
+      await delay()
+    })
+    assert.deepEqual(requests, [
+      'profile patch',
+      'profile success',
+      'group success',
+    ])
+    assert.equal(current.save.result.outcome, 'success')
+    assert.equal(current.organization.form.state.isDirty, false)
+    assert.equal(current.profile.form.state.isDirty, false)
+    assert.equal(current.operations.form.state.isDirty, false)
+    assert.equal(
+      qc.getQueryData<any>(workspaceKeys.organizationProfiles.detail('org-1'))
+        .name,
+      'Renamed Clinic',
     )
   } finally {
     globalThis.fetch = original
