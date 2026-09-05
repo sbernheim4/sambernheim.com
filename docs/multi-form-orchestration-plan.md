@@ -19,6 +19,7 @@ verification remains user-managed. The handoff notes below are historical contex
 - [x] Shared dependent-flow lifecycle, boundary documentation, final build and review.
 - [x] Subtle entity-tinted shells for form and entity pages using CSS modifier variables.
 - [x] Split create and update request contracts so POST inputs stay required and PATCH inputs stay partial.
+- [x] Removed standalone `/forms/organization`, `/forms/project`, and `/forms/task` demo routes.
 
 ### Revision And Verification Log
 
