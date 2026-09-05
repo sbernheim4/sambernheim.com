@@ -1,6 +1,44 @@
 # Domain Form Hooks And Multi-Form Orchestration
 
-Status: implementation plan. Saving this document does not implement the feature.
+Status: implementation in progress. See the live checklist below; the handoff
+notes remain historical context.
+
+## Live Implementation Checklist (2026-09-05)
+
+- [x] Inspect handoff and preserve starting revisions; use jj exclusively.
+- [x] Resource list/detail reads, keys, structured API errors, request-only domain mutations.
+- [x] Migrate demo query calls and requests to domain hooks.
+- [x] Typed opaque participants, mappings, cache targets, lifecycle callbacks, type-test configuration.
+- [ ] Ordered executor: validation, snapshots, dependencies, retries, partial results, refresh/cache/effects.
+- [ ] React bindings and standalone CRUD compatibility; query initialization and saved baselines.
+- [ ] Extract resource/demo domain form hooks and migrate workspace resource reads.
+- [ ] Profile/Operations backend ownership, reads, writes, initialization, clear-all.
+- [ ] Resource cache projections and clear-all lifecycle coordination.
+- [ ] Composed configuration page, navigation, per-child/aggregate feedback, projects.
+- [ ] Focused executor, binding, cache, API and compile-time regression coverage.
+- [ ] Shared dependent-flow lifecycle, boundary documentation, final build and review.
+
+### Revision And Verification Log
+
+- `uvowqtsv`: domain query and mutation hooks. `npm run typecheck` passed.
+  Resource-editor migration follows the new binding implementation. Demo flow
+  uses a one-argument wrapper to avoid passing flow context as mutateAsync options.
+- `zzouoqmm`: typed participants and lifecycle contracts. `npx tsc -p
+  tsconfig.tests.json` passed, including negative inference fixtures.
+- No browser automation or server startup; user owns browser verification.
+
+### Working Notes / Open Issues
+
+- Domain extraction is moved after the new binding to avoid migrating resource
+  forms twice. Each validated unit still receives its own jj revision.
+- Clear-all currently has its request hook; lifecycle locking and all-resource
+  cache removal remain pending.
+- Need explicit coverage for snapshot validation (both field and form validators),
+  overlapping refreshes, post-save edits, and independent child summary merges.
+- Consistency guarantee covers the coordinated lifecycle. Later uncoordinated
+  replica reads need a documented limit or separate protection; staleTime alone
+  does not provide it.
+
 
 ## Session Handoff And jj Workflow
 
