@@ -20,6 +20,7 @@ verification remains user-managed. The handoff notes below are historical contex
 - [x] Subtle entity-tinted shells for form and entity pages using CSS modifier variables.
 - [x] Split create and update request contracts so POST inputs stay required and PATCH inputs stay partial.
 - [x] Removed standalone `/forms/organization`, `/forms/project`, and `/forms/task` demo routes.
+- [x] Folded organization Profile/Operations editing into `/organizations/:organizationId` and removed the separate configuration route.
 
 ### Revision And Verification Log
 
@@ -67,6 +68,15 @@ verification remains user-managed. The handoff notes below are historical contex
   executor, and configuration page are clean. Build warnings remain Monaco's
   large chunks and dependency unused imports. The generated (ignored) route tree
   was inspected: configuration has the root route as parent and the intended URL.
+- Current scratch note: the organization detail page needs reactive dirty-state
+  subscriptions from each TanStack form store so the single Save button reflects
+  live edits instead of only reading a stale render-time snapshot.
+- Current hook note: `useFormOrchestrator` now accepts either bindings or legacy
+  participant arrays, filters dirty bindings by default, and lets query-backed
+  create forms opt into pristine submission with `includePristine: true`.
+- Final verification for this change: `npm run typecheck`, `npm run test:forms`,
+  and `npm run build` all pass after wiring the organization page save button to
+  TanStack form-store subscriptions.
 - Nine focused implementation revisions follow `trzpnmmy`; preserved checkpoint
   `otryutsq` and bookmarks were not rewritten or moved. Current completed revision
   is `zqltupnm`. No push, browser automation, or development-server startup.
