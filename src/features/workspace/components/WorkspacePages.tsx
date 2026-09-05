@@ -12,11 +12,16 @@ import {
 } from "lucide-react";
 import { WorkspaceLayout } from "./WorkspaceLayout";
 import type { BootstrapData, Organization, Project, Task } from "../types";
-import { useWorkspaceResources } from "../hooks/useWorkspaceResources";
+import {
+  useOrganizationsWorkspace,
+  useOrganizationWorkspace,
+  useProjectWorkspace,
+  useTaskWorkspace,
+} from "../hooks/useWorkspaceResources";
 import { OrganizationEditor, ProjectEditor, TaskEditor } from "./ResourceEditors";
 
 export function OrganizationsPage() {
-  const query = useWorkspaceResources();
+  const query = useOrganizationsWorkspace();
   return (
     <Workspace
       title="Organizations"
@@ -38,7 +43,7 @@ export function OrganizationsPage() {
 }
 
 export function OrganizationPage({ id }: { id: string }) {
-  const query = useWorkspaceResources();
+  const query = useOrganizationWorkspace(id);
   const organization = query.data?.organizations.find((item) => item.id === id);
   return (
     <Workspace
@@ -73,7 +78,7 @@ export function OrganizationPage({ id }: { id: string }) {
 }
 
 export function ProjectPage({ id }: { id: string }) {
-  const query = useWorkspaceResources();
+  const query = useProjectWorkspace(id);
   const project = query.data?.projects.find((item) => item.id === id);
   const organization = query.data?.organizations.find(
     (item) => item.id === project?.organizationId,
@@ -110,7 +115,7 @@ export function ProjectPage({ id }: { id: string }) {
 }
 
 export function TaskPage({ id }: { id: string }) {
-  const query = useWorkspaceResources();
+  const query = useTaskWorkspace(id);
   const task = query.data?.tasks.find((item) => item.id === id);
   const project = query.data?.projects.find((item) => item.id === task?.projectId);
   const organization = query.data?.organizations.find((item) => item.id === task?.organizationId);
@@ -239,7 +244,7 @@ function QueryState({
   missing,
   children,
 }: {
-  query: ReturnType<typeof useWorkspaceResources>;
+  query: ReturnType<typeof useOrganizationsWorkspace>;
   missing?: boolean;
   children: ReactNode;
 }) {

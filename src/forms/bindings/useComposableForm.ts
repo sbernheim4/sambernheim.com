@@ -37,7 +37,7 @@ export function useComposableForm<
   const D extends readonly AnyParticipant[] = readonly [],
 >(
   config: Omit<ComposableFormConfig<Id, Q, NoInfer<ReturnType<F>>, M, D>, "toFormData"> & {
-    query: QuerySource<Q>;
+    query?: QuerySource<Q>;
     toFormData: F;
   },
 ): BindingReturn<Id, ReturnType<F>, M>;

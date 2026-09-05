@@ -30,7 +30,7 @@ type CrudReturn<V, M extends AsyncMutation> = Binding<V, M> & {
 
 export function useQueryBackedForm<Q, F extends (data: Q) => any, M extends AsyncMutation>(
   config: Omit<CrudConfig<Q, NoInfer<ReturnType<F>>, M>, "toFormData"> & {
-    query: QuerySource<Q>;
+    query?: QuerySource<Q>;
     toFormData: F;
   },
 ): CrudReturn<ReturnType<F>, M>;

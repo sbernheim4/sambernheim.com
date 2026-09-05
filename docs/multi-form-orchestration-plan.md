@@ -11,7 +11,7 @@ notes remain historical context.
 - [x] Typed opaque participants, mappings, cache targets, lifecycle callbacks, type-test configuration.
 - [x] Ordered executor: validation, snapshots, dependencies, retries, partial results, refresh/cache/effects.
 - [x] React bindings and standalone CRUD compatibility; query initialization and saved baselines.
-- [ ] Extract resource/demo domain form hooks and migrate workspace resource reads.
+- [x] Extract resource/demo domain form hooks and migrate workspace resource reads.
 - [ ] Profile/Operations backend ownership, reads, writes, initialization, clear-all.
 - [ ] Resource cache projections and clear-all lifecycle coordination.
 - [ ] Composed configuration page, navigation, per-child/aggregate feedback, projects.
@@ -36,6 +36,10 @@ notes remain historical context.
   verification.
 - Added `scripts/tsserver-tools.mjs` using installed tsserver for semantic references,
   rename locations, definitions, hover types, symbol lookup and diagnostics.
+- `toynrkns`: resource and demo form hooks extracted; workspace pages compose
+  resource queries. New CRUD hooks use flat refreshes and outcome callbacks, and
+  reconcile list, detail, parent-list, and bootstrap caches. Full type checks pass;
+  tsserver reference lookup confirms form ownership moved out of route views.
 - No browser automation or server startup; user owns browser verification.
 
 ### Working Notes / Open Issues
