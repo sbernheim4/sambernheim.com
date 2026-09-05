@@ -2,6 +2,201 @@
 
 Status: implementation plan. Saving this document does not implement the feature.
 
+## Session Handoff And jj Workflow
+
+Handoff recorded on 2026-09-05. The user paused implementation to continue in a
+new session. No application implementation changes for this plan have been made.
+Only repository inspection, a jj checkpoint, and this handoff documentation have
+been completed. The earlier workspace and forms implementation already exists
+and is the starting point, not evidence that this plan has been implemented.
+
+Repository: `/Users/sambernheim/monaco-lsp`.
+
+### Preserved Starting Point
+
+- `otryutsq` is the preserved jj change containing all pre-existing workspace
+  work and the agreed plan. Its description is
+  `checkpoint: workspace forms and agreed orchestration plan`.
+- `trzpnmmy` is the child change for this documentation handoff. It was initially
+  created as an empty domain-hook revision before the user paused; its description
+  is now `docs: record orchestration handoff and jj revision workflow`.
+- Prefer these stable jj change IDs over commit hashes, which change when a
+  revision is amended. Inspect `jj status` and `jj log` on resuming; later user
+  work may have changed the working revision.
+- Do not discard or rewrite the checkpoint's unrelated editor, UI, backend, or
+  dependency changes. Do not move/push bookmarks unless requested.
+
+### Revision Strategy
+
+The user explicitly requests planned, focused jj revisions and authorizes as
+many as needed. The purpose is to make an approach easy to inspect, replace, or
+abandon without losing unrelated completed work. Use new child revisions at
+validated boundaries; do not accumulate the whole implementation in one change.
+
+Suggested sequence, splitting further when a unit grows too large:
+
+1. `feat(workspace): domain query and mutation hooks` - add resource reads, keys,
+   and request-only domain mutation hooks; migrate direct domain query calls.
+2. `refactor(workspace): extract domain form hooks` - move entity form setup,
+   mapping, and lifecycle declarations out of resource view components.
+3. `feat(forms): typed participants and lifecycle contracts` - add the mapper,
+   cache selector, flat refresh, retry, and callback contracts with type tests.
+4. `feat(forms): ordered orchestration executor` - implement validation,
+   snapshots, ordered saves, retries, partial results, reconciliation, and callback
+   execution with focused non-React tests.
+5. `feat(forms): composable bindings and CRUD facade` - add the React adapters;
+   make `useQueryBackedForm` the simpler one-resource facade; verify compatibility
+   and the domain `mutateAsync` boundary.
+6. `feat(workspace): profile and operations resources` - implement the child
+   endpoints, single ownership of fields, initialization, queries, and mutation
+   hooks, including clear-all and legacy projections.
+7. `feat(workspace): composed organization configuration` - implement the two
+   domain form hooks, one Save All page, navigation, status, and project list.
+8. `test(forms): verify migration and document boundaries` - close integration
+   gaps, update documentation, and perform final checks. Tests for earlier units
+   belong in their own revisions as well, not exclusively in this final change.
+
+Start by reading this entire document and inspecting the actual repository. Then
+create a fresh implementation change from the handoff revision, for example:
+
+```sh
+jj status
+jj log -n 8 --no-graph
+jj new -m 'feat(workspace): domain query and mutation hooks'
+```
+
+At each boundary, review `jj diff`, run relevant checks, describe the completed
+change accurately, and create the next revision with `jj new -m '...'`. Each
+revision should be coherent and typecheck where feasible. Keep exploratory work
+in separate revisions, and record any temporarily failing checks explicitly.
+
+To change direction, first inspect the exact revision and its descendants.
+Abandon only the isolated work being replaced; do not blindly abandon a revision
+under completed dependent work. Preserve useful portions in a separate change
+before dropping an approach, and account for jj descendant rebases/conflicts.
+Never use broad restore/reset commands to clean the checkpoint. Leave a concise
+revision/test summary for the next handoff.
+
+### Implementation Facts And Constraints
+
+- Existing generic hooks are under `src/forms/query` and form/UI adapters under
+  `src/forms/bindings`; domain code is under `src/features/workspace`.
+- Existing `useQueryBackedForm` currently wraps default values and a save endpoint.
+  It does not yet implement the planned query initialization and participant API.
+- Existing `useSaveFlow` handles endpoint steps, not independent form instances.
+  It and standalone saves have existing cache-reconciliation helpers to inspect.
+- Workspace views currently use a bootstrap-based domain query hook; entity
+  editor specifications and HTTP calls are still mixed into `ResourceEditors`.
+  The domain query/mutation/form migrations remain outstanding.
+- The new APIs in this document are proposals, including `useFormOrchestrator`,
+  `useComposableForm`, and the Profile/Operations resources. Do not assume example
+  snippets already compile or that their types have been implemented.
+- Latest naming decisions are `toFormData`, `toMutationPayload`, `getData`,
+  functional `queryKey`, `refetchFunctions`, `invalidateQueryKeys`, `onSuccess`,
+  and `onFailure`. Both child forms and the group support refreshes and callbacks.
+- Domain mutation hooks supply `mutateAsync`; all refetches settle before any
+  authoritative cache injection. Do not move refreshes into mutation callbacks.
+- Ordered-only scheduling supersedes earlier discussion of parallel groups or
+  independent branch continuation. Preserve partial successes; no atomicity is
+  promised across endpoints.
+- Do not install Playwright or other browser automation. The user handles browser
+  checks. Use focused logic/type tests and builds for automated verification.
+- Existing verification commands include `npm run typecheck`, `npm run build`,
+  and `node --experimental-strip-types --test tests/cacheReconciliation.test.ts`.
+  No implementation verification was run in this handoff-only session.
+- A user-managed dev server may already be running. Inspect ports before starting
+  another server; do not stop the user's server as incidental cleanup.
+
+### Technical Background And Implementation Caveats
+
+These observations were checked against the repository during handoff. They are
+implementation considerations, not claims that the planned fixes already exist.
+
+- The app uses React 19, TanStack Form 1.x, Query 5.x, Router/Start, TypeScript 5.9,
+  Vite, and ESM. Inspect the lockfile for exact installed versions. The field
+  components use Radix primitives and local CSS with Lucide icons; this is not a
+  generated shadcn installation. No UI library replacement is required.
+- The client has a QueryClientProvider in `src/routes/__root.tsx` and routes are
+  configured with `ssr: false`. Keep query ownership consistent across the forms
+  and orchestrator. The module-level client must be revisited if server rendering
+  is introduced, but adding SSR is not part of this work.
+- `npm run dev` serves frontend routes and `/api/*` through Vite's
+  `configureServer` middleware. Backend state is in memory and simulates a 2500 ms
+  lag by copying the current write store into the read store after a timeout.
+  Backend code changes may restart the server and reset example data.
+- The current API middleware is development-only. A successful production build
+  does not prove a deployed backend works. `npm start` points at
+  `.output/server/index.mjs`, while the observed build emitted `dist/server`.
+  Production hosting is a separate existing gap; do not silently expand this
+  task into deployment work or claim production API verification.
+- TanStack route files generate the route tree. Existing `/forms` is an Outlet
+  parent and `/forms/` is its index. A new nested organization configuration route
+  must have a parent Outlet or use the router's non-nested route convention;
+  simply nesting under the existing detail page can hide the child page.
+
+Validation and state handling require more than delegating to `handleSubmit`:
+
+- Installed TanStack Form source shows `validateAllFields('submit')` validates
+  field-level validators only. Its submission path also calls `validate('submit')`
+  for form-level validation and inspects validity. The participant adapter must
+  cover both and await async validators without invoking the child's save.
+- `handleSubmit()` can resolve without saving when a form is invalid; a resolved
+  promise is not a successful write. Report explicit validation outcomes.
+- `form.reset(values)` changes defaults and clears field metadata. Avoid calling
+  it unconditionally on every query update. Preserve dirty data and associate
+  baseline updates with the submission that actually succeeded.
+- Capture the participant definitions, inputs, and context for each run. React
+  rerenders, fresh callback identities, and query updates must not swap the active
+  run's configuration. Promise resolution remains the source of request results,
+  not polling a mutation hook's transient `data` or `isSuccess` state.
+
+Cache and failure handling have known limits to address deliberately:
+
+- The existing `createCacheReconciliation` replays updates within one run. It does
+  not protect against arbitrary later background fetches or a separate form's
+  stale refetch. A five-second `staleTime` does not block explicit refetches.
+  The new ordering guarantee covers the coordinated refresh phase; test subsequent
+  navigation/fetch behavior and document any remaining consistency limit. Do not
+  claim globally monotonic reads without a separate version-aware strategy.
+- `upsertBootstrap` compares `updatedAt` only against currently cached records.
+  Once a stale fetch replaces the cache, records lost from it cannot be recovered
+  by merging only the latest response. List/detail projection policies need
+  explicit coverage, especially when two children contribute to one summary.
+- Existing `useSaveFlow` records completed steps after refetch/effects and has
+  compensation callbacks. A failure after a successful write can therefore omit
+  that write from its completed list. The new executor must record persistence
+  immediately and distinguish follow-up failures; do not automatically transfer
+  the legacy compensation behavior into the new ordered form runner.
+- The current HTTP helper throws a plain Error containing response text. Reliable
+  retry classification needs a structured domain/API error retaining HTTP status;
+  do not parse error-message strings to decide whether a write is retryable.
+- Clear-all currently cancels and resets only the bootstrap query, and its disabled
+  state watches active mutations. Resource-specific caches and an orchestrator's
+  post-request lifecycle extend that surface. Update clear-all coordination so
+  pending reconciliation cannot reinsert deleted data after clear-all completes.
+- UI feedback should report partial saves truthfully. A successful Profile write
+  is still persisted when Operations fails. Avoid notifications that imply rollback
+  or promise safe repetition of non-idempotent creates.
+
+Testing and verification specifics:
+
+- The existing tests cover only the small reconciliation helper with QueryClient,
+  not mounted form hooks, validation, retries, endpoint behavior, or the full flow.
+- Root `tsconfig.json` includes `src` and `vite.config.ts`, not `tests`. Node's
+  TypeScript stripping does not typecheck test files. Add a dedicated type-test
+  configuration or otherwise include compile-time fixtures explicitly so
+  `@ts-expect-error` inference tests are actually verified.
+- Use `.ts` imports where needed for direct Node ESM tests, as the existing test
+  does. Keep a React-free executor importable without loading TSX field components.
+- If adding mounted-hook tests, choose a small non-browser test harness and
+  document its purpose. The user declined Playwright, not focused automated logic
+  or hook tests. Test API handlers in isolated state, not by clearing a running
+  user workspace to prepare test data.
+- Vite builds may regenerate route artifacts. Inspect those diffs before closing
+  each jj revision. Monaco produces large-chunk warnings in existing builds;
+  distinguish these from new compilation failures. Do not rebuild the ty WASM
+  toolchain unless needed by the existing scripts.
+
 ## Goal And Public API
 
 Provide composable form orchestration for a page that presents several resource
