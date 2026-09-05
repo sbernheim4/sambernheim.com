@@ -1,6 +1,6 @@
-import { useState, type ReactNode } from 'react'
-import { useStore } from '@tanstack/react-form'
-import { Link } from '@tanstack/react-router'
+import { useState, type ReactNode } from "react";
+import { useStore } from "@tanstack/react-form";
+import { Link } from "@tanstack/react-router";
 import {
   ArrowRight,
   Building2,
@@ -10,30 +10,26 @@ import {
   Plus,
   Search,
   X,
-} from 'lucide-react'
-import { WorkspaceLayout } from './WorkspaceLayout'
-import type { BootstrapData, Organization, Project, Task } from '../types'
+} from "lucide-react";
+import { WorkspaceLayout } from "./WorkspaceLayout";
+import type { BootstrapData, Organization, Project, Task } from "../types";
 import {
   useOrganizationsWorkspace,
   useOrganizationWorkspace,
   useProjectWorkspace,
   useTaskWorkspace,
-} from '../hooks/useWorkspaceResources'
-import {
-  OrganizationEditor,
-  ProjectEditor,
-  TaskEditor,
-} from './ResourceEditors'
-import { useOrganizationForm } from '../hooks/forms'
+} from "../hooks/useWorkspaceResources";
+import { OrganizationEditor, ProjectEditor, TaskEditor } from "./ResourceEditors";
+import { useOrganizationForm } from "../hooks/forms";
 import {
   useOrganizationOperationsForm,
   useOrganizationProfileForm,
-} from '../hooks/organizationConfigurationForms'
-import { useFormOrchestrator } from '../../../forms/query/useFormOrchestrator'
-import { regionOptions, sectorOptions } from '../fieldOptions'
+} from "../hooks/organizationConfigurationForms";
+import { useFormOrchestrator } from "../../../forms/hooks/useFormOrchestrator";
+import { regionOptions, sectorOptions } from "../fieldOptions";
 
 export function OrganizationsPage() {
-  const query = useOrganizationsWorkspace()
+  const query = useOrganizationsWorkspace();
   return (
     <Workspace
       title="Organizations"
@@ -51,15 +47,15 @@ export function OrganizationsPage() {
         )}
       </QueryState>
     </Workspace>
-  )
+  );
 }
 
 export function OrganizationPage({ id }: { id: string }) {
-  const query = useOrganizationWorkspace(id)
-  const organization = query.data?.organizations.find((item) => item.id === id)
+  const query = useOrganizationWorkspace(id);
+  const organization = query.data?.organizations.find((item) => item.id === id);
   return (
     <Workspace
-      title={organization?.name ?? 'Organization'}
+      title={organization?.name ?? "Organization"}
       description="Account details and projects."
       entity="organization"
       organization={organization}
@@ -84,47 +80,43 @@ export function OrganizationPage({ id }: { id: string }) {
               title="Projects"
               kind="projects"
               data={query.data}
-              items={query.data.projects.filter(
-                (item) => item.organizationId === organization.id,
-              )}
+              items={query.data.projects.filter((item) => item.organizationId === organization.id)}
               create={(close) => (
-                <ProjectEditor
-                  organizationId={organization.id}
-                  onCreated={close}
-                />
+                <ProjectEditor organizationId={organization.id} onCreated={close} />
               )}
             />
           </div>
         )}
       </QueryState>
     </Workspace>
-  )
+  );
 }
 function OrganizationWorkspaceForm({
   organization,
   organizationId,
 }: {
-  organization: Organization
-  organizationId: string
+  organization: Organization;
+  organizationId: string;
 }) {
-  const core = useOrganizationForm({ resource: organization })
-  const profile = useOrganizationProfileForm({ organizationId })
-  const operations = useOrganizationOperationsForm({ organizationId })
-  const coreDirty = useStore(core.form.store, (state) => state.isDirty)
-  const profileDirty = useStore(profile.form.store, (state) => state.isDirty)
-  const operationsDirty = useStore(
-    operations.form.store,
-    (state) => state.isDirty,
-  )
+  const core = useOrganizationForm({ resource: organization });
+  const profile = useOrganizationProfileForm({ organizationId });
+  const operations = useOrganizationOperationsForm({ organizationId });
+
+  const coreDirty = useStore(core.form.store, (state) => state.isDirty);
+  const profileDirty = useStore(profile.form.store, (state) => state.isDirty);
+  const operationsDirty = useStore(operations.form.store, (state) => state.isDirty);
+
   const save = useFormOrchestrator({
     forms: [core, profile, operations] as const,
     retry: { maxRetries: 1, delayMs: 500 },
-  })
-  const [submitError, setSubmitError] = useState<unknown>()
-  const ready = core.isReady && profile.isReady && operations.isReady
-  const readError = core.readError || profile.readError || operations.readError
-  const dirtyCount = [coreDirty, profileDirty, operationsDirty].filter(Boolean)
-    .length
+  });
+
+  const [submitError, setSubmitError] = useState<unknown>();
+
+  const ready = core.isReady && profile.isReady && operations.isReady;
+  const readError = core.readError || profile.readError || operations.readError;
+  const dirtyCount = [coreDirty, profileDirty, operationsDirty].filter(Boolean).length;
+
   return (
     <section className="workspace-section">
       <div className="workspace-section-heading">
@@ -133,20 +125,23 @@ function OrganizationWorkspaceForm({
       <form
         className="resource-editor configuration-form"
         onSubmit={(event) => {
-          event.preventDefault()
-          setSubmitError(undefined)
-          if (!dirtyCount) return
-          void save.submit().catch(setSubmitError)
+          event.preventDefault();
+          setSubmitError(undefined);
+          if (!dirtyCount) {
+              return
+          };
+
+          save.submit().catch(setSubmitError);
         }}
       >
         {readError ? (
           <p className="form-error" role="alert">
-            Unable to load configuration.{' '}
+            Unable to load configuration.{" "}
             <button
               type="button"
               onClick={() => {
-                void profile.retryRead()
-                void operations.retryRead()
+                void profile.retryRead();
+                void operations.retryRead();
               }}
             >
               Retry
@@ -171,19 +166,15 @@ function OrganizationWorkspaceForm({
             <h3>Operations</h3>
             <OperationsFields form={operations.form} />
           </section>
-          <button
-            className="primary-action"
-            type="submit"
-            disabled={save.isSaving || !dirtyCount}
-          >
+          <button className="primary-action" type="submit" disabled={save.isSaving || !dirtyCount}>
             {save.isSaving
-              ? 'Saving changes...'
+              ? "Saving changes..."
               : dirtyCount
-                ? 'Save changes'
-                : 'No changes to save'}
+                ? "Save changes"
+                : "No changes to save"}
           </button>
         </fieldset>
-        {save.phase !== 'idle' && (
+        {save.phase !== "idle" && (
           <div role="status" aria-live="polite">
             <p>
               {save.isSaving
@@ -191,31 +182,26 @@ function OrganizationWorkspaceForm({
                 : outcomeMessage(save.result?.outcome)}
             </p>
             <ul>
-              {(['resource', 'profile', 'operations'] as const).map(
-                (participantId) => {
-                  const state = save.participants?.[participantId]
-                  const status = state?.status ?? 'unchanged'
-                  return (
-                    <li key={participantId}>
-                      {participantId === 'resource'
-                        ? 'Organization'
-                        : participantId === 'profile'
-                          ? 'Profile'
-                          : 'Operations'}
-                      : {status}
-                      {state?.attempts
-                        ? ` (${state.attempts} ${state.attempts === 1 ? 'attempt' : 'attempts'})`
-                        : ''}
-                      {state?.failure && (
-                        <span className="form-error">
-                          {' '}
-                          — {String(state.failure.error)}
-                        </span>
-                      )}
-                    </li>
-                  )
-                },
-              )}
+              {(["resource", "profile", "operations"] as const).map((formId) => {
+                const state = save.result?.forms[formId];
+                const status = state?.status ?? "unchanged";
+                return (
+                  <li key={formId}>
+                    {formId === "resource"
+                      ? "Organization"
+                      : formId === "profile"
+                        ? "Profile"
+                        : "Operations"}
+                    : {status}
+                    {state?.attempts
+                      ? ` (${state.attempts} ${state.attempts === 1 ? "attempt" : "attempts"})`
+                      : ""}
+                    {state?.failure && (
+                      <span className="form-error"> — {String(state.failure.error)}</span>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           </div>
         )}
@@ -226,31 +212,25 @@ function OrganizationWorkspaceForm({
         )}
       </form>
     </section>
-  )
+  );
 }
 
 function OrganizationFields({
   form,
   fields,
 }: {
-  form: ReturnType<typeof useOrganizationForm>['form']
-  fields: ReturnType<typeof useOrganizationForm>['fields']
+  form: ReturnType<typeof useOrganizationForm>["form"];
+  fields: ReturnType<typeof useOrganizationForm>["fields"];
 }) {
   return (
     <>
       {fields.map((item) => (
         <form.AppField key={item.name} name={item.name}>
           {(field) =>
-            item.mode === 'radio' ? (
-              <field.RadioGroupField
-                label={item.label}
-                options={item.options ?? []}
-              />
-            ) : item.mode === 'select' ? (
-              <field.SelectField
-                label={item.label}
-                options={item.options ?? []}
-              />
+            item.mode === "radio" ? (
+              <field.RadioGroupField label={item.label} options={item.options ?? []} />
+            ) : item.mode === "select" ? (
+              <field.SelectField label={item.label} options={item.options ?? []} />
             ) : (
               <field.TextField label={item.label} required />
             )
@@ -258,38 +238,31 @@ function OrganizationFields({
         </form.AppField>
       ))}
     </>
-  )
+  );
 }
 
-function ProfileFields({
-  form,
-}: {
-  form: ReturnType<typeof useOrganizationProfileForm>['form']
-}) {
+function ProfileFields({ form }: { form: ReturnType<typeof useOrganizationProfileForm>["form"] }) {
   return (
     <>
       <form.AppField
         name="displayName"
         validators={{
-          onSubmit: ({ value }) =>
-            !value.trim() ? 'Name is required.' : undefined,
+          onSubmit: ({ value }) => (!value.trim() ? "Name is required." : undefined),
         }}
       >
         {(field) => <field.TextField label="Name" required />}
       </form.AppField>
       <form.AppField name="selectedSector">
-        {(field) => (
-          <field.SelectField label="Sector" options={sectorOptions} />
-        )}
+        {(field) => <field.SelectField label="Sector" options={sectorOptions} />}
       </form.AppField>
     </>
-  )
+  );
 }
 
 function OperationsFields({
   form,
 }: {
-  form: ReturnType<typeof useOrganizationOperationsForm>['form']
+  form: ReturnType<typeof useOrganizationOperationsForm>["form"];
 }) {
   return (
     <>
@@ -304,7 +277,7 @@ function OperationsFields({
                 checked={field.state.value === true}
                 onChange={() => field.handleChange(true)}
                 onBlur={field.handleBlur}
-              />{' '}
+              />{" "}
               Active
             </label>
             <label>
@@ -314,39 +287,37 @@ function OperationsFields({
                 checked={field.state.value === false}
                 onChange={() => field.handleChange(false)}
                 onBlur={field.handleBlur}
-              />{' '}
+              />{" "}
               Paused
             </label>
           </fieldset>
         )}
       </form.AppField>
       <form.AppField name="region">
-        {(field) => (
-          <field.SelectField label="Region" options={regionOptions} />
-        )}
+        {(field) => <field.SelectField label="Region" options={regionOptions} />}
       </form.AppField>
     </>
-  )
+  );
 }
 
 function outcomeMessage(outcome?: string) {
-  if (outcome === 'success') return 'All changes saved.'
-  if (outcome === 'saved-with-follow-up-errors')
-    return 'All changes saved, but a follow-up action failed. The saved changes do not need to be submitted again.'
-  if (outcome === 'partial-failure')
-    return 'The save stopped. Saved sections remain persisted; failed and skipped sections retain their edits.'
-  return 'Please correct the form errors. No changes were saved.'
+  if (outcome === "success") return "All changes saved.";
+  if (outcome === "saved-with-follow-up-errors")
+    return "All changes saved, but a follow-up action failed. The saved changes do not need to be submitted again.";
+  if (outcome === "partial-failure")
+    return "The save stopped. Saved sections remain persisted; failed and skipped sections retain their edits.";
+  return "Please correct the form errors. No changes were saved.";
 }
 
 export function ProjectPage({ id }: { id: string }) {
-  const query = useProjectWorkspace(id)
-  const project = query.data?.projects.find((item) => item.id === id)
+  const query = useProjectWorkspace(id);
+  const project = query.data?.projects.find((item) => item.id === id);
   const organization = query.data?.organizations.find(
     (item) => item.id === project?.organizationId,
-  )
+  );
   return (
     <Workspace
-      title={project?.name ?? 'Project'}
+      title={project?.name ?? "Project"}
       description="Project settings and assigned work."
       entity="project"
       organization={organization}
@@ -355,11 +326,7 @@ export function ProjectPage({ id }: { id: string }) {
       <QueryState query={query} missing={!!query.data && !project}>
         {project && query.data && (
           <div className="workspace-columns">
-            <Details
-              title="Project details"
-              id={project.id}
-              updatedAt={project.updatedAt}
-            >
+            <Details title="Project details" id={project.id} updatedAt={project.updatedAt}>
               <ProjectEditor
                 key={project.id}
                 resource={project}
@@ -370,32 +337,24 @@ export function ProjectPage({ id }: { id: string }) {
               title="Tasks"
               kind="tasks"
               data={query.data}
-              items={query.data.tasks.filter(
-                (item) => item.projectId === project.id,
-              )}
-              create={(close) => (
-                <TaskEditor project={project} onCreated={close} />
-              )}
+              items={query.data.tasks.filter((item) => item.projectId === project.id)}
+              create={(close) => <TaskEditor project={project} onCreated={close} />}
             />
           </div>
         )}
       </QueryState>
     </Workspace>
-  )
+  );
 }
 
 export function TaskPage({ id }: { id: string }) {
-  const query = useTaskWorkspace(id)
-  const task = query.data?.tasks.find((item) => item.id === id)
-  const project = query.data?.projects.find(
-    (item) => item.id === task?.projectId,
-  )
-  const organization = query.data?.organizations.find(
-    (item) => item.id === task?.organizationId,
-  )
+  const query = useTaskWorkspace(id);
+  const task = query.data?.tasks.find((item) => item.id === id);
+  const project = query.data?.projects.find((item) => item.id === task?.projectId);
+  const organization = query.data?.organizations.find((item) => item.id === task?.organizationId);
   return (
     <Workspace
-      title={task?.title ?? 'Task'}
+      title={task?.title ?? "Task"}
       description="Ownership, status, and delivery."
       entity="task"
       organization={organization}
@@ -405,11 +364,7 @@ export function TaskPage({ id }: { id: string }) {
       <QueryState query={query} missing={!!query.data && (!task || !project)}>
         {task && project && (
           <div className="workspace-columns">
-            <Details
-              title="Task details"
-              id={task.id}
-              updatedAt={task.updatedAt}
-            >
+            <Details title="Task details" id={task.id} updatedAt={task.updatedAt}>
               <TaskEditor key={task.id} resource={task} project={project} />
             </Details>
             <section className="workspace-section">
@@ -428,10 +383,7 @@ export function TaskPage({ id }: { id: string }) {
                     <ArrowRight size={16} />
                   </Link>
                 )}
-                <Link
-                  to="/projects/$projectId"
-                  params={{ projectId: project.id }}
-                >
+                <Link to="/projects/$projectId" params={{ projectId: project.id }}>
                   <Folder size={20} />
                   <span>
                     <small>Project</small>
@@ -445,7 +397,7 @@ export function TaskPage({ id }: { id: string }) {
         )}
       </QueryState>
     </Workspace>
-  )
+  );
 }
 
 export function Workspace({
@@ -457,13 +409,13 @@ export function Workspace({
   project,
   task,
 }: {
-  title: string
-  description: string
-  children: ReactNode
-  entity?: 'organization' | 'project' | 'task'
-  organization?: Organization
-  project?: Project
-  task?: Task
+  title: string;
+  description: string;
+  children: ReactNode;
+  entity?: "organization" | "project" | "task";
+  organization?: Organization;
+  project?: Project;
+  task?: Task;
 }) {
   return (
     <WorkspaceLayout title={title} description={description} entity={entity}>
@@ -484,10 +436,7 @@ export function Workspace({
           {project && (
             <>
               <ChevronRight size={14} />
-              <Link
-                to="/projects/$projectId"
-                params={{ projectId: project.id }}
-              >
+              <Link to="/projects/$projectId" params={{ projectId: project.id }}>
                 {project.name}
               </Link>
             </>
@@ -502,7 +451,7 @@ export function Workspace({
         {children}
       </div>
     </WorkspaceLayout>
-  )
+  );
 }
 
 function Details({
@@ -511,21 +460,19 @@ function Details({
   updatedAt,
   children,
 }: {
-  title: string
-  id: string
-  updatedAt: string
-  children: ReactNode
+  title: string;
+  id: string;
+  updatedAt: string;
+  children: ReactNode;
 }) {
   return (
     <section className="workspace-details">
       <h2>{title}</h2>
       <p className="resource-reference">{id}</p>
       {children}
-      <p className="resource-updated">
-        Updated {new Date(updatedAt).toLocaleString()}
-      </p>
+      <p className="resource-updated">Updated {new Date(updatedAt).toLocaleString()}</p>
     </section>
-  )
+  );
 }
 
 export function QueryState({
@@ -533,30 +480,26 @@ export function QueryState({
   missing,
   children,
 }: {
-  query: ReturnType<typeof useOrganizationsWorkspace>
-  missing?: boolean
-  children: ReactNode
+  query: ReturnType<typeof useOrganizationsWorkspace>;
+  missing?: boolean;
+  children: ReactNode;
 }) {
   if (query.isPending)
     return (
       <p className="workspace-empty" role="status">
         Loading resources...
       </p>
-    )
+    );
   if (query.isError)
     return (
       <div className="workspace-empty" role="alert">
         <h2>Unable to load resources</h2>
         <p>Please try again.</p>
-        <button
-          type="button"
-          className="workspace-button"
-          onClick={() => void query.refetch()}
-        >
+        <button type="button" className="workspace-button" onClick={() => void query.refetch()}>
           Retry
         </button>
       </div>
-    )
+    );
   if (missing)
     return (
       <div className="workspace-empty">
@@ -564,8 +507,8 @@ export function QueryState({
         <p>This resource may have been removed.</p>
         <Link to="/organizations">Back to organizations</Link>
       </div>
-    )
-  return children
+    );
+  return children;
 }
 
 export function EntityList({
@@ -575,31 +518,20 @@ export function EntityList({
   data,
   create,
 }: {
-  title: string
-  kind: keyof BootstrapData
-  items: Array<Organization | Project | Task>
-  data: BootstrapData
-  create: (close: () => void) => ReactNode
+  title: string;
+  kind: keyof BootstrapData;
+  items: Array<Organization | Project | Task>;
+  data: BootstrapData;
+  create: (close: () => void) => ReactNode;
 }) {
-  const [search, setSearch] = useState('')
-  const [creating, setCreating] = useState(false)
+  const [search, setSearch] = useState("");
+  const [creating, setCreating] = useState(false);
   const singular =
-    kind === 'organizations'
-      ? 'organization'
-      : kind === 'projects'
-        ? 'project'
-        : 'task'
+    kind === "organizations" ? "organization" : kind === "projects" ? "project" : "task";
   const filtered = items.filter((item) =>
-    ('name' in item ? item.name : item.title)
-      .toLowerCase()
-      .includes(search.toLowerCase()),
-  )
-  const Icon =
-    kind === 'organizations'
-      ? Building2
-      : kind === 'projects'
-        ? Folder
-        : ListTodo
+    ("name" in item ? item.name : item.title).toLowerCase().includes(search.toLowerCase()),
+  );
+  const Icon = kind === "organizations" ? Building2 : kind === "projects" ? Folder : ListTodo;
   return (
     <section className="workspace-section">
       <div className="workspace-section-heading">
@@ -613,15 +545,15 @@ export function EntityList({
           aria-expanded={creating}
         >
           {creating ? <X size={16} /> : <Plus size={16} />}
-          {creating ? 'Cancel' : `New ${singular}`}
+          {creating ? "Cancel" : `New ${singular}`}
         </button>
       </div>
       {creating && (
         <div className="workspace-create">
           <h3>New {singular}</h3>
           {create(() => {
-            setCreating(false)
-            setSearch('')
+            setCreating(false);
+            setSearch("");
           })}
         </div>
       )}
@@ -638,11 +570,9 @@ export function EntityList({
       {filtered.length === 0 ? (
         <div className="workspace-empty">
           <Icon size={28} />
-          <h3>{items.length === 0 ? `No ${kind} yet` : 'No matches'}</h3>
+          <h3>{items.length === 0 ? `No ${kind} yet` : "No matches"}</h3>
           <p>
-            {items.length === 0
-              ? `Create a ${singular} to get started.`
-              : 'Try a different name.'}
+            {items.length === 0 ? `Create a ${singular} to get started.` : "Try a different name."}
           </p>
         </div>
       ) : (
@@ -654,44 +584,38 @@ export function EntityList({
                   <Icon size={20} />
                 </span>
                 <span className="workspace-row-main">
-                  <strong>{'name' in item ? item.name : item.title}</strong>
+                  <strong>{"name" in item ? item.name : item.title}</strong>
                   <small>
-                    {'sector' in item
+                    {"sector" in item
                       ? `${label(item.sector)} / ${label(item.region)}`
-                      : 'phase' in item
+                      : "phase" in item
                         ? `${label(item.phase)} / ${item.budget}`
                         : `${label(item.owner)} / ${label(item.dueWindow)}`}
                   </small>
                 </span>
                 <span className="workspace-row-meta">
                   <span className="workspace-badge">
-                    {label('priority' in item ? item.priority : item.status)}
+                    {label("priority" in item ? item.priority : item.status)}
                   </span>
                   <small>
-                    {kind === 'organizations'
+                    {kind === "organizations"
                       ? `${data.projects.filter((p) => p.organizationId === item.id).length} projects`
-                      : kind === 'projects'
+                      : kind === "projects"
                         ? `${data.tasks.filter((t) => t.projectId === item.id).length} tasks`
-                        : ''}
+                        : ""}
                   </small>
                 </span>
                 <ArrowRight size={17} className="workspace-row-arrow" />
               </>
-            )
+            );
             return (
               <li key={item.id}>
-                {kind === 'organizations' ? (
-                  <Link
-                    to="/organizations/$organizationId"
-                    params={{ organizationId: item.id }}
-                  >
+                {kind === "organizations" ? (
+                  <Link to="/organizations/$organizationId" params={{ organizationId: item.id }}>
                     {content}
                   </Link>
-                ) : kind === 'projects' ? (
-                  <Link
-                    to="/projects/$projectId"
-                    params={{ projectId: item.id }}
-                  >
+                ) : kind === "projects" ? (
+                  <Link to="/projects/$projectId" params={{ projectId: item.id }}>
                     {content}
                   </Link>
                 ) : (
@@ -700,17 +624,17 @@ export function EntityList({
                   </Link>
                 )}
               </li>
-            )
+            );
           })}
         </ul>
       )}
     </section>
-  )
+  );
 }
 
 function label(value: string) {
   return value
-    .split('-')
+    .split("-")
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ')
+    .join(" ");
 }

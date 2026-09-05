@@ -1,4 +1,4 @@
-import type { CacheUpdate } from '../../forms/orchestration/contracts'
+import type { CacheUpdate } from "../../forms/orchestration/types";
 import type {
   Organization,
   Project,
@@ -6,14 +6,11 @@ import type {
   SaveOrganizationResponse,
   SaveProjectResponse,
   SaveTaskResponse,
-} from './types'
-import { reconcileWorkspaceRead, upsertBootstrap } from './cache.ts'
-import { workspaceKeys as keys, bootstrapKey } from './queries.ts'
+} from "./types";
+import { reconcileWorkspaceRead, upsertBootstrap } from "./cache.ts";
+import { workspaceKeys as keys, bootstrapKey } from "./queries.ts";
 
-export function organizationCacheUpdates<I>(): CacheUpdate<
-  SaveOrganizationResponse,
-  I
->[] {
+export function organizationCacheUpdates<I>(): CacheUpdate<SaveOrganizationResponse, I>[] {
   return [
     {
       queryKey: () => bootstrapKey,
@@ -22,17 +19,14 @@ export function organizationCacheUpdates<I>(): CacheUpdate<
     },
     {
       queryKey: () => keys.organizations.list(),
-      update: (previous, { response }) =>
-        upsertList(previous, response.organization),
+      update: (previous, { response }) => upsertList(previous, response.organization),
     },
     {
-      queryKey: ({ response }) =>
-        keys.organizations.detail(response.organization.id),
+      queryKey: ({ response }) => keys.organizations.detail(response.organization.id),
       getData: (response) => response.organization,
     },
     {
-      queryKey: ({ response }) =>
-        keys.organizationProfiles.detail(response.organization.id),
+      queryKey: ({ response }) => keys.organizationProfiles.detail(response.organization.id),
       getData: ({ organization: o }) => ({
         organizationId: o.id,
         name: o.name,
@@ -41,8 +35,7 @@ export function organizationCacheUpdates<I>(): CacheUpdate<
       }),
     },
     {
-      queryKey: ({ response }) =>
-        keys.organizationOperations.detail(response.organization.id),
+      queryKey: ({ response }) => keys.organizationOperations.detail(response.organization.id),
       getData: ({ organization: o }) => ({
         organizationId: o.id,
         status: o.status,
@@ -50,12 +43,9 @@ export function organizationCacheUpdates<I>(): CacheUpdate<
         updatedAt: o.operationsUpdatedAt ?? o.updatedAt,
       }),
     },
-  ]
+  ];
 }
-export function projectCacheUpdates<I>(): CacheUpdate<
-  SaveProjectResponse,
-  I
->[] {
+export function projectCacheUpdates<I>(): CacheUpdate<SaveProjectResponse, I>[] {
   return [
     {
       queryKey: () => bootstrapKey,
@@ -64,47 +54,42 @@ export function projectCacheUpdates<I>(): CacheUpdate<
     },
     {
       queryKey: () => keys.projects.list(),
-      update: (previous, { response }) =>
-        upsertList(previous, response.project),
+      update: (previous, { response }) => upsertList(previous, response.project),
     },
     {
-      queryKey: ({ response }) =>
-        keys.projects.forOrganization(response.project.organizationId),
-      update: (previous, { response }) =>
-        upsertList(previous, response.project),
+      queryKey: ({ response }) => keys.projects.forOrganization(response.project.organizationId),
+      update: (previous, { response }) => upsertList(previous, response.project),
     },
     {
       queryKey: ({ response }) => keys.projects.detail(response.project.id),
       getData: (response) => response.project,
     },
-  ]
+  ];
 }
 export function taskCacheUpdates<I>(): CacheUpdate<SaveTaskResponse, I>[] {
   return [
     {
       queryKey: () => bootstrapKey,
-      update: (previous, { response }) =>
-        upsertBootstrap(previous, { tasks: [response.task] }),
+      update: (previous, { response }) => upsertBootstrap(previous, { tasks: [response.task] }),
     },
     {
       queryKey: () => keys.tasks.list(),
       update: (previous, { response }) => upsertList(previous, response.task),
     },
     {
-      queryKey: ({ response }) =>
-        keys.tasks.forProject(response.task.projectId),
+      queryKey: ({ response }) => keys.tasks.forProject(response.task.projectId),
       update: (previous, { response }) => upsertList(previous, response.task),
     },
     {
       queryKey: ({ response }) => keys.tasks.detail(response.task.id),
       getData: (response) => response.task,
     },
-  ]
+  ];
 }
 export function upsertList<T extends Organization | Project | Task>(
   previous: unknown,
   resource: T,
 ): T[] {
-  const current = (previous as T[] | undefined) ?? []
-  return reconcileWorkspaceRead(current, [resource]) as T[]
+  const current = (previous as T[] | undefined) ?? [];
+  return reconcileWorkspaceRead(current, [resource]) as T[];
 }

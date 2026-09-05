@@ -1,5 +1,5 @@
-import { useComposableForm } from '../../../forms/bindings/useComposableForm'
-import type { OutcomeCallbacks } from '../../../forms/orchestration/contracts'
+import { useComposableForm } from "../../../forms/hooks/useComposableForm";
+import type { OutcomeCallbacks } from "../../../forms/orchestration/types";
 import type {
   OrganizationProfile,
   OrganizationOperations,
@@ -8,30 +8,24 @@ import type {
   UpdateOperationsInput,
   ProfileResponse,
   OperationsResponse,
-} from '../types'
+} from "../types";
 import {
   useOrganization,
   useOrganizationProfile,
   useOrganizationOperations,
-} from './useWorkspaceResources'
-import {
-  useUpdateOrganizationProfile,
-  useUpdateOrganizationOperations,
-} from './mutations'
-import {
-  profileCacheUpdates,
-  operationsCacheUpdates,
-} from '../childCachePolicies'
-import { workspaceKeys } from '../queries'
+} from "./useWorkspaceResources";
+import { useUpdateOrganizationProfile, useUpdateOrganizationOperations } from "./mutations";
+import { profileCacheUpdates, operationsCacheUpdates } from "../childCachePolicies";
+import { workspaceKeys } from "../queries";
 
 type ProfileValues = {
-  displayName: string
-  selectedSector: OrganizationProfile['sector']
-}
+  displayName: string;
+  selectedSector: OrganizationProfile["sector"];
+};
 type OperationsValues = {
-  isActive: boolean
-  region: OrganizationOperations['region']
-}
+  isActive: boolean;
+  region: OrganizationOperations["region"];
+};
 export function useOrganizationProfileForm({
   organizationId,
   ...callbacks
@@ -40,11 +34,15 @@ export function useOrganizationProfileForm({
   UpdateProfileInput,
   ProfileResponse
 >) {
-  const query = useOrganizationProfile(organizationId)
-  const organization = useOrganization(organizationId)
-  const mutation = useUpdateOrganizationProfile(organizationId)
+  const query = useOrganizationProfile(organizationId);
+  const organization = useOrganization(organizationId);
+  const mutation = useUpdateOrganizationProfile(organizationId);
   const binding = useComposableForm({
-    id: 'profile',
+    id: "profile",
+    defaultValues: {
+      displayName: "",
+      selectedSector: "healthcare",
+    } as ProfileValues,
     query,
     ...callbacks,
     toFormData: (profile): ProfileValues => ({
@@ -56,7 +54,7 @@ export function useOrganizationProfileForm({
       sector: values.selectedSector,
     }),
     validate: (values) =>
-      !values.displayName.trim() ? 'Organization name is required.' : undefined,
+      !values.displayName.trim() ? "Organization name is required." : undefined,
     endpoint: {
       mutationFn: mutation.mutateAsync,
       retrySafe: true,
@@ -64,8 +62,8 @@ export function useOrganizationProfileForm({
       invalidateQueryKeys: [workspaceKeys.organizations.all],
       cacheUpdates: profileCacheUpdates(organization.data),
     },
-  })
-  return { ...binding, retryRead: query.refetch }
+  });
+  return { ...binding, retryRead: query.refetch };
 }
 export function useOrganizationOperationsForm({
   organizationId,
@@ -75,19 +73,20 @@ export function useOrganizationOperationsForm({
   UpdateOperationsInput,
   OperationsResponse
 >) {
-  const query = useOrganizationOperations(organizationId)
-  const organization = useOrganization(organizationId)
-  const mutation = useUpdateOrganizationOperations(organizationId)
+  const query = useOrganizationOperations(organizationId);
+  const organization = useOrganization(organizationId);
+  const mutation = useUpdateOrganizationOperations(organizationId);
   const binding = useComposableForm({
-    id: 'operations',
+    id: "operations",
+    defaultValues: { isActive: false, region: "east" } as OperationsValues,
     query,
     ...callbacks,
     toFormData: (operations): OperationsValues => ({
-      isActive: operations.status === 'active',
+      isActive: operations.status === "active",
       region: operations.region,
     }),
     toMutationPayload: (values): OperationsInput => ({
-      status: values.isActive ? 'active' : 'paused',
+      status: values.isActive ? "active" : "paused",
       region: values.region,
     }),
     endpoint: {
@@ -97,6 +96,6 @@ export function useOrganizationOperationsForm({
       invalidateQueryKeys: [workspaceKeys.organizations.all],
       cacheUpdates: operationsCacheUpdates(organization.data),
     },
-  })
-  return { ...binding, retryRead: query.refetch }
+  });
+  return { ...binding, retryRead: query.refetch };
 }

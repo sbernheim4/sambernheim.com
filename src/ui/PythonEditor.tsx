@@ -1,9 +1,6 @@
-import Editor from '@monaco-editor/react'
-import '../monaco'
-import {
-  buildEditableSource,
-  useTyMonacoSession,
-} from '../lsp/useTyMonacoSession'
+import Editor from "@monaco-editor/react";
+import "../monaco";
+import { buildEditableSource, useTyMonacoSession } from "../lsp/useTyMonacoSession";
 
 const HIDDEN_PYTHON_PRELUDE = `from dataclasses import dataclass
 
@@ -11,27 +8,21 @@ const HIDDEN_PYTHON_PRELUDE = `from dataclasses import dataclass
 class Car:
     make: str
     model: str
-`
+`;
 
 const EDITABLE_DEFINITIONS = [
   {
-    signature: 'def include_car(car: Car) -> bool:',
+    signature: "def include_car(car: Car) -> bool:",
     initialBody: '    return car.make == "Toyota"',
   },
-] as const
+] as const;
 
 export function PythonEditor() {
-  const initialSource = buildEditableSource(EDITABLE_DEFINITIONS)
-  const {
-    tyState,
-    handleMount,
-    resetSource,
-    diagnostics,
-    revealDiagnostic,
-  } = useTyMonacoSession({
+  const initialSource = buildEditableSource(EDITABLE_DEFINITIONS);
+  const { tyState, handleMount, resetSource, diagnostics, revealDiagnostic } = useTyMonacoSession({
     predefinedPython: HIDDEN_PYTHON_PRELUDE,
     editableDefinitions: EDITABLE_DEFINITIONS,
-  })
+  });
 
   return (
     <main className="editor-shell">
@@ -62,8 +53,7 @@ export function PythonEditor() {
             onMount={handleMount}
             options={{
               automaticLayout: true,
-              fontFamily:
-                'Menlo, Monaco, Consolas, "Liberation Mono", monospace',
+              fontFamily: 'Menlo, Monaco, Consolas, "Liberation Mono", monospace',
               fontSize: 14,
               glyphMargin: true,
               lineNumbersMinChars: 3,
@@ -72,7 +62,7 @@ export function PythonEditor() {
               scrollBeyondLastLine: false,
               smoothScrolling: true,
               tabSize: 4,
-              wordWrap: 'on',
+              wordWrap: "on",
             }}
           />
         </div>
@@ -93,14 +83,14 @@ export function PythonEditor() {
                   className="diagnostic-button"
                   onClick={() => revealDiagnostic(diagnostic)}
                 >
-                <span className={`diagnostic-severity ${diagnostic.severity}`}>
-                  {diagnostic.severity}
-                </span>
-                <span className="diagnostic-location">
-                  {diagnostic.startLineNumber}:{diagnostic.startColumn}
-                </span>
-                <span>{diagnostic.message}</span>
-                <code>{diagnostic.code}</code>
+                  <span className={`diagnostic-severity ${diagnostic.severity}`}>
+                    {diagnostic.severity}
+                  </span>
+                  <span className="diagnostic-location">
+                    {diagnostic.startLineNumber}:{diagnostic.startColumn}
+                  </span>
+                  <span>{diagnostic.message}</span>
+                  <code>{diagnostic.code}</code>
                 </button>
               </li>
             ))}
@@ -108,5 +98,5 @@ export function PythonEditor() {
         )}
       </section>
     </main>
-  )
+  );
 }

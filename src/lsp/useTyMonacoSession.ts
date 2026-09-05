@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
-import type { OnMount } from '@monaco-editor/react'
-import type { editor } from 'monaco-editor'
+import { useEffect, useRef, useState } from "react";
+import type { OnMount } from "@monaco-editor/react";
+import type { editor } from "monaco-editor";
 
 import {
   createTySession,
@@ -11,30 +11,30 @@ import {
   type TyDiagnostic,
   type TyState,
   updateTyFile,
-} from './tyWasmClient'
+} from "./tyWasmClient";
 
 export type EditablePythonDefinition = {
-  signature: string
-  initialBody: string
-}
+  signature: string;
+  initialBody: string;
+};
 
 export type UseTyMonacoSessionOptions = {
-  predefinedPython: string
-  editableDefinitions: readonly EditablePythonDefinition[]
-  filePath?: string
-  pythonVersion?: string
-}
+  predefinedPython: string;
+  editableDefinitions: readonly EditablePythonDefinition[];
+  filePath?: string;
+  pythonVersion?: string;
+};
 
 export type TyMonacoSession = {
-  source: string
-  tyState: TyState
-  hiddenLineCount: number
-  editableLineCount: number
-  handleMount: OnMount
-  resetSource: () => void
-  diagnostics: TyDiagnostic[]
-  revealDiagnostic: (diagnostic: TyDiagnostic) => void
-}
+  source: string;
+  tyState: TyState;
+  hiddenLineCount: number;
+  editableLineCount: number;
+  handleMount: OnMount;
+  resetSource: () => void;
+  diagnostics: TyDiagnostic[];
+  revealDiagnostic: (diagnostic: TyDiagnostic) => void;
+};
 
 export function useTyMonacoSession({
   predefinedPython,
@@ -42,102 +42,102 @@ export function useTyMonacoSession({
   filePath,
   pythonVersion,
 }: UseTyMonacoSessionOptions): TyMonacoSession {
-  const initialSource = buildEditableSource(editableDefinitions)
-  const [source, setSource] = useState(initialSource)
+  const initialSource = buildEditableSource(editableDefinitions);
+  const [source, setSource] = useState(initialSource);
   const [tyState, setTyState] = useState<TyState>({
-    status: 'loading',
+    status: "loading",
     version: null,
-    message: 'Loading ty WASM...',
-  })
-  const [diagnostics, setDiagnosticsState] = useState<TyDiagnostic[]>([])
+    message: "Loading ty WASM...",
+  });
+  const [diagnostics, setDiagnosticsState] = useState<TyDiagnostic[]>([]);
 
-  const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null)
-  const monacoRef = useRef<typeof import('monaco-editor') | null>(null)
-  const sessionRef = useRef<TySession | null>(null)
-  const lastGoodSourceRef = useRef(initialSource)
-  const restoringRef = useRef(false)
-  const diagnosticsTimerRef = useRef<number | null>(null)
-  const contentListenerRef = useRef<{ dispose: () => void } | null>(null)
-  const providersDisposeRef = useRef<(() => void) | null>(null)
-  const languageDisposeRef = useRef<{ dispose: () => void } | null>(null)
-  const signatureDecorationsRef = useRef<string[]>([])
-  const commandKeyRef = useRef(false)
-  const mountTokenRef = useRef(0)
-  const normalizedPrelude = predefinedPython.endsWith('\n')
+  const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
+  const monacoRef = useRef<typeof import("monaco-editor") | null>(null);
+  const sessionRef = useRef<TySession | null>(null);
+  const lastGoodSourceRef = useRef(initialSource);
+  const restoringRef = useRef(false);
+  const diagnosticsTimerRef = useRef<number | null>(null);
+  const contentListenerRef = useRef<{ dispose: () => void } | null>(null);
+  const providersDisposeRef = useRef<(() => void) | null>(null);
+  const languageDisposeRef = useRef<{ dispose: () => void } | null>(null);
+  const signatureDecorationsRef = useRef<string[]>([]);
+  const commandKeyRef = useRef(false);
+  const mountTokenRef = useRef(0);
+  const normalizedPrelude = predefinedPython.endsWith("\n")
     ? predefinedPython
-    : `${predefinedPython}\n`
-  const hiddenLineCount = normalizedPrelude.split('\n').length - 1
+    : `${predefinedPython}\n`;
+  const hiddenLineCount = normalizedPrelude.split("\n").length - 1;
 
   useEffect(() => {
     return () => {
       if (diagnosticsTimerRef.current != null) {
-        window.clearTimeout(diagnosticsTimerRef.current)
+        window.clearTimeout(diagnosticsTimerRef.current);
       }
 
-      mountTokenRef.current += 1
-      contentListenerRef.current?.dispose()
-      providersDisposeRef.current?.()
-      languageDisposeRef.current?.dispose()
-      editorRef.current?.deltaDecorations(signatureDecorationsRef.current, [])
-      contentListenerRef.current = null
-      providersDisposeRef.current = null
-      languageDisposeRef.current = null
+      mountTokenRef.current += 1;
+      contentListenerRef.current?.dispose();
+      providersDisposeRef.current?.();
+      languageDisposeRef.current?.dispose();
+      editorRef.current?.deltaDecorations(signatureDecorationsRef.current, []);
+      contentListenerRef.current = null;
+      providersDisposeRef.current = null;
+      languageDisposeRef.current = null;
 
-      const session = sessionRef.current
-      sessionRef.current = null
+      const session = sessionRef.current;
+      sessionRef.current = null;
       if (session != null) {
-        disposeTySession(session)
+        disposeTySession(session);
       }
-    }
-  }, [])
+    };
+  }, []);
 
-  const toVirtualSource = (userSource: string) => normalizedPrelude + userSource
+  const toVirtualSource = (userSource: string) => normalizedPrelude + userSource;
 
   const runDiagnostics = () => {
-    const monaco = monacoRef.current
-    const model = editorRef.current?.getModel()
-    const session = sessionRef.current
+    const monaco = monacoRef.current;
+    const model = editorRef.current?.getModel();
+    const session = sessionRef.current;
 
     if (monaco == null || model == null || session == null) {
-      return
+      return;
     }
 
     try {
-      setDiagnosticsState(setDiagnostics(monaco, model, session, hiddenLineCount))
+      setDiagnosticsState(setDiagnostics(monaco, model, session, hiddenLineCount));
     } catch (error) {
       setTyState({
-        status: 'error',
+        status: "error",
         version: null,
         message: formatError(error),
-      })
-      setDiagnosticsState([])
+      });
+      setDiagnosticsState([]);
     }
-  }
+  };
 
   const scheduleDiagnostics = () => {
     if (diagnosticsTimerRef.current != null) {
-      window.clearTimeout(diagnosticsTimerRef.current)
+      window.clearTimeout(diagnosticsTimerRef.current);
     }
 
-    diagnosticsTimerRef.current = window.setTimeout(runDiagnostics, 120)
-  }
+    diagnosticsTimerRef.current = window.setTimeout(runDiagnostics, 120);
+  };
 
   const handleMount: OnMount = async (editorInstance, monaco) => {
-    const mountToken = ++mountTokenRef.current
-    editorRef.current = editorInstance
-    monacoRef.current = monaco
+    const mountToken = ++mountTokenRef.current;
+    editorRef.current = editorInstance;
+    monacoRef.current = monaco;
 
     languageDisposeRef.current = monaco.languages.register({
-      id: 'python',
-      extensions: ['.py'],
-    })
+      id: "python",
+      extensions: [".py"],
+    });
 
-    const model = editorInstance.getModel()
+    const model = editorInstance.getModel();
     if (model == null) {
-      return
+      return;
     }
 
-    model.updateOptions({ tabSize: 4, insertSpaces: true })
+    model.updateOptions({ tabSize: 4, insertSpaces: true });
     const updateSignatureDecorations = () => {
       signatureDecorationsRef.current = editorInstance.deltaDecorations(
         signatureDecorationsRef.current,
@@ -150,250 +150,247 @@ export function useTyMonacoSession({
           },
           options: {
             isWholeLine: true,
-            className: 'fixed-python-line',
-            linesDecorationsClassName: 'fixed-python-decoration',
-            glyphMarginClassName: 'fixed-python-glyph',
+            className: "fixed-python-line",
+            linesDecorationsClassName: "fixed-python-decoration",
+            glyphMarginClassName: "fixed-python-glyph",
           },
         })),
-      )
-    }
-    updateSignatureDecorations()
+      );
+    };
+    updateSignatureDecorations();
     const keydownListener = editorInstance.onKeyDown((event) => {
-      if (event.browserEvent.key === 'Meta') {
-        commandKeyRef.current = true
+      if (event.browserEvent.key === "Meta") {
+        commandKeyRef.current = true;
       }
 
-      const selection = editorInstance.getSelection()
+      const selection = editorInstance.getSelection();
 
       if (
         selection != null &&
         selectionTouchesSignature(selection, model, editableDefinitions) &&
         isMutatingKey(event.browserEvent)
       ) {
-        event.browserEvent.preventDefault()
-        event.browserEvent.stopPropagation()
+        event.browserEvent.preventDefault();
+        event.browserEvent.stopPropagation();
       }
-    })
+    });
     const keyupListener = editorInstance.onKeyUp((event) => {
-      if (event.browserEvent.key === 'Meta') {
-        commandKeyRef.current = false
+      if (event.browserEvent.key === "Meta") {
+        commandKeyRef.current = false;
       }
-    })
+    });
     const blurListener = editorInstance.onDidBlurEditorText(() => {
-      commandKeyRef.current = false
-    })
+      commandKeyRef.current = false;
+    });
     contentListenerRef.current = model.onDidChangeContent(() => {
       if (restoringRef.current) {
-        return
+        return;
       }
 
       if (!hasExpectedSignatures(model, editableDefinitions)) {
-        restoringRef.current = true
-        model.setValue(lastGoodSourceRef.current)
-        editorInstance.setPosition({ lineNumber: 2, column: 5 })
-        restoringRef.current = false
-        updateSignatureDecorations()
-        return
+        restoringRef.current = true;
+        model.setValue(lastGoodSourceRef.current);
+        editorInstance.setPosition({ lineNumber: 2, column: 5 });
+        restoringRef.current = false;
+        updateSignatureDecorations();
+        return;
       }
 
-      const nextSource = model.getValue()
-      lastGoodSourceRef.current = nextSource
-      setSource(nextSource)
-      updateSignatureDecorations()
+      const nextSource = model.getValue();
+      lastGoodSourceRef.current = nextSource;
+      setSource(nextSource);
+      updateSignatureDecorations();
 
       if (sessionRef.current != null) {
         try {
-          updateTyFile(sessionRef.current, toVirtualSource(nextSource))
-          scheduleDiagnostics()
+          updateTyFile(sessionRef.current, toVirtualSource(nextSource));
+          scheduleDiagnostics();
         } catch (error) {
           setTyState({
-            status: 'error',
+            status: "error",
             version: null,
             message: formatError(error),
-          })
-          setDiagnosticsState([])
+          });
+          setDiagnosticsState([]);
         }
       }
-    })
-    const previousContentListener = contentListenerRef.current
+    });
+    const previousContentListener = contentListenerRef.current;
     contentListenerRef.current = {
       dispose() {
-        keydownListener.dispose()
-        keyupListener.dispose()
-        blurListener.dispose()
-        previousContentListener?.dispose()
+        keydownListener.dispose();
+        keyupListener.dispose();
+        blurListener.dispose();
+        previousContentListener?.dispose();
       },
-    }
+    };
 
     try {
       const session = await createTySession(toVirtualSource(model.getValue()), {
         filePath,
         pythonVersion,
-      })
+      });
       if (mountToken !== mountTokenRef.current) {
-        disposeTySession(session)
-        return
+        disposeTySession(session);
+        return;
       }
 
-      sessionRef.current = session
+      sessionRef.current = session;
       const disposeProviders = registerTyProviders(
         monaco,
         sessionRef,
         hiddenLineCount,
         commandKeyRef,
-      )
-      providersDisposeRef.current = disposeProviders
+      );
+      providersDisposeRef.current = disposeProviders;
       editorInstance.onDidDispose(() => {
-        disposeProviders()
-        providersDisposeRef.current = null
-      })
+        disposeProviders();
+        providersDisposeRef.current = null;
+      });
 
       setTyState({
-        status: 'ready',
-        version: session.module.version?.() ?? 'unknown',
-        message: 'ty WASM is analyzing this virtual Python file.',
-      })
-      runDiagnostics()
+        status: "ready",
+        version: session.module.version?.() ?? "unknown",
+        message: "ty WASM is analyzing this virtual Python file.",
+      });
+      runDiagnostics();
     } catch (error) {
       setTyState({
-        status: 'error',
+        status: "error",
         version: null,
         message: formatError(error),
-      })
+      });
     }
-  }
+  };
 
   const resetSource = () => {
-    const model = editorRef.current?.getModel()
+    const model = editorRef.current?.getModel();
     if (model == null) {
-      return
+      return;
     }
 
-    restoringRef.current = true
-    model.setValue(initialSource)
-    restoringRef.current = false
-    lastGoodSourceRef.current = initialSource
-    setSource(initialSource)
+    restoringRef.current = true;
+    model.setValue(initialSource);
+    restoringRef.current = false;
+    lastGoodSourceRef.current = initialSource;
+    setSource(initialSource);
 
-    const session = sessionRef.current
+    const session = sessionRef.current;
     if (session != null) {
-      updateTyFile(session, toVirtualSource(initialSource))
-      scheduleDiagnostics()
+      updateTyFile(session, toVirtualSource(initialSource));
+      scheduleDiagnostics();
     }
-  }
+  };
 
   const revealDiagnostic = (diagnostic: TyDiagnostic) => {
-    const editorInstance = editorRef.current
+    const editorInstance = editorRef.current;
     if (editorInstance == null) {
-      return
+      return;
     }
 
-    editorInstance.revealLineInCenter(diagnostic.startLineNumber)
+    editorInstance.revealLineInCenter(diagnostic.startLineNumber);
     editorInstance.setPosition({
       lineNumber: diagnostic.startLineNumber,
       column: diagnostic.startColumn,
-    })
-    editorInstance.focus()
-  }
+    });
+    editorInstance.focus();
+  };
 
   return {
     source,
     tyState,
     hiddenLineCount,
-    editableLineCount: Math.max(source.split('\n').length, 1),
+    editableLineCount: Math.max(source.split("\n").length, 1),
     handleMount,
     resetSource,
     diagnostics,
     revealDiagnostic,
-  }
+  };
 }
 
 function formatError(error: unknown) {
-  return error instanceof Error ? error.message : String(error)
+  return error instanceof Error ? error.message : String(error);
 }
 
-export function buildEditableSource(
-  definitions: readonly EditablePythonDefinition[],
-) {
+export function buildEditableSource(definitions: readonly EditablePythonDefinition[]) {
   return definitions
     .map(({ signature, initialBody }) => `${signature}\n${initialBody}`)
-    .join('\n\n')
+    .join("\n\n");
 }
 
 function hasExpectedSignatures(
   model: editor.ITextModel,
   definitions: readonly EditablePythonDefinition[],
 ) {
-  let nextSearchLine = 1
+  let nextSearchLine = 1;
 
   for (const { signature } of definitions) {
-    let matchingLine = 0
+    let matchingLine = 0;
 
     for (let lineNumber = nextSearchLine; lineNumber <= model.getLineCount(); lineNumber += 1) {
       if (model.getLineContent(lineNumber) === signature) {
         if (matchingLine !== 0) {
-          return false
+          return false;
         }
-        matchingLine = lineNumber
+        matchingLine = lineNumber;
       }
     }
 
     if (matchingLine === 0) {
-      return false
+      return false;
     }
 
-    nextSearchLine = matchingLine + 1
+    nextSearchLine = matchingLine + 1;
   }
 
-  return true
+  return true;
 }
 
 function selectionTouchesSignature(
   selection: {
-    startLineNumber: number
-    endLineNumber: number
+    startLineNumber: number;
+    endLineNumber: number;
   },
   model: editor.ITextModel,
   definitions: readonly EditablePythonDefinition[],
 ) {
-  const signatureLines = findSignatureLines(model, definitions)
+  const signatureLines = findSignatureLines(model, definitions);
   return signatureLines.some(
-    (line) =>
-      line >= selection.startLineNumber && line <= selection.endLineNumber,
-  )
+    (line) => line >= selection.startLineNumber && line <= selection.endLineNumber,
+  );
 }
 
 function findSignatureLines(
   model: editor.ITextModel,
   definitions: readonly EditablePythonDefinition[],
 ) {
-  const lines: number[] = []
-  let nextSearchLine = 1
+  const lines: number[] = [];
+  let nextSearchLine = 1;
 
   for (const { signature } of definitions) {
     const matchingLine = Array.from(
       { length: model.getLineCount() - nextSearchLine + 1 },
       (_, index) => nextSearchLine + index,
-    ).find((line) => model.getLineContent(line) === signature)
+    ).find((line) => model.getLineContent(line) === signature);
 
     if (matchingLine == null) {
-      return []
+      return [];
     }
 
-    lines.push(matchingLine)
-    nextSearchLine = matchingLine + 1
+    lines.push(matchingLine);
+    nextSearchLine = matchingLine + 1;
   }
 
-  return lines
+  return lines;
 }
 
 function isMutatingKey(event: KeyboardEvent) {
-  const key = event.key
-  const modified = event.ctrlKey || event.metaKey
+  const key = event.key;
+  const modified = event.ctrlKey || event.metaKey;
 
   if (modified) {
-    return ['v', 'x', 'z', 'y'].includes(key.toLowerCase())
+    return ["v", "x", "z", "y"].includes(key.toLowerCase());
   }
 
-  return key.length === 1 || ['Backspace', 'Delete', 'Enter', 'Tab'].includes(key)
+  return key.length === 1 || ["Backspace", "Delete", "Enter", "Tab"].includes(key);
 }

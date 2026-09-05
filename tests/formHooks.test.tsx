@@ -1,50 +1,47 @@
-import { test } from 'node:test'
-import assert from 'node:assert/strict'
-import { act, create, type ReactTestRenderer } from 'react-test-renderer'
-import {
-  QueryClient,
-  QueryClientProvider,
-  useQuery,
-} from '@tanstack/react-query'
-import { useQueryBackedForm } from '../src/forms/bindings/useQueryBackedForm'
-import { useFormOrchestrator } from '../src/forms/query/useFormOrchestrator'
-import { useOrganizationForm } from '../src/features/workspace/hooks/forms'
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { act, create, type ReactTestRenderer } from "react-test-renderer";
+import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
+import { useQueryBackedForm } from "../src/forms/hooks/useQueryBackedForm";
+import { useFormOrchestrator } from "../src/forms/hooks/useFormOrchestrator";
+import { useOrganizationForm } from "../src/features/workspace/hooks/forms";
 import {
   useOrganizationProfileForm,
   useOrganizationOperationsForm,
-} from '../src/features/workspace/hooks/organizationConfigurationForms'
-import { useCreateOrganization } from '../src/features/workspace/hooks/mutations'
-import { workspaceKeys } from '../src/features/workspace/queries'
-import { clearWorkspace } from '../src/features/workspace/clearWorkspace'
+} from "../src/features/workspace/hooks/organizationConfigurationForms";
+import { useCreateOrganization } from "../src/features/workspace/hooks/mutations";
+import { useWorkspaceLaunchForms } from "../src/features/workspace/hooks/useWorkspaceLaunchForms";
+import { workspaceKeys } from "../src/features/workspace/queries";
+import { clearWorkspace } from "../src/features/workspace/clearWorkspace";
 
-Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true })
+Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
 const client = () =>
   new QueryClient({
     defaultOptions: {
       queries: { retry: false, gcTime: Infinity },
       mutations: { retry: 4, gcTime: Infinity },
     },
-  })
-const delay = () => new Promise<void>((r) => setTimeout(r, 10))
+  });
+const delay = () => new Promise<void>((r) => setTimeout(r, 10));
 const gate = () => {
-  let resolve!: () => void
+  let resolve!: () => void;
   const promise = new Promise<void>((r) => {
-    resolve = r
-  })
-  return { resolve, promise }
-}
+    resolve = r;
+  });
+  return { resolve, promise };
+};
 async function mount(qc: QueryClient, render: () => React.ReactNode) {
   function Harness() {
-    return render()
+    return render();
   }
-  let root!: ReactTestRenderer
+  let root!: ReactTestRenderer;
   await act(async () => {
     root = create(
       <QueryClientProvider client={qc}>
         <Harness />
       </QueryClientProvider>,
-    )
-  })
+    );
+  });
   return {
     update: async () => {
       await act(async () => {
@@ -52,512 +49,577 @@ async function mount(qc: QueryClient, render: () => React.ReactNode) {
           <QueryClientProvider client={qc}>
             <Harness />
           </QueryClientProvider>,
-        )
-      })
+        );
+      });
     },
     dispose: async () => {
-      await act(async () => root.unmount())
-      qc.clear()
+      await act(async () => root.unmount());
+      qc.clear();
     },
-  }
+  };
 }
 
-test('CRUD query selection initializes mapped values, preserves dirty edits and accepts only the submitted baseline', async () => {
-  const qc = client()
-  const loaded = gate()
-  const refreshed = gate()
-  let callback = 0
-  let writes = 0
+test("CRUD query selection initializes mapped values, preserves dirty edits and accepts only the submitted baseline", async () => {
+  const qc = client();
+  const loaded = gate();
+  const refreshed = gate();
+  let callback = 0;
+  let writes = 0;
   // Use a typed capture without altering the hook's own inferred types.
-  let current: any
+  let current: any;
   const harness = await mount(qc, () => {
     const query = useQuery({
-      queryKey: ['read'],
+      queryKey: ["read"],
       queryFn: async () => {
-        await loaded.promise
-        return { envelope: { name: 'server' } }
+        await loaded.promise;
+        return { envelope: { name: "server" } };
       },
       select: (data) => data.envelope,
-    })
+    });
     current = useQueryBackedForm({
+      defaultValues: { display: "" },
       query,
       toFormData: (data) => ({ display: data.name }),
       toMutationPayload: (v) => ({ name: v.display }),
       endpoint: {
         mutationFn: async (v: { name: string }) => {
-          writes++
-          return v
+          writes++;
+          return v;
         },
         refetchFunctions: [() => refreshed.promise],
-        cacheUpdates: [
-          { queryKey: () => ['read'], getData: (r) => ({ envelope: r }) },
-        ],
+        cacheUpdates: [{ queryKey: () => ["read"], getData: (r) => ({ envelope: r }) }],
       },
       onSuccess: () => {
-        callback++
+        callback++;
       },
-    })
-    return (
-      <current.form.AppField name="display">{() => null}</current.form.AppField>
-    )
-  })
+    });
+    return <current.form.AppField name="display">{() => null}</current.form.AppField>;
+  });
   try {
-    assert.equal(current.isReady, false)
+    assert.equal(current.isReady, false);
     await act(async () => {
-      loaded.resolve()
-      await delay()
-    })
-    assert.equal(current.isReady, true)
-    assert.deepEqual(current.form.state.values, { display: 'server' })
+      loaded.resolve();
+      await delay();
+    });
+    assert.equal(current.isReady, true);
+    assert.deepEqual(current.form.state.values, { display: "server" });
     await act(async () => {
-      current.form.setFieldValue('display', 'edit')
-      qc.setQueryData(['read'], { envelope: { name: 'background' } })
-      await delay()
-    })
-    assert.equal(current.form.state.values.display, 'edit')
-    let pending: Promise<any>
+      current.form.setFieldValue("display", "edit");
+      qc.setQueryData(["read"], { envelope: { name: "background" } });
+      await delay();
+    });
+    assert.equal(current.form.state.values.display, "edit");
+    let pending: Promise<any>;
     await act(async () => {
-      pending = current.submit()
-      await delay()
-    })
-    assert.equal(current.isSaving, true)
+      pending = current.submit();
+      await delay();
+    });
+    assert.equal(current.isSaving, true);
     await act(async () => {
-      current.form.setFieldValue('display', 'later')
-      refreshed.resolve()
-      await pending!
-      await delay()
-    })
-    assert.equal(writes, 1)
-    assert.equal(callback, 1)
-    assert.equal(current.isSaving, false)
-    assert.equal(current.form.state.values.display, 'later')
-    assert.equal(current.form.state.isDirty, true)
-    assert.deepEqual(current.form.options.defaultValues, { display: 'edit' })
-    assert.deepEqual(qc.getQueryData(['read']), { envelope: { name: 'edit' } })
+      current.form.setFieldValue("display", "later");
+      refreshed.resolve();
+      await pending!;
+      await delay();
+    });
+    assert.equal(writes, 1);
+    assert.equal(callback, 1);
+    assert.equal(current.isSaving, false);
+    assert.equal(current.form.state.values.display, "later");
+    assert.equal(current.form.state.isDirty, true);
+    assert.deepEqual(current.form.options.defaultValues, { display: "edit" });
+    assert.deepEqual(qc.getQueryData(["read"]), { envelope: { name: "edit" } });
   } finally {
-    await harness.dispose()
+    await harness.dispose();
   }
-})
+});
 
-test('domain create mutateAsync owns one mutation, overrides inherited retries and aggregate state includes refresh/effects', async () => {
-  const original = globalThis.fetch
-  const qc = client()
-  const refresh = gate()
-  let calls = 0
-  let successes = 0
-  let current: any
-  let mutation: any
+test("domain create mutateAsync owns one mutation, overrides inherited retries and aggregate state includes refresh/effects", async () => {
+  const original = globalThis.fetch;
+  const qc = client();
+  const refresh = gate();
+  let calls = 0;
+  let successes = 0;
+  let current: any;
+  let mutation: any;
   globalThis.fetch = async () => {
-    calls++
-    return Response.json({ organization: { id: 'new' }, readModelLagMs: 2500 })
-  }
+    calls++;
+    return Response.json({ organization: { id: "new" }, readModelLagMs: 2500 });
+  };
   const harness = await mount(qc, () => {
-    mutation = useCreateOrganization()
+    mutation = useCreateOrganization();
     current = useQueryBackedForm({
       defaultValues: {
-        name: 'N',
-        sector: 'healthcare' as const,
-        status: 'active' as const,
-        region: 'east' as const,
+        name: "N",
+        sector: "healthcare" as const,
+        status: "active" as const,
+        region: "east" as const,
       },
       endpoint: {
         mutationFn: mutation.mutateAsync,
         refetchFunctions: [() => refresh.promise],
       },
       onSuccess: () => {
-        successes++
+        successes++;
       },
-    })
-    return null
-  })
+    });
+    return null;
+  });
   try {
-    let pending: Promise<any>
+    let pending: Promise<any>;
     await act(async () => {
-      pending = current.submit()
-      await delay()
-    })
-    assert.equal(mutation.isPending, false)
-    assert.equal(current.isSaving, true)
-    assert.equal(qc.getMutationCache().getAll().length, 1)
-    assert.equal(qc.getMutationCache().getAll()[0].options.retry, false)
+      pending = current.submit();
+      await delay();
+    });
+    assert.equal(mutation.isPending, false);
+    assert.equal(current.isSaving, true);
+    assert.equal(qc.getMutationCache().getAll().length, 1);
+    assert.equal(qc.getMutationCache().getAll()[0].options.retry, false);
     assert.equal(
-      await clearWorkspace(qc, async () =>
-        assert.fail('must not clear in refresh phase'),
-      ),
+      await clearWorkspace(qc, async () => assert.fail("must not clear in refresh phase")),
       false,
-    )
+    );
     await act(async () => {
-      refresh.resolve()
-      await pending!
-    })
-    assert.equal(calls, 1)
-    assert.equal(successes, 1)
-    assert.equal(current.isSaving, false)
+      refresh.resolve();
+      await pending!;
+    });
+    assert.equal(calls, 1);
+    assert.equal(successes, 1);
+    assert.equal(current.isSaving, false);
   } finally {
-    globalThis.fetch = original
-    await harness.dispose()
+    globalThis.fetch = original;
+    await harness.dispose();
   }
-})
+});
 
-test('composed domain forms retry only Operations, keep Profile success and preserve failed edits', async () => {
-  const qc = client()
-  const original = globalThis.fetch
-  const log: string[] = []
-  let current: any
+test("composed domain forms retry only Operations, keep Profile success and preserve failed edits", async () => {
+  const qc = client();
+  const original = globalThis.fetch;
+  const log: string[] = [];
+  let current: any;
   const organization = {
-    id: 'org-1',
-    name: 'Old',
-    sector: 'healthcare',
-    status: 'active',
-    region: 'east',
-    updatedAt: '1',
-    profileUpdatedAt: '1',
-    operationsUpdatedAt: '1',
-  }
+    id: "org-1",
+    name: "Old",
+    sector: "healthcare",
+    status: "active",
+    region: "east",
+    updatedAt: "1",
+    profileUpdatedAt: "1",
+    operationsUpdatedAt: "1",
+  };
   globalThis.fetch = async (url, options) => {
-    const path = String(url)
-    const patch = options?.method === 'PATCH'
+    const path = String(url);
+    const patch = options?.method === "PATCH";
     if (patch) {
-      log.push(
-        path.endsWith('profile') ? 'profile request' : 'operations request',
-      )
-      if (path.endsWith('operations'))
-        return new Response('Unavailable', { status: 503 })
+      log.push(path.endsWith("profile") ? "profile request" : "operations request");
+      if (path.endsWith("operations")) return new Response("Unavailable", { status: 503 });
       return Response.json({
         profile: {
-          organizationId: 'org-1',
+          organizationId: "org-1",
           ...JSON.parse(String(options.body)),
-          updatedAt: '2',
+          updatedAt: "2",
         },
         readModelLagMs: 2500,
-      })
+      });
     }
-    if (path.endsWith('/profile'))
+    if (path.endsWith("/profile"))
       return Response.json({
-        organizationId: 'org-1',
-        name: 'Old',
-        sector: 'healthcare',
-        updatedAt: '1',
-      })
-    if (path.endsWith('/operations'))
+        organizationId: "org-1",
+        name: "Old",
+        sector: "healthcare",
+        updatedAt: "1",
+      });
+    if (path.endsWith("/operations"))
       return Response.json({
-        organizationId: 'org-1',
-        status: 'active',
-        region: 'east',
-        updatedAt: '1',
-      })
-    return Response.json(organization)
-  }
+        organizationId: "org-1",
+        status: "active",
+        region: "east",
+        updatedAt: "1",
+      });
+    return Response.json(organization);
+  };
   const harness = await mount(qc, () => {
     const profile = useOrganizationProfileForm({
-      organizationId: 'org-1',
+      organizationId: "org-1",
       onSuccess: () => {
-        log.push('profile success')
+        log.push("profile success");
       },
-    })
+    });
     const operations = useOrganizationOperationsForm({
-      organizationId: 'org-1',
+      organizationId: "org-1",
       onFailure: () => {
-        log.push('operations failure')
+        log.push("operations failure");
       },
-    })
+    });
     const save = useFormOrchestrator({
-      forms: [profile.participant, operations.participant],
+      forms: [profile, operations],
       retry: { delayMs: 0 },
       onFailure: () => {
-        log.push('group failure')
+        log.push("group failure");
       },
-    })
-    current = { profile, operations, save }
-    return null
-  })
+    });
+    current = { profile, operations, save };
+    return null;
+  });
   try {
-    await act(delay)
-    assert.equal(current.profile.isReady, true)
-    assert.equal(current.operations.isReady, true)
+    await act(delay);
+    assert.equal(current.profile.isReady, true);
+    assert.equal(current.operations.isReady, true);
     await act(async () => {
-      current.profile.form.setFieldValue('displayName', 'Saved')
-      current.operations.form.setFieldValue('isActive', false)
-    })
+      current.profile.form.setFieldValue("displayName", "Saved");
+      current.operations.form.setFieldValue("isActive", false);
+    });
     await act(async () => {
-      await current.save.submit()
-      await delay()
-    })
+      await current.save.submit();
+      await delay();
+    });
     assert.deepEqual(log, [
-      'profile request',
-      'operations request',
-      'operations request',
-      'profile success',
-      'operations failure',
-      'group failure',
-    ])
-    assert.equal(current.save.result.outcome, 'partial-failure')
-    assert.equal(current.profile.form.state.values.displayName, 'Saved')
-    assert.equal(current.operations.form.state.values.isActive, false)
-    assert.equal(
-      qc.getQueryData<any>(workspaceKeys.organizations.detail('org-1')).name,
-      'Saved',
-    )
+      "profile request",
+      "operations request",
+      "operations request",
+      "profile success",
+      "operations failure",
+      "group failure",
+    ]);
+    assert.equal(current.save.result.outcome, "partial-failure");
+    assert.equal(current.profile.form.state.values.displayName, "Saved");
+    assert.equal(current.operations.form.state.values.isActive, false);
+    assert.equal(qc.getQueryData<any>(workspaceKeys.organizations.detail("org-1")).name, "Saved");
   } finally {
-    globalThis.fetch = original
-    await harness.dispose()
+    globalThis.fetch = original;
+    await harness.dispose();
   }
-})
+});
 
-test('organization page orchestrator skips clean participants and only submits dirty forms', async () => {
-  const qc = client()
-  const original = globalThis.fetch
-  const requests: string[] = []
-  let current: any
+test("organization page orchestrator skips clean forms and only submits dirty forms", async () => {
+  const qc = client();
+  const original = globalThis.fetch;
+  const requests: string[] = [];
+  let current: any;
   globalThis.fetch = async (url, options) => {
-    const path = String(url)
-    const method = options?.method ?? 'GET'
-    if (path.endsWith('/organizations/org-1/profile') && method === 'GET')
+    const path = String(url);
+    const method = options?.method ?? "GET";
+    if (path.endsWith("/organizations/org-1/profile") && method === "GET")
       return Response.json({
-        organizationId: 'org-1',
-        name: 'Existing Clinic',
-        sector: 'healthcare',
-        updatedAt: '1',
-      })
-    if (path.endsWith('/organizations/org-1/operations') && method === 'GET')
+        organizationId: "org-1",
+        name: "Existing Clinic",
+        sector: "healthcare",
+        updatedAt: "1",
+      });
+    if (path.endsWith("/organizations/org-1/operations") && method === "GET")
       return Response.json({
-        organizationId: 'org-1',
-        status: 'active',
-        region: 'east',
-        updatedAt: '1',
-      })
-    if (path.endsWith('/organizations/org-1') && method === 'GET')
+        organizationId: "org-1",
+        status: "active",
+        region: "east",
+        updatedAt: "1",
+      });
+    if (path.endsWith("/organizations/org-1") && method === "GET")
       return Response.json({
-        id: 'org-1',
-        name: 'Existing Clinic',
-        sector: 'healthcare',
-        status: 'active',
-        region: 'east',
-        updatedAt: '1',
-        profileUpdatedAt: '1',
-        operationsUpdatedAt: '1',
-      })
-    if (path.endsWith('/organizations/org-1') && method === 'PATCH') {
-      requests.push('organization patch')
+        id: "org-1",
+        name: "Existing Clinic",
+        sector: "healthcare",
+        status: "active",
+        region: "east",
+        updatedAt: "1",
+        profileUpdatedAt: "1",
+        operationsUpdatedAt: "1",
+      });
+    if (path.endsWith("/organizations/org-1") && method === "PATCH") {
+      requests.push("organization patch");
       return Response.json({
         organization: {
-          id: 'org-1',
-          name: 'Existing Clinic',
-          sector: 'healthcare',
-          status: 'active',
-          region: 'east',
-          updatedAt: '2',
-          profileUpdatedAt: '1',
-          operationsUpdatedAt: '1',
+          id: "org-1",
+          name: "Existing Clinic",
+          sector: "healthcare",
+          status: "active",
+          region: "east",
+          updatedAt: "2",
+          profileUpdatedAt: "1",
+          operationsUpdatedAt: "1",
         },
         readModelLagMs: 2500,
-      })
+      });
     }
-    if (path.endsWith('/organizations/org-1/profile') && method === 'PATCH') {
-      requests.push('profile patch')
+    if (path.endsWith("/organizations/org-1/profile") && method === "PATCH") {
+      requests.push("profile patch");
       return Response.json({
         profile: {
-          organizationId: 'org-1',
+          organizationId: "org-1",
           ...JSON.parse(String(options?.body)),
-          updatedAt: '2',
+          updatedAt: "2",
         },
         readModelLagMs: 2500,
-      })
+      });
     }
-    if (path.endsWith('/organizations/org-1/operations') && method === 'PATCH') {
-      requests.push('operations patch')
+    if (path.endsWith("/organizations/org-1/operations") && method === "PATCH") {
+      requests.push("operations patch");
       return Response.json({
         operations: {
-          organizationId: 'org-1',
-          status: 'active',
-          region: 'east',
-          updatedAt: '2',
+          organizationId: "org-1",
+          status: "active",
+          region: "east",
+          updatedAt: "2",
         },
         readModelLagMs: 2500,
-      })
+      });
     }
-    throw new Error(`Unexpected request: ${method} ${path}`)
-  }
+    throw new Error(`Unexpected request: ${method} ${path}`);
+  };
   const harness = await mount(qc, () => {
     const organization = useOrganizationForm({
       resource: {
-        id: 'org-1',
-        name: 'Existing Clinic',
-        sector: 'healthcare',
-        status: 'active',
-        region: 'east',
-        updatedAt: '1',
-        profileUpdatedAt: '1',
-        operationsUpdatedAt: '1',
+        id: "org-1",
+        name: "Existing Clinic",
+        sector: "healthcare",
+        status: "active",
+        region: "east",
+        updatedAt: "1",
+        profileUpdatedAt: "1",
+        operationsUpdatedAt: "1",
       },
-    })
+    });
     const profile = useOrganizationProfileForm({
-      organizationId: 'org-1',
+      organizationId: "org-1",
       onSuccess: () => {
-        requests.push('profile success')
+        requests.push("profile success");
       },
-    })
+    });
     const operations = useOrganizationOperationsForm({
-      organizationId: 'org-1',
+      organizationId: "org-1",
       onSuccess: () => {
-        requests.push('operations success')
+        requests.push("operations success");
       },
-    })
+    });
     const save = useFormOrchestrator({
       forms: [organization, profile, operations] as const,
       retry: { delayMs: 0 },
       onSuccess: () => {
-        requests.push('group success')
+        requests.push("group success");
       },
-    })
-    current = { organization, profile, operations, save }
-    return null
-  })
+    });
+    current = { organization, profile, operations, save };
+    return null;
+  });
   try {
-    await act(delay)
+    await act(delay);
     await act(async () => {
-      current.profile.form.setFieldValue('displayName', 'Renamed Clinic')
-      await delay()
-    })
-    assert.equal(current.profile.form.state.isDirty, true)
+      current.profile.form.setFieldValue("displayName", "Renamed Clinic");
+      await delay();
+    });
+    assert.equal(current.profile.form.state.isDirty, true);
     await act(async () => {
-      await current.save.submit()
-      await delay()
-    })
-    assert.deepEqual(requests, [
-      'profile patch',
-      'profile success',
-      'group success',
-    ])
-    assert.equal(current.save.result.outcome, 'success')
-    assert.equal(current.organization.form.state.isDirty, false)
-    assert.equal(current.profile.form.state.isDirty, false)
-    assert.equal(current.operations.form.state.isDirty, false)
+      await current.save.submit();
+      await delay();
+    });
+    assert.deepEqual(requests, ["profile patch", "profile success", "group success"]);
+    assert.equal(current.save.result.outcome, "success");
+    assert.equal(current.organization.form.state.isDirty, false);
+    assert.equal(current.profile.form.state.isDirty, false);
+    assert.equal(current.operations.form.state.isDirty, false);
     assert.equal(
-      qc.getQueryData<any>(workspaceKeys.organizationProfiles.detail('org-1'))
-        .name,
-      'Renamed Clinic',
-    )
+      qc.getQueryData<any>(workspaceKeys.organizationProfiles.detail("org-1")).name,
+      "Renamed Clinic",
+    );
   } finally {
-    globalThis.fetch = original
-    await harness.dispose()
+    globalThis.fetch = original;
+    await harness.dispose();
   }
-})
+});
 
-test('legacy facade callbacks run once and default-values create mode remains ready', async () => {
-  const qc = client()
-  const log: string[] = []
-  let current: any
+test("query-backed creates resolve dynamic cache keys and run success after refresh and cache updates", async () => {
+  const qc = client();
+  const log: string[] = [];
+  let current: any;
   const harness = await mount(qc, () => {
     current = useQueryBackedForm({
-      defaultValues: { name: 'A' },
+      defaultValues: { name: "A", organizationId: "org-1" },
       endpoint: {
-        mutationFn: async (v) => v,
-        refetchPolicy: {
-          refetchFns: [
-            async () => {
-              log.push('refresh')
-            },
-          ],
-        },
-        cacheUpdates: [
-          {
-            queryKey: ['legacy'],
-            update: (_previous, { response }) => response,
+        mutationFn: async (v: { name: string; organizationId: string }) => ({
+          id: "created-1",
+          name: v.name,
+        }),
+        refetchFunctions: [
+          async () => {
+            log.push("refresh");
           },
         ],
-        afterEffects: [
-          () => {
-            log.push('endpoint')
+        cacheUpdates: [
+          {
+            queryKey: ({ response, variables }) => [
+              "organizations",
+              variables.organizationId,
+              "resources",
+              response.id,
+            ],
           },
         ],
       },
-      afterEffects: [
-        () => {
-          log.push('form')
-        },
-      ],
-    })
-    return null
-  })
+      onSuccess: ({ response, variables, queryClient }) => {
+        assert.deepEqual(
+          queryClient.getQueryData([
+            "organizations",
+            variables.organizationId,
+            "resources",
+            response.id,
+          ]),
+          response,
+        );
+        log.push("success");
+      },
+    });
+    return null;
+  });
   try {
-    assert.equal(current.isReady, true)
+    assert.equal(current.isReady, true);
     await act(async () => {
-      await current.form.handleSubmit()
-    })
-    assert.deepEqual(log, ['refresh', 'endpoint', 'form'])
-    assert.deepEqual(qc.getQueryData(['legacy']), { name: 'A' })
+      await current.form.handleSubmit();
+    });
+    assert.deepEqual(log, ["refresh", "success"]);
+    assert.deepEqual(qc.getQueryData(["organizations", "org-1", "resources", "created-1"]), {
+      id: "created-1",
+      name: "A",
+    });
   } finally {
-    await harness.dispose()
+    await harness.dispose();
   }
-})
+});
 
-test('read errors and query mapping errors block writes and release the submission lock', async () => {
+test("read errors and query mapping errors block writes and release the submission lock", async () => {
   for (const mappingError of [false, true]) {
-    const qc = client()
-    let current: any
-    let failures = 0
-    let maps = 0
+    const qc = client();
+    let current: any;
+    let failures = 0;
+    let maps = 0;
     const harness = await mount(qc, () => {
       const query = useQuery({
-        queryKey: ['read-error'],
+        queryKey: ["read-error"],
         queryFn: async () => {
-          if (!mappingError) throw new Error('read failed')
-          return { name: 'A' }
+          if (!mappingError) throw new Error("read failed");
+          return { name: "A" };
         },
-      })
+      });
       current = useQueryBackedForm({
+        defaultValues: { name: "" },
         query,
         toFormData: (data) => {
-          maps++
-          if (mappingError) throw new Error('mapping failed')
-          return { name: data.name }
+          maps++;
+          if (mappingError) throw new Error("mapping failed");
+          return { name: data.name };
         },
         endpoint: {
-          mutationFn: async (_input: { name: string }) =>
-            assert.fail('no writes'),
+          mutationFn: async (_input: { name: string }) => assert.fail("no writes"),
         },
         onFailure: () => {
-          failures++
+          failures++;
         },
-      })
-      return null
-    })
+      });
+      return null;
+    });
     try {
-      await act(delay)
-      assert.equal(current.isReady, false)
+      await act(delay);
+      assert.equal(current.isReady, false);
       await act(async () => {
-        await current.submit()
-      })
-      assert.equal(current.save.result.outcome, 'validation-failed')
-      assert.equal(current.isSaving, false)
-      assert.equal(failures, 1)
-      if (!mappingError) assert.equal(maps, 0)
+        await current.submit();
+      });
+      assert.equal(current.result.outcome, "validation-failed");
+      assert.equal(current.isSaving, false);
+      assert.equal(failures, 1);
+      if (!mappingError) assert.equal(maps, 0);
     } finally {
-      await harness.dispose()
+      await harness.dispose();
     }
   }
-})
+});
 
-import { legacyFormConfig } from '../src/forms/bindings/legacyFormConfig'
-test('compatibility adapter rejects mixed callback styles', () => {
-  assert.throws(
-    () =>
-      legacyFormConfig({
-        defaultValues: {},
-        endpoint: { mutationFn: async () => ({}), afterEffects: [] },
-        onSuccess: () => {},
-      }),
-    /not both/,
-  )
-  assert.throws(
-    () =>
-      legacyFormConfig({
-        defaultValues: {},
-        endpoint: { mutationFn: async () => ({}) },
-        afterEffects: [],
-        onFailure: () => {},
-      }),
-    /not both/,
-  )
-})
+for (const failProject of [false, true]) {
+  test(`workspace launch composes entity forms with dependent IDs (${failProject ? "partial failure" : "success"})`, async () => {
+    const qc = client();
+    const original = globalThis.fetch;
+    const writes: Array<{ path: string; input: Record<string, unknown> }> = [];
+    const activity: string[] = [];
+    let current!: ReturnType<typeof useWorkspaceLaunchForms>;
+    globalThis.fetch = async (url, options) => {
+      const path = String(url);
+      if (options?.method !== "POST")
+        return Response.json({ organizations: [], projects: [], tasks: [] });
+      const input = JSON.parse(String(options.body));
+      writes.push({ path, input });
+      if (failProject && path === "/api/projects")
+        return new Response("Project creation failed", { status: 500 });
+      const entity =
+        path === "/api/organizations"
+          ? "organization"
+          : path === "/api/projects"
+            ? "project"
+            : "task";
+      return Response.json({
+        [entity]: {
+          ...input,
+          id: `${entity}-new`,
+          updatedAt: "2026-09-05T12:00:00Z",
+        },
+        readModelLagMs: 2500,
+      });
+    };
+    const harness = await mount(qc, () => {
+      current = useWorkspaceLaunchForms((text) => activity.push(text));
+      return null;
+    });
+    try {
+      assert.notEqual(current.organization.form, current.project.form);
+      assert.notEqual(current.project.form, current.task.form);
+      assert.equal(current.organization.form.state.isDirty, false);
+      if (failProject) {
+        await act(async () => {
+          current.project.form.setFieldValue("name", "Edited project");
+          current.task.form.setFieldValue("title", "Edited task");
+        });
+      }
+      await act(async () => {
+        await current.save.submit();
+      });
+      const result = current.save.result!;
+      assert.deepEqual(
+        writes.map(({ path }) => path),
+        failProject
+          ? ["/api/organizations", "/api/projects"]
+          : ["/api/organizations", "/api/projects", "/api/tasks"],
+      );
+      assert.equal(writes[1].input.organizationId, "organization-new");
+      assert.equal(result.forms.organization.status, "saved");
+      assert.equal(
+        qc.getQueryData<{ id: string }>(workspaceKeys.organizations.detail("organization-new"))?.id,
+        "organization-new",
+      );
+      assert.equal(current.save.isSaving, false);
+      if (failProject) {
+        assert.equal(result.outcome, "partial-failure");
+        assert.equal(result.forms.project.attempts, 1);
+        assert.equal(result.forms.project.status, "failed");
+        assert.equal(result.forms.task.status, "skipped");
+        assert.equal(current.project.form.state.isDirty, true);
+        assert.equal(current.task.form.state.values.title, "Edited task");
+        assert.deepEqual(activity, [
+          "Saved organization: Acme Health",
+          "Workspace creation failed. See the save results.",
+        ]);
+      } else {
+        assert.equal(result.outcome, "success");
+        assert.equal(writes[2].input.organizationId, "organization-new");
+        assert.equal(writes[2].input.projectId, "project-new");
+        assert.equal(
+          qc.getQueryData<{ id: string }>(workspaceKeys.tasks.detail("task-new"))?.id,
+          "task-new",
+        );
+        assert.deepEqual(activity, [
+          "Saved organization: Acme Health",
+          "Saved project: Patient Intake",
+          "Saved task: Provision workspace",
+          "Workspace created: Acme Health",
+        ]);
+      }
+    } finally {
+      globalThis.fetch = original;
+      await harness.dispose();
+    }
+  });
+}

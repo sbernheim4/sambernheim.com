@@ -1,4 +1,4 @@
-import type { BootstrapData } from '../types'
+import type { BootstrapData } from "../types";
 
 export function ResourceDataPanel({
   data,
@@ -6,16 +6,16 @@ export function ResourceDataPanel({
   isFetching,
   focus,
 }: {
-  data: BootstrapData | undefined
-  isError: boolean
-  isFetching: boolean
-  focus?: 'organizations' | 'projects' | 'tasks'
+  data: BootstrapData | undefined;
+  isError: boolean;
+  isFetching: boolean;
+  focus?: "organizations" | "projects" | "tasks";
 }) {
   return (
     <section className="state-panel">
       <div className="panel-heading">
         <h2>Resource Data</h2>
-        <span>{isFetching ? 'Fetching' : 'Settled'}</span>
+        <span>{isFetching ? "Fetching" : "Settled"}</span>
       </div>
       {isError ? (
         <p className="form-error">The local API route did not respond.</p>
@@ -23,24 +23,24 @@ export function ResourceDataPanel({
         <ResourceList data={data} focus={focus} />
       )}
     </section>
-  )
+  );
 }
 
 function ResourceList({
   data,
   focus,
 }: {
-  data: BootstrapData | undefined
-  focus?: 'organizations' | 'projects' | 'tasks'
+  data: BootstrapData | undefined;
+  focus?: "organizations" | "projects" | "tasks";
 }) {
   if (!data) {
-    return <p className="empty-copy">Loading resources...</p>
+    return <p className="empty-copy">Loading resources...</p>;
   }
 
   const columns = [
     {
-      key: 'organizations' as const,
-      title: 'Organizations',
+      key: "organizations" as const,
+      title: "Organizations",
       items: data.organizations.map((item) => ({
         id: item.id,
         primary: item.name,
@@ -50,8 +50,8 @@ function ResourceList({
       })),
     },
     {
-      key: 'projects' as const,
-      title: 'Projects',
+      key: "projects" as const,
+      title: "Projects",
       items: data.projects.map((item) => ({
         id: item.id,
         primary: item.name,
@@ -61,8 +61,8 @@ function ResourceList({
       })),
     },
     {
-      key: 'tasks' as const,
-      title: 'Tasks',
+      key: "tasks" as const,
+      title: "Tasks",
       items: data.tasks.map((item) => ({
         id: item.id,
         primary: item.title,
@@ -71,14 +71,14 @@ function ResourceList({
         meta: `Project ${item.projectId}`,
       })),
     },
-  ]
+  ];
 
   return (
     <div className="resource-grid">
       {columns.map((column) => (
         <div
           key={column.key}
-          className={focus === column.key ? 'resource-column focus' : 'resource-column'}
+          className={focus === column.key ? "resource-column focus" : "resource-column"}
         >
           <h3>{column.title}</h3>
           {column.items.length === 0 ? (
@@ -98,20 +98,20 @@ function ResourceList({
         </div>
       ))}
     </div>
-  )
+  );
 }
 
 function label(value: string) {
   return value
-    .split('-')
+    .split("-")
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ')
+    .join(" ");
 }
 
 function formatTime(value: string) {
   return new Intl.DateTimeFormat(undefined, {
-    hour: 'numeric',
-    minute: '2-digit',
-    second: '2-digit',
-  }).format(new Date(value))
+    hour: "numeric",
+    minute: "2-digit",
+    second: "2-digit",
+  }).format(new Date(value));
 }

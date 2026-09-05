@@ -1,7 +1,7 @@
 type ActivityItem = {
-  id: number
-  text: string
-}
+  id: number;
+  text: string;
+};
 
 export function ActivityPanel({ activity }: { activity: ActivityItem[] }) {
   return (
@@ -20,12 +20,12 @@ export function ActivityPanel({ activity }: { activity: ActivityItem[] }) {
         </ul>
       )}
     </section>
-  )
+  );
 }
 
 export function createActivity(text: string): ActivityItem {
   return {
     id: Date.now() + Math.random(),
     text,
-  }
+  };
 }

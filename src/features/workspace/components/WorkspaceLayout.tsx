@@ -1,6 +1,6 @@
-import type { ReactNode } from 'react'
-import { Link } from '@tanstack/react-router'
-import { useClearEntities } from '../hooks/useClearEntities'
+import type { ReactNode } from "react";
+import { Link } from "@tanstack/react-router";
+import { useClearEntities } from "../hooks/useClearEntities";
 
 export function WorkspaceLayout({
   title,
@@ -8,17 +8,15 @@ export function WorkspaceLayout({
   children,
   entity,
 }: {
-  title: string
-  description: string
-  children: ReactNode
-  entity?: 'organization' | 'project' | 'task' | 'flow'
+  title: string;
+  description: string;
+  children: ReactNode;
+  entity?: "organization" | "project" | "task" | "flow";
 }) {
-  const clear = useClearEntities()
+  const clear = useClearEntities();
 
   return (
-    <main
-      className={`forms-shell${entity ? ` forms-shell--${entity}` : ''}`}
-    >
+    <main className={`forms-shell${entity ? ` forms-shell--${entity}` : ""}`}>
       <header className="forms-topbar">
         <div>
           <h1>{title}</h1>
@@ -37,15 +35,23 @@ export function WorkspaceLayout({
             disabled={clear.isDisabled}
             onClick={clear.clear}
           >
-            {clear.isPending ? 'Clearing...' : 'Clear all entities'}
+            {clear.isPending ? "Clearing..." : "Clear all entities"}
           </button>
         </nav>
       </header>
-      {clear.isError && <p className="form-error" role="alert">Could not clear entities. Please try again.</p>}
-      {clear.isSuccess && <p className="clear-status" role="status">All entities cleared.</p>}
+      {clear.isError && (
+        <p className="form-error" role="alert">
+          Could not clear entities. Please try again.
+        </p>
+      )}
+      {clear.isSuccess && (
+        <p className="clear-status" role="status">
+          All entities cleared.
+        </p>
+      )}
       <fieldset className="forms-content" disabled={clear.isPending}>
         {children}
       </fieldset>
     </main>
-  )
+  );
 }

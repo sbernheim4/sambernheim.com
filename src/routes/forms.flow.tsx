@@ -1,12 +1,9 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
-import {
-  ActivityPanel,
-  createActivity,
-} from '../features/form-demos/ActivityPanel'
-import { WorkspaceLayout } from '../features/workspace/components/WorkspaceLayout'
-import { ResourceDataPanel } from '../features/workspace/components/ResourceDataPanel'
-import { useFlowDemoForm } from '../features/workspace/hooks/useFlowDemoForm'
+import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
+import { ActivityPanel, createActivity } from "../features/form-demos/ActivityPanel";
+import { WorkspaceLayout } from "../features/workspace/components/WorkspaceLayout";
+import { ResourceDataPanel } from "../features/workspace/components/ResourceDataPanel";
+import { useWorkspaceLaunchForms } from "../features/workspace/hooks/useWorkspaceLaunchForms";
 import {
   budgetOptions,
   dueWindowOptions,
@@ -14,33 +11,31 @@ import {
   priorityOptions,
   regionOptions,
   sectorOptions,
-} from '../features/workspace/fieldOptions'
+} from "../features/workspace/fieldOptions";
 
-export const Route = createFileRoute('/forms/flow')({
+export const Route = createFileRoute("/forms/flow")({
   ssr: false,
   component: FlowFormRoute,
-})
+});
 
 function FlowFormRoute() {
-  const [activity, setActivity] = useState<
-    Array<ReturnType<typeof createActivity>>
-  >([])
-  const { launchForm, bootstrap } = useFlowDemoForm((text) => {
-    setActivity((items) => [createActivity(text), ...items])
-  })
+  const [activity, setActivity] = useState<Array<ReturnType<typeof createActivity>>>([]);
+  const { organization, project, task, save, bootstrap } = useWorkspaceLaunchForms((text) => {
+    setActivity((items) => [createActivity(text), ...items]);
+  });
 
   return (
     <WorkspaceLayout
-      title="Dependent Save Flow"
-      description="A guided resource creation workflow that saves three related records across separate endpoints."
+      title="Create a Workspace"
+      description="Create an organization, project, and first task together."
       entity="flow"
     >
       <section className="forms-workspace app-workspace">
         <form
           className="form-panel app-form-panel flow-form-panel"
           onSubmit={(event) => {
-            event.preventDefault()
-            void launchForm.form.handleSubmit()
+            event.preventDefault();
+            void save.submit();
           }}
         >
           <div className="panel-heading">
@@ -48,72 +43,66 @@ function FlowFormRoute() {
               <h2>Workspace Launch</h2>
               <p>Account, project, and first task</p>
             </div>
-            <span>{launchForm.isSaving ? 'Saving' : 'Ready'}</span>
+            <span>{save.isSaving ? "Saving" : "Ready"}</span>
           </div>
-          <div className="form-section-label">Organization</div>
-          <launchForm.form.AppField name="organizationName">
-            {(field) => (
-              <field.TextField label="Organization" placeholder="Acme Health" />
-            )}
-          </launchForm.form.AppField>
-          <div className="inline-fields">
-            <launchForm.form.AppField name="organizationSector">
-              {(field) => (
-                <field.SelectField label="Sector" options={sectorOptions} />
-              )}
-            </launchForm.form.AppField>
-            <launchForm.form.AppField name="organizationRegion">
-              {(field) => (
-                <field.SelectField label="Region" options={regionOptions} />
-              )}
-            </launchForm.form.AppField>
-          </div>
-          <div className="form-section-label">Project</div>
-          <launchForm.form.AppField name="projectName">
-            {(field) => (
-              <field.TextField label="Project" placeholder="Patient Intake" />
-            )}
-          </launchForm.form.AppField>
-          <div className="inline-fields">
-            <launchForm.form.AppField name="projectPriority">
-              {(field) => (
-                <field.RadioGroupField
-                  label="Priority"
-                  options={priorityOptions}
-                />
-              )}
-            </launchForm.form.AppField>
-            <launchForm.form.AppField name="projectBudget">
-              {(field) => (
-                <field.SelectField label="Budget" options={budgetOptions} />
-              )}
-            </launchForm.form.AppField>
-          </div>
-          <div className="form-section-label">Task</div>
-          <launchForm.form.AppField name="taskTitle">
-            {(field) => (
-              <field.TextField label="Task" placeholder="Provision workspace" />
-            )}
-          </launchForm.form.AppField>
-          <div className="inline-fields">
-            <launchForm.form.AppField name="taskOwner">
-              {(field) => (
-                <field.SelectField label="Owner" options={ownerOptions} />
-              )}
-            </launchForm.form.AppField>
-            <launchForm.form.AppField name="taskDueWindow">
-              {(field) => (
-                <field.SelectField label="Due" options={dueWindowOptions} />
-              )}
-            </launchForm.form.AppField>
-          </div>
-          <launchForm.form.SubmitButton
-            label="Save Flow"
-            isSaving={launchForm.isSaving}
-          />
-          {launchForm.error ? (
-            <p className="form-error">{String(launchForm.error)}</p>
-          ) : null}
+          <fieldset className="workspace-launch-fields" disabled={save.isSaving}>
+            <div className="form-section-label">Organization</div>
+            <organization.form.AppField name="name">
+              {(field) => <field.TextField label="Organization" placeholder="Acme Health" />}
+            </organization.form.AppField>
+            <div className="inline-fields">
+              <organization.form.AppField name="sector">
+                {(field) => <field.SelectField label="Sector" options={sectorOptions} />}
+              </organization.form.AppField>
+              <organization.form.AppField name="region">
+                {(field) => <field.SelectField label="Region" options={regionOptions} />}
+              </organization.form.AppField>
+            </div>
+            <div className="form-section-label">Project</div>
+            <project.form.AppField name="name">
+              {(field) => <field.TextField label="Project" placeholder="Patient Intake" />}
+            </project.form.AppField>
+            <div className="inline-fields">
+              <project.form.AppField name="priority">
+                {(field) => <field.RadioGroupField label="Priority" options={priorityOptions} />}
+              </project.form.AppField>
+              <project.form.AppField name="budget">
+                {(field) => <field.SelectField label="Budget" options={budgetOptions} />}
+              </project.form.AppField>
+            </div>
+            <div className="form-section-label">Task</div>
+            <task.form.AppField name="title">
+              {(field) => <field.TextField label="Task" placeholder="Provision workspace" />}
+            </task.form.AppField>
+            <div className="inline-fields">
+              <task.form.AppField name="owner">
+                {(field) => <field.SelectField label="Owner" options={ownerOptions} />}
+              </task.form.AppField>
+              <task.form.AppField name="dueWindow">
+                {(field) => <field.SelectField label="Due" options={dueWindowOptions} />}
+              </task.form.AppField>
+            </div>
+            <organization.form.SubmitButton label="Create workspace" isSaving={save.isSaving} />
+          </fieldset>
+          {save.result && (
+            <div role="status">
+              <p>
+                {save.result.outcome === "success"
+                  ? "Workspace created."
+                  : save.result.outcome === "saved-with-follow-up-errors"
+                    ? "Workspace created, but some follow-up actions failed."
+                    : "Workspace creation did not complete."}
+              </p>
+              <ul>
+                {Object.entries(save.result.forms).map(([id, state]) => (
+                  <li key={id}>
+                    {id}: {state.status}
+                    {state.failure ? ` — ${String(state.failure.error)}` : ""}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </form>
 
         <ResourceDataPanel
@@ -124,5 +113,5 @@ function FlowFormRoute() {
         <ActivityPanel activity={activity} />
       </section>
     </WorkspaceLayout>
-  )
+  );
 }
