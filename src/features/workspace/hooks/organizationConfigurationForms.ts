@@ -63,6 +63,7 @@ export function useOrganizationProfileForm({
     invalidateQueryKeys: [workspaceKeys.organizations.all],
     cacheUpdates: profileCacheUpdates(organization.data),
   });
+
   return { ...binding, retryRead: query.refetch };
 }
 export function useOrganizationOperationsForm({
