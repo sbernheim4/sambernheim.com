@@ -26,9 +26,11 @@ const isTransientError = (error: unknown) => {
   if (!error || typeof error !== "object") {
     return false;
   }
+
   if ("status" in error && typeof error.status === "number") {
     return error.status === 408 || error.status === 429 || error.status >= 500;
   }
+
   return error instanceof TypeError; // fetch network failures; only used by retry-safe endpoints
 };
 
@@ -68,11 +70,13 @@ export const createOrchestrator = <P extends readonly AnyForm[]>(
       const seen = new Set<string>();
 
       for (const form of forms) {
-        if (seen.has(form.id)) {
+        const hasBeenProcessed = seen.has(form.id);
+        if (hasBeenProcessed) {
           return Promise.reject(new Error(`Duplicate form ID: ${form.id}`));
         }
 
-        if (form.dependencies?.some(({ id }) => !seen.has(id))) {
+        const isOutOfOrderDep = form.dependencies?.some(({ id }) => !seen.has(id))
+        if (isOutOfOrderDep) {
           return Promise.reject(new Error(`Dependencies for ${form.id} must precede it.`));
         }
 
@@ -633,14 +637,13 @@ const reconcileCacheWithMutationResponses = <P extends readonly AnyForm[]>(
   queryClient: QueryClient,
   config: SaveConfig<P>,
 ): FollowUpError[] => {
-
-  const formCacheUpdateErrors = successful.flatMap(form => {
-     return updateCacheWithMutationResponse(
+  const formCacheUpdateErrors = successful.flatMap((form) => {
+    return updateCacheWithMutationResponse(
       context(form),
       form.cacheUpdates as readonly CacheUpdate<any, any, any>[] | undefined,
       form.id,
     );
-  })
+  });
 
   const configCacheUpdateErrors = updateCacheWithMutationResponse(
     {
