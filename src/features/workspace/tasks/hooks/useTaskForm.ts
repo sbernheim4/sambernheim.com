@@ -7,12 +7,21 @@ import { dueWindowOptions, ownerOptions, taskStatusOptions } from "../fieldOptio
 import { option } from "../../formOptions";
 import { useCreateTask, useUpdateTask } from "./mutations";
 import { useTask } from "./queries";
+export type TaskFormValues = Pick<Task, "title" | "owner" | "status" | "dueWindow">;
+
+const defaultValues: TaskFormValues = {
+  title: "",
+  owner: "alex",
+  status: "todo",
+  dueWindow: "this-week",
+};
+
 export function useTaskForm({
   resource,
   project,
   ...callbacks
 }: { resource?: Task; project: Project } & OutcomeCallbacks<
-  Record<string, string>,
+  TaskFormValues,
   Omit<SaveTaskInput, "organizationId" | "projectId">,
   SaveTaskResponse
 >) {
@@ -21,13 +30,8 @@ export function useTaskForm({
   const update = useUpdateTask(resource?.id ?? "");
   const form = useQueryBackedForm({
     query: resource ? query : undefined,
-    defaultValues: {
-      title: "",
-      owner: "alex",
-      status: "todo",
-      dueWindow: "this-week",
-    } as Record<string, string>,
-    toFormData: (data: Task): Record<string, string> => ({
+    defaultValues,
+    toFormData: (data: Task): TaskFormValues => ({
       title: data.title,
       owner: data.owner,
       status: data.status,
