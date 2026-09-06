@@ -159,7 +159,7 @@ tombstone and QueryClient ownership policies. The API middleware remains
 
 - `npm run typecheck` checks application code; `npm run typecheck:tests` also
   checks tests and negative inference fixtures in `tests/types`.
-- `npm run test:forms` bundles TS/TSX tests with the existing esbuild tool and runs
+- `npm test` bundles TS/TSX tests with the existing esbuild tool and runs
   Node tests. The small react-test-renderer harness tests hooks without a browser;
   React/Query remain external so it uses the same runtime instances. The renderer
   currently emits an upstream deprecation notice.

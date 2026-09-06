@@ -9,7 +9,7 @@ const require = createRequire(import.meta.url);
 const [command, ...args] = process.argv.slice(2);
 const supported = ["diagnostics", "references", "rename", "definition", "quickinfo", "navto"];
 if (!supported.includes(command))
-  throw Error(`Usage: tsserver-tools.mjs ${supported.join("|")} FILE LINE OFFSET`);
+  throw Error(`Usage: tsserver-tools.ts ${supported.join("|")} FILE LINE OFFSET`);
 const server = spawn(
   process.execPath,
   [require.resolve("typescript/lib/tsserver.js"), "--disableAutomaticTypingAcquisition"],
@@ -17,7 +17,10 @@ const server = spawn(
 );
 let sequence = 0;
 let buffer = "";
-const pending = new Map();
+const pending = new Map<
+  number,
+  { resolve: (body: unknown) => void; reject: (error: Error) => void }
+>();
 server.stdout.on("data", (chunk) => {
   buffer += chunk.toString();
   while (true) {
@@ -43,10 +46,10 @@ server.stdout.on("data", (chunk) => {
   }
 });
 server.stderr.on("data", (chunk) => process.stderr.write(chunk));
-const request = (command, args) =>
+const request = <T = unknown>(command: string, args: Record<string, unknown>): Promise<T> =>
   new Promise((resolve, reject) => {
     const seq = ++sequence;
-    pending.set(seq, { resolve, reject });
+    pending.set(seq, { resolve: (body) => resolve(body as T), reject });
     server.stdin.write(`${JSON.stringify({ seq, type: "request", command, arguments: args })}\n`);
   });
 const timeout = setTimeout(() => {
@@ -69,8 +72,8 @@ try {
   if (command === "diagnostics") {
     for (const file of files) {
       const diagnostics = [
-        ...(await request("syntacticDiagnosticsSync", { file: resolve(file) })),
-        ...(await request("semanticDiagnosticsSync", { file: resolve(file) })),
+        ...(await request<unknown[]>("syntacticDiagnosticsSync", { file: resolve(file) })),
+        ...(await request<unknown[]>("semanticDiagnosticsSync", { file: resolve(file) })),
       ];
       console.log(JSON.stringify({ file, diagnostics }, null, 2));
       if (diagnostics.length) process.exitCode = 1;

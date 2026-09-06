@@ -35,3 +35,11 @@ Use direct imports from the owning module. Keep cross-entity composition at the
 workspace level and entity-specific queries, mutations, forms, and fields with
 the entity. The workspace API and cache reconciliation remain shared because
 they handle related records and aggregate views across entities.
+
+## Local commands
+
+Use Node 22.18 or newer to run the TypeScript scripts directly. Authored application
+and tooling code uses `.ts`/`.tsx`; bundled tests and application output use `.js`.
+`npm run build` creates the application output; `npm start` previews that build
+with the same in-memory example API used during development. Preview is a local
+verification server, not a production deployment configuration.
