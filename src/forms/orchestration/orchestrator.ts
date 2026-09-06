@@ -97,7 +97,8 @@ export const createOrchestrator = <P extends readonly AnyForm[]>(
 
   async function run(config: SaveConfig<P>, forms: AnyForm[]): Promise<SaveResult<P>> {
     let states = snapshotForms(forms);
-    let responses: Responses = Object.create(null);
+    let responses: Responses = {};
+
     const result = {
       outcome: "validation-failed",
       forms: states,
@@ -114,14 +115,13 @@ export const createOrchestrator = <P extends readonly AnyForm[]>(
 
     states = await validateForms(forms, states);
 
-    if (!forms.some((form) => states[form.id].failure)) {
+    const noFormsFailed = !forms.some((form) => states[form.id].failure);
+
+    if (noFormsFailed) {
       states = prepareIndependentPayloads(forms, states);
-    }
 
-    const preflightPassed = !forms.some((form) => states[form.id].failure);
-
-    if (preflightPassed) {
       const saved = await saveFormsInOrder(forms, states, responses, config, emit);
+
       states = saved.states;
       responses = saved.responses;
     }
@@ -133,7 +133,7 @@ export const createOrchestrator = <P extends readonly AnyForm[]>(
     const successful = forms.filter((form) => states[form.id].status === "saved");
     const allSaved = successful.length === forms.length;
 
-    result.outcome = getOutcome(!preflightPassed, allSaved);
+    result.outcome = getOutcome(!noFormsFailed, allSaved);
 
     const context = (form: AnyForm) => ({
       queryClient,
@@ -148,7 +148,7 @@ export const createOrchestrator = <P extends readonly AnyForm[]>(
 
     // After writes, refresh only successful forms, plus group-level queries.
     // This includes partial saves; failed and skipped forms have no follow-ups.
-    if (preflightPassed) {
+    if (noFormsFailed) {
       emit("refreshing");
 
       const refreshAndCacheInvalidationErrors = await refreshAndInvalidateCache(
@@ -594,7 +594,7 @@ const refreshAndInvalidateCache = async <P extends readonly AnyForm[]>(
   config: SaveConfig<P>,
   queryClient: QueryClient,
 ): Promise<FollowUpError[]> => {
-  const additionalFollowUpErrors = [
+  const refreshAndCacheInvalidationErrors = [
     ...(await settleRefreshes(queryClient, [
       ...successful.map((form) => ({
         refetchFunctions: form.refetchFunctions,
@@ -605,7 +605,7 @@ const refreshAndInvalidateCache = async <P extends readonly AnyForm[]>(
     ])),
   ];
 
-  return additionalFollowUpErrors;
+  return refreshAndCacheInvalidationErrors;
 };
 
 const updateSkippedFormsState = (states: FormStates): FormStates => {
@@ -633,14 +633,13 @@ const reconcileCacheWithMutationResponses = <P extends readonly AnyForm[]>(
   queryClient: QueryClient,
   config: SaveConfig<P>,
 ): FollowUpError[] => {
-  let formCacheUpdateErrors: FollowUpError[] = [];
-  for (const form of successful) {
-    formCacheUpdateErrors = updateCacheWithMutationResponse(
+  const formCacheUpdateErrors = successful.flatMap((form) => {
+    return updateCacheWithMutationResponse(
       context(form),
       form.cacheUpdates as readonly CacheUpdate<any, any, any>[] | undefined,
       form.id,
     );
-  }
+  });
 
   const configCacheUpdateErrors = updateCacheWithMutationResponse(
     {
