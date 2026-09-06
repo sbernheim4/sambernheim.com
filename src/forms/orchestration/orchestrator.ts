@@ -75,7 +75,7 @@ export const createOrchestrator = <P extends readonly AnyForm[]>(
           return Promise.reject(new Error(`Duplicate form ID: ${form.id}`));
         }
 
-        const isOutOfOrderDep = form.dependencies?.some(({ id }) => !seen.has(id))
+        const isOutOfOrderDep = form.dependencies?.some(({ id }) => !seen.has(id));
         if (isOutOfOrderDep) {
           return Promise.reject(new Error(`Dependencies for ${form.id} must precede it.`));
         }
@@ -83,7 +83,7 @@ export const createOrchestrator = <P extends readonly AnyForm[]>(
         seen.add(form.id);
       }
 
-      active = run(captured as unknown as SaveConfig<P>, forms).finally(() => {
+      active = run(captured as unknown as SaveConfig<P>).finally(() => {
         active = undefined;
       });
 
@@ -99,7 +99,8 @@ export const createOrchestrator = <P extends readonly AnyForm[]>(
     },
   };
 
-  async function run(config: SaveConfig<P>, forms: AnyForm[]): Promise<SaveResult<P>> {
+  async function run(config: SaveConfig<P>): Promise<SaveResult<P>> {
+    const { forms } = config;
     let states = snapshotForms(forms);
     let responses: Responses = {};
 
@@ -419,7 +420,7 @@ const markFormsSaved = async (
   return errors;
 };
 
-const invokeFormFinish = (forms: AnyForm[]): FollowUpError[] => {
+const invokeFormFinish = (forms: readonly AnyForm[]): FollowUpError[] => {
   const finishErrors: FollowUpError[] = [];
 
   for (const form of forms) {
