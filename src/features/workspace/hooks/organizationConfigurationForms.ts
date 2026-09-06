@@ -58,10 +58,10 @@ export function useOrganizationProfileForm({
     endpoint: {
       mutationFn: mutation.mutateAsync,
       retrySafe: true,
-      refetchFunctions: [query.refetch],
-      invalidateQueryKeys: [workspaceKeys.organizations.all],
-      cacheUpdates: profileCacheUpdates(organization.data),
     },
+    refetchFunctions: [query.refetch],
+    invalidateQueryKeys: [workspaceKeys.organizations.all],
+    cacheUpdates: profileCacheUpdates(organization.data),
   });
   return { ...binding, retryRead: query.refetch };
 }
@@ -92,10 +92,10 @@ export function useOrganizationOperationsForm({
     endpoint: {
       mutationFn: mutation.mutateAsync,
       retrySafe: true,
-      refetchFunctions: [query.refetch],
-      invalidateQueryKeys: [workspaceKeys.organizations.all],
-      cacheUpdates: operationsCacheUpdates(organization.data),
     },
+    refetchFunctions: [query.refetch],
+    invalidateQueryKeys: [workspaceKeys.organizations.all],
+    cacheUpdates: operationsCacheUpdates(organization.data),
   });
   return { ...binding, retryRead: query.refetch };
 }

@@ -59,6 +59,81 @@ async function mount(qc: QueryClient, render: () => React.ReactNode) {
   };
 }
 
+test("saving awaits native live field and form validation and clears errors on correction", async () => {
+  const qc = client();
+  const validation = gate();
+  let writes = 0;
+  let fieldValidationStarted = false;
+  let current: any;
+  const harness = await mount(qc, () => {
+    current = useQueryBackedForm({
+      defaultValues: { name: "" },
+      validate: async (values) => {
+        await validation.promise;
+        return values.name === "bad" ? "form error" : undefined;
+      },
+      endpoint: {
+        mutationFn: async (values: { name: string }) => {
+          writes++;
+          return values;
+        },
+      },
+    });
+    return (
+      <current.form.AppField
+        name="name"
+        validators={{
+          onSubmitAsync: async ({ value, fieldApi }: any) => {
+            assert.equal(fieldApi.form.store, current.form.store);
+            fieldValidationStarted = true;
+            await validation.promise;
+            return !value ? "field error" : undefined;
+          },
+        }}
+      >
+        {() => null}
+      </current.form.AppField>
+    );
+  });
+  try {
+    let pending!: Promise<unknown>;
+    await act(async () => {
+      pending = current.submit();
+      await delay();
+    });
+    assert.equal(current.isSaving, true);
+    assert.equal(fieldValidationStarted, true);
+    assert.equal(writes, 0);
+    await act(async () => {
+      validation.resolve();
+      await pending;
+    });
+    assert.equal(current.result.outcome, "validation-failed");
+    assert.deepEqual(current.form.getFieldMeta("name").errors, ["field error"]);
+    assert.equal(writes, 0);
+
+    await act(async () => {
+      current.form.setFieldValue("name", "bad");
+      await current.submit();
+    });
+    assert.equal(current.result.outcome, "validation-failed");
+    assert.deepEqual(current.form.state.errors, ["form error"]);
+    assert.equal(writes, 0);
+
+    await act(async () => {
+      current.form.setFieldValue("name", "good");
+      await current.form.handleSubmit();
+    });
+    assert.equal(current.result.outcome, "success");
+    assert.deepEqual(current.form.state.errors, []);
+    assert.deepEqual(current.form.getFieldMeta("name").errors, []);
+    assert.equal(writes, 1);
+  } finally {
+    validation.resolve();
+    await harness.dispose();
+  }
+});
+
 test("CRUD query selection initializes mapped values, preserves dirty edits and marks only submitted values as saved", async () => {
   const qc = client();
   const loaded = gate();
@@ -86,9 +161,9 @@ test("CRUD query selection initializes mapped values, preserves dirty edits and 
           writes++;
           return v;
         },
-        refetchFunctions: [() => refreshed.promise],
-        cacheUpdates: [{ queryKey: () => ["read"], getData: (r) => ({ envelope: r }) }],
       },
+      refetchFunctions: [() => refreshed.promise],
+      cacheUpdates: [{ queryKey: () => ["read"], getData: (r) => ({ envelope: r }) }],
       onSuccess: () => {
         callback++;
       },
@@ -156,8 +231,8 @@ test("domain create mutateAsync owns one mutation, overrides inherited retries a
       },
       endpoint: {
         mutationFn: mutation.mutateAsync,
-        refetchFunctions: [() => refresh.promise],
       },
+      refetchFunctions: [() => refresh.promise],
       onSuccess: () => {
         successes++;
       },
@@ -401,6 +476,9 @@ test("organization page orchestrator skips clean forms and only submits dirty fo
   });
   try {
     await act(delay);
+    assert.equal(current.organization.form.state.isDirty, false);
+    assert.equal(current.profile.form.state.isDirty, false);
+    assert.equal(current.operations.form.state.isDirty, false);
     await act(async () => {
       current.profile.form.setFieldValue("displayName", "Renamed Clinic");
       await delay();
@@ -437,22 +515,22 @@ test("query-backed creates resolve dynamic cache keys and run success after refr
           id: "created-1",
           name: v.name,
         }),
-        refetchFunctions: [
-          async () => {
-            log.push("refresh");
-          },
-        ],
-        cacheUpdates: [
-          {
-            queryKey: ({ response, variables }) => [
-              "organizations",
-              variables.organizationId,
-              "resources",
-              response.id,
-            ],
-          },
-        ],
       },
+      refetchFunctions: [
+        async () => {
+          log.push("refresh");
+        },
+      ],
+      cacheUpdates: [
+        {
+          queryKey: ({ response, variables }) => [
+            "organizations",
+            variables.organizationId,
+            "resources",
+            response.id,
+          ],
+        },
+      ],
       onSuccess: ({ response, variables, queryClient }) => {
         assert.deepEqual(
           queryClient.getQueryData([

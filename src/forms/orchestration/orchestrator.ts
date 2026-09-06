@@ -42,13 +42,11 @@ export function createOrchestrator<P extends readonly AnyForm[]>(
           ...form,
           dependencies: form.dependencies?.map(({ id }) => ({ id })),
           retry: form.retry && { ...form.retry },
+          refetchFunctions: form.refetchFunctions?.slice(),
+          invalidateQueryKeys: form.invalidateQueryKeys?.map((key) => [...key]),
+          cacheUpdates: form.cacheUpdates?.map((target) => ({ ...target })),
           endpoint: {
             ...form.endpoint,
-            cacheUpdates: form.endpoint.cacheUpdates?.map((target) => ({
-              ...target,
-            })),
-            refetchFunctions: form.endpoint.refetchFunctions?.slice(),
-            invalidateQueryKeys: form.endpoint.invalidateQueryKeys?.map((key) => [...key]),
           },
         })),
         retry: config.retry && { ...config.retry },
@@ -161,7 +159,7 @@ export function createOrchestrator<P extends readonly AnyForm[]>(
       for (const form of successful) {
         const formCacheUpdateErrors = updateCacheWithMutationResponse(
           context(form),
-          form.endpoint.cacheUpdates,
+          form.cacheUpdates as readonly CacheUpdate<any, any, any>[] | undefined,
           form.id,
         );
         result.followUpErrors.push(...formCacheUpdateErrors);
@@ -666,7 +664,8 @@ const refreshAndInvalidateCache = async <P extends readonly AnyForm[]>(
   const additionalFollowUpErrors = [
     ...(await settleRefreshes(queryClient, [
       ...successful.map((form) => ({
-        ...form.endpoint,
+        refetchFunctions: form.refetchFunctions,
+        invalidateQueryKeys: form.invalidateQueryKeys,
         formId: form.id,
       })),
       config,

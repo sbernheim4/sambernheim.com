@@ -24,14 +24,41 @@ verification remains user-managed. The handoff notes below are historical contex
 
 ### Revision And Verification Log
 
+- [x] Remove `validateSnapshot` and detached Form/Field instances. Saving now
+  awaits native validation on the live form. Register `config.validate` as a
+  TanStack submit validator so TanStack owns error updates and clearing.
+  Inputs should remain disabled during validation/saving; asynchronous validation
+  no longer guarantees isolation from live edits. Mutation/retry values remain
+  captured by the orchestrator.
+- [x] Replace detached-validation tests with mounted hook coverage for native
+  field and form errors, validation awaiting, blocked writes, and corrected resubmits.
+- [x] Verified native validation changes: application/test type checks, all 27
+  form tests, production build, and TypeScript language-server diagnostics pass.
+  Existing build chunk/dependency warnings and test-renderer deprecation remain.
+- [x] Replace all three deprecated `useStore` calls in `WorkspacePages.tsx`
+  with the installed TanStack Form export `useSelector`.
+- [x] Audit backend/client endpoint parity after the create/edit split. POST
+  create contracts require all entity fields; PATCH entity and Profile/
+  Operations contracts accept partial update fields; dependent project/task
+  validation, replica lag, missing parents, and clear-all behavior are covered
+  by the API tests. Application and test type checks pass.
+- [x] Clarify ownership in the composed organization page. The page now renders
+  only the editable Profile and Operations forms; Profile owns name/sector and
+  Operations owns status/region. Organization remains the aggregate route and
+  details context, while the single Save button submits only the owning forms.
+- [x] Move aggregate dirty-state subscription into `useFormOrchestrator` and
+  expose `isDirty`; composed pages now use the orchestrator's single dirty flag
+  for Save button state and submit guards.
+
 - [x] Remove the custom baseline values/ref/type and comparison helper. Query
   synchronization now uses TanStack `isDirty`; only readiness/error state is
   tracked separately. TanStack owns values and saved defaults.
 - [x] Replace `acceptBaseline` with `markSaved`, retaining a small reset adapter
   to preserve edits made during a save. Reuse the native defaults through a form
   reference so rerenders cannot restore old defaults. No copied values are stored.
-- [ ] Verify native-defaults handling, clean query refreshes, dirty protection,
-  post-save rerenders, and existing behavior with type checks and form tests.
+- [x] Verified native-defaults handling, clean query refreshes, dirty protection,
+  and post-save rerenders. Both type checks, all 28 form tests, and language-server
+  diagnostics for the changed hooks pass.
 
 - [x] Simplify forms to plain bindings passed directly to `createOrchestrator`;
       remove the participant factory, wrapper, symbol and separate runtime shape.
@@ -1118,3 +1145,17 @@ facade must invoke each configured callback exactly once per submission outcome.
 Run TypeScript checks, focused automated tests, and the production build. Browser
 verification is performed by the user; do not add Playwright or another browser
 automation dependency.
+
+## Deferred Exploration: Effect-Based Execution
+
+Keep the current promise-based form API for now, but consider using Effect as an
+internal execution layer later. The orchestrator could lift each user-supplied
+`mutationFn` with `Effect.tryPromise`, apply retry schedules, exponential or
+jittered backoff, timeouts, interruption, cancellation, fallbacks, and bounded
+concurrency, then expose the result through `Effect.runPromise` so existing
+hooks continue to receive a Promise.
+
+When revisiting this, connect Effect interruption to an `AbortSignal` so
+canceling an Effect also cancels the underlying network request. Evaluate the
+additional dependency and abstraction cost against the current orchestrator
+before adopting it.

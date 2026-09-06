@@ -108,9 +108,9 @@ export function useOrganizationForm({
     endpoint: {
       mutationFn: resource ? update.mutateAsync : create.mutateAsync,
       retrySafe: !!resource,
-      invalidateQueryKeys: [workspaceKeys.all],
-      cacheUpdates: organizationCacheUpdates(),
     },
+    invalidateQueryKeys: [workspaceKeys.all],
+    cacheUpdates: organizationCacheUpdates(),
     ...callbacks,
   });
   return { ...form, fields: organizationFields };
@@ -152,9 +152,9 @@ export function useProjectForm({
     endpoint: {
       mutationFn: resource ? update.mutateAsync : create.mutateAsync,
       retrySafe: !!resource,
-      invalidateQueryKeys: [workspaceKeys.all],
-      cacheUpdates: projectCacheUpdates(),
     },
+    invalidateQueryKeys: [workspaceKeys.all],
+    cacheUpdates: projectCacheUpdates(),
     ...callbacks,
   });
   return { ...form, fields: projectFields };
@@ -197,9 +197,9 @@ export function useTaskForm({
     endpoint: {
       mutationFn: resource ? update.mutateAsync : create.mutateAsync,
       retrySafe: !!resource,
-      invalidateQueryKeys: [workspaceKeys.all],
-      cacheUpdates: taskCacheUpdates(),
     },
+    invalidateQueryKeys: [workspaceKeys.all],
+    cacheUpdates: taskCacheUpdates(),
     ...callbacks,
   });
   return { ...form, fields: taskFields };
