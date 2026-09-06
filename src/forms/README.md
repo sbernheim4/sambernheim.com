@@ -17,7 +17,7 @@ components, or notification libraries.
 - `orchestration/types.ts` describes form configurations, endpoints, and results.
 - `hooks/formState.ts` resets saved
   form defaults without overwriting edits made during submission.
-- `hooks/useAppForm.ts`, `context.ts`, and `ui/fields.tsx` register and render fields.
+- `hooks/useAppForm.ts`, `context.ts`, and `components/fields.tsx` register and render fields.
 
 The execution path is:
 
@@ -32,7 +32,10 @@ Composed pages call `useComposableForm` for each entity and pass those bindings
 into one `useFormOrchestrator`. Both hooks have one typed definition; no overload
 implementations or `useComposableFormImpl` remain.
 
-Domain query/mutation/form hooks live in `src/features/workspace/hooks`. Views
+Domain query/mutation/form hooks live under
+`src/features/workspace/{organizations,projects,tasks}/hooks`, alongside each
+entity’s `components` and field options. Profile and Operations belong to
+organizations. Shared workspace hooks compose those entity hooks; shared pages
 render their forms. Request hooks own URLs, mutation keys and `retry: false`;
 form hooks pass their `mutateAsync` directly as `endpoint.mutationFn`. Do not wrap
 it in another mutation, put lifecycle effects in mutation callbacks, or watch
@@ -74,8 +77,10 @@ request. A mapped input is calculated once and retained across retries.
 
 ## Save sequence and results
 
-1. Capture all form configurations and form values. Run native TanStack field
-   and form validation on each live form; `config.validate` is registered as its
+1. Use the submitted configuration directly. Callers must leave it unchanged
+   during an active save; readonly types express this contract without runtime copying.
+   Snapshot all form values. Run native TanStack field and form validation on each
+   live form; `config.validate` is registered as its
    form-level submit validator. Disable inputs while saving, including validation:
    validators can observe live edits during an asynchronous run. Captured values
    are retained for mutation payloads and retries.

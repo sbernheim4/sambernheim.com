@@ -1,5 +1,5 @@
 import { defineForm } from "../formConfig";
-import type { CacheTarget, SaveResult } from "../../src/forms/orchestration/types.ts";
+import type { CacheTarget, SaveResult } from "../../src/forms/orchestration/types";
 const mutateAsync = async (input: { name: string }, _options?: { onSuccess?: () => void }) => ({
   profile: { name: input.name, id: "1" },
 });
@@ -164,3 +164,24 @@ useComposableForm({
   },
   endpoint: { mutationFn: mutateAsync },
 });
+
+// Submitted configuration is read-only, including nested declarations.
+function checkImmutableConfig(
+  config: import("../../src/forms/orchestration/types").SaveConfig<readonly [typeof profile]>,
+) {
+  // @ts-expect-error submitted form lists cannot be replaced
+  config.forms = [];
+  // @ts-expect-error submitted form lists cannot be appended to
+  config.forms.push(profile);
+  // @ts-expect-error endpoint functions cannot be replaced during a run
+  config.forms[0].endpoint.mutationFn = mutateAsync;
+  if (config.retry) {
+    // @ts-expect-error retry policies cannot be changed during a run
+    config.retry.maxRetries = 5;
+  }
+  if (config.cacheUpdates?.[0]) {
+    // @ts-expect-error cache targets cannot be changed during a run
+    config.cacheUpdates[0].queryKey = () => ["replacement"];
+  }
+}
+void checkImmutableConfig;

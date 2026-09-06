@@ -1,6 +1,7 @@
 import type { QueryClient } from "@tanstack/react-query";
 import type {
   AnyForm,
+  FormInput,
   SaveConfig,
   SaveResult,
   FormSaveState,
@@ -9,7 +10,7 @@ import type {
   CacheUpdate,
   FollowUpError,
   RefreshOptions,
-} from "./types.ts";
+} from "./types";
 
 // Helpers read caller-owned state and return their own updated values.
 type FormState = Readonly<FormSaveState<any, any, any>>;
@@ -37,7 +38,9 @@ export const createOrchestrator = <P extends readonly AnyForm[]>(
       const { forms } = config;
       const errors = preflightFormsChecks(forms);
       if (errors.length) {
-          return Promise.reject(new AggregateError(errors, "Form preflight checks failed"));
+        return Promise.reject(
+          new AggregateError(errors, errors.map((error) => error.message).join("; ")),
+        );
       }
 
       active = run(config).finally(() => {
@@ -77,11 +80,14 @@ export const createOrchestrator = <P extends readonly AnyForm[]>(
 
     states = await validateForms(forms, states);
 
-    const noFormsFailed = !forms.some((form) => states[form.id].failure);
+    const validationPassed = !forms.some((form) => states[form.id].failure);
+    if (validationPassed) {
+      const preparedForms = prepareIndependentPayloads(forms, states);
+      states = preparedForms;
+    }
 
-    if (noFormsFailed) {
-      states = prepareIndependentPayloads(forms, states);
-
+    const preflightPassed = !forms.some((form) => states[form.id].failure);
+    if (preflightPassed) {
       const saved = await saveFormsInOrder(forms, states, responses, config, emit);
 
       states = saved.states;
@@ -95,9 +101,9 @@ export const createOrchestrator = <P extends readonly AnyForm[]>(
     const successful = forms.filter((form) => states[form.id].status === "saved");
     const allSaved = successful.length === forms.length;
 
-    result.outcome = getOutcome(!noFormsFailed, allSaved);
+    result.outcome = getOutcome(!preflightPassed, allSaved);
 
-    const context = (form: AnyForm) => ({
+    const context = (form: FormInput) => ({
       queryClient,
       response: states[form.id].response,
       variables: states[form.id].variables,
@@ -110,7 +116,7 @@ export const createOrchestrator = <P extends readonly AnyForm[]>(
 
     // After writes, refresh only successful forms, plus group-level queries.
     // This includes partial saves; failed and skipped forms have no follow-ups.
-    if (noFormsFailed) {
+    if (preflightPassed) {
       emit("refreshing");
 
       const refreshAndCacheInvalidationErrors = await refreshAndInvalidateCache(
@@ -156,9 +162,7 @@ export const createOrchestrator = <P extends readonly AnyForm[]>(
   }
 };
 
-const preflightFormsChecks = <P extends readonly AnyForm[]>(
-  forms: P,
-): Error[] => {
+const preflightFormsChecks = <P extends readonly AnyForm[]>(forms: P): Error[] => {
   const seen = new Set<string>();
   const errors: Error[] = [];
 
@@ -167,14 +171,10 @@ const preflightFormsChecks = <P extends readonly AnyForm[]>(
       errors.push(new Error(`Duplicate form ID: ${form.id}`));
     }
 
-    const isOutOfOrderDep = form.dependencies?.some(
-      ({ id }) => !seen.has(id),
-    );
+    const isOutOfOrderDep = form.dependencies?.some(({ id }) => !seen.has(id));
 
     if (isOutOfOrderDep) {
-      errors.push(
-        new Error(`Dependencies for ${form.id} must precede it.`),
-      );
+      errors.push(new Error(`Dependencies for ${form.id} must precede it.`));
     }
 
     seen.add(form.id);
@@ -273,7 +273,7 @@ const updateCacheWithMutationResponse = <R, I, Results>(
 };
 
 const validateForms = async (
-  forms: readonly AnyForm[],
+  forms: readonly FormInput[],
   states: FormStates,
 ): Promise<FormStates> => {
   const validated = await Promise.all(
@@ -299,7 +299,7 @@ const validateForms = async (
   return Object.fromEntries(validated);
 };
 
-const getVariables = (form: AnyForm, state: FormState, responses: Responses) => {
+const getVariables = (form: FormInput, state: FormState, responses: Responses) => {
   const variables = structuredClone(
     form.toMutationPayload
       ? form.toMutationPayload(structuredClone(state.formValues), {
@@ -311,7 +311,10 @@ const getVariables = (form: AnyForm, state: FormState, responses: Responses) => 
   return variables;
 };
 
-const prepareIndependentPayloads = (forms: readonly AnyForm[], states: FormStates): FormStates => {
+const prepareIndependentPayloads = (
+  forms: readonly FormInput[],
+  states: FormStates,
+): FormStates => {
   // Discover independent mapping errors before issuing any writes.
   return Object.fromEntries(
     forms.map((form) => {
@@ -329,7 +332,7 @@ const prepareIndependentPayloads = (forms: readonly AnyForm[], states: FormState
   );
 };
 
-const snapshotForms = (forms: readonly AnyForm[]): FormStates => {
+const snapshotForms = (forms: readonly FormInput[]): FormStates => {
   return Object.fromEntries(
     forms.map((form) => {
       const state: FormState = {
@@ -348,9 +351,9 @@ const snapshotForms = (forms: readonly AnyForm[]): FormStates => {
 };
 
 const invokeFormCallbacks = async (
-  forms: readonly AnyForm[],
+  forms: readonly FormInput[],
   states: FormStates,
-  context: (form: AnyForm) => {
+  context: (form: FormInput) => {
     queryClient: QueryClient;
     response: any;
     variables: any;
@@ -402,7 +405,7 @@ const invokeConfigCallbacks = async <P extends readonly AnyForm[]>(
 
 // Mark submitted values as saved without clearing edits made during the save.
 const markFormsSaved = async (
-  forms: readonly AnyForm[],
+  forms: readonly FormInput[],
   states: FormStates,
 ): Promise<FollowUpError[]> => {
   const errors: FollowUpError[] = [];
@@ -416,7 +419,7 @@ const markFormsSaved = async (
   return errors;
 };
 
-const invokeFormFinish = (forms: readonly AnyForm[]): FollowUpError[] => {
+const invokeFormFinish = (forms: readonly FormInput[]): FollowUpError[] => {
   const finishErrors: FollowUpError[] = [];
 
   for (const form of forms) {
@@ -438,13 +441,13 @@ const getOutcome = (hasSomeFailure: boolean, allSaved: boolean) => {
   return hasSomeFailure ? "validation-failed" : allSaved ? "success" : "partial-failure";
 };
 
-const invokeMutation = async (form: AnyForm, state: FormState): Promise<FormState> => {
+const invokeMutation = async (form: FormInput, state: FormState): Promise<FormState> => {
   const response = await form.endpoint.mutationFn(structuredClone(state.variables));
   return { ...state, response, status: "saved" };
 };
 
 const getRetryable = (
-  form: AnyForm,
+  form: FormInput,
   state: FormState,
   error: unknown,
   retry: {
@@ -465,7 +468,7 @@ const getRetryable = (
 };
 
 const saveFormWithRetry = async (
-  form: AnyForm,
+  form: FormInput,
   initialState: FormState,
   retry: {
     maxRetries: number;
@@ -505,7 +508,7 @@ const saveFormWithRetry = async (
 };
 
 const saveFormsInOrder = async <P extends readonly AnyForm[]>(
-  forms: readonly AnyForm[],
+  forms: readonly FormInput[],
   initialStates: FormStates,
   initialResponses: Responses,
   config: SaveConfig<P>,
@@ -591,7 +594,7 @@ const getFailedState = (
 });
 
 const refreshAndInvalidateCache = async <P extends readonly AnyForm[]>(
-  successful: AnyForm[],
+  successful: readonly FormInput[],
   config: SaveConfig<P>,
   queryClient: QueryClient,
 ): Promise<FollowUpError[]> => {
@@ -619,8 +622,8 @@ const updateSkippedFormsState = (states: FormStates): FormStates => {
 };
 
 const reconcileCacheWithMutationResponses = <P extends readonly AnyForm[]>(
-  successful: AnyForm[],
-  context: (form: AnyForm) => {
+  successful: readonly FormInput[],
+  context: (form: FormInput) => {
     queryClient: QueryClient;
     response: any;
     variables: any;

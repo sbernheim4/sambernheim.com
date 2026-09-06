@@ -1,6 +1,6 @@
 import type { editor } from "monaco-editor";
-import { checkTyFile } from "./tyRuntime";
 import type { TySession } from "./tyRuntime";
+import { checkTyFile } from "./tyRuntime";
 
 export { checkTyFile, createTySession, disposeTySession, updateTyFile } from "./tyRuntime";
 export type { TySession, TySessionOptions, TyState } from "./tyRuntime";

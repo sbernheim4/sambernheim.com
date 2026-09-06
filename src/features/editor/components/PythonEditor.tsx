@@ -1,6 +1,6 @@
 import Editor from "@monaco-editor/react";
+import { buildEditableSource, useTyMonacoSession } from "../hooks/useTyMonacoSession";
 import "../monaco";
-import { buildEditableSource, useTyMonacoSession } from "../lsp/useTyMonacoSession";
 
 const HIDDEN_PYTHON_PRELUDE = `from dataclasses import dataclass
 

@@ -1,22 +1,18 @@
-import { useComposableForm } from "../../../forms/hooks/useComposableForm";
-import type { OutcomeCallbacks } from "../../../forms/orchestration/types";
+import { useComposableForm } from "../../../../forms/hooks/useComposableForm";
+import type { OutcomeCallbacks } from "../../../../forms/orchestration/types";
+import { operationsCacheUpdates, profileCacheUpdates } from "../../childCachePolicies";
+import { workspaceKeys } from "../../queries";
 import type {
-  OrganizationProfile,
-  OrganizationOperations,
   OperationsInput,
-  UpdateProfileInput,
-  UpdateOperationsInput,
-  ProfileResponse,
   OperationsResponse,
-} from "../types";
-import {
-  useOrganization,
-  useOrganizationProfile,
-  useOrganizationOperations,
-} from "./useWorkspaceResources";
-import { useUpdateOrganizationProfile, useUpdateOrganizationOperations } from "./mutations";
-import { profileCacheUpdates, operationsCacheUpdates } from "../childCachePolicies";
-import { workspaceKeys } from "../queries";
+  OrganizationOperations,
+  OrganizationProfile,
+  ProfileResponse,
+  UpdateOperationsInput,
+  UpdateProfileInput,
+} from "../../types";
+import { useUpdateOrganizationOperations, useUpdateOrganizationProfile } from "./mutations";
+import { useOrganization, useOrganizationOperations, useOrganizationProfile } from "./queries";
 
 type ProfileValues = {
   displayName: string;

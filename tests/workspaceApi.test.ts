@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { Readable } from "node:stream";
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { createExampleApi } from "../server/example-api.ts";
+import { createExampleApi } from "../server/example-api";
 
 function harness() {
   const api = createExampleApi({ readModelLagMs: 10 });

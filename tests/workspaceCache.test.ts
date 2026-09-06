@@ -1,21 +1,21 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { QueryClient } from "@tanstack/react-query";
-import { createOrchestrator } from "../src/forms/orchestration/orchestrator.ts";
+import { createOrchestrator } from "../src/forms/orchestration/orchestrator";
 import { defineForm } from "./formConfig";
 import {
   profileCacheUpdates,
   operationsCacheUpdates,
-} from "../src/features/workspace/childCachePolicies.ts";
+} from "../src/features/workspace/childCachePolicies";
 import {
   organizationCacheUpdates,
   projectCacheUpdates,
   taskCacheUpdates,
-} from "../src/features/workspace/cachePolicies.ts";
-import { reconcileWorkspaceRead } from "../src/features/workspace/cache.ts";
-import { clearWorkspace } from "../src/features/workspace/clearWorkspace.ts";
-import { workspaceKeys as keys, bootstrapKey } from "../src/features/workspace/queries.ts";
-import type { Organization } from "../src/features/workspace/types.ts";
+} from "../src/features/workspace/cachePolicies";
+import { reconcileWorkspaceRead } from "../src/features/workspace/cache";
+import { clearWorkspace } from "../src/features/workspace/clearWorkspace";
+import { workspaceKeys as keys, bootstrapKey } from "../src/features/workspace/queries";
+import type { Organization } from "../src/features/workspace/types";
 const organization: Organization = {
   id: "org-1",
   name: "Old",
@@ -203,8 +203,8 @@ test("clear-all calls the backend and resets workspace caches", async () => {
 });
 
 import { QueryObserver } from "@tanstack/react-query";
-import { readReplicaResource } from "../src/features/workspace/replicaRead.ts";
-import { ApiError } from "../src/features/workspace/api.ts";
+import { readReplicaResource } from "../src/features/workspace/replicaRead";
+import { ApiError } from "../src/features/workspace/api";
 
 test("clear resets mounted list/detail observers, including version-aware query caches", async () => {
   const qc = client();

@@ -4,13 +4,13 @@ export type AsyncMutation = (variables: any, ...options: any[]) => Promise<any>;
 export type Input<M extends AsyncMutation> = Parameters<M>[0];
 export type Response<M extends AsyncMutation> = Awaited<ReturnType<M>>;
 export type RefreshOptions = {
-  refetchFunctions?: readonly (() => unknown)[];
-  invalidateQueryKeys?: readonly QueryKey[];
+  readonly refetchFunctions?: readonly (() => unknown)[];
+  readonly invalidateQueryKeys?: readonly QueryKey[];
 };
 export type RetryPolicy = {
-  maxRetries?: number;
-  delayMs?: number | ((attempt: number, error: unknown) => number);
-  shouldRetry?: (error: unknown) => boolean;
+  readonly maxRetries?: number;
+  readonly delayMs?: number | ((attempt: number, error: unknown) => number);
+  readonly shouldRetry?: (error: unknown) => boolean;
 };
 export type CacheContext<R, I, Results = {}> = {
   response: R;
@@ -19,20 +19,20 @@ export type CacheContext<R, I, Results = {}> = {
   queryClient: QueryClient;
 };
 export type CacheTarget<R, I, Data = R, Results = {}> = {
-  queryKey: (context: CacheContext<R, I, Results>) => QueryKey;
+  readonly queryKey: (context: CacheContext<R, I, Results>) => QueryKey;
 } & ([R] extends [Data]
-  ? { getData?: (response: R) => Data; update?: never }
-  : { getData: (response: R) => Data; update?: never });
+  ? { readonly getData?: (response: R) => Data; readonly update?: never }
+  : { readonly getData: (response: R) => Data; readonly update?: never });
 export type CacheUpdate<R, I, Results = {}> =
   | {
-      queryKey: (context: CacheContext<R, I, Results>) => QueryKey;
-      getData?: (response: R) => unknown;
-      update?: never;
+      readonly queryKey: (context: CacheContext<R, I, Results>) => QueryKey;
+      readonly getData?: (response: R) => unknown;
+      readonly update?: never;
     }
   | {
-      queryKey: (context: CacheContext<R, I, Results>) => QueryKey;
-      getData?: never;
-      update: (previous: unknown, context: CacheContext<R, I, Results>) => unknown;
+      readonly queryKey: (context: CacheContext<R, I, Results>) => QueryKey;
+      readonly getData?: never;
+      readonly update: (previous: unknown, context: CacheContext<R, I, Results>) => unknown;
     };
 export type FollowUpError = {
   phase: "refresh" | "cache" | "form-state" | "effect";
@@ -54,18 +54,18 @@ export type SuccessContext<V, I, R, Results = {}> = CacheContext<R, I, Results> 
   followUpErrors: readonly FollowUpError[];
 };
 export type OutcomeCallbacks<V, I, R, Results = {}> = {
-  onSuccess?: (context: SuccessContext<V, I, R, Results>) => void | Promise<void>;
-  onFailure?: (context: FailureContext<V, I>) => void | Promise<void>;
+  readonly onSuccess?: (context: SuccessContext<V, I, R, Results>) => void | Promise<void>;
+  readonly onFailure?: (context: FailureContext<V, I>) => void | Promise<void>;
 };
 export type Endpoint<M extends AsyncMutation> = {
-  mutationFn: M;
+  readonly mutationFn: M;
   /** Only idempotent operations may opt into automatic retries. */
-  retrySafe?: boolean;
+  readonly retrySafe?: boolean;
 };
 export type ValidationResult = { valid: true } | { valid: false; error: unknown };
 export type PayloadMapping<V, I, Results> = [V] extends [I]
-  ? { toMutationPayload?: (values: V, context: { results: Results }) => I }
-  : { toMutationPayload: (values: V, context: { results: Results }) => I };
+  ? { readonly toMutationPayload?: (values: V, context: { results: Results }) => I }
+  : { readonly toMutationPayload: (values: V, context: { results: Results }) => I };
 
 /** Common shape consumed by the save loop; callbacks retain their types at declaration. */
 export type AnyForm = {
@@ -87,6 +87,11 @@ export type AnyForm = {
     retrySafe?: boolean;
   };
 };
+/** Read-only view used while the orchestrator consumes a form definition. */
+export type FormInput<F extends AnyForm = AnyForm> = Readonly<F> & {
+  readonly endpoint: Readonly<F["endpoint"]>;
+};
+
 export type ResponsesOf<F extends readonly AnyForm[]> = {
   [Form in F[number] as Form["id"]]: Response<Form["endpoint"]["mutationFn"]>;
 };
@@ -97,21 +102,21 @@ export type FormConfig<
   D extends readonly AnyForm[] = readonly [],
 > = OutcomeCallbacks<V, Input<NoInfer<M>>, Response<NoInfer<M>>, Partial<ResponsesOf<D>>> &
   PayloadMapping<V, Input<NoInfer<M>>, Partial<ResponsesOf<D>>> & {
-    id: Id;
-    dependencies?: D;
-    snapshot: () => V;
-    validate: (values: V) => ValidationResult | Promise<ValidationResult>;
-    markSaved?: (values: V) => void | Promise<void>;
-    finish?: () => void;
-    endpoint: Endpoint<M>;
-    refetchFunctions?: readonly (() => unknown)[];
-    invalidateQueryKeys?: readonly QueryKey[];
-    cacheUpdates?: readonly CacheUpdate<
+    readonly id: Id;
+    readonly dependencies?: Readonly<D>;
+    readonly snapshot: () => V;
+    readonly validate: (values: V) => ValidationResult | Promise<ValidationResult>;
+    readonly markSaved?: (values: V) => void | Promise<void>;
+    readonly finish?: () => void;
+    readonly endpoint: Endpoint<M>;
+    readonly refetchFunctions?: readonly (() => unknown)[];
+    readonly invalidateQueryKeys?: readonly QueryKey[];
+    readonly cacheUpdates?: readonly CacheUpdate<
       Response<NoInfer<M>>,
       Input<NoInfer<M>>,
       Partial<ResponsesOf<D>>
     >[];
-    retry?: RetryPolicy;
+    readonly retry?: RetryPolicy;
   };
 
 export type FormSaveState<V = unknown, I = unknown, R = unknown> = {
@@ -154,13 +159,13 @@ export type Phase =
   | "complete";
 
 export type SaveConfig<P extends readonly AnyForm[]> = RefreshOptions & {
-  forms: P;
-  retry?: RetryPolicy;
-  cacheUpdates?: readonly CacheUpdate<
+  readonly forms: Readonly<P>;
+  readonly retry?: RetryPolicy;
+  readonly cacheUpdates?: readonly CacheUpdate<
     Partial<ResponsesOf<P>>,
     undefined,
     Partial<ResponsesOf<P>>
   >[];
-  onSuccess?: (context: { result: SaveResult<P> }) => void | Promise<void>;
-  onFailure?: (context: { result: SaveResult<P> }) => void | Promise<void>;
+  readonly onSuccess?: (context: { result: SaveResult<P> }) => void | Promise<void>;
+  readonly onFailure?: (context: { result: SaveResult<P> }) => void | Promise<void>;
 };

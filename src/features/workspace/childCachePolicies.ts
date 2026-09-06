@@ -1,17 +1,17 @@
 import type { CacheUpdate } from "../../forms/orchestration/types";
+import { mergeOperations, mergeProfile, upsertBootstrap } from "./cache";
+import { upsertList } from "./cachePolicies";
+import { bootstrapKey, workspaceKeys as keys } from "./queries";
 import type {
   BootstrapData,
-  Organization,
-  OrganizationProfile,
-  OrganizationOperations,
-  UpdateProfileInput,
-  UpdateOperationsInput,
-  ProfileResponse,
   OperationsResponse,
+  Organization,
+  OrganizationOperations,
+  OrganizationProfile,
+  ProfileResponse,
+  UpdateOperationsInput,
+  UpdateProfileInput,
 } from "./types";
-import { mergeProfile, mergeOperations, upsertBootstrap } from "./cache.ts";
-import { upsertList } from "./cachePolicies.ts";
-import { bootstrapKey, workspaceKeys as keys } from "./queries.ts";
 
 function summaryTargets<R, I, Child extends { organizationId: string }>(
   select: (response: R) => Child,
