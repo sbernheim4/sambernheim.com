@@ -43,3 +43,10 @@ and tooling code uses `.ts`/`.tsx`; bundled tests and application output use `.j
 `npm run build` creates the application output; `npm start` previews that build
 with the same in-memory example API used during development. Preview is a local
 verification server, not a production deployment configuration.
+
+- `npm test` runs the test suite.
+- `npm run check` runs lint, formatting checks, application/test/script typechecks,
+  and the test suite.
+- `npm run format` applies the repository formatting rules; `npm run format:check`
+  checks them without writing files.
+- `npm run lint` checks authored code with the pinned oxlint version.

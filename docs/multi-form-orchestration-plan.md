@@ -2,7 +2,6 @@
 
 Focused improvements in progress:
 
-- [ ] Pin oxlint/oxfmt and add repeatable check commands.
 - [ ] Remove forwarding editor components.
 - [ ] Limit save invalidations to affected queries.
 
