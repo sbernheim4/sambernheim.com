@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type RefObject } from "react";
-import { evaluate, type AnyFormApi } from "@tanstack/form-core";
+import type { AnyFormApi } from "@tanstack/form-core";
 import type {
   AnyForm,
   AsyncMutation,
@@ -10,9 +10,12 @@ import type {
   Input,
   PayloadMapping,
   ResponsesOf,
+  ValidationResult,
+  CacheUpdate,
+  RefreshOptions,
 } from "../orchestration/types";
 import { useAppForm } from "./useAppForm";
-import { markFormSaved, resetFormValues, validateSnapshot } from "./formState";
+import { markFormSaved, resetFormValues } from "./formState";
 
 export type QuerySource<QueryData> = {
   data: QueryData | undefined;
@@ -29,27 +32,17 @@ export type FormSource<QueryData, Values> = { defaultValues: Values } & (
 );
 type FormValidator<Values> = (values: Values) => string | undefined | Promise<string | undefined>;
 
-async function validateFormValues<Values>(
-  form: AnyFormApi,
-  values: Values,
-  validate?: FormValidator<NoInfer<Values>>,
-) {
-  const fields = await validateSnapshot(form, values);
-  const error = await validate?.(values);
+async function validateForm(form: AnyFormApi): Promise<ValidationResult> {
+  await form.validateAllFields("submit");
+  await form.validate("submit");
 
-  if (!error) {
-    return fields;
-  }
-
-  if (evaluate(form.state.values, values)) {
-    form.setErrorMap({
-      onSubmit: { form: error, fields: {} },
-    });
+  if (form.state.isValid) {
+    return { valid: true };
   }
 
   return {
-    valid: false as const,
-    error: new Error(error),
+    valid: false,
+    error: new Error("Please correct the highlighted fields."),
   };
 }
 
@@ -117,11 +110,18 @@ export type FormOptions<
   Partial<ResponsesOf<Dependencies>>
 > &
   PayloadMapping<NoInfer<Values>, Input<NoInfer<Mutation>>, Partial<ResponsesOf<Dependencies>>> &
+  RefreshOptions & {
+    cacheUpdates?: readonly CacheUpdate<
+      Response<NoInfer<Mutation>>,
+      Input<NoInfer<Mutation>>,
+      Partial<ResponsesOf<Dependencies>>
+    >[];
+  } &
   FormSource<QueryData, Values> & {
     dependencies?: Dependencies;
-    endpoint: Endpoint<Mutation, Partial<ResponsesOf<Dependencies>>>;
+    endpoint: Endpoint<Mutation>;
     retry?: RetryPolicy;
-    /** Validation of the submitted values, alongside registered field validators. */
+    /** Runs as TanStack's form-level submit validator alongside field validators. */
     validate?: FormValidator<NoInfer<Values>>;
   };
 
@@ -146,6 +146,9 @@ export function useComposableForm<
   const formRef = useRef<{ options: { defaultValues?: Values } } | null>(null);
   const form = useAppForm({
     defaultValues: formRef.current?.options.defaultValues ?? config.defaultValues,
+    validators: {
+      onSubmitAsync: async ({ value }) => config.validate?.(value),
+    },
   });
   formRef.current = form;
 
@@ -154,6 +157,7 @@ export function useComposableForm<
     form,
     inFlight,
   });
+
   const isReady = isFormReady(initialized, readError, config.query);
 
   const saveConfig = {
@@ -169,7 +173,7 @@ export function useComposableForm<
       inFlight.current = true;
       return form.state.values;
     },
-    validate: (values: Values) => validateFormValues(form, values, config.validate),
+    validate: () => validateForm(form),
     markSaved: (values: Values) => markFormSaved(form, values),
   };
 

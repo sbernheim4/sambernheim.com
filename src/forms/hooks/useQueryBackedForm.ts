@@ -20,8 +20,7 @@ export function useQueryBackedForm<QueryData, Values, Mutation extends AsyncMuta
     includePristine: true,
   });
 
-  // handleSubmit enters the same executor directly; validation belongs to the
-  // snapshot adapter, avoiding TanStack's resolved-without-writing ambiguity.
+  // The orchestrator awaits native TanStack validation before executing writes.
   binding.form.handleSubmit = async () => {
     await save.submit();
   };

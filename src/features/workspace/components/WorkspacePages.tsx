@@ -1,5 +1,4 @@
 import { useState, type ReactNode } from "react";
-import { useStore } from "@tanstack/react-form";
 import { Link } from "@tanstack/react-router";
 import {
   ArrowRight,
@@ -69,11 +68,10 @@ export function OrganizationPage({ id }: { id: string }) {
               updatedAt={organization.updatedAt}
             >
               <p className="workspace-edit-hint">
-                Edit the organization, profile, and operations together below.
+                Organization details are composed from the Profile and Operations records below.
               </p>
             </Details>
             <OrganizationWorkspaceForm
-              organization={organization}
               organizationId={organization.id}
             />
             <EntityList
@@ -92,46 +90,38 @@ export function OrganizationPage({ id }: { id: string }) {
   );
 }
 function OrganizationWorkspaceForm({
-  organization,
   organizationId,
 }: {
-  organization: Organization;
   organizationId: string;
 }) {
-  const core = useOrganizationForm({ resource: organization });
   const profile = useOrganizationProfileForm({ organizationId });
   const operations = useOrganizationOperationsForm({ organizationId });
 
-  const coreDirty = useStore(core.form.store, (state) => state.isDirty);
-  const profileDirty = useStore(profile.form.store, (state) => state.isDirty);
-  const operationsDirty = useStore(operations.form.store, (state) => state.isDirty);
-
-  const save = useFormOrchestrator({
-    forms: [core, profile, operations] as const,
+  const formOrchestrator = useFormOrchestrator({
+    forms: [profile, operations] as const,
     retry: { maxRetries: 1, delayMs: 500 },
   });
 
   const [submitError, setSubmitError] = useState<unknown>();
 
-  const ready = core.isReady && profile.isReady && operations.isReady;
-  const readError = core.readError || profile.readError || operations.readError;
-  const dirtyCount = [coreDirty, profileDirty, operationsDirty].filter(Boolean).length;
+  const ready = profile.isReady && operations.isReady;
+  const readError = profile.readError || operations.readError;
 
   return (
     <section className="workspace-section">
       <div className="workspace-section-heading">
-        <h2>Organization, Profile, and Operations</h2>
+        <h2>Organization configuration</h2>
       </div>
       <form
         className="resource-editor configuration-form"
         onSubmit={(event) => {
           event.preventDefault();
           setSubmitError(undefined);
-          if (!dirtyCount) {
-              return
-          };
+          if (!formOrchestrator.isDirty) {
+            return;
+          }
 
-          save.submit().catch(setSubmitError);
+          formOrchestrator.submit().catch(setSubmitError);
         }}
       >
         {readError ? (
@@ -150,14 +140,7 @@ function OrganizationWorkspaceForm({
         ) : (
           !ready && <p role="status">Loading configuration...</p>
         )}
-        <fieldset disabled={save.isSaving || !ready} className="editor-fields">
-          <section className="workspace-details">
-            <h3>Organization</h3>
-            <OrganizationFields form={core.form} fields={core.fields} />
-            <p className="resource-updated">
-              Updated {new Date(organization.updatedAt).toLocaleString()}
-            </p>
-          </section>
+        <fieldset disabled={formOrchestrator.isSaving || !ready} className="editor-fields">
           <section className="workspace-details">
             <h3>Profile</h3>
             <ProfileFields form={profile.form} />
@@ -166,32 +149,32 @@ function OrganizationWorkspaceForm({
             <h3>Operations</h3>
             <OperationsFields form={operations.form} />
           </section>
-          <button className="primary-action" type="submit" disabled={save.isSaving || !dirtyCount}>
-            {save.isSaving
+          <button
+            className="primary-action"
+            type="submit"
+            disabled={formOrchestrator.isSaving || !formOrchestrator.isDirty}
+          >
+            {formOrchestrator.isSaving
               ? "Saving changes..."
-              : dirtyCount
+              : formOrchestrator.isDirty
                 ? "Save changes"
                 : "No changes to save"}
           </button>
         </fieldset>
-        {save.phase !== "idle" && (
+        {formOrchestrator.phase !== "idle" && (
           <div role="status" aria-live="polite">
             <p>
-              {save.isSaving
-                ? `Save progress: ${save.phase}`
-                : outcomeMessage(save.result?.outcome)}
+              {formOrchestrator.isSaving
+                ? `Save progress: ${formOrchestrator.phase}`
+                : outcomeMessage(formOrchestrator.result?.outcome)}
             </p>
             <ul>
-              {(["resource", "profile", "operations"] as const).map((formId) => {
-                const state = save.result?.forms[formId];
+              {(["profile", "operations"] as const).map((formId) => {
+                const state = formOrchestrator.result?.forms[formId];
                 const status = state?.status ?? "unchanged";
                 return (
                   <li key={formId}>
-                    {formId === "resource"
-                      ? "Organization"
-                      : formId === "profile"
-                        ? "Profile"
-                        : "Operations"}
+                    {formId === "profile" ? "Profile" : "Operations"}
                     : {status}
                     {state?.attempts
                       ? ` (${state.attempts} ${state.attempts === 1 ? "attempt" : "attempts"})`

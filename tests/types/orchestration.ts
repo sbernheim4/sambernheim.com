@@ -10,18 +10,18 @@ const profile = defineForm({
   toMutationPayload: (values) => ({ name: values.displayName }),
   endpoint: {
     mutationFn: mutateAsync,
-    cacheUpdates: [
-      {
-        queryKey: ({ response, variables }) => [response.profile.id, variables.name],
-        getData: (response) => response.profile,
-      },
-      {
-        queryKey: () => ["name"],
-        getData: (response) => response.profile.name,
-      },
-      { queryKey: () => ["envelope"] },
-    ],
   },
+  cacheUpdates: [
+    {
+      queryKey: ({ response, variables }) => [response.profile.id, variables.name],
+      getData: (response) => response.profile,
+    },
+    {
+      queryKey: () => ["name"],
+      getData: (response) => response.profile.name,
+    },
+    { queryKey: () => ["envelope"] },
+  ],
   onSuccess: ({ response, variables, formValues }) => {
     response.profile.name satisfies string;
     variables.name satisfies string;
@@ -40,8 +40,8 @@ defineForm({
   }),
   endpoint: {
     mutationFn: mutateAsync,
-    cacheUpdates: [{ queryKey: ({ results }) => [results.profile?.profile.id] }],
   },
+  cacheUpdates: [{ queryKey: ({ results }) => [results.profile?.profile.id] }],
 });
 // @ts-expect-error mapper is required when form and mutation shapes differ
 defineForm({

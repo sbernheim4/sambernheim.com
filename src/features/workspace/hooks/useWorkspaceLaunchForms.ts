@@ -36,8 +36,8 @@ export function useWorkspaceLaunchForms(appendActivity: (text: string) => void) 
     defaultValues: organizationDefaults,
     endpoint: {
       mutationFn: createOrganization.mutateAsync,
-      cacheUpdates: organizationCacheUpdates(),
     },
+    cacheUpdates: organizationCacheUpdates(),
     onSuccess: ({ response }) =>
       appendActivity(`Saved organization: ${response.organization.name}`),
   });
@@ -51,8 +51,8 @@ export function useWorkspaceLaunchForms(appendActivity: (text: string) => void) 
     },
     endpoint: {
       mutationFn: createProject.mutateAsync,
-      cacheUpdates: projectCacheUpdates(),
     },
+    cacheUpdates: projectCacheUpdates(),
     onSuccess: ({ response }) => appendActivity(`Saved project: ${response.project.name}`),
   });
   const task = useComposableForm({
@@ -70,8 +70,8 @@ export function useWorkspaceLaunchForms(appendActivity: (text: string) => void) 
     },
     endpoint: {
       mutationFn: createTask.mutateAsync,
-      cacheUpdates: taskCacheUpdates(),
     },
+    cacheUpdates: taskCacheUpdates(),
     onSuccess: ({ response }) => appendActivity(`Saved task: ${response.task.title}`),
   });
   const save = useFormOrchestrator({

@@ -57,9 +57,8 @@ export type OutcomeCallbacks<V, I, R, Results = {}> = {
   onSuccess?: (context: SuccessContext<V, I, R, Results>) => void | Promise<void>;
   onFailure?: (context: FailureContext<V, I>) => void | Promise<void>;
 };
-export type Endpoint<M extends AsyncMutation, Results = {}> = RefreshOptions & {
+export type Endpoint<M extends AsyncMutation> = {
   mutationFn: M;
-  cacheUpdates?: readonly CacheUpdate<Response<NoInfer<M>>, Input<NoInfer<M>>, Results>[];
   /** Only idempotent operations may opt into automatic retries. */
   retrySafe?: boolean;
 };
@@ -80,13 +79,12 @@ export type AnyForm = {
   onSuccess?: (...args: any[]) => void | Promise<void>;
   onFailure?: (...args: any[]) => void | Promise<void>;
   retry?: RetryPolicy;
-  endpoint: RefreshOptions & {
+  refetchFunctions?: readonly (() => unknown)[];
+  invalidateQueryKeys?: readonly QueryKey[];
+  cacheUpdates?: readonly CacheUpdate<never, any, any>[];
+  endpoint: {
     mutationFn: AsyncMutation;
     retrySafe?: boolean;
-    cacheUpdates?: readonly ({ queryKey: (...args: any[]) => QueryKey } & (
-      | { getData?: (...args: any[]) => unknown; update?: never }
-      | { getData?: never; update: (...args: any[]) => unknown }
-    ))[];
   };
 };
 export type ResponsesOf<F extends readonly AnyForm[]> = {
@@ -105,7 +103,14 @@ export type FormConfig<
     validate: (values: V) => ValidationResult | Promise<ValidationResult>;
     markSaved?: (values: V) => void | Promise<void>;
     finish?: () => void;
-    endpoint: Endpoint<M, Partial<ResponsesOf<D>>>;
+    endpoint: Endpoint<M>;
+    refetchFunctions?: readonly (() => unknown)[];
+    invalidateQueryKeys?: readonly QueryKey[];
+    cacheUpdates?: readonly CacheUpdate<
+      Response<NoInfer<M>>,
+      Input<NoInfer<M>>,
+      Partial<ResponsesOf<D>>
+    >[];
     retry?: RetryPolicy;
   };
 

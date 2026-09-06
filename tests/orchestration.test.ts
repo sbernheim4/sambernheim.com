@@ -135,25 +135,25 @@ test("partial failure retains persistence, waits for every refresh, reconciles t
         log.push("write a");
         return { name: v };
       },
-      refetchFunctions: [
-        () => {
-          throw Error("refresh");
-        },
-        async () => {
-          await gate.promise;
-          qc.setQueryData(["summary"], "stale");
-          log.push("refetched");
-        },
-      ],
-      cacheUpdates: [
-        {
-          queryKey: () => {
-            throw Error("key");
-          },
-        },
-        { queryKey: () => ["summary"], getData: (r) => r.name },
-      ],
     },
+    refetchFunctions: [
+      () => {
+        throw Error("refresh");
+      },
+      async () => {
+        await gate.promise;
+        qc.setQueryData(["summary"], "stale");
+        log.push("refetched");
+      },
+    ],
+    cacheUpdates: [
+      {
+        queryKey: () => {
+          throw Error("key");
+        },
+      },
+      { queryKey: () => ["summary"], getData: (r) => r.name },
+    ],
     markSaved: () => {
       log.push("form-state");
     },
@@ -247,15 +247,15 @@ test("invalidation and direct refetch settle before injection; successful writes
         writes++;
         return v;
       },
-      invalidateQueryKeys: [["resource"]],
-      refetchFunctions: [
-        observer.refetch.bind(observer),
-        () => {
-          throw Error("sync");
-        },
-      ],
-      cacheUpdates: [{ queryKey: () => ["resource"] }],
     },
+    invalidateQueryKeys: [["resource"]],
+    refetchFunctions: [
+      observer.refetch.bind(observer),
+      () => {
+        throw Error("sync");
+      },
+    ],
+    cacheUpdates: [{ queryKey: () => ["resource"] }],
     onSuccess: async () => {
       throw Error("toast");
     },
@@ -343,17 +343,17 @@ test("active runs retain callback definitions; group cache targets follow childr
         await wait.promise;
         return { value: v };
       },
-      cacheUpdates: [
-        {
-          queryKey: ({ variables }) => ["child", variables],
-          getData: (response) => {
-            log.push("child cache");
-            return response.value;
-          },
-        },
-        { queryKey: () => ["keep"], getData: () => undefined },
-      ],
     },
+    cacheUpdates: [
+      {
+        queryKey: ({ variables }) => ["child", variables],
+        getData: (response) => {
+          log.push("child cache");
+          return response.value;
+        },
+      },
+      { queryKey: () => ["keep"], getData: () => undefined },
+    ],
     onSuccess: async () => {
       await Promise.resolve();
       log.push("child callback");
@@ -388,7 +388,7 @@ test("active runs retain callback definitions; group cache targets follow childr
   first.onSuccess = () => {
     log.push("replacement child callback");
   };
-  first.endpoint.cacheUpdates = [];
+  first.cacheUpdates = [];
   wait.resolve();
   const result = await pending;
   assert.equal(result.outcome, "success");

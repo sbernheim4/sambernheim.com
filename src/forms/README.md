@@ -16,7 +16,7 @@ components, or notification libraries.
   refreshes queries, updates caches, accepts saved values, and calls outcomes.
   Its local helpers also guard Clear All until the complete save has finished.
 - `orchestration/types.ts` describes form configurations, endpoints, and results.
-- `hooks/formState.ts` validates detached TanStack snapshots and resets saved
+- `hooks/formState.ts` resets saved
   form defaults without overwriting edits made during submission.
 - `hooks/useAppForm.ts`, `context.ts`, and `ui/fields.tsx` register and render fields.
 
@@ -75,7 +75,11 @@ request. A mapped input is calculated once and retained across retries.
 
 ## Save sequence and results
 
-1. Capture all form configurations and form values. Validate every snapshot.
+1. Capture all form configurations and form values. Run native TanStack field
+   and form validation on each live form; `config.validate` is registered as its
+   form-level submit validator. Disable inputs while saving, including validation:
+   validators can observe live edits during an asynchronous run. Captured values
+   are retained for mutation payloads and retries.
    Validation or independent mapping failures prevent all writes.
 2. Save in declared order. Record each acknowledged response immediately. Retry
    only retry-safe endpoints for qualifying errors; stop and skip remaining
