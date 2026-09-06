@@ -27,7 +27,7 @@ const profile = defineForm({
     variables.name satisfies string;
     formValues.displayName satisfies string;
     // @ts-expect-error unrelated response
-    response.operations;
+    void response.operations;
   },
 });
 defineForm({
@@ -77,7 +77,7 @@ const incorrect: CacheTarget<{ name: string }, {}, number> = {
 declare const result: SaveResult<readonly [typeof profile]>;
 result.responses.profile?.profile.name satisfies string | undefined;
 // @ts-expect-error response keyed by literal form ID
-result.responses.operations;
+void result.responses.operations;
 void identity;
 void incorrect;
 
@@ -99,7 +99,7 @@ const binding = useComposableForm({
 binding.form.state.values.display satisfies string;
 binding.form.state.values.active satisfies boolean;
 // @ts-expect-error query fields are not form fields
-binding.form.state.values.nested;
+void binding.form.state.values.nested;
 useQueryBackedForm({
   defaultValues: query.data,
   query,
@@ -138,16 +138,16 @@ const standalone = useQueryBackedForm({
     variables.name satisfies string;
     formValues.display satisfies string;
     // @ts-expect-error callbacks must retain the actual response shape
-    response.task;
+    void response.task;
   },
 });
 standalone.form.state.values.display satisfies string;
 // @ts-expect-error form values are derived from defaults, not query data
-standalone.form.state.values.nested;
+void standalone.form.state.values.nested;
 // @ts-expect-error field updates must match the field value type
 standalone.form.setFieldValue("display", 123);
 // @ts-expect-error bindings no longer have a participant wrapper
-standalone.participant;
+void standalone.participant;
 
 // @ts-expect-error every form must declare its initial values
 useQueryBackedForm({ query, endpoint: { mutationFn: mutateAsync } });
@@ -159,7 +159,7 @@ useComposableForm({
   toMutationPayload: (values, { results }) => {
     results.profile?.profile.id satisfies string | undefined;
     // @ts-expect-error only declared dependencies appear in results
-    results.operations;
+    void results.operations;
     return values;
   },
   endpoint: { mutationFn: mutateAsync },
