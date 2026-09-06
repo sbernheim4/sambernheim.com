@@ -19,12 +19,12 @@ import {
   useTaskWorkspace,
 } from "../hooks/useWorkspaceResources";
 import { OrganizationEditor, ProjectEditor, TaskEditor } from "./ResourceEditors";
-import { useOrganizationForm } from "../hooks/forms";
 import {
   useOrganizationOperationsForm,
   useOrganizationProfileForm,
 } from "../hooks/organizationConfigurationForms";
 import { useFormOrchestrator } from "../../../forms/hooks/useFormOrchestrator";
+import { Form, useFormContext } from "../../../forms/ui/FormComponents";
 import { regionOptions, sectorOptions } from "../fieldOptions";
 
 export function OrganizationsPage() {
@@ -106,125 +106,104 @@ function OrganizationWorkspaceForm({
 
   const ready = profile.isReady && operations.isReady;
   const readError = profile.readError || operations.readError;
+  const aggregateForm = {
+    handleSubmit: () => formOrchestrator.submit(),
+    reset: () => {
+      profile.form.reset();
+      operations.form.reset();
+    },
+  };
 
   return (
     <section className="workspace-section">
       <div className="workspace-section-heading">
         <h2>Organization configuration</h2>
       </div>
-      <form
-        className="resource-editor configuration-form"
-        onSubmit={(event) => {
-          event.preventDefault();
-          setSubmitError(undefined);
-          if (!formOrchestrator.isDirty) {
-            return;
-          }
-
-          formOrchestrator.submit().catch(setSubmitError);
+      <Form.Provider
+        value={{
+          form: aggregateForm,
+          forms: {
+            profile: profile.form,
+            operations: operations.form,
+          },
+          isReady: ready,
+          isSaving: formOrchestrator.isSaving,
+          isDirty: formOrchestrator.isDirty,
+          onChange: () => setSubmitError(undefined),
+          onSubmitError: setSubmitError,
         }}
       >
-        {readError ? (
-          <p className="form-error" role="alert">
-            Unable to load configuration.{" "}
-            <button
-              type="button"
-              onClick={() => {
-                void profile.retryRead();
-                void operations.retryRead();
-              }}
-            >
-              Retry
-            </button>
-          </p>
-        ) : (
-          !ready && <p role="status">Loading configuration...</p>
-        )}
-        <fieldset disabled={formOrchestrator.isSaving || !ready} className="editor-fields">
-          <section className="workspace-details">
-            <h3>Profile</h3>
-            <ProfileFields form={profile.form} />
-          </section>
-          <section className="workspace-details">
-            <h3>Operations</h3>
-            <OperationsFields form={operations.form} />
-          </section>
-          <button
-            className="primary-action"
-            type="submit"
-            disabled={formOrchestrator.isSaving || !formOrchestrator.isDirty}
-          >
-            {formOrchestrator.isSaving
-              ? "Saving changes..."
-              : formOrchestrator.isDirty
-                ? "Save changes"
-                : "No changes to save"}
-          </button>
-        </fieldset>
-        {formOrchestrator.phase !== "idle" && (
-          <div role="status" aria-live="polite">
-            <p>
-              {formOrchestrator.isSaving
-                ? `Save progress: ${formOrchestrator.phase}`
-                : outcomeMessage(formOrchestrator.result?.outcome)}
+        <Form.Shell>
+          {readError ? (
+            <p className="form-error" role="alert">
+              Unable to load configuration.{" "}
+              <button
+                type="button"
+                onClick={() => {
+                  void profile.retryRead();
+                  void operations.retryRead();
+                }}
+              >
+                Retry
+              </button>
             </p>
-            <ul>
-              {(["profile", "operations"] as const).map((formId) => {
-                const state = formOrchestrator.result?.forms[formId];
-                const status = state?.status ?? "unchanged";
-                return (
-                  <li key={formId}>
-                    {formId === "profile" ? "Profile" : "Operations"}
-                    : {status}
-                    {state?.attempts
-                      ? ` (${state.attempts} ${state.attempts === 1 ? "attempt" : "attempts"})`
-                      : ""}
-                    {state?.failure && (
-                      <span className="form-error"> — {String(state.failure.error)}</span>
-                    )}
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        )}
-        {!!submitError && (
-          <p className="form-error" role="alert">
-            {String(submitError)}
-          </p>
-        )}
-      </form>
+          ) : (
+            !ready && <p role="status">Loading configuration...</p>
+          )}
+          <Form.Fields>
+            <section className="workspace-details">
+              <h3>Profile</h3>
+              <ProfileFields />
+            </section>
+            <section className="workspace-details">
+              <h3>Operations</h3>
+              <OperationsFields />
+            </section>
+            <div className="form-actions">
+              <Form.SaveButton />
+              <Form.DiscardButton />
+            </div>
+          </Form.Fields>
+          {formOrchestrator.phase !== "idle" && (
+            <div role="status" aria-live="polite">
+              <p>
+                {formOrchestrator.isSaving
+                  ? `Save progress: ${formOrchestrator.phase}`
+                  : outcomeMessage(formOrchestrator.result?.outcome)}
+              </p>
+              <ul>
+                {(["profile", "operations"] as const).map((formId) => {
+                  const state = formOrchestrator.result?.forms[formId];
+                  const status = state?.status ?? "unchanged";
+                  return (
+                    <li key={formId}>
+                      {formId === "profile" ? "Profile" : "Operations"}
+                      : {status}
+                      {state?.attempts
+                        ? ` (${state.attempts} ${state.attempts === 1 ? "attempt" : "attempts"})`
+                        : ""}
+                      {state?.failure && (
+                        <span className="form-error"> — {String(state.failure.error)}</span>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          )}
+          {!!submitError && (
+            <p className="form-error" role="alert">
+              {String(submitError)}
+            </p>
+          )}
+        </Form.Shell>
+      </Form.Provider>
     </section>
   );
 }
 
-function OrganizationFields({
-  form,
-  fields,
-}: {
-  form: ReturnType<typeof useOrganizationForm>["form"];
-  fields: ReturnType<typeof useOrganizationForm>["fields"];
-}) {
-  return (
-    <>
-      {fields.map((item) => (
-        <form.AppField key={item.name} name={item.name}>
-          {(field) =>
-            item.mode === "radio" ? (
-              <field.RadioGroupField label={item.label} options={item.options ?? []} />
-            ) : item.mode === "select" ? (
-              <field.SelectField label={item.label} options={item.options ?? []} />
-            ) : (
-              <field.TextField label={item.label} required />
-            )
-          }
-        </form.AppField>
-      ))}
-    </>
-  );
-}
-
-function ProfileFields({ form }: { form: ReturnType<typeof useOrganizationProfileForm>["form"] }) {
+function ProfileFields() {
+  const form = useFormContext<ReturnType<typeof useOrganizationProfileForm>["form"]>("profile");
   return (
     <>
       <form.AppField
@@ -242,11 +221,10 @@ function ProfileFields({ form }: { form: ReturnType<typeof useOrganizationProfil
   );
 }
 
-function OperationsFields({
-  form,
-}: {
-  form: ReturnType<typeof useOrganizationOperationsForm>["form"];
-}) {
+function OperationsFields() {
+  const form = useFormContext<ReturnType<typeof useOrganizationOperationsForm>["form"]>(
+    "operations",
+  );
   return (
     <>
       <form.AppField name="isActive">
