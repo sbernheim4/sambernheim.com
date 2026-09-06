@@ -22,18 +22,6 @@ export type SaveState<P extends readonly AnyForm[]> = {
   result?: SaveResult<P>;
 };
 
-const isTransientError = (error: unknown) => {
-  if (!error || typeof error !== "object") {
-    return false;
-  }
-
-  if ("status" in error && typeof error.status === "number") {
-    return error.status === 408 || error.status === 429 || error.status >= 500;
-  }
-
-  return error instanceof TypeError; // fetch network failures; only used by retry-safe endpoints
-};
-
 export const createOrchestrator = <P extends readonly AnyForm[]>(
   queryClient: QueryClient,
   onChange: (state: SaveState<P>) => void = () => {},
@@ -46,44 +34,13 @@ export const createOrchestrator = <P extends readonly AnyForm[]>(
         return active;
       }
 
-      // Capture definitions/callbacks at submission, never read a React ref during a run.
-      const captured = {
-        ...config,
-        forms: config.forms.map((form) => ({
-          ...form,
-          dependencies: form.dependencies?.map(({ id }) => ({ id })),
-          retry: form.retry && { ...form.retry },
-          refetchFunctions: form.refetchFunctions?.slice(),
-          invalidateQueryKeys: form.invalidateQueryKeys?.map((key) => [...key]),
-          cacheUpdates: form.cacheUpdates?.map((target) => ({ ...target })),
-          endpoint: {
-            ...form.endpoint,
-          },
-        })),
-        retry: config.retry && { ...config.retry },
-        refetchFunctions: config.refetchFunctions?.slice(),
-        invalidateQueryKeys: config.invalidateQueryKeys?.map((key) => [...key]),
-        cacheUpdates: config.cacheUpdates?.map((target) => ({ ...target })),
-      };
-
-      const forms = captured.forms;
-      const seen = new Set<string>();
-
-      for (const form of forms) {
-        const hasBeenProcessed = seen.has(form.id);
-        if (hasBeenProcessed) {
-          return Promise.reject(new Error(`Duplicate form ID: ${form.id}`));
-        }
-
-        const isOutOfOrderDep = form.dependencies?.some(({ id }) => !seen.has(id));
-        if (isOutOfOrderDep) {
-          return Promise.reject(new Error(`Dependencies for ${form.id} must precede it.`));
-        }
-
-        seen.add(form.id);
+      const { forms } = config;
+      const errors = preflightFormsChecks(forms);
+      if (errors.length) {
+          return Promise.reject(new AggregateError(errors, "Form preflight checks failed"));
       }
 
-      active = run(captured as unknown as SaveConfig<P>).finally(() => {
+      active = run(config).finally(() => {
         active = undefined;
       });
 
@@ -197,6 +154,45 @@ export const createOrchestrator = <P extends readonly AnyForm[]>(
 
     return result;
   }
+};
+
+const preflightFormsChecks = <P extends readonly AnyForm[]>(
+  forms: P,
+): Error[] => {
+  const seen = new Set<string>();
+  const errors: Error[] = [];
+
+  for (const form of forms) {
+    if (seen.has(form.id)) {
+      errors.push(new Error(`Duplicate form ID: ${form.id}`));
+    }
+
+    const isOutOfOrderDep = form.dependencies?.some(
+      ({ id }) => !seen.has(id),
+    );
+
+    if (isOutOfOrderDep) {
+      errors.push(
+        new Error(`Dependencies for ${form.id} must precede it.`),
+      );
+    }
+
+    seen.add(form.id);
+  }
+
+  return errors;
+};
+
+const isTransientError = (error: unknown) => {
+  if (!error || typeof error !== "object") {
+    return false;
+  }
+
+  if ("status" in error && typeof error.status === "number") {
+    return error.status === 408 || error.status === 429 || error.status >= 500;
+  }
+
+  return error instanceof TypeError; // fetch network failures; only used by retry-safe endpoints
 };
 
 const settleRefreshes = async (
