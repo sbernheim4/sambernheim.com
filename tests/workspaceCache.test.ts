@@ -1,7 +1,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { QueryClient } from "@tanstack/react-query";
-import { updateCacheWithMutationResponse } from "../src/forms/orchestration/orchestrator.ts";
+import { createOrchestrator } from "../src/forms/orchestration/orchestrator.ts";
+import { defineForm } from "./formConfig";
 import {
   profileCacheUpdates,
   operationsCacheUpdates,
@@ -13,7 +14,6 @@ import {
 } from "../src/features/workspace/cachePolicies.ts";
 import { reconcileWorkspaceRead } from "../src/features/workspace/cache.ts";
 import { clearWorkspace } from "../src/features/workspace/clearWorkspace.ts";
-import { getSaveGuard } from "../src/forms/orchestration/orchestrator.ts";
 import { workspaceKeys as keys, bootstrapKey } from "../src/features/workspace/queries.ts";
 import type { Organization } from "../src/features/workspace/types.ts";
 const organization: Organization = {
@@ -39,15 +39,19 @@ const client = () =>
 
 test("two children merge owned fields into every summary and later stale navigation reads retain both", async () => {
   const qc = client();
-  const context = { queryClient: qc, results: {} };
-  updateCacheWithMutationResponse(
-    {
-      ...context,
-      response: { organization, readModelLagMs: 2500 },
-      variables: undefined,
+  const organizationForm = defineForm({
+    id: "organization",
+    snapshot: () => organization,
+    validate: () => ({ valid: true }),
+    endpoint: {
+      mutationFn: async (_input: Organization) => ({ organization, readModelLagMs: 2500 }),
     },
-    organizationCacheUpdates(),
-  );
+    cacheUpdates: organizationCacheUpdates(),
+  });
+  const created = await createOrchestrator<readonly [typeof organizationForm]>(qc).submit({
+    forms: [organizationForm],
+  });
+  assert.equal(created.outcome, "success");
   const profile = {
     organizationId: "org-1",
     name: "New",
@@ -60,28 +64,29 @@ test("two children merge owned fields into every summary and later stale navigat
     region: "west" as const,
     updatedAt: "3",
   };
-  assert.deepEqual(
-    updateCacheWithMutationResponse(
-      {
-        ...context,
-        response: { profile, readModelLagMs: 2500 },
-        variables: profile,
-      },
-      profileCacheUpdates(organization),
-    ),
-    [],
-  );
-  assert.deepEqual(
-    updateCacheWithMutationResponse(
-      {
-        ...context,
-        response: { operations, readModelLagMs: 2500 },
-        variables: operations,
-      },
-      operationsCacheUpdates(organization),
-    ),
-    [],
-  );
+  const profileForm = defineForm({
+    id: "profile",
+    snapshot: () => profile,
+    validate: () => ({ valid: true }),
+    endpoint: {
+      mutationFn: async (_input: typeof profile) => ({ profile, readModelLagMs: 2500 }),
+    },
+    cacheUpdates: profileCacheUpdates(organization),
+  });
+  const operationsForm = defineForm({
+    id: "operations",
+    snapshot: () => operations,
+    validate: () => ({ valid: true }),
+    endpoint: {
+      mutationFn: async (_input: typeof operations) => ({ operations, readModelLagMs: 2500 }),
+    },
+    cacheUpdates: operationsCacheUpdates(organization),
+  });
+  const saved = await createOrchestrator<readonly [typeof profileForm, typeof operationsForm]>(
+    qc,
+  ).submit({ forms: [profileForm, operationsForm] });
+  assert.equal(saved.outcome, "success");
+  assert.deepEqual(saved.followUpErrors, []);
   for (const key of [keys.organizations.detail("org-1"), keys.organizations.list(), bootstrapKey]) {
     const data: any = qc.getQueryData(key);
     const summary = Array.isArray(data)
@@ -126,9 +131,8 @@ test("partial profile save preserves operations and newer operations timestamp c
   assert.equal(merged.region, "west");
 });
 
-test("project/task saves populate parent lists, detail caches, and bootstrap", () => {
+test("project/task saves populate parent lists, detail caches, and bootstrap", async () => {
   const qc = client();
-  const context = { queryClient: qc, results: {}, variables: undefined };
   const project = {
     id: "p",
     organizationId: "org-1",
@@ -148,36 +152,54 @@ test("project/task saves populate parent lists, detail caches, and bootstrap", (
     dueWindow: "this-week" as const,
     updatedAt: "1",
   };
-  updateCacheWithMutationResponse(
-    { ...context, response: { project, readModelLagMs: 2500 } },
-    projectCacheUpdates(),
+  const projectForm = defineForm({
+    id: "project",
+    snapshot: () => project,
+    validate: () => ({ valid: true }),
+    endpoint: {
+      mutationFn: async (_input: typeof project) => ({ project, readModelLagMs: 2500 }),
+    },
+    cacheUpdates: projectCacheUpdates(),
+  });
+  const taskForm = defineForm({
+    id: "task",
+    snapshot: () => task,
+    validate: () => ({ valid: true }),
+    endpoint: {
+      mutationFn: async (_input: typeof task) => ({ task, readModelLagMs: 2500 }),
+    },
+    cacheUpdates: taskCacheUpdates(),
+  });
+  const saved = await createOrchestrator<readonly [typeof projectForm, typeof taskForm]>(qc).submit(
+    { forms: [projectForm, taskForm] },
   );
-  updateCacheWithMutationResponse(
-    { ...context, response: { task, readModelLagMs: 2500 } },
-    taskCacheUpdates(),
-  );
+  assert.equal(saved.outcome, "success");
+  assert.deepEqual(saved.followUpErrors, []);
   assert.deepEqual(qc.getQueryData(keys.projects.forOrganization("org-1")), [project]);
   assert.deepEqual(qc.getQueryData(keys.tasks.forProject("p")), [task]);
   assert.deepEqual(qc.getQueryData(keys.projects.detail("p")), project);
   assert.deepEqual(qc.getQueryData(keys.tasks.detail("t")), task);
 });
 
-test("clear-all waits for lifecycle exclusion, removes resource caches, and blocks new saves during clear", async () => {
+test("clear-all calls the backend and resets workspace caches", async () => {
   const qc = client();
   qc.setQueryData(keys.organizationProfiles.detail("org-1"), { name: "saved" });
-  const release = getSaveGuard(qc).begin();
   let calls = 0;
   const request = async () => {
     calls++;
-    assert.throws(() => getSaveGuard(qc).begin(), /cleared/);
     return { organizations: [], projects: [], tasks: [] };
   };
-  assert.equal(await clearWorkspace(qc, request), false);
-  release();
   assert.equal(await clearWorkspace(qc, request), true);
   assert.equal(calls, 1);
   assert.equal(qc.getQueryData(keys.organizationProfiles.detail("org-1")), undefined);
   assert.deepEqual(qc.getQueryData(keys.organizations.list()), []);
+  assert.deepEqual(qc.getQueryData(keys.projects.list()), []);
+  assert.deepEqual(qc.getQueryData(keys.tasks.list()), []);
+  assert.deepEqual(qc.getQueryData(bootstrapKey), {
+    organizations: [],
+    projects: [],
+    tasks: [],
+  });
 });
 
 import { QueryObserver } from "@tanstack/react-query";

@@ -12,7 +12,6 @@ import {
 import { useCreateOrganization } from "../src/features/workspace/hooks/mutations";
 import { useWorkspaceLaunchForms } from "../src/features/workspace/hooks/useWorkspaceLaunchForms";
 import { workspaceKeys } from "../src/features/workspace/queries";
-import { clearWorkspace } from "../src/features/workspace/clearWorkspace";
 
 Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
 const client = () =>
@@ -249,10 +248,6 @@ test("domain create mutateAsync owns one mutation, overrides inherited retries a
     assert.equal(current.isSaving, true);
     assert.equal(qc.getMutationCache().getAll().length, 1);
     assert.equal(qc.getMutationCache().getAll()[0].options.retry, false);
-    assert.equal(
-      await clearWorkspace(qc, async () => assert.fail("must not clear in refresh phase")),
-      false,
-    );
     await act(async () => {
       refresh.resolve();
       await pending!;

@@ -2,8 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { QueryClient, QueryObserver } from "@tanstack/react-query";
 import { defineForm } from "./formConfig";
-import { createOrchestrator } from "../src/forms/orchestration/orchestrator.ts";
-import { getSaveGuard } from "../src/forms/orchestration/orchestrator.ts";
+import { type SaveState, createOrchestrator } from "../src/forms/orchestration/orchestrator.ts";
 const client = () =>
   new QueryClient({
     defaultOptions: { queries: { retry: false, gcTime: Infinity } },
@@ -202,8 +201,6 @@ test("partial failure retains persistence, waits for every refresh, reconciles t
     },
   });
   await new Promise((r) => setTimeout(r, 15));
-  assert.equal(getSaveGuard(qc).getSnapshot(), 1);
-  assert.equal(getSaveGuard(qc).beginClear(), undefined);
   assert.deepEqual(log, ["write a"]);
   gate.resolve();
   const result = await pending;
@@ -219,7 +216,6 @@ test("partial failure retains persistence, waits for every refresh, reconciles t
     "b failure",
     "group failure",
   ]);
-  assert.equal(getSaveGuard(qc).getSnapshot(), 0);
 });
 
 test("invalidation and direct refetch settle before injection; successful writes never retry for follow-up failures", async () => {
@@ -280,7 +276,7 @@ test("invalidation and direct refetch settle before injection; successful writes
   unsub();
 });
 
-test("duplicate IDs, reversed dependencies and clear lock reject before writes", async () => {
+test("duplicate IDs and reversed dependencies reject before writes", async () => {
   const qc = client();
   const p = defineForm({
     id: "p",
@@ -297,9 +293,6 @@ test("duplicate IDs, reversed dependencies and clear lock reject before writes",
     endpoint: { mutationFn: async (_v: number) => 1 },
   });
   await assert.rejects(createOrchestrator(qc).submit({ forms: [dependent, p] }), /precede/);
-  const release = getSaveGuard(qc).beginClear()!;
-  await assert.rejects(createOrchestrator(qc).submit({ forms: [p] }), /cleared/);
-  release();
 });
 
 test("permanent errors and non-idempotent creates never automatically retry", async () => {
@@ -437,4 +430,115 @@ test("dependency mapping errors skip their request, preserve successful parents 
   assert.equal(result.outcome, "partial-failure");
   assert.equal(result.responses.parent, 1);
   assert.deepEqual(log, ["parent saved", "child failed"]);
+});
+
+// Retained progress must describe the moment it was emitted, even after later
+// attempts, dependent writes, and follow-up failures have completed.
+test("progress retains retry states and prior responses without later mutation", async () => {
+  let attempts = 0;
+  const first = defineForm({
+    id: "first",
+    snapshot: () => ({ name: "submitted" }),
+    validate: valid,
+    endpoint: {
+      retrySafe: true,
+      mutationFn: async (input: { name: string }) => {
+        attempts++;
+        if (attempts === 1) {
+          throw { status: 503 };
+        }
+        return { id: input.name };
+      },
+    },
+    onSuccess: () => {
+      throw new Error("callback");
+    },
+  });
+  const second = defineForm({
+    id: "second",
+    dependencies: [first],
+    snapshot: () => ({ name: "child" }),
+    validate: valid,
+    toMutationPayload: (values, { results }) => ({
+      name: results.first!.id + ":" + values.name,
+    }),
+    endpoint: { mutationFn: async (input: { name: string }) => input },
+  });
+  const progress: SaveState<readonly [typeof first, typeof second]>[] = [];
+  const snapshots: typeof progress = [];
+  const result = await createOrchestrator<readonly [typeof first, typeof second]>(
+    client(),
+    (state) => {
+      progress.push(state);
+      snapshots.push(structuredClone(state));
+      if (state.result) {
+        for (const entry of Object.values(state.result.forms)) {
+          Object.freeze(entry);
+        }
+        Object.freeze(state.result.forms);
+        Object.freeze(state.result.responses);
+        Object.freeze(state.result.followUpErrors);
+      }
+    },
+  ).submit({ forms: [first, second], retry: { delayMs: 0 } });
+
+  assert.deepEqual(progress, snapshots);
+  const saving = progress.filter((state) => state.phase === "saving");
+  assert.deepEqual(
+    saving.map((state) => [
+      state.result!.forms.first.status,
+      state.result!.forms.first.attempts,
+      state.result!.forms.second.status,
+    ]),
+    [
+      ["saving", 1, "ready"],
+      ["retrying", 1, "ready"],
+      ["saving", 2, "ready"],
+      ["saved", 2, "saving"],
+    ],
+  );
+  assert.deepEqual(saving[3].result!.responses.first, { id: "submitted" });
+  assert.equal(saving[0].result!.responses.first, undefined);
+  assert.deepEqual(result.responses.second, { name: "submitted:child" });
+  assert.equal(result.outcome, "saved-with-follow-up-errors");
+});
+
+test("snapshot and concurrent validation failures retain each form's failure", async () => {
+  const gate = deferred();
+  const broken = defineForm({
+    id: "broken",
+    snapshot: (): number => {
+      throw new Error("snapshot");
+    },
+    validate: () => assert.fail("snapshot failures must skip validation"),
+    endpoint: { mutationFn: async (value: number) => value },
+  });
+  const slow = defineForm({
+    id: "slow",
+    snapshot: () => 1,
+    validate: async () => {
+      await gate.promise;
+      return { valid: false as const, error: "slow validation" };
+    },
+    endpoint: { mutationFn: async (_value: number) => assert.fail("no writes") },
+  });
+  const fast = defineForm({
+    id: "fast",
+    snapshot: () => 2,
+    validate: () => ({ valid: false as const, error: "fast validation" }),
+    endpoint: { mutationFn: async (_value: number) => assert.fail("no writes") },
+  });
+  const pending = createOrchestrator<readonly [typeof broken, typeof slow, typeof fast]>(
+    client(),
+  ).submit({ forms: [broken, slow, fast] });
+  gate.resolve();
+  const result = await pending;
+  assert.equal(result.outcome, "validation-failed");
+  assert.match(String(result.forms.broken.failure?.error), /snapshot/);
+  assert.equal(result.forms.slow.failure?.error, "slow validation");
+  assert.equal(result.forms.fast.failure?.error, "fast validation");
+  assert.deepEqual(
+    Object.values(result.forms).map((state) => state.attempts),
+    [0, 0, 0],
+  );
 });

@@ -14,7 +14,6 @@ components, or notification libraries.
   participant wrapper or separate runtime form representation.
 - `orchestration/orchestrator.ts` captures values, validates, saves in order,
   refreshes queries, updates caches, accepts saved values, and calls outcomes.
-  Its local helpers also guard Clear All until the complete save has finished.
 - `orchestration/types.ts` describes form configurations, endpoints, and results.
 - `hooks/formState.ts` resets saved
   form defaults without overwriting edits made during submission.
@@ -142,7 +141,8 @@ replica reads, including missing list entries. Separate Profile/Operations versi
 timestamps prevent one child's version from hiding stale fields from the other.
 A replica 404 can use an existing cached resource, so immediate navigation after
 creation works. Clear-all resets active observers, removes inactive workspace
-caches, and prevents pending lifecycles from reinserting deleted records.
+caches, and repopulates empty lists. It is a developer reset convenience with no
+coordination with in-flight saves; use it once saves have settled.
 
 This policy fits the demo's clear-all deletion model. It does not guarantee
 monotonic reads across cache eviction, reloads, other clients, or external deletes.

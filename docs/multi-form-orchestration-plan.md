@@ -1,6 +1,6 @@
 # Multi-Form Orchestration — Next Steps
 
-The implementation is complete. Remaining work is optional follow-up:
+Remaining work is optional follow-up:
 
 1. Perform manual browser verification of the organization detail page:
    - edit Profile and Operations fields;

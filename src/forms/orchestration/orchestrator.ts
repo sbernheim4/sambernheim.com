@@ -11,22 +11,31 @@ import type {
   RefreshOptions,
 } from "./types.ts";
 
+// Helpers read caller-owned state and return their own updated values.
+type FormState = Readonly<FormSaveState<any, any, any>>;
+type FormStates = Readonly<Record<string, FormState>>;
+type Responses = Readonly<Record<string, any>>;
+
 export type SaveState<P extends readonly AnyForm[]> = {
   phase: Phase;
   isSaving: boolean;
   result?: SaveResult<P>;
 };
-export function isTransientError(error: unknown) {
-  if (!error || typeof error !== "object") return false;
-  if ("status" in error && typeof error.status === "number")
-    return error.status === 408 || error.status === 429 || error.status >= 500;
-  return error instanceof TypeError; // fetch network failures; only used by retry-safe endpoints
-}
 
-export function createOrchestrator<P extends readonly AnyForm[]>(
+const isTransientError = (error: unknown) => {
+  if (!error || typeof error !== "object") {
+    return false;
+  }
+  if ("status" in error && typeof error.status === "number") {
+    return error.status === 408 || error.status === 429 || error.status >= 500;
+  }
+  return error instanceof TypeError; // fetch network failures; only used by retry-safe endpoints
+};
+
+export const createOrchestrator = <P extends readonly AnyForm[]>(
   queryClient: QueryClient,
   onChange: (state: SaveState<P>) => void = () => {},
-) {
+) => {
   let active: Promise<SaveResult<P>> | undefined;
 
   return {
@@ -70,33 +79,25 @@ export function createOrchestrator<P extends readonly AnyForm[]>(
         seen.add(form.id);
       }
 
-      let release: () => void;
-
-      try {
-        release = getSaveGuard(queryClient).begin();
-      } catch (error) {
-        return Promise.reject(error);
-      }
-
       active = run(captured as unknown as SaveConfig<P>, forms).finally(() => {
         active = undefined;
-        release();
       });
 
       return active;
     },
 
     reset() {
-      if (active) return false;
+      if (active) {
+        return false;
+      }
       onChange({ phase: "idle", isSaving: false });
       return true;
     },
   };
 
   async function run(config: SaveConfig<P>, forms: AnyForm[]): Promise<SaveResult<P>> {
-    const states: Record<string, FormSaveState<any, any, any>> = Object.create(null);
-    const responses: Record<string, any> = Object.create(null);
-
+    let states = snapshotForms(forms);
+    let responses: Responses = Object.create(null);
     const result = {
       outcome: "validation-failed",
       forms: states,
@@ -104,27 +105,30 @@ export function createOrchestrator<P extends readonly AnyForm[]>(
       followUpErrors: [],
     } as unknown as SaveResult<P>;
 
-    const emit = toEmit(onChange, states, result, responses);
-    const fail = toFail(states);
+    const emit = (phase: Phase, currentStates = states, currentResponses = responses) => {
+      emitProgress(onChange, phase, result, currentStates, currentResponses);
+    };
 
-    // Snapshot every child before awaiting validation in any child.
-    snapshotForms(forms, states, fail);
-
+    // Every snapshot is captured synchronously before any validation starts.
     emit("validating");
 
-    await validateForms(forms, states, fail);
+    states = await validateForms(forms, states);
 
     if (!forms.some((form) => states[form.id].failure)) {
-      prepareIndependentPayloads(forms, states, fail);
+      states = prepareIndependentPayloads(forms, states);
     }
 
     const preflightPassed = !forms.some((form) => states[form.id].failure);
 
     if (preflightPassed) {
-      await saveFormsInOrder(forms, states, responses, fail, config, emit);
+      const saved = await saveFormsInOrder(forms, states, responses, config, emit);
+      states = saved.states;
+      responses = saved.responses;
     }
 
-    updateSkippedFormsState(states);
+    states = updateSkippedFormsState(states);
+    result.forms = states as SaveResult<P>["forms"];
+    result.responses = responses as SaveResult<P>["responses"];
 
     const successful = forms.filter((form) => states[form.id].status === "saved");
     const allSaved = successful.length === forms.length;
@@ -152,62 +156,37 @@ export function createOrchestrator<P extends readonly AnyForm[]>(
         config,
         queryClient,
       );
-      result.followUpErrors.push(...refreshAndCacheInvalidationErrors);
 
       emit("reconciling");
 
-      for (const form of successful) {
-        const formCacheUpdateErrors = updateCacheWithMutationResponse(
-          context(form),
-          form.cacheUpdates as readonly CacheUpdate<any, any, any>[] | undefined,
-          form.id,
-        );
-        result.followUpErrors.push(...formCacheUpdateErrors);
-      }
-
-      const configCacheUpdateErrors = updateCacheWithMutationResponse(
-        {
-          queryClient,
-          response: result.responses,
-          variables: undefined,
-          results: result.responses,
-        },
-        config.cacheUpdates,
+      const cacheUpdateErrors = reconcileCacheWithMutationResponses(
+        successful,
+        context,
+        result,
+        queryClient,
+        config,
       );
-      result.followUpErrors.push(...configCacheUpdateErrors);
 
-      // Mark submitted values as saved without clearing edits made during the save.
-      for (const form of successful) {
-        try {
-          await form.markSaved?.(structuredClone(states[form.id].formValues));
-        } catch (error) {
-          result.followUpErrors.push({
-            phase: "form-state",
-            formId: form.id,
-            error,
-          });
-        }
-      }
+      const markSavedErrors = await markFormsSaved(successful, states);
+
+      result.followUpErrors.push(
+          ...refreshAndCacheInvalidationErrors,
+          ...cacheUpdateErrors,
+          ...markSavedErrors
+      );
     }
 
     emit("effects");
 
-    const callbackErrors = await invokeFormCallbacks(forms, states, context);
-    result.followUpErrors.push(...callbackErrors);
-
-    if (allSaved && result.followUpErrors.length) {
-      result.outcome = "saved-with-follow-up-errors";
-    }
-
+    const formCallbackErrors = await invokeFormCallbacks(forms, states, context);
     const configCallbackErrors = await invokeConfigCallbacks(allSaved, config, result);
-    result.followUpErrors.push(...configCallbackErrors);
-
-    if (allSaved && result.followUpErrors.length) {
-      result.outcome = "saved-with-follow-up-errors";
-    }
-
     const formFinishErrors = invokeFormFinish(forms);
-    result.followUpErrors.push(...formFinishErrors);
+
+    result.followUpErrors.push(
+        ...formCallbackErrors,
+        ...configCallbackErrors,
+        ...formFinishErrors
+    );
 
     if (allSaved && result.followUpErrors.length) {
       result.outcome = "saved-with-follow-up-errors";
@@ -217,12 +196,12 @@ export function createOrchestrator<P extends readonly AnyForm[]>(
 
     return result;
   }
-}
+};
 
-async function settleRefreshes(
+const settleRefreshes = async (
   queryClient: QueryClient,
   sources: readonly (RefreshOptions & { formId?: string })[],
-): Promise<FollowUpError[]> {
+): Promise<FollowUpError[]> => {
   const refetchAndInvalidationsQueue = sources.flatMap((source) => [
     ...(source.invalidateQueryKeys ?? []).map((queryKey) => ({
       formId: source.formId,
@@ -248,8 +227,9 @@ async function settleRefreshes(
         "isError" in value &&
         value.isError &&
         "error" in value
-      )
+      ) {
         throw value.error;
+      }
     }),
   );
 
@@ -266,13 +246,13 @@ async function settleRefreshes(
   );
 
   return erroredRefetchAndInvalidations;
-}
+};
 
-export function updateCacheWithMutationResponse<R, I, Results>(
+const updateCacheWithMutationResponse = <R, I, Results>(
   context: CacheContext<R, I, Results>,
   cacheUpdates: readonly CacheUpdate<R, I, Results>[] = [],
   formId?: string,
-): FollowUpError[] {
+): FollowUpError[] => {
   const errors: FollowUpError[] = [];
 
   for (const cacheUpdate of cacheUpdates) {
@@ -293,85 +273,36 @@ export function updateCacheWithMutationResponse<R, I, Results>(
   }
 
   return errors;
-}
-
-// Clear All must wait for saves, cache updates, and callbacks to finish.
-const saveGuards = new WeakMap<QueryClient, ReturnType<typeof createSaveGuard>>();
-
-function createSaveGuard() {
-  let active = 0;
-  let clearing = false;
-  const listeners = new Set<() => void>();
-  const emit = () => listeners.forEach((listener) => listener());
-  return {
-    subscribe: (listener: () => void) => {
-      listeners.add(listener);
-      return () => {
-        listeners.delete(listener);
-      };
-    },
-    getSnapshot: () => active + Number(clearing),
-    begin: () => {
-      if (clearing) throw new Error("Workspace is being cleared.");
-      active++;
-      emit();
-      return () => {
-        active--;
-        emit();
-      };
-    },
-    beginClear: () => {
-      if (active || clearing) return undefined;
-      clearing = true;
-      emit();
-      return () => {
-        clearing = false;
-        emit();
-      };
-    },
-  };
-}
-
-export function getSaveGuard(client: QueryClient) {
-  let guard = saveGuards.get(client);
-  if (!guard) {
-    guard = createSaveGuard();
-    saveGuards.set(client, guard);
-  }
-  return guard;
-}
+};
 
 const validateForms = async (
-  forms: AnyForm[],
-  states: Record<string, FormSaveState<any, any, any>>,
-  fail: (form: AnyForm, phase: "validation" | "mapping" | "save", error: unknown) => void,
-) => {
-  await Promise.all(
-    forms.map(async (form) => {
-      if (states[form.id].failure) {
-        return;
+  forms: readonly AnyForm[],
+  states: FormStates,
+): Promise<FormStates> => {
+  const validated = await Promise.all(
+    forms.map(async (form): Promise<[string, FormState]> => {
+      const state = states[form.id];
+      if (state.failure) {
+        return [form.id, state];
       }
 
       try {
-        const validation = await form.validate(structuredClone(states[form.id].formValues));
-
-        if (!validation.valid) {
-          fail(form, "validation", validation.error);
-        } else {
-          states[form.id].status = "ready";
-        }
+        const validation = await form.validate(structuredClone(state.formValues));
+        return [
+          form.id,
+          validation.valid
+            ? { ...state, status: "ready" }
+            : getFailedState(state, "validation", validation.error),
+        ];
       } catch (error) {
-        fail(form, "validation", error);
+        return [form.id, getFailedState(state, "validation", error)];
       }
     }),
   );
+  return Object.fromEntries(validated);
 };
 
-const getVariables = (
-  form: AnyForm,
-  state: FormSaveState<any, any, any>,
-  responses: Record<string, any>,
-) => {
+const getVariables = (form: AnyForm, state: FormState, responses: Responses) => {
   const variables = structuredClone(
     form.toMutationPayload
       ? form.toMutationPayload(structuredClone(state.formValues), {
@@ -383,48 +314,45 @@ const getVariables = (
   return variables;
 };
 
-const prepareIndependentPayloads = (
-  forms: AnyForm[],
-  states: Record<string, FormSaveState<any, any, any>>,
-  fail: Fail,
-) => {
+const prepareIndependentPayloads = (forms: readonly AnyForm[], states: FormStates): FormStates => {
   // Discover independent mapping errors before issuing any writes.
-  for (const form of forms) {
-    if (form.dependencies?.length) {
-      continue;
-    }
+  return Object.fromEntries(
+    forms.map((form) => {
+      const state = states[form.id];
+      if (form.dependencies?.length) {
+        return [form.id, state];
+      }
 
-    try {
-      states[form.id].variables = getVariables(form, states[form.id], {});
-    } catch (error) {
-      fail(form, "mapping", error);
-    }
-  }
+      try {
+        return [form.id, { ...state, variables: getVariables(form, state, {}) }];
+      } catch (error) {
+        return [form.id, getFailedState(state, "mapping", error)];
+      }
+    }),
+  );
 };
 
-const snapshotForms = (
-  forms: AnyForm[],
-  states: Record<string, FormSaveState<any, any, any>>,
-  fail: (form: AnyForm, phase: "validation" | "mapping" | "save", error: unknown) => void,
-) => {
-  for (const form of forms) {
-    states[form.id] = {
-      formId: form.id,
-      status: "validating",
-      attempts: 0,
-    };
+const snapshotForms = (forms: readonly AnyForm[]): FormStates => {
+  return Object.fromEntries(
+    forms.map((form) => {
+      const state: FormState = {
+        formId: form.id,
+        status: "validating",
+        attempts: 0,
+      };
 
-    try {
-      states[form.id].formValues = structuredClone(form.snapshot());
-    } catch (error) {
-      fail(form, "validation", error);
-    }
-  }
+      try {
+        return [form.id, { ...state, formValues: structuredClone(form.snapshot()) }];
+      } catch (error) {
+        return [form.id, getFailedState(state, "validation", error)];
+      }
+    }),
+  );
 };
 
 const invokeFormCallbacks = async (
-  forms: AnyForm[],
-  states: Record<string, FormSaveState<any, any, any>>,
+  forms: readonly AnyForm[],
+  states: FormStates,
   context: (form: AnyForm) => {
     queryClient: QueryClient;
     response: any;
@@ -436,7 +364,7 @@ const invokeFormCallbacks = async (
     followUpErrors: FollowUpError[];
   },
 ): Promise<FollowUpError[]> => {
-  let callbackErrors: FollowUpError[] = [];
+  const callbackErrors: FollowUpError[] = [];
 
   for (const form of forms) {
     try {
@@ -475,6 +403,22 @@ const invokeConfigCallbacks = async <P extends readonly AnyForm[]>(
   }
 };
 
+// Mark submitted values as saved without clearing edits made during the save.
+const markFormsSaved = async (
+  forms: readonly AnyForm[],
+  states: FormStates,
+): Promise<FollowUpError[]> => {
+  const errors: FollowUpError[] = [];
+  for (const form of forms) {
+    try {
+      await form.markSaved?.(structuredClone(states[form.id].formValues));
+    } catch (error) {
+      errors.push({ phase: "form-state", formId: form.id, error });
+    }
+  }
+  return errors;
+};
+
 const invokeFormFinish = (forms: AnyForm[]): FollowUpError[] => {
   const finishErrors: FollowUpError[] = [];
 
@@ -497,21 +441,14 @@ const getOutcome = (hasSomeFailure: boolean, allSaved: boolean) => {
   return hasSomeFailure ? "validation-failed" : allSaved ? "success" : "partial-failure";
 };
 
-const invokeMutation = async (
-  form: AnyForm,
-  state: FormSaveState<any, any, any>,
-  responses: Record<string, any>,
-) => {
+const invokeMutation = async (form: AnyForm, state: FormState): Promise<FormState> => {
   const response = await form.endpoint.mutationFn(structuredClone(state.variables));
-  // Persistence is recorded immediately, before any follow-up work.
-  state.response = response;
-  responses[form.id] = response;
-  state.status = "saved";
+  return { ...state, response, status: "saved" };
 };
 
 const getRetryable = (
   form: AnyForm,
-  state: FormSaveState<any, any, any>,
+  state: FormState,
   error: unknown,
   retry: {
     maxRetries: number;
@@ -532,35 +469,29 @@ const getRetryable = (
 
 const saveFormWithRetry = async (
   form: AnyForm,
-  state: FormSaveState<any, any, any>,
+  initialState: FormState,
   retry: {
     maxRetries: number;
     delayMs: number | ((attempt: number, error: unknown) => number);
     shouldRetry: (error: unknown) => boolean;
   },
-  emit: (p: Phase) => void,
-  responses: Record<string, any>,
-  fail: (form: AnyForm, phase: "validation" | "mapping" | "save", error: unknown) => void,
-) => {
+  onProgress: (state: FormState) => void,
+): Promise<FormState> => {
+  let state = initialState;
   while (true) {
-    state.status = "saving";
-    state.attempts++;
-    emit("saving");
+    state = { ...state, status: "saving", attempts: state.attempts + 1 };
+    onProgress(state);
 
     try {
-      await invokeMutation(form, state, responses);
-      break;
+      return await invokeMutation(form, state);
     } catch (error) {
-      const retryable = getRetryable(form, state, error, retry);
-
-      if (!retryable) {
-        fail(form, "save", error);
-        break;
+      if (!getRetryable(form, state, error, retry)) {
+        return getFailedState(state, "save", error);
       }
 
-      state.status = "retrying";
-      emit("saving");
-      let delay = 500;
+      state = { ...state, status: "retrying" };
+      onProgress(state);
+      let delay: number;
 
       try {
         delay =
@@ -568,8 +499,7 @@ const saveFormWithRetry = async (
             ? retry.delayMs(state.attempts, error)
             : retry.delayMs;
       } catch {
-        fail(form, "save", error);
-        break;
+        return getFailedState(state, "save", error);
       }
 
       await new Promise((resolve) => setTimeout(resolve, Math.max(0, delay)));
@@ -578,21 +508,24 @@ const saveFormWithRetry = async (
 };
 
 const saveFormsInOrder = async <P extends readonly AnyForm[]>(
-  forms: AnyForm[],
-  states: Record<string, FormSaveState<any, any, any>>,
-  responses: Record<string, any>,
-  fail: (form: AnyForm, phase: "validation" | "mapping" | "save", error: unknown) => void,
+  forms: readonly AnyForm[],
+  initialStates: FormStates,
+  initialResponses: Responses,
   config: SaveConfig<P>,
-  emit: (p: Phase) => void,
-) => {
+  emit: (phase: Phase, states: FormStates, responses: Responses) => void,
+): Promise<{ states: FormStates; responses: Responses }> => {
+  // These accumulators belong to this helper, never to its caller.
+  const states = { ...initialStates };
+  const responses = { ...initialResponses };
+
   for (const form of forms) {
-    const state = states[form.id];
+    let state = states[form.id];
 
     if (form.dependencies?.length) {
       try {
-        state.variables = getVariables(form, state, responses);
+        state = { ...state, variables: getVariables(form, state, responses) };
       } catch (error) {
-        fail(form, "mapping", error);
+        states[form.id] = getFailedState(state, "mapping", error);
         break;
       }
     }
@@ -605,56 +538,60 @@ const saveFormsInOrder = async <P extends readonly AnyForm[]>(
       ...form.retry,
     };
 
-    await saveFormWithRetry(form, state, retry, emit, responses, fail);
+    state = await saveFormWithRetry(form, state, retry, (progress) => {
+      emit("saving", { ...states, [form.id]: progress }, { ...responses });
+    });
+    states[form.id] = state;
 
+    // Record persistence before the next dependent mapping or any follow-up.
+    if (state.status === "saved") {
+      responses[form.id] = state.response;
+    }
     if (state.failure) {
       break;
     }
   }
+
+  return { states, responses };
 };
 
-type Emit = (p: Phase) => void;
-const toEmit = <P extends readonly AnyForm[]>(
+const emitProgress = <P extends readonly AnyForm[]>(
   onChange: (state: SaveState<P>) => void,
-  states: Record<string, FormSaveState<any, any, any>>,
+  phase: Phase,
   result: SaveResult<P>,
-  responses: Record<string, any>,
-): Emit => {
-  const emit = (phase: Phase) => {
-    return onChange({
-      phase,
-      isSaving: phase !== "complete",
-      result: {
-        ...result,
-        forms: Object.fromEntries(
-          Object.entries(states).map(([id, state]) => [id, { ...state }]),
-        ) as SaveResult<P>["forms"],
-        responses: { ...responses } as SaveResult<P>["responses"],
-        followUpErrors: [...result.followUpErrors],
-      },
-    });
-  };
-
-  return emit;
+  states: FormStates,
+  responses: Responses,
+): void => {
+  onChange({
+    phase,
+    isSaving: phase !== "complete",
+    result: {
+      ...result,
+      forms: Object.fromEntries(
+        Object.entries(states).map(([id, state]) => [id, { ...state }]),
+      ) as SaveResult<P>["forms"],
+      responses: { ...responses } as SaveResult<P>["responses"],
+      followUpErrors: [...result.followUpErrors],
+    },
+  });
 };
 
-type Fail = (form: AnyForm, phase: "validation" | "mapping" | "save", error: unknown) => void;
-const toFail = (states: Record<string, FormSaveState<any, any, any>>): Fail => {
-  const fail = (form: AnyForm, phase: "validation" | "mapping" | "save", error: unknown) => {
-    const state = states[form.id];
-    state.status = phase === "validation" ? "invalid" : "failed";
-    state.failure = {
-      formId: form.id,
-      phase,
-      error,
-      formValues: state.formValues,
-      variables: state.variables,
-      attempts: state.attempts,
-    };
-  };
-
-  return fail;
-};
+const getFailedState = (
+  state: FormState,
+  phase: "validation" | "mapping" | "save",
+  error: unknown,
+): FormState => ({
+  ...state,
+  status: phase === "validation" ? "invalid" : "failed",
+  failure: {
+    formId: state.formId,
+    phase,
+    error,
+    formValues: state.formValues,
+    variables: state.variables,
+    attempts: state.attempts,
+  },
+});
 
 const refreshAndInvalidateCache = async <P extends readonly AnyForm[]>(
   successful: AnyForm[],
@@ -675,10 +612,49 @@ const refreshAndInvalidateCache = async <P extends readonly AnyForm[]>(
   return additionalFollowUpErrors;
 };
 
-const updateSkippedFormsState = (states: Record<string, FormSaveState<any, any, any>>) => {
-  for (const state of Object.values(states)) {
-    if (state.status === "ready") {
-      state.status = "skipped";
-    }
+const updateSkippedFormsState = (states: FormStates): FormStates => {
+  return Object.fromEntries(
+    Object.entries(states).map(([id, state]) => [
+      id,
+      state.status === "ready" ? { ...state, status: "skipped" } : state,
+    ]),
+  );
+};
+
+const reconcileCacheWithMutationResponses = <P extends readonly AnyForm[]>(
+  successful: AnyForm[],
+  context: (form: AnyForm) => {
+    queryClient: QueryClient;
+    response: any;
+    variables: any;
+    results: Readonly<Record<string, any>>;
+    formValues: any;
+    formId: string;
+    attempts: number;
+    followUpErrors: FollowUpError[];
+  },
+  result: SaveResult<P>,
+  queryClient: QueryClient,
+  config: SaveConfig<P>,
+): FollowUpError[] => {
+  let formCacheUpdateErrors: FollowUpError[] = [];
+  for (const form of successful) {
+    formCacheUpdateErrors = updateCacheWithMutationResponse(
+      context(form),
+      form.cacheUpdates as readonly CacheUpdate<any, any, any>[] | undefined,
+      form.id,
+    );
   }
+
+  const configCacheUpdateErrors = updateCacheWithMutationResponse(
+    {
+      queryClient,
+      response: result.responses,
+      variables: undefined,
+      results: result.responses,
+    },
+    config.cacheUpdates,
+  );
+
+  return [...formCacheUpdateErrors, ...configCacheUpdateErrors];
 };
