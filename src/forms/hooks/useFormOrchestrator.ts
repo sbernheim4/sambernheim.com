@@ -38,7 +38,7 @@ export function useFormOrchestrator<const T extends readonly SavableForm[]>(
     isSaving: false,
   });
 
-  const [executor] = useState(() => createOrchestrator<T>(client, setState));
+  const [conductor] = useState(() => createOrchestrator<T>(client, setState));
 
   const latest = useRef(config);
 
@@ -57,7 +57,7 @@ export function useFormOrchestrator<const T extends readonly SavableForm[]>(
 
     const { includePristine: _includePristine, ...submitConfig } = latest.current;
 
-    return executor.submit({
+    return conductor.submit({
       ...submitConfig,
       forms,
     });
@@ -67,6 +67,6 @@ export function useFormOrchestrator<const T extends readonly SavableForm[]>(
     ...state,
     isDirty,
     submit,
-    reset: executor.reset,
+    reset: conductor.reset,
   };
 }
