@@ -34,45 +34,6 @@ import {
   dueWindowOptions,
 } from "../fieldOptions";
 
-export type EditorField = {
-  name: string;
-  label: string;
-  mode?: "select" | "radio";
-  options?: readonly { value: string; label: string }[];
-};
-const organizationFields: EditorField[] = [
-  { name: "name", label: "Organization name" },
-  { name: "sector", label: "Sector", mode: "select", options: sectorOptions },
-  { name: "status", label: "Status", mode: "radio", options: statusOptions },
-  { name: "region", label: "Region", mode: "select", options: regionOptions },
-];
-const projectFields: EditorField[] = [
-  { name: "name", label: "Project name" },
-  {
-    name: "priority",
-    label: "Priority",
-    mode: "radio",
-    options: priorityOptions,
-  },
-  { name: "phase", label: "Phase", mode: "select", options: phaseOptions },
-  { name: "budget", label: "Budget", mode: "select", options: budgetOptions },
-];
-const taskFields: EditorField[] = [
-  { name: "title", label: "Task title" },
-  { name: "owner", label: "Owner", mode: "select", options: ownerOptions },
-  {
-    name: "status",
-    label: "Status",
-    mode: "radio",
-    options: taskStatusOptions,
-  },
-  {
-    name: "dueWindow",
-    label: "Due",
-    mode: "select",
-    options: dueWindowOptions,
-  },
-];
 export function useOrganizationForm({
   resource,
   ...callbacks
@@ -113,7 +74,7 @@ export function useOrganizationForm({
     cacheUpdates: organizationCacheUpdates(),
     ...callbacks,
   });
-  return { ...form, fields: organizationFields };
+  return form;
 }
 export function useProjectForm({
   resource,
@@ -157,7 +118,7 @@ export function useProjectForm({
     cacheUpdates: projectCacheUpdates(),
     ...callbacks,
   });
-  return { ...form, fields: projectFields };
+  return form;
 }
 export function useTaskForm({
   resource,
@@ -202,7 +163,7 @@ export function useTaskForm({
     cacheUpdates: taskCacheUpdates(),
     ...callbacks,
   });
-  return { ...form, fields: taskFields };
+  return form;
 }
 function option<T extends string>(value: string, options: readonly { value: T }[]): T {
   const match = options.find((item) => item.value === value);

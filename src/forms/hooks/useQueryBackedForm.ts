@@ -36,6 +36,7 @@ export function useQueryBackedForm<QueryData, Values, Mutation extends AsyncMuta
     result: save.result,
     submit: save.submit,
     isSaving: save.isSaving,
+    isDirty: save.isDirty,
     error,
   };
 }
