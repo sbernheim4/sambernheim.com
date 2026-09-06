@@ -422,7 +422,7 @@ const snapshotForms = (
   }
 };
 
-const invokeFormCallbacks = async <P extends readonly AnyForm[]>(
+const invokeFormCallbacks = async (
   forms: AnyForm[],
   states: Record<string, FormSaveState<any, any, any>>,
   context: (form: AnyForm) => {

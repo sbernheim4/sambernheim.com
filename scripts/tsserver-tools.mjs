@@ -33,7 +33,11 @@ server.stdout.on("data", (chunk) => {
       const wait = pending.get(message.request_seq);
       if (wait) {
         pending.delete(message.request_seq);
-        message.success ? wait.resolve(message.body) : wait.reject(Error(message.message));
+        if (message.success) {
+          wait.resolve(message.body);
+        } else {
+          wait.reject(Error(message.message));
+        }
       }
     }
   }
