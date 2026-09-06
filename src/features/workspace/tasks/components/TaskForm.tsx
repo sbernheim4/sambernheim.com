@@ -5,10 +5,6 @@ import { dueWindowOptions, ownerOptions, taskStatusOptions } from "../fieldOptio
 import { useTaskForm } from "../hooks/useTaskForm";
 import { FormActions } from "../../components/FormActions";
 import { SaveFeedback } from "../../components/SaveFeedback";
-export function TaskEditor(props: { resource?: Task; project: Project; onCreated?: () => void }) {
-  return <TaskForm {...props} />;
-}
-
 export function TaskForm({
   resource,
   project,

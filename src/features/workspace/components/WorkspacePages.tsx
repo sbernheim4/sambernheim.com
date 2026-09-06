@@ -16,10 +16,10 @@ import {
   useProjectWorkspace,
   useTaskWorkspace,
 } from "../hooks/useWorkspaceResources";
-import { OrganizationEditor } from "../organizations/components/OrganizationForm";
+import { OrganizationForm } from "../organizations/components/OrganizationForm";
 import { OrganizationWorkspaceForm } from "../organizations/components/OrganizationWorkspaceForm";
-import { ProjectEditor } from "../projects/components/ProjectForm";
-import { TaskEditor } from "../tasks/components/TaskForm";
+import { ProjectForm } from "../projects/components/ProjectForm";
+import { TaskForm } from "../tasks/components/TaskForm";
 import type { BootstrapData, Organization, Project, Task } from "../types";
 import { WorkspaceLayout } from "./WorkspaceLayout";
 export function OrganizationsPage() {
@@ -36,7 +36,7 @@ export function OrganizationsPage() {
             kind="organizations"
             items={query.data.organizations}
             data={query.data}
-            create={(close) => <OrganizationEditor onCreated={close} />}
+            create={(close) => <OrganizationForm onCreated={close} />}
           />
         )}
       </QueryState>
@@ -73,7 +73,7 @@ export function OrganizationPage({ id }: { id: string }) {
               data={query.data}
               items={query.data.projects.filter((item) => item.organizationId === organization.id)}
               create={(close) => (
-                <ProjectEditor organizationId={organization.id} onCreated={close} />
+                <ProjectForm organizationId={organization.id} onCreated={close} />
               )}
             />
           </div>
@@ -101,7 +101,7 @@ export function ProjectPage({ id }: { id: string }) {
         {project && query.data && (
           <div className="workspace-columns">
             <Details title="Project details" id={project.id} updatedAt={project.updatedAt}>
-              <ProjectEditor
+              <ProjectForm
                 key={project.id}
                 resource={project}
                 organizationId={project.organizationId}
@@ -112,7 +112,7 @@ export function ProjectPage({ id }: { id: string }) {
               kind="tasks"
               data={query.data}
               items={query.data.tasks.filter((item) => item.projectId === project.id)}
-              create={(close) => <TaskEditor project={project} onCreated={close} />}
+              create={(close) => <TaskForm project={project} onCreated={close} />}
             />
           </div>
         )}
@@ -139,7 +139,7 @@ export function TaskPage({ id }: { id: string }) {
         {task && project && (
           <div className="workspace-columns">
             <Details title="Task details" id={task.id} updatedAt={task.updatedAt}>
-              <TaskEditor key={task.id} resource={task} project={project} />
+              <TaskForm key={task.id} resource={task} project={project} />
             </Details>
             <section className="workspace-section">
               <h2>Related resources</h2>

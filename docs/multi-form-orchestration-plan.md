@@ -2,7 +2,6 @@
 
 Focused improvements in progress:
 
-- [ ] Remove forwarding editor components.
 - [ ] Limit save invalidations to affected queries.
 
 Remaining work is optional follow-up:

@@ -5,10 +5,6 @@ import { regionOptions, sectorOptions, statusOptions } from "../fieldOptions";
 import { useOrganizationForm } from "../hooks/useOrganizationForm";
 import { FormActions } from "../../components/FormActions";
 import { SaveFeedback } from "../../components/SaveFeedback";
-export function OrganizationEditor(props: { resource?: Organization; onCreated?: () => void }) {
-  return <OrganizationForm {...props} />;
-}
-
 export function OrganizationForm({
   resource,
   onCreated,
