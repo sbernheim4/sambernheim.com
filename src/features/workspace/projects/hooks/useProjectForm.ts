@@ -7,12 +7,21 @@ import { phaseOptions, priorityOptions } from "../fieldOptions";
 import { option } from "../../formOptions";
 import { useCreateProject, useUpdateProject } from "./mutations";
 import { useProject } from "./queries";
+export type ProjectFormValues = Pick<Project, "name" | "priority" | "phase" | "budget">;
+
+const defaultValues: ProjectFormValues = {
+  name: "",
+  priority: "medium",
+  phase: "planning",
+  budget: "$50k",
+};
+
 export function useProjectForm({
   resource,
   organizationId,
   ...callbacks
 }: { resource?: Project; organizationId: string } & OutcomeCallbacks<
-  Record<string, string>,
+  ProjectFormValues,
   Omit<SaveProjectInput, "organizationId">,
   SaveProjectResponse
 >) {
@@ -21,13 +30,8 @@ export function useProjectForm({
   const update = useUpdateProject(resource?.id ?? "");
   const form = useQueryBackedForm({
     query: resource ? query : undefined,
-    defaultValues: {
-      name: "",
-      priority: "medium",
-      phase: "planning",
-      budget: "$50k",
-    } as Record<string, string>,
-    toFormData: (data: Project): Record<string, string> => ({
+    defaultValues,
+    toFormData: (data: Project): ProjectFormValues => ({
       name: data.name,
       priority: data.priority,
       phase: data.phase,

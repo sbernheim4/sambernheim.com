@@ -7,11 +7,20 @@ import { regionOptions, sectorOptions, statusOptions } from "../fieldOptions";
 import { option } from "../../formOptions";
 import { useCreateOrganization, useUpdateOrganization } from "./mutations";
 import { useOrganization } from "./queries";
+export type OrganizationFormValues = Pick<Organization, "name" | "sector" | "status" | "region">;
+
+const defaultValues: OrganizationFormValues = {
+  name: "",
+  sector: "healthcare",
+  status: "active",
+  region: "east",
+};
+
 export function useOrganizationForm({
   resource,
   ...callbacks
 }: { resource?: Organization } & OutcomeCallbacks<
-  Record<string, string>,
+  OrganizationFormValues,
   SaveOrganizationInput,
   SaveOrganizationResponse
 >) {
@@ -20,13 +29,8 @@ export function useOrganizationForm({
   const update = useUpdateOrganization(resource?.id ?? "");
   const form = useQueryBackedForm({
     query: resource ? query : undefined,
-    defaultValues: {
-      name: "",
-      sector: "healthcare",
-      status: "active",
-      region: "east",
-    } as Record<string, string>,
-    toFormData: (data: Organization): Record<string, string> => ({
+    defaultValues,
+    toFormData: (data: Organization): OrganizationFormValues => ({
       name: data.name,
       sector: data.sector,
       status: data.status,

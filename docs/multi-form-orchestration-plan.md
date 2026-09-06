@@ -1,5 +1,12 @@
 # Multi-Form Orchestration — Next Steps
 
+Focused improvements in progress:
+
+- [ ] Replace authored `.mjs` scripts with TypeScript and emit JavaScript test bundles.
+- [ ] Pin oxlint/oxfmt and add repeatable check commands.
+- [ ] Remove forwarding editor components.
+- [ ] Limit save invalidations to affected queries.
+
 Remaining work is optional follow-up:
 
 1. Perform manual browser verification of the organization detail page:

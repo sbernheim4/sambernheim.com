@@ -185,3 +185,29 @@ function checkImmutableConfig(
   }
 }
 void checkImmutableConfig;
+
+// Domain fields retain their names and allowed values through the form binding.
+function checkDomainFields(
+  organization: ReturnType<
+    typeof import("../../src/features/workspace/organizations/hooks/useOrganizationForm").useOrganizationForm
+  >,
+  project: ReturnType<
+    typeof import("../../src/features/workspace/projects/hooks/useProjectForm").useProjectForm
+  >,
+  task: ReturnType<
+    typeof import("../../src/features/workspace/tasks/hooks/useTaskForm").useTaskForm
+  >,
+) {
+  organization.form.setFieldValue("sector", "finance");
+  project.form.setFieldValue("priority", "high");
+  task.form.setFieldValue("status", "todo");
+  // @ts-expect-error fields belong to their entity
+  organization.form.setFieldValue("title", "Wrong field");
+  // @ts-expect-error sector must be a declared option
+  organization.form.setFieldValue("sector", "unknown");
+  // @ts-expect-error priority must be a declared option
+  project.form.setFieldValue("priority", "urgent");
+  // @ts-expect-error task status is distinct from organization status
+  task.form.setFieldValue("status", "active");
+}
+void checkDomainFields;
