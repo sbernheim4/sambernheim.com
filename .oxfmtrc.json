@@ -1,0 +1,17 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "printWidth": 100,
+  "ignorePatterns": [
+    ".vendor/**",
+    ".jj/**",
+    ".git/**",
+    "node_modules/**",
+    "dist/**",
+    ".output/**",
+    ".nitro/**",
+    ".tanstack/**",
+    "src/wasm/ty/pkg/**",
+    "src/routeTree.gen.ts",
+    "package-lock.json"
+  ]
+}
