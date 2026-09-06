@@ -61,7 +61,6 @@ function FlowFormRoute() {
             </div>
 
             <Form.Fields className="workspace-launch-fields">
-
               <div className="form-section-label">Organization</div>
               <OrganizationFormFields />
 
@@ -96,7 +95,6 @@ function FlowFormRoute() {
                 </ul>
               </div>
             )}
-
           </Form.Shell>
         </Form.Provider>
 
@@ -107,7 +105,6 @@ function FlowFormRoute() {
         />
 
         <ActivityPanel activity={activity} />
-
       </section>
     </WorkspaceLayout>
   );

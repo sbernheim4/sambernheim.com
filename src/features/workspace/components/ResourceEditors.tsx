@@ -14,10 +14,7 @@ import {
   taskStatusOptions,
 } from "../fieldOptions";
 
-export function OrganizationEditor(props: {
-  resource?: Organization;
-  onCreated?: () => void;
-}) {
+export function OrganizationEditor(props: { resource?: Organization; onCreated?: () => void }) {
   return <OrganizationForm {...props} />;
 }
 
@@ -96,11 +93,7 @@ export function ProjectForm({
   );
 }
 
-export function TaskEditor(props: {
-  resource?: Task;
-  project: Project;
-  onCreated?: () => void;
-}) {
+export function TaskEditor(props: { resource?: Task; project: Project; onCreated?: () => void }) {
   return <TaskForm {...props} />;
 }
 

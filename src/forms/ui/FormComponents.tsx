@@ -31,13 +31,7 @@ export function useFormContext<TForm = FormScopeValue["form"]>(id?: string) {
   return ((id && scope.forms?.[id]) ?? scope.form) as TForm;
 }
 
-export function FormScope({
-  value,
-  children,
-}: {
-  value: FormScopeValue;
-  children: ReactNode;
-}) {
+export function FormScope({ value, children }: { value: FormScopeValue; children: ReactNode }) {
   return <formScopeContext.Provider value={value}>{children}</formScopeContext.Provider>;
 }
 

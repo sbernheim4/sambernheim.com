@@ -46,11 +46,7 @@ async function validateForm(form: AnyFormApi): Promise<ValidationResult> {
   };
 }
 
-function isFormReady(
-  initialized: boolean,
-  readError: unknown,
-  query?: QuerySource<unknown>,
-) {
+function isFormReady(initialized: boolean, readError: unknown, query?: QuerySource<unknown>) {
   return (
     initialized &&
     !readError &&
@@ -116,8 +112,7 @@ export type FormOptions<
       Input<NoInfer<Mutation>>,
       Partial<ResponsesOf<Dependencies>>
     >[];
-  } &
-  FormSource<QueryData, Values> & {
+  } & FormSource<QueryData, Values> & {
     dependencies?: Dependencies;
     endpoint: Endpoint<Mutation>;
     retry?: RetryPolicy;

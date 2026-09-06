@@ -71,9 +71,7 @@ export function OrganizationPage({ id }: { id: string }) {
                 Organization details are composed from the Profile and Operations records below.
               </p>
             </Details>
-            <OrganizationWorkspaceForm
-              organizationId={organization.id}
-            />
+            <OrganizationWorkspaceForm organizationId={organization.id} />
             <EntityList
               title="Projects"
               kind="projects"
@@ -89,11 +87,7 @@ export function OrganizationPage({ id }: { id: string }) {
     </Workspace>
   );
 }
-function OrganizationWorkspaceForm({
-  organizationId,
-}: {
-  organizationId: string;
-}) {
+function OrganizationWorkspaceForm({ organizationId }: { organizationId: string }) {
   const profile = useOrganizationProfileForm({ organizationId });
   const operations = useOrganizationOperationsForm({ organizationId });
 
@@ -177,8 +171,7 @@ function OrganizationWorkspaceForm({
                   const status = state?.status ?? "unchanged";
                   return (
                     <li key={formId}>
-                      {formId === "profile" ? "Profile" : "Operations"}
-                      : {status}
+                      {formId === "profile" ? "Profile" : "Operations"}: {status}
                       {state?.attempts
                         ? ` (${state.attempts} ${state.attempts === 1 ? "attempt" : "attempts"})`
                         : ""}
@@ -222,9 +215,8 @@ function ProfileFields() {
 }
 
 function OperationsFields() {
-  const form = useFormContext<ReturnType<typeof useOrganizationOperationsForm>["form"]>(
-    "operations",
-  );
+  const form =
+    useFormContext<ReturnType<typeof useOrganizationOperationsForm>["form"]>("operations");
   return (
     <>
       <form.AppField name="isActive">
