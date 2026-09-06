@@ -50,23 +50,24 @@ export async function validateSnapshot(
   }
 }
 
-export function acceptSavedBaseline(form: AnyFormApi, values: unknown) {
+/** Reset TanStack's values/defaults and keep its React facade in sync. */
+export function resetFormValues(form: AnyFormApi, values: unknown) {
+  const defaults = structuredClone(values);
+  form.reset(defaults);
+  form.options = { ...form.options, defaultValues: defaults };
+}
+
+export function markFormSaved(form: AnyFormApi, values: unknown) {
   const current = form.state.values;
   const meta = form.baseStore.state.fieldMetaBase;
   const changed = !evaluate(current, values);
-  form.reset(structuredClone(values));
+  resetFormValues(form, values);
 
-  // React exposes a shallow FormApi facade; reset updates the core options.
-  // Keep the facade's public defaults in sync as well.
-  form.options = {
-    ...form.options,
-    defaultValues: structuredClone(values),
-  };
-
-  if (changed)
+  if (changed) {
     form.baseStore.setState((state) => ({
       ...state,
       values: current,
       fieldMetaBase: meta,
     }));
+  }
 }

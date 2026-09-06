@@ -16,8 +16,8 @@ components, or notification libraries.
   refreshes queries, updates caches, accepts saved values, and calls outcomes.
   Its local helpers also guard Clear All until the complete save has finished.
 - `orchestration/types.ts` describes form configurations, endpoints, and results.
-- `hooks/formState.ts` validates detached TanStack snapshots and accepts saved
-  baselines without overwriting edits made during submission.
+- `hooks/formState.ts` validates detached TanStack snapshots and resets saved
+  form defaults without overwriting edits made during submission.
 - `hooks/useAppForm.ts`, `context.ts`, and `ui/fields.tsx` register and render fields.
 
 The execution path is:
@@ -38,7 +38,7 @@ render their forms. Request hooks own URLs, mutation keys and `retry: false`;
 form hooks pass their `mutateAsync` directly as `endpoint.mutationFn`. Do not wrap
 it in another mutation, put lifecycle effects in mutation callbacks, or watch
 transient mutation `data`/`isSuccess` to infer a response. Aggregate saving lasts
-through refresh, cache updates, baselines and callbacks. The application's
+through refresh, cache updates, form resets and callbacks. The application's
 QueryClient has no global mutation callbacks that interfere with this ordering.
 
 ## Composition
@@ -61,8 +61,11 @@ Each form requires typed `defaultValues` and accepts an optional domain query, o
 only across identity-compatible boundaries. Default-values mode supports creates
 without a read query. Query-to-form mapping never receives loading `undefined`.
 Background query changes do not replace dirty values. A save accepts the submitted
-form-shaped values as its new baseline; normalized API fields only enter through
+form-shaped values as TanStack's new defaults; normalized API fields only enter through
 an explicit mapping of compatible query data. Later edits remain dirty.
+The hook does not store a second copy of saved values. Query sync uses TanStack's
+`isDirty`, and successful saves reset its native defaults. A form reference keeps
+those native defaults when React updates its options on subsequent renders.
 
 For dependent saves, declare `dependencies: [earlierForm]`
 and use the typed `results` argument of `toMutationPayload`. Dependencies must
@@ -84,7 +87,7 @@ request. A mapped input is calculated once and retained across retries.
    functional `queryKey` and either `getData`/identity replacement or an advanced
    `(previous, context) => next` updater. `undefined` means no cache update.
    A failed target does not prevent subsequent targets.
-5. Accept successful forms' submitted baselines. Failed and skipped forms keep
+5. Mark successful forms' submitted values as saved in TanStack. Failed and skipped forms keep
    their edits.
 6. Await child outcomes in order, then the group outcome. Successful children
    receive `onSuccess` even on partial saves. Failed children receive `onFailure`
@@ -94,7 +97,7 @@ request. A mapped input is calculated once and retained across retries.
 Results distinguish `validation-failed`, `success`, `partial-failure`, and
 `saved-with-follow-up-errors`. `result.forms` retains IDs, attempts, submitted
 values, mapped variables, responses and validation/mapping/save errors. Refresh,
-cache, baseline and callback errors live in `followUpErrors`. Group success means
+cache, form-state and callback errors live in `followUpErrors`. Group success means
 all writes succeeded, even if a follow-up failed. Do not recommend repeating
 successful creates after a follow-up error. There is no cross-endpoint atomicity
 or implicit rollback. A second submit on a busy orchestrator returns its active

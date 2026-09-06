@@ -181,10 +181,10 @@ export function createOrchestrator<P extends readonly AnyForm[]>(
       // Mark submitted values as saved without clearing edits made during the save.
       for (const form of successful) {
         try {
-          await form.acceptBaseline?.(structuredClone(states[form.id].formValues));
+          await form.markSaved?.(structuredClone(states[form.id].formValues));
         } catch (error) {
           result.followUpErrors.push({
-            phase: "baseline",
+            phase: "form-state",
             formId: form.id,
             error,
           });
@@ -485,7 +485,7 @@ const invokeFormFinish = (forms: AnyForm[]): FollowUpError[] => {
       form.finish?.();
     } catch (error) {
       finishErrors.push({
-        phase: "baseline",
+        phase: "form-state",
         formId: form.id,
         error,
       });

@@ -12,7 +12,7 @@ import type {
   ResponsesOf,
 } from "../orchestration/types";
 import { useAppForm } from "./useAppForm";
-import { acceptSavedBaseline, validateSnapshot } from "./formState";
+import { markFormSaved, resetFormValues, validateSnapshot } from "./formState";
 
 export type QuerySource<QueryData> = {
   data: QueryData | undefined;
@@ -27,44 +27,7 @@ export type FormSource<QueryData, Values> = { defaultValues: Values } & (
       toFormData: (data: QueryData) => NoInfer<Values>;
     }
 );
-type Baseline<Values> = { values: Values; initialized: boolean };
 type FormValidator<Values> = (values: Values) => string | undefined | Promise<string | undefined>;
-
-/** Resolve query data or create defaults without changing the live form. */
-function readFormSource<QueryData, Values>(
-  source: FormSource<QueryData, Values>,
-): {
-  baseline: Baseline<Values>;
-  error?: unknown;
-} {
-  const { query, defaultValues, toFormData } = source;
-
-  const baseline = {
-    values: defaultValues,
-    initialized: !query,
-  };
-
-  if (!query || query.data === undefined || query.isError) {
-    return {
-      baseline,
-    };
-  }
-
-  try {
-    return {
-      baseline: {
-        values: toFormData ? toFormData(query.data) : query.data,
-        initialized: true,
-      },
-    };
-  } catch (error) {
-    return { baseline, error };
-  }
-}
-
-function canAcceptQueryValues<Values>(baseline: Baseline<Values>, values: Values, saving: boolean) {
-  return !saving && (!baseline.initialized || evaluate(values, baseline.values));
-}
 
 async function validateFormValues<Values>(
   form: AnyFormApi,
@@ -91,66 +54,55 @@ async function validateFormValues<Values>(
 }
 
 function isFormReady(
-  baseline: { initialized: boolean },
+  initialized: boolean,
   readError: unknown,
   query?: QuerySource<unknown>,
 ) {
   return (
-    baseline.initialized &&
+    initialized &&
     !readError &&
     (!query || (!query.isPending && !query.isError && query.data !== undefined))
   );
 }
 
-// Update the values for the form if the backing data changes.
-// The backing data can change if someone else made an update
-// which is manifested via a refetch function invocation/cache invalidation of
-// the associated entity query hook.
+// Sync backing query updates (including polling) while the form is clean.
+// TanStack owns the saved defaults and dirty state; no separate values are stored.
 function useQueryFormSync<QueryData, Values>({
   source,
   form,
-  baseline,
   inFlight,
-  initialError,
 }: {
   source: FormSource<QueryData, Values>;
   form: AnyFormApi;
-  baseline: RefObject<Baseline<Values>>;
   inFlight: RefObject<boolean>;
-  initialError: unknown;
 }) {
-  const [readError, setReadError] = useState(initialError);
-  const [, render] = useState(0);
-  const lastData = useRef(baseline.current.initialized ? source.query?.data : undefined);
+  const [queryState, setQueryState] = useState({
+    initialized: !source.query,
+    readError: undefined as unknown,
+  });
+  const lastData = useRef<unknown>(undefined);
 
   useEffect(() => {
-    if (
-      !source.query ||
-      source.query.data === undefined ||
-      source.query.isError ||
-      lastData.current === source.query.data
-    ) {
+    const { query, toFormData } = source;
+    if (!query || query.data === undefined || query.isError || lastData.current === query.data) {
       return;
     }
 
-    lastData.current = source.query.data;
-
-    if (!canAcceptQueryValues(baseline.current, form.state.values, inFlight.current)) {
+    lastData.current = query.data;
+    if (inFlight.current || form.state.isDirty) {
       return;
     }
 
-    const next = readFormSource(source);
-    setReadError(next.error);
-    if (!next.baseline.initialized) {
-      return;
+    try {
+      const values = toFormData ? toFormData(query.data) : query.data;
+      resetFormValues(form, values);
+      setQueryState({ initialized: true, readError: undefined });
+    } catch (error) {
+      setQueryState((state) => ({ ...state, readError: error }));
     }
+  }, [source.query?.data, source.query?.isError, source.toFormData, form, inFlight]);
 
-    baseline.current = next.baseline;
-    form.reset(next.baseline.values);
-    render((n) => n + 1);
-  }, [source.query?.data, source.query?.isError, source.toFormData, form, baseline, inFlight]);
-
-  return readError;
+  return queryState;
 }
 
 export type FormOptions<
@@ -188,22 +140,21 @@ export function useComposableForm<
   Mutation extends AsyncMutation,
   const Dependencies extends readonly AnyForm[] = readonly [],
 >(config: ComposableFormConfig<Id, QueryData, Values, Mutation, Dependencies>) {
-  const [initial] = useState(() => readFormSource(config));
-  const baseline = useRef(initial.baseline);
   const inFlight = useRef(false);
+  // Reuse TanStack's current defaults when React updates the form options.
+  // This is a reference to the form, not another copy of its values.
+  const formRef = useRef<{ options: { defaultValues?: Values } } | null>(null);
   const form = useAppForm({
-    defaultValues: baseline.current.values,
+    defaultValues: formRef.current?.options.defaultValues ?? config.defaultValues,
   });
+  formRef.current = form;
 
-  const readError = useQueryFormSync({
+  const { initialized, readError } = useQueryFormSync({
     source: config,
     form,
-    baseline,
     inFlight,
-    initialError: initial.error,
   });
-
-  const isReady = isFormReady(baseline.current, readError, config.query);
+  const isReady = isFormReady(initialized, readError, config.query);
 
   const saveConfig = {
     ...config,
@@ -219,10 +170,7 @@ export function useComposableForm<
       return form.state.values;
     },
     validate: (values: Values) => validateFormValues(form, values, config.validate),
-    acceptBaseline: (values: Values) => {
-      baseline.current = { values, initialized: true };
-      acceptSavedBaseline(form, values);
-    },
+    markSaved: (values: Values) => markFormSaved(form, values),
   };
 
   return {
