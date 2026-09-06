@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 
-import { useOrganizations } from "../features/workspace/hooks/useWorkspaceResources";
+import { useOrganizations } from "../features/workspace/organizations/hooks/queries";
 import { WorkspaceLayout } from "../features/workspace/components/WorkspaceLayout";
 
 export const Route = createFileRoute("/forms/")({

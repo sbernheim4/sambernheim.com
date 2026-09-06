@@ -1,17 +1,17 @@
-import { useEffect, useRef, useState } from "react";
 import type { OnMount } from "@monaco-editor/react";
 import type { editor } from "monaco-editor";
+import { useEffect, useRef, useState } from "react";
 
 import {
   createTySession,
   disposeTySession,
   registerTyProviders,
   setDiagnostics,
-  type TySession,
   type TyDiagnostic,
+  type TySession,
   type TyState,
   updateTyFile,
-} from "./tyWasmClient";
+} from "../lsp/tyWasmClient";
 
 export type EditablePythonDefinition = {
   signature: string;

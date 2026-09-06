@@ -1,6 +1,6 @@
 import type { QueryClient } from "@tanstack/react-query";
+import { bootstrapKey, workspaceKeys } from "./queries";
 import type { BootstrapData } from "./types";
-import { bootstrapKey, workspaceKeys } from "./queries.ts";
 
 export async function clearWorkspace(
   queryClient: QueryClient,

@@ -3,13 +3,11 @@ import { useState } from "react";
 import { ActivityPanel, createActivity } from "../features/form-demos/ActivityPanel";
 import { WorkspaceLayout } from "../features/workspace/components/WorkspaceLayout";
 import { ResourceDataPanel } from "../features/workspace/components/ResourceDataPanel";
-import {
-  OrganizationFormFields,
-  ProjectFormFields,
-  TaskFormFields,
-} from "../features/workspace/components/ResourceEditors";
+import { OrganizationFormFields } from "../features/workspace/organizations/components/OrganizationForm";
+import { ProjectFormFields } from "../features/workspace/projects/components/ProjectForm";
+import { TaskFormFields } from "../features/workspace/tasks/components/TaskForm";
 import { useWorkspaceLaunchForms } from "../features/workspace/hooks/useWorkspaceLaunchForms";
-import { Form } from "../forms/ui/FormComponents";
+import { Form } from "../forms/components/FormComponents";
 
 export const Route = createFileRoute("/forms/flow")({
   ssr: false,

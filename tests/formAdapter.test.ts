@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { FormApi, FieldApi } from "@tanstack/form-core";
-import { markFormSaved } from "../src/forms/hooks/formState.ts";
+import { markFormSaved } from "../src/forms/hooks/formState";
 
 test("marking a form saved retains form shape and subsequent dirty edits", () => {
   const form = new FormApi({

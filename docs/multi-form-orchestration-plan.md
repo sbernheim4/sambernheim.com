@@ -18,3 +18,6 @@ Remaining work is optional follow-up:
    `AbortSignal` so canceling the Effect also cancels the network request.
 3. Before adopting Effect, compare its dependency and abstraction cost with the
    current orchestrator and prototype the boundary in isolation.
+
+4. Smoke-test `/editor` after the feature directory move: confirm Monaco loads,
+   Python diagnostics and hover work, and Reset restores the editable source.

@@ -1,5 +1,5 @@
 import type { QueryClient, QueryKey } from "@tanstack/react-query";
-import { ApiError } from "./api.ts";
+import { ApiError } from "./api";
 
 // A newly created resource can have an acknowledged cache entry while the
 // replica still returns 404. Clear-all resets that entry before subsequent reads.

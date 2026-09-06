@@ -4,12 +4,12 @@ import { act, create, type ReactTestRenderer } from "react-test-renderer";
 import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { useQueryBackedForm } from "../src/forms/hooks/useQueryBackedForm";
 import { useFormOrchestrator } from "../src/forms/hooks/useFormOrchestrator";
-import { useOrganizationForm } from "../src/features/workspace/hooks/forms";
+import { useOrganizationForm } from "../src/features/workspace/organizations/hooks/useOrganizationForm";
 import {
   useOrganizationProfileForm,
   useOrganizationOperationsForm,
-} from "../src/features/workspace/hooks/organizationConfigurationForms";
-import { useCreateOrganization } from "../src/features/workspace/hooks/mutations";
+} from "../src/features/workspace/organizations/hooks/organizationConfigurationForms";
+import { useCreateOrganization } from "../src/features/workspace/organizations/hooks/mutations";
 import { useWorkspaceLaunchForms } from "../src/features/workspace/hooks/useWorkspaceLaunchForms";
 import { workspaceKeys } from "../src/features/workspace/queries";
 

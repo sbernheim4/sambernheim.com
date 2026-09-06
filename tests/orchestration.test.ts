@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { QueryClient, QueryObserver } from "@tanstack/react-query";
 import { defineForm } from "./formConfig";
-import { type SaveState, createOrchestrator } from "../src/forms/orchestration/orchestrator.ts";
+import { type SaveState, createOrchestrator } from "../src/forms/orchestration/orchestrator";
 const client = () =>
   new QueryClient({
     defaultOptions: { queries: { retry: false, gcTime: Infinity } },
@@ -293,6 +293,16 @@ test("duplicate IDs and reversed dependencies reject before writes", async () =>
     endpoint: { mutationFn: async (_v: number) => 1 },
   });
   await assert.rejects(createOrchestrator(qc).submit({ forms: [dependent, p] }), /precede/);
+  await assert.rejects(
+    createOrchestrator(qc).submit({ forms: [dependent, p, p] }),
+    (error: unknown) => {
+      assert.ok(error instanceof AggregateError);
+      assert.equal(error.errors.length, 2);
+      assert.match(String(error), /precede/);
+      assert.match(String(error), /Duplicate/);
+      return true;
+    },
+  );
 });
 
 test("permanent errors and non-idempotent creates never automatically retry", async () => {
@@ -322,7 +332,7 @@ test("permanent errors and non-idempotent creates never automatically retry", as
   }
 });
 
-test("active runs retain callback definitions; group cache targets follow children and undefined selectors do not delete", async () => {
+test("immutable configuration supports ordered cache updates and callbacks without deleting undefined selections", async () => {
   const qc = client();
   const wait = deferred();
   const log: string[] = [];
@@ -372,16 +382,18 @@ test("active runs retain callback definitions; group cache targets follow childr
       log.push("original group callback");
     },
   };
+  Object.freeze(first.endpoint);
+  first.cacheUpdates?.forEach(Object.freeze);
+  Object.freeze(first.cacheUpdates);
+  Object.freeze(first);
+  config.cacheUpdates.forEach(Object.freeze);
+  Object.freeze(config.cacheUpdates);
+  Object.freeze(config.refetchFunctions);
+  Object.freeze(config.forms);
+  Object.freeze(config);
+
   const runner = createOrchestrator<readonly [typeof first]>(qc);
   const pending = runner.submit(config);
-  config.onSuccess = async () => {
-    log.push("replacement callback");
-  };
-  config.refetchFunctions.length = 0;
-  first.onSuccess = () => {
-    log.push("replacement child callback");
-  };
-  first.cacheUpdates = [];
   wait.resolve();
   const result = await pending;
   assert.equal(result.outcome, "success");

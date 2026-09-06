@@ -1,6 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useClearWorkspaceMutation } from "./mutations";
 import { clearWorkspace } from "../clearWorkspace";
+import { useClearWorkspaceMutation } from "./useClearWorkspaceMutation";
 
 export function useClearEntities() {
   const queryClient = useQueryClient();

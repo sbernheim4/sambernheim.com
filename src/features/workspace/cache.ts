@@ -30,7 +30,7 @@ function upsertById<TItem extends { id: string; updatedAt: string }>(
   return Array.from(next.values());
 }
 
-import type { Organization, OrganizationProfile, OrganizationOperations } from "./types";
+import type { Organization, OrganizationOperations, OrganizationProfile } from "./types";
 
 export function mergeOrganization(
   previous: Organization | undefined,
