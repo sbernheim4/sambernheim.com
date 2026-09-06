@@ -1,6 +1,6 @@
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
-import { defineConfig } from "vite";
+import { defineConfig, type PreviewServer, type ViteDevServer } from "vite";
 
 import { handleApiRequest } from "./server/example-api";
 
@@ -16,16 +16,8 @@ export default defineConfig({
   plugins: [
     {
       name: "example-api",
-      configureServer(server) {
-        server.middlewares.use((request, response, next) => {
-          if (!request.url?.startsWith("/api/")) {
-            next();
-            return;
-          }
-
-          void handleApiRequest(request, response);
-        });
-      },
+      configureServer: installExampleApi,
+      configurePreviewServer: installExampleApi,
     },
     tanstackStart({
       srcDirectory: "src",
@@ -33,3 +25,13 @@ export default defineConfig({
     viteReact(),
   ],
 });
+
+function installExampleApi(server: ViteDevServer | PreviewServer) {
+  server.middlewares.use((request, response, next) => {
+    if (!request.url?.startsWith("/api/")) {
+      next();
+      return;
+    }
+    void handleApiRequest(request, response);
+  });
+}

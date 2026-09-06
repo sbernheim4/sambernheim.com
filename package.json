@@ -6,12 +6,13 @@
     "dev": "npm run ensure:ty-wasm && vite dev",
     "build": "npm run ensure:ty-wasm && vite build && tsc --noEmit",
     "typecheck": "tsc --noEmit",
-    "start": "node .output/server/index.mjs",
+    "start": "vite preview",
     "build:ty-wasm": "bash scripts/build-ty-wasm.sh",
     "ensure:ty-wasm": "bash scripts/ensure-ty-wasm.sh",
-    "test:forms": "node scripts/test-forms.mjs",
     "typecheck:tests": "tsc -p tsconfig.tests.json",
-    "tsserver": "node scripts/tsserver-tools.mjs"
+    "tsserver": "node scripts/tsserver-tools.ts",
+    "typecheck:scripts": "tsc -p tsconfig.scripts.json",
+    "test": "node scripts/test-forms.ts"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",
@@ -35,5 +36,8 @@
     "react-test-renderer": "^19.2.8",
     "typescript": "^5.9.2",
     "vite": "^7.1.4"
+  },
+  "engines": {
+    "node": ">=22.18.0"
   }
 }
