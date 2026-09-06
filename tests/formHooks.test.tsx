@@ -59,7 +59,7 @@ async function mount(qc: QueryClient, render: () => React.ReactNode) {
   };
 }
 
-test("CRUD query selection initializes mapped values, preserves dirty edits and accepts only the submitted baseline", async () => {
+test("CRUD query selection initializes mapped values, preserves dirty edits and marks only submitted values as saved", async () => {
   const qc = client();
   const loaded = gate();
   const refreshed = gate();
@@ -623,3 +623,60 @@ for (const failProject of [false, true]) {
     }
   });
 }
+
+test("query sync uses TanStack dirty state and retains saved defaults across rerenders", async () => {
+  const qc = client();
+  let serverName = "initial";
+  let current: any;
+  const harness = await mount(qc, () => {
+    const query = useQuery({
+      queryKey: ["native-defaults"],
+      queryFn: async () => ({ name: serverName }),
+    });
+    const binding = useQueryBackedForm({
+      defaultValues: { name: "" },
+      query,
+      endpoint: { mutationFn: async (values: { name: string }) => values },
+    });
+    current = { binding, query };
+    return <binding.form.AppField name="name">{() => null}</binding.form.AppField>;
+  });
+  const refetch = async (name: string) => {
+    serverName = name;
+    await act(async () => {
+      await current.query.refetch();
+      await delay();
+    });
+  };
+  try {
+    await act(delay);
+    assert.equal(current.binding.form.state.values.name, "initial");
+    await refetch("remote update");
+    assert.equal(current.binding.form.state.values.name, "remote update");
+    assert.equal(current.binding.form.state.isDirty, false);
+    assert.deepEqual(current.binding.form.options.defaultValues, { name: "remote update" });
+
+    await act(async () => {
+      current.binding.form.setFieldValue("name", "local edit");
+    });
+    await refetch("another remote update");
+    assert.equal(current.binding.form.state.values.name, "local edit");
+    assert.deepEqual(current.binding.form.options.defaultValues, { name: "remote update" });
+
+    await act(async () => {
+      await current.binding.save();
+    });
+    await harness.update();
+    assert.equal(current.binding.form.state.isDirty, false);
+    assert.equal(current.binding.form.state.isDefaultValue, true);
+    assert.deepEqual(current.binding.form.options.defaultValues, { name: "local edit" });
+    await act(async () => current.binding.form.reset());
+    assert.equal(current.binding.form.state.values.name, "local edit");
+
+    await refetch("latest remote update");
+    assert.equal(current.binding.form.state.values.name, "latest remote update");
+    assert.equal(current.binding.form.state.isDirty, false);
+  } finally {
+    await harness.dispose();
+  }
+});

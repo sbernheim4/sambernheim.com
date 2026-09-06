@@ -154,8 +154,8 @@ test("partial failure retains persistence, waits for every refresh, reconciles t
         { queryKey: () => ["summary"], getData: (r) => r.name },
       ],
     },
-    acceptBaseline: () => {
-      log.push("baseline");
+    markSaved: () => {
+      log.push("form-state");
     },
     onSuccess: ({ followUpErrors }) => {
       assert.equal(qc.getQueryData(["summary"]), "submitted");
@@ -214,7 +214,7 @@ test("partial failure retains persistence, waits for every refresh, reconciles t
   assert.deepEqual(log, [
     "write a",
     "refetched",
-    "baseline",
+    "form-state",
     "a success",
     "b failure",
     "group failure",

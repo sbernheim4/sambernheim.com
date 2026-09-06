@@ -24,6 +24,15 @@ verification remains user-managed. The handoff notes below are historical contex
 
 ### Revision And Verification Log
 
+- [x] Remove the custom baseline values/ref/type and comparison helper. Query
+  synchronization now uses TanStack `isDirty`; only readiness/error state is
+  tracked separately. TanStack owns values and saved defaults.
+- [x] Replace `acceptBaseline` with `markSaved`, retaining a small reset adapter
+  to preserve edits made during a save. Reuse the native defaults through a form
+  reference so rerenders cannot restore old defaults. No copied values are stored.
+- [ ] Verify native-defaults handling, clean query refreshes, dirty protection,
+  post-save rerenders, and existing behavior with type checks and form tests.
+
 - [x] Simplify forms to plain bindings passed directly to `createOrchestrator`;
       remove the participant factory, wrapper, symbol and separate runtime shape.
       Dependencies reference forms directly; results use `forms` and `formId`.

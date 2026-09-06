@@ -35,7 +35,7 @@ export type CacheUpdate<R, I, Results = {}> =
       update: (previous: unknown, context: CacheContext<R, I, Results>) => unknown;
     };
 export type FollowUpError = {
-  phase: "refresh" | "cache" | "baseline" | "effect";
+  phase: "refresh" | "cache" | "form-state" | "effect";
   formId?: string;
   error: unknown;
 };
@@ -75,7 +75,7 @@ export type AnyForm = {
   snapshot: () => any;
   validate: (...args: any[]) => ValidationResult | Promise<ValidationResult>;
   toMutationPayload?: (...args: any[]) => any;
-  acceptBaseline?: (...args: any[]) => void | Promise<void>;
+  markSaved?: (...args: any[]) => void | Promise<void>;
   finish?: () => void;
   onSuccess?: (...args: any[]) => void | Promise<void>;
   onFailure?: (...args: any[]) => void | Promise<void>;
@@ -103,7 +103,7 @@ export type FormConfig<
     dependencies?: D;
     snapshot: () => V;
     validate: (values: V) => ValidationResult | Promise<ValidationResult>;
-    acceptBaseline?: (values: V) => void | Promise<void>;
+    markSaved?: (values: V) => void | Promise<void>;
     finish?: () => void;
     endpoint: Endpoint<M, Partial<ResponsesOf<D>>>;
     retry?: RetryPolicy;
