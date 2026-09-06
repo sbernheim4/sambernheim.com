@@ -5,14 +5,6 @@ import { budgetOptions, phaseOptions, priorityOptions } from "../fieldOptions";
 import { useProjectForm } from "../hooks/useProjectForm";
 import { FormActions } from "../../components/FormActions";
 import { SaveFeedback } from "../../components/SaveFeedback";
-export function ProjectEditor(props: {
-  resource?: Project;
-  organizationId: string;
-  onCreated?: () => void;
-}) {
-  return <ProjectForm {...props} />;
-}
-
 export function ProjectForm({
   resource,
   organizationId,
