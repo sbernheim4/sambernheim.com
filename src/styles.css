@@ -1377,6 +1377,10 @@ textarea {
   border: 0;
 }
 
+.about {
+  --main-bg-color: #f2e65a;
+}
+
 .site-demo {
   max-width: 760px;
   min-height: calc(100vh - 62px);
