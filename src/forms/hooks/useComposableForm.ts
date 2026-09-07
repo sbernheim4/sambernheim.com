@@ -84,8 +84,9 @@ const useQueryFormSync = <QueryData, Values>({
       return;
     }
 
+    const isInitialData = lastData.current === undefined;
     lastData.current = query.data;
-    if (inFlight.current || form.state.isDirty) {
+    if (inFlight.current || (!isInitialData && form.state.isDirty)) {
       return;
     }
 
