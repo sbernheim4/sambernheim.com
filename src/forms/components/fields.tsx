@@ -8,8 +8,7 @@ type Option<TValue extends string = string> = {
   value: TValue;
   label: string;
 };
-
-export function TextField({
+export const TextField = ({
   label,
   placeholder,
   required,
@@ -17,7 +16,7 @@ export function TextField({
   label: string;
   placeholder?: string;
   required?: boolean;
-}) {
+}) => {
   const field = useFieldContext<string>();
 
   return (
@@ -29,7 +28,9 @@ export function TextField({
         value={field.state.value ?? ""}
         placeholder={placeholder}
         onBlur={field.handleBlur}
-        onChange={(event) => field.handleChange(event.target.value)}
+        onChange={(event) => {
+          return field.handleChange(event.target.value);
+        }}
       />
       {field.state.meta.errors.length > 0 && (
         <span className="form-error" role="alert">
@@ -38,9 +39,8 @@ export function TextField({
       )}
     </label>
   );
-}
-
-export function SelectField<TValue extends string>({
+};
+export const SelectField = <TValue extends string>({
   label,
   options,
   placeholder = "Select option",
@@ -50,7 +50,7 @@ export function SelectField<TValue extends string>({
   options: ReadonlyArray<Option<TValue>>;
   placeholder?: string;
   onValueChange?: (value: TValue) => void;
-}) {
+}) => {
   const field = useFieldContext<TValue | "">();
   const labelId = useId();
 
@@ -77,26 +77,27 @@ export function SelectField<TValue extends string>({
         <Select.Portal>
           <Select.Content className="app-select-content" position="popper" sideOffset={4}>
             <Select.Viewport>
-              {options.map((option) => (
-                <Select.Item key={option.value} value={option.value} className="app-select-item">
-                  <Select.ItemText>{option.label}</Select.ItemText>
-                </Select.Item>
-              ))}
+              {options.map((option) => {
+                return (
+                  <Select.Item key={option.value} value={option.value} className="app-select-item">
+                    <Select.ItemText>{option.label}</Select.ItemText>
+                  </Select.Item>
+                );
+              })}
             </Select.Viewport>
           </Select.Content>
         </Select.Portal>
       </Select.Root>
     </div>
   );
-}
-
-export function RadioGroupField<TValue extends string>({
+};
+export const RadioGroupField = <TValue extends string>({
   label,
   options,
 }: {
   label: string;
   options: ReadonlyArray<Option<TValue>>;
-}) {
+}) => {
   const field = useFieldContext<TValue>();
   const labelId = useId();
 
@@ -108,25 +109,28 @@ export function RadioGroupField<TValue extends string>({
         name={field.name}
         onBlur={field.handleBlur}
         value={field.state.value}
-        onValueChange={(value) => field.handleChange(value as TValue)}
+        onValueChange={(value) => {
+          return field.handleChange(value as TValue);
+        }}
       >
-        {options.map((option) => (
-          <label key={option.value} className="app-radio-option">
-            <RadioGroup.Item value={option.value} className="app-radio-item">
-              <RadioGroup.Indicator className="app-radio-indicator" />
-            </RadioGroup.Item>
-            <span>{option.label}</span>
-          </label>
-        ))}
+        {options.map((option) => {
+          return (
+            <label key={option.value} className="app-radio-option">
+              <RadioGroup.Item value={option.value} className="app-radio-item">
+                <RadioGroup.Indicator className="app-radio-indicator" />
+              </RadioGroup.Item>
+              <span>{option.label}</span>
+            </label>
+          );
+        })}
       </RadioGroup.Root>
     </fieldset>
   );
-}
-
-export function SubmitButton({ label, isSaving }: { label: string; isSaving: boolean }) {
+};
+export const SubmitButton = ({ label, isSaving }: { label: string; isSaving: boolean }) => {
   return (
     <button type="submit" className="primary-action" disabled={isSaving}>
       {isSaving ? "Saving..." : label}
     </button>
   );
-}
+};

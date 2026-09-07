@@ -3,10 +3,12 @@ import { useOrganization, useOrganizations } from "../organizations/hooks/querie
 import { useOrganizationProjects, useProject, useProjects } from "../projects/hooks/queries";
 import { bootstrapQueryOptions } from "../queryOptions";
 import { useProjectTasks, useTask, useTasks } from "../tasks/hooks/queries";
-export function useWorkspaceResources() { return useQuery(bootstrapQueryOptions()); }
+export const useWorkspaceResources = () => {
+  return useQuery(bootstrapQueryOptions());
+};
 
 // Page-level read composition keeps resource ownership in domain queries.
-export function useOrganizationsWorkspace() {
+export const useOrganizationsWorkspace = () => {
   const organizations = useOrganizations();
   const projects = useProjects();
   return workspaceRead([organizations, projects], {
@@ -14,9 +16,8 @@ export function useOrganizationsWorkspace() {
     projects: projects.data ?? [],
     tasks: [],
   });
-}
-
-export function useOrganizationWorkspace(id: string) {
+};
+export const useOrganizationWorkspace = (id: string) => {
   const organization = useOrganization(id);
   const projects = useOrganizationProjects(id);
   const tasks = useTasks();
@@ -25,9 +26,8 @@ export function useOrganizationWorkspace(id: string) {
     projects: projects.data ?? [],
     tasks: tasks.data ?? [],
   });
-}
-
-export function useProjectWorkspace(id: string) {
+};
+export const useProjectWorkspace = (id: string) => {
   const project = useProject(id);
   const organization = useOrganization(project.data?.organizationId ?? "");
   const tasks = useProjectTasks(id);
@@ -36,9 +36,8 @@ export function useProjectWorkspace(id: string) {
     projects: project.data ? [project.data] : [],
     tasks: tasks.data ?? [],
   });
-}
-
-export function useTaskWorkspace(id: string) {
+};
+export const useTaskWorkspace = (id: string) => {
   const task = useTask(id);
   const project = useProject(task.data?.projectId ?? "");
   const organization = useOrganization(task.data?.organizationId ?? "");
@@ -47,20 +46,29 @@ export function useTaskWorkspace(id: string) {
     projects: project.data ? [project.data] : [],
     tasks: task.data ? [task.data] : [],
   });
-}
-
-function workspaceRead(
+};
+const workspaceRead = (
   queries: Array<{
     isPending: boolean;
     isError: boolean;
     refetch: () => unknown;
   }>,
   data: import("../types").BootstrapData,
-) {
+) => {
   return {
     data,
-    isPending: queries.some((q) => q.isPending),
-    isError: queries.some((q) => q.isError),
-    refetch: () => Promise.allSettled(queries.map((q) => q.refetch())),
+    isPending: queries.some((q) => {
+      return q.isPending;
+    }),
+    isError: queries.some((q) => {
+      return q.isError;
+    }),
+    refetch: () => {
+      return Promise.allSettled(
+        queries.map((q) => {
+          return q.refetch();
+        }),
+      );
+    },
   };
-}
+};

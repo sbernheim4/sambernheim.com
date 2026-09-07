@@ -5,31 +5,51 @@ import { createOrchestrator, type SaveState } from "../orchestration/orchestrato
 
 type SavableForm = AnyForm & {
   form: {
-    state: { isDirty: boolean };
-    store: { subscribe: (listener: () => void) => { unsubscribe: () => void } };
+    state: {
+      isDirty: boolean;
+    };
+    store: {
+      subscribe: (listener: () => void) => {
+        unsubscribe: () => void;
+      };
+    };
   };
 };
-
-function useFormsDirty(forms: readonly SavableForm[], includePristine: boolean) {
+const useFormsDirty = (forms: readonly SavableForm[], includePristine: boolean) => {
   return useSyncExternalStore(
     (listener) => {
-      const subscriptions = forms.map((binding) => binding.form.store.subscribe(listener));
+      const subscriptions = forms.map((binding) => {
+        return binding.form.store.subscribe(listener);
+      });
       return () => {
         for (const subscription of subscriptions) {
           subscription.unsubscribe();
         }
       };
     },
-    () => includePristine || forms.some((binding) => binding.form.state.isDirty),
-    () => includePristine || forms.some((binding) => binding.form.state.isDirty),
+    () => {
+      return (
+        includePristine ||
+        forms.some((binding) => {
+          return binding.form.state.isDirty;
+        })
+      );
+    },
+    () => {
+      return (
+        includePristine ||
+        forms.some((binding) => {
+          return binding.form.state.isDirty;
+        })
+      );
+    },
   );
-}
-
-export function useFormOrchestrator<const T extends readonly SavableForm[]>(
+};
+export const useFormOrchestrator = <const T extends readonly SavableForm[]>(
   config: SaveConfig<T> & {
     includePristine?: boolean;
   },
-) {
+) => {
   const client = useQueryClient();
   const isDirty = useFormsDirty(config.forms, config.includePristine ?? false);
 
@@ -37,8 +57,9 @@ export function useFormOrchestrator<const T extends readonly SavableForm[]>(
     phase: "idle",
     isSaving: false,
   });
-
-  const [conductor] = useState(() => createOrchestrator<T>(client, setState));
+  const [conductor] = useState(() => {
+    return createOrchestrator<T>(client, setState);
+  });
 
   const latest = useRef(config);
 
@@ -47,7 +68,9 @@ export function useFormOrchestrator<const T extends readonly SavableForm[]>(
   const submit = () => {
     const selectedForms = latest.current.includePristine
       ? latest.current.forms
-      : latest.current.forms.filter((binding) => binding.form.state.isDirty);
+      : latest.current.forms.filter((binding) => {
+          return binding.form.state.isDirty;
+        });
 
     const forms = selectedForms as unknown as T;
 
@@ -69,4 +92,4 @@ export function useFormOrchestrator<const T extends readonly SavableForm[]>(
     submit,
     reset: conductor.reset,
   };
-}
+};

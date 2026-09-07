@@ -1,13 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 
 import { PythonEditor } from "../features/editor/components/PythonEditor";
-
-export const Route = createFileRoute("/editor")({
-  ssr: false,
-  component: EditorRoute,
-});
-
-function EditorRoute() {
+const EditorRoute = () => {
   return (
     <div className="editor-route-shell">
       <Link to="/" className="editor-home-link">
@@ -16,4 +10,8 @@ function EditorRoute() {
       <PythonEditor />
     </div>
   );
-}
+};
+export const Route = createFileRoute("/editor")({
+  ssr: false,
+  component: EditorRoute,
+});

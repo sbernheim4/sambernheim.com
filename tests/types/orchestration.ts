@@ -1,26 +1,53 @@
 import { defineForm } from "../formConfig";
 import type { CacheTarget, SaveResult } from "../../src/forms/orchestration/types";
-const mutateAsync = async (input: { name: string }, _options?: { onSuccess?: () => void }) => ({
-  profile: { name: input.name, id: "1" },
-});
+const mutateAsync = async (
+  input: {
+    name: string;
+  },
+  _options?: {
+    onSuccess?: () => void;
+  },
+) => {
+  return {
+    profile: { name: input.name, id: "1" },
+  };
+};
 const profile = defineForm({
   id: "profile",
-  snapshot: () => ({ displayName: "A" }),
-  validate: () => ({ valid: true }),
-  toMutationPayload: (values) => ({ name: values.displayName }),
+  snapshot: () => {
+    return { displayName: "A" };
+  },
+  validate: () => {
+    return { valid: true };
+  },
+  toMutationPayload: (values) => {
+    return { name: values.displayName };
+  },
   endpoint: {
     mutationFn: mutateAsync,
   },
   cacheUpdates: [
     {
-      queryKey: ({ response, variables }) => [response.profile.id, variables.name],
-      getData: (response) => response.profile,
+      queryKey: ({ response, variables }) => {
+        return [response.profile.id, variables.name];
+      },
+      getData: (response) => {
+        return response.profile;
+      },
     },
     {
-      queryKey: () => ["name"],
-      getData: (response) => response.profile.name,
+      queryKey: () => {
+        return ["name"];
+      },
+      getData: (response) => {
+        return response.profile.name;
+      },
     },
-    { queryKey: () => ["envelope"] },
+    {
+      queryKey: () => {
+        return ["envelope"];
+      },
+    },
   ],
   onSuccess: ({ response, variables, formValues }) => {
     response.profile.name satisfies string;
@@ -33,46 +60,87 @@ const profile = defineForm({
 defineForm({
   id: "dependent",
   dependencies: [profile],
-  snapshot: () => ({ name: "B" }),
-  validate: () => ({ valid: true }),
-  toMutationPayload: (values, { results }) => ({
-    name: results.profile?.profile.name ?? values.name,
-  }),
+  snapshot: () => {
+    return { name: "B" };
+  },
+  validate: () => {
+    return { valid: true };
+  },
+  toMutationPayload: (values, { results }) => {
+    return {
+      name: results.profile?.profile.name ?? values.name,
+    };
+  },
   endpoint: {
     mutationFn: mutateAsync,
   },
-  cacheUpdates: [{ queryKey: ({ results }) => [results.profile?.profile.id] }],
+  cacheUpdates: [
+    {
+      queryKey: ({ results }) => {
+        return [results.profile?.profile.id];
+      },
+    },
+  ],
 });
 // @ts-expect-error mapper is required when form and mutation shapes differ
 defineForm({
   id: "bad",
-  snapshot: () => ({ display: "A" }),
-  validate: () => ({ valid: true }),
+  snapshot: () => {
+    return { display: "A" };
+  },
+  validate: () => {
+    return { valid: true };
+  },
   endpoint: { mutationFn: mutateAsync },
 });
 defineForm({
   id: "bad",
-  snapshot: () => ({ name: "A" }),
-  validate: () => ({ valid: true }),
+  snapshot: () => {
+    return { name: "A" };
+  },
+  validate: () => {
+    return { valid: true };
+  },
   endpoint: { mutationFn: mutateAsync },
   // @ts-expect-error endpoint input must not widen to mapper result
-  toMutationPayload: () => ({ name: 1 }),
+  toMutationPayload: () => {
+    return { name: 1 };
+  },
 });
 defineForm({
   id: "bad",
-  snapshot: () => ({ name: "A" }),
-  validate: () => ({ valid: true }),
+  snapshot: () => {
+    return { name: "A" };
+  },
+  validate: () => {
+    return { valid: true };
+  },
   endpoint: {
     // @ts-expect-error mutate returns void
     mutationFn: (_input: { name: string }) => {},
   },
 });
-const identity: CacheTarget<{ name: string }, {}> = {
-  queryKey: () => ["identity"],
+const identity: CacheTarget<
+  {
+    name: string;
+  },
+  {}
+> = {
+  queryKey: () => {
+    return ["identity"];
+  },
 };
 // @ts-expect-error unrelated cache data requires selector
-const incorrect: CacheTarget<{ name: string }, {}, number> = {
-  queryKey: () => ["incorrect"],
+const incorrect: CacheTarget<
+  {
+    name: string;
+  },
+  {},
+  number
+> = {
+  queryKey: () => {
+    return ["incorrect"];
+  },
 };
 declare const result: SaveResult<readonly [typeof profile]>;
 result.responses.profile?.profile.name satisfies string | undefined;
@@ -92,8 +160,12 @@ const binding = useComposableForm({
   id: "profile",
   defaultValues: { display: "", active: false },
   query,
-  toFormData: (data) => ({ display: data.name, active: data.nested.active }),
-  toMutationPayload: (v) => ({ name: v.display }),
+  toFormData: (data) => {
+    return { display: data.name, active: data.nested.active };
+  },
+  toMutationPayload: (v) => {
+    return { name: v.display };
+  },
   endpoint: { mutationFn: mutateAsync },
 });
 binding.form.state.values.display satisfies string;
@@ -112,9 +184,13 @@ useComposableForm({
   id: "bad",
   defaultValues: { display: "" },
   query,
-  toFormData: (data) => ({ display: data.name }),
+  toFormData: (data) => {
+    return { display: data.name };
+  },
   // @ts-expect-error incorrect mutation payload type
-  toMutationPayload: () => ({ name: 12 }),
+  toMutationPayload: () => {
+    return { name: 12 };
+  },
   endpoint: { mutationFn: mutateAsync },
 });
 // @ts-expect-error renamed form requires a payload mapper
@@ -122,7 +198,9 @@ useComposableForm({
   id: "bad",
   defaultValues: { display: "" },
   query,
-  toFormData: (data) => ({ display: data.name }),
+  toFormData: (data) => {
+    return { display: data.name };
+  },
   endpoint: { mutationFn: mutateAsync },
 });
 
@@ -130,8 +208,12 @@ useComposableForm({
 const standalone = useQueryBackedForm({
   defaultValues: { display: "" },
   query,
-  toFormData: (data) => ({ display: data.name }),
-  toMutationPayload: (values) => ({ name: values.display }),
+  toFormData: (data) => {
+    return { display: data.name };
+  },
+  toMutationPayload: (values) => {
+    return { name: values.display };
+  },
   endpoint: { mutationFn: mutateAsync },
   onSuccess: ({ response, variables, formValues }) => {
     response.profile.id satisfies string;
@@ -166,9 +248,9 @@ useComposableForm({
 });
 
 // Submitted configuration is read-only, including nested declarations.
-function checkImmutableConfig(
+const checkImmutableConfig = (
   config: import("../../src/forms/orchestration/types").SaveConfig<readonly [typeof profile]>,
-) {
+) => {
   // @ts-expect-error submitted form lists cannot be replaced
   config.forms = [];
   // @ts-expect-error submitted form lists cannot be appended to
@@ -181,13 +263,15 @@ function checkImmutableConfig(
   }
   if (config.cacheUpdates?.[0]) {
     // @ts-expect-error cache targets cannot be changed during a run
-    config.cacheUpdates[0].queryKey = () => ["replacement"];
+    config.cacheUpdates[0].queryKey = () => {
+      return ["replacement"];
+    };
   }
-}
+};
 void checkImmutableConfig;
 
 // Domain fields retain their names and allowed values through the form binding.
-function checkDomainFields(
+const checkDomainFields = (
   organization: ReturnType<
     typeof import("../../src/features/workspace/organizations/hooks/useOrganizationForm").useOrganizationForm
   >,
@@ -197,7 +281,7 @@ function checkDomainFields(
   task: ReturnType<
     typeof import("../../src/features/workspace/tasks/hooks/useTaskForm").useTaskForm
   >,
-) {
+) => {
   organization.form.setFieldValue("sector", "finance");
   project.form.setFieldValue("priority", "high");
   task.form.setFieldValue("status", "todo");
@@ -209,5 +293,5 @@ function checkDomainFields(
   project.form.setFieldValue("priority", "urgent");
   // @ts-expect-error task status is distinct from organization status
   task.form.setFieldValue("status", "active");
-}
+};
 void checkDomainFields;

@@ -1,8 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { clearWorkspace } from "../clearWorkspace";
 import { useClearWorkspaceMutation } from "./useClearWorkspaceMutation";
-
-export function useClearEntities() {
+export const useClearEntities = () => {
   const queryClient = useQueryClient();
   const mutation = useClearWorkspaceMutation();
   return {
@@ -12,4 +11,4 @@ export function useClearEntities() {
       void clearWorkspace(queryClient, mutation.mutateAsync).catch(() => {});
     },
   };
-}
+};

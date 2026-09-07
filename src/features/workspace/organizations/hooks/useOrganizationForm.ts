@@ -1,4 +1,9 @@
-import { organizationListsKey, organizationKey, organizationProfileKey, organizationOperationsKey } from "../queryOptions";
+import {
+  organizationListsKey,
+  organizationKey,
+  organizationProfileKey,
+  organizationOperationsKey,
+} from "../queryOptions";
 import { bootstrapKey } from "../../queryOptions";
 import { useQueryBackedForm } from "../../../../forms/hooks/useQueryBackedForm";
 import type { OutcomeCallbacks } from "../../../../forms/orchestration/types";
@@ -15,40 +20,53 @@ const defaultValues: OrganizationFormValues = {
   status: "active",
   region: "east",
 };
-
-export function useOrganizationForm({
+export const useOrganizationForm = ({
   resource,
   ...callbacks
-}: { resource?: Organization } & OutcomeCallbacks<
-  OrganizationFormValues,
-  SaveOrganizationInput,
-  SaveOrganizationResponse
->) {
+}: {
+  resource?: Organization;
+} & OutcomeCallbacks<OrganizationFormValues, SaveOrganizationInput, SaveOrganizationResponse>) => {
   const query = useOrganization(resource?.id ?? "");
   const create = useCreateOrganization();
   const update = useUpdateOrganization(resource?.id ?? "");
   const form = useQueryBackedForm({
     query: resource ? query : undefined,
     defaultValues,
-    toFormData: (data: Organization): OrganizationFormValues => ({
-      name: data.name,
-      sector: data.sector,
-      status: data.status,
-      region: data.region,
-    }),
-    toMutationPayload: (values): SaveOrganizationInput => ({
-      name: values.name.trim(),
-      sector: option(values.sector, sectorOptions),
-      status: option(values.status, statusOptions),
-      region: option(values.region, regionOptions),
-    }),
-    validate: (values) => (!values.name?.trim() ? "Organization name is required." : undefined),
+    toFormData: (data: Organization): OrganizationFormValues => {
+      return {
+        name: data.name,
+        sector: data.sector,
+        status: data.status,
+        region: data.region,
+      };
+    },
+    toMutationPayload: (values): SaveOrganizationInput => {
+      return {
+        name: values.name.trim(),
+        sector: option(values.sector, sectorOptions),
+        status: option(values.status, statusOptions),
+        region: option(values.region, regionOptions),
+      };
+    },
+    validate: (values) => {
+      return !values.name?.trim() ? "Organization name is required." : undefined;
+    },
     endpoint: {
       mutationFn: resource ? update.mutateAsync : create.mutateAsync,
       retrySafe: !!resource,
     },
-    invalidateQueryKeys: [organizationListsKey(), bootstrapKey(), ...(resource ? [organizationKey(resource.id), organizationProfileKey(resource.id), organizationOperationsKey(resource.id)] : [])],
+    invalidateQueryKeys: [
+      organizationListsKey(),
+      bootstrapKey(),
+      ...(resource
+        ? [
+            organizationKey(resource.id),
+            organizationProfileKey(resource.id),
+            organizationOperationsKey(resource.id),
+          ]
+        : []),
+    ],
     ...callbacks,
   });
   return form;
-}
+};

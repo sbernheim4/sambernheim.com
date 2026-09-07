@@ -16,8 +16,7 @@ const EDITABLE_DEFINITIONS = [
     initialBody: '    return car.make == "Toyota"',
   },
 ] as const;
-
-export function PythonEditor() {
+export const PythonEditor = () => {
   const initialSource = buildEditableSource(EDITABLE_DEFINITIONS);
   const { tyState, handleMount, resetSource, diagnostics, revealDiagnostic } = useTyMonacoSession({
     predefinedPython: HIDDEN_PYTHON_PRELUDE,
@@ -76,27 +75,31 @@ export function PythonEditor() {
           <p className="diagnostics-empty">No issues reported.</p>
         ) : (
           <ul className="diagnostics-list">
-            {diagnostics.map((diagnostic, index) => (
-              <li key={`${diagnostic.code}-${diagnostic.startLineNumber}-${index}`}>
-                <button
-                  type="button"
-                  className="diagnostic-button"
-                  onClick={() => revealDiagnostic(diagnostic)}
-                >
-                  <span className={`diagnostic-severity ${diagnostic.severity}`}>
-                    {diagnostic.severity}
-                  </span>
-                  <span className="diagnostic-location">
-                    {diagnostic.startLineNumber}:{diagnostic.startColumn}
-                  </span>
-                  <span>{diagnostic.message}</span>
-                  <code>{diagnostic.code}</code>
-                </button>
-              </li>
-            ))}
+            {diagnostics.map((diagnostic, index) => {
+              return (
+                <li key={`${diagnostic.code}-${diagnostic.startLineNumber}-${index}`}>
+                  <button
+                    type="button"
+                    className="diagnostic-button"
+                    onClick={() => {
+                      return revealDiagnostic(diagnostic);
+                    }}
+                  >
+                    <span className={`diagnostic-severity ${diagnostic.severity}`}>
+                      {diagnostic.severity}
+                    </span>
+                    <span className="diagnostic-location">
+                      {diagnostic.startLineNumber}:{diagnostic.startColumn}
+                    </span>
+                    <span>{diagnostic.message}</span>
+                    <code>{diagnostic.code}</code>
+                  </button>
+                </li>
+              );
+            })}
           </ul>
         )}
       </section>
     </main>
   );
-}
+};

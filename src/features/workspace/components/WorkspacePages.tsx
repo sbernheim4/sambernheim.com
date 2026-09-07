@@ -22,7 +22,7 @@ import { ProjectForm } from "../projects/components/ProjectForm";
 import { TaskForm } from "../tasks/components/TaskForm";
 import type { BootstrapData, Organization, Project, Task } from "../types";
 import { WorkspaceLayout } from "./WorkspaceLayout";
-export function OrganizationsPage() {
+export const OrganizationsPage = () => {
   const query = useOrganizationsWorkspace();
   return (
     <Workspace
@@ -36,17 +36,20 @@ export function OrganizationsPage() {
             kind="organizations"
             items={query.data.organizations}
             data={query.data}
-            create={(close) => <OrganizationForm onCreated={close} />}
+            create={(close) => {
+              return <OrganizationForm onCreated={close} />;
+            }}
           />
         )}
       </QueryState>
     </Workspace>
   );
-}
-
-export function OrganizationPage({ id }: { id: string }) {
+};
+export const OrganizationPage = ({ id }: { id: string }) => {
   const query = useOrganizationWorkspace(id);
-  const organization = query.data?.organizations.find((item) => item.id === id);
+  const organization = query.data?.organizations.find((item) => {
+    return item.id === id;
+  });
   return (
     <Workspace
       title={organization?.name ?? "Organization"}
@@ -71,24 +74,27 @@ export function OrganizationPage({ id }: { id: string }) {
               title="Projects"
               kind="projects"
               data={query.data}
-              items={query.data.projects.filter((item) => item.organizationId === organization.id)}
-              create={(close) => (
-                <ProjectForm organizationId={organization.id} onCreated={close} />
-              )}
+              items={query.data.projects.filter((item) => {
+                return item.organizationId === organization.id;
+              })}
+              create={(close) => {
+                return <ProjectForm organizationId={organization.id} onCreated={close} />;
+              }}
             />
           </div>
         )}
       </QueryState>
     </Workspace>
   );
-}
-
-export function ProjectPage({ id }: { id: string }) {
+};
+export const ProjectPage = ({ id }: { id: string }) => {
   const query = useProjectWorkspace(id);
-  const project = query.data?.projects.find((item) => item.id === id);
-  const organization = query.data?.organizations.find(
-    (item) => item.id === project?.organizationId,
-  );
+  const project = query.data?.projects.find((item) => {
+    return item.id === id;
+  });
+  const organization = query.data?.organizations.find((item) => {
+    return item.id === project?.organizationId;
+  });
   return (
     <Workspace
       title={project?.name ?? "Project"}
@@ -111,21 +117,30 @@ export function ProjectPage({ id }: { id: string }) {
               title="Tasks"
               kind="tasks"
               data={query.data}
-              items={query.data.tasks.filter((item) => item.projectId === project.id)}
-              create={(close) => <TaskForm project={project} onCreated={close} />}
+              items={query.data.tasks.filter((item) => {
+                return item.projectId === project.id;
+              })}
+              create={(close) => {
+                return <TaskForm project={project} onCreated={close} />;
+              }}
             />
           </div>
         )}
       </QueryState>
     </Workspace>
   );
-}
-
-export function TaskPage({ id }: { id: string }) {
+};
+export const TaskPage = ({ id }: { id: string }) => {
   const query = useTaskWorkspace(id);
-  const task = query.data?.tasks.find((item) => item.id === id);
-  const project = query.data?.projects.find((item) => item.id === task?.projectId);
-  const organization = query.data?.organizations.find((item) => item.id === task?.organizationId);
+  const task = query.data?.tasks.find((item) => {
+    return item.id === id;
+  });
+  const project = query.data?.projects.find((item) => {
+    return item.id === task?.projectId;
+  });
+  const organization = query.data?.organizations.find((item) => {
+    return item.id === task?.organizationId;
+  });
   return (
     <Workspace
       title={task?.title ?? "Task"}
@@ -172,9 +187,8 @@ export function TaskPage({ id }: { id: string }) {
       </QueryState>
     </Workspace>
   );
-}
-
-export function Workspace({
+};
+export const Workspace = ({
   title,
   description,
   children,
@@ -190,7 +204,7 @@ export function Workspace({
   organization?: Organization;
   project?: Project;
   task?: Task;
-}) {
+}) => {
   return (
     <WorkspaceLayout title={title} description={description} entity={entity}>
       <div className="workspace-body">
@@ -226,9 +240,8 @@ export function Workspace({
       </div>
     </WorkspaceLayout>
   );
-}
-
-function Details({
+};
+const Details = ({
   title,
   id,
   updatedAt,
@@ -238,7 +251,7 @@ function Details({
   id: string;
   updatedAt: string;
   children: ReactNode;
-}) {
+}) => {
   return (
     <section className="workspace-details">
       <h2>{title}</h2>
@@ -247,9 +260,8 @@ function Details({
       <p className="resource-updated">Updated {new Date(updatedAt).toLocaleString()}</p>
     </section>
   );
-}
-
-export function QueryState({
+};
+export const QueryState = ({
   query,
   missing,
   children,
@@ -257,24 +269,32 @@ export function QueryState({
   query: ReturnType<typeof useOrganizationsWorkspace>;
   missing?: boolean;
   children: ReactNode;
-}) {
-  if (query.isPending)
+}) => {
+  if (query.isPending) {
     return (
       <p className="workspace-empty" role="status">
         Loading resources...
       </p>
     );
-  if (query.isError)
+  }
+  if (query.isError) {
     return (
       <div className="workspace-empty" role="alert">
         <h2>Unable to load resources</h2>
         <p>Please try again.</p>
-        <button type="button" className="workspace-button" onClick={() => void query.refetch()}>
+        <button
+          type="button"
+          className="workspace-button"
+          onClick={() => {
+            return void query.refetch();
+          }}
+        >
           Retry
         </button>
       </div>
     );
-  if (missing)
+  }
+  if (missing) {
     return (
       <div className="workspace-empty">
         <h2>Resource not found</h2>
@@ -282,10 +302,10 @@ export function QueryState({
         <Link to="/organizations">Back to organizations</Link>
       </div>
     );
+  }
   return children;
-}
-
-export function EntityList({
+};
+export const EntityList = ({
   title,
   kind,
   items,
@@ -297,14 +317,14 @@ export function EntityList({
   items: Array<Organization | Project | Task>;
   data: BootstrapData;
   create: (close: () => void) => ReactNode;
-}) {
+}) => {
   const [search, setSearch] = useState("");
   const [creating, setCreating] = useState(false);
   const singular =
     kind === "organizations" ? "organization" : kind === "projects" ? "project" : "task";
-  const filtered = items.filter((item) =>
-    ("name" in item ? item.name : item.title).toLowerCase().includes(search.toLowerCase()),
-  );
+  const filtered = items.filter((item) => {
+    return ("name" in item ? item.name : item.title).toLowerCase().includes(search.toLowerCase());
+  });
   const Icon = kind === "organizations" ? Building2 : kind === "projects" ? Folder : ListTodo;
   return (
     <section className="workspace-section">
@@ -315,7 +335,9 @@ export function EntityList({
         <button
           className="workspace-button"
           type="button"
-          onClick={() => setCreating(!creating)}
+          onClick={() => {
+            return setCreating(!creating);
+          }}
           aria-expanded={creating}
         >
           {creating ? <X size={16} /> : <Plus size={16} />}
@@ -338,7 +360,9 @@ export function EntityList({
           aria-label={`Search ${kind}`}
           placeholder={`Search ${kind}...`}
           value={search}
-          onChange={(event) => setSearch(event.target.value)}
+          onChange={(event) => {
+            return setSearch(event.target.value);
+          }}
         />
       </label>
       {filtered.length === 0 ? (
@@ -373,9 +397,17 @@ export function EntityList({
                   </span>
                   <small>
                     {kind === "organizations"
-                      ? `${data.projects.filter((p) => p.organizationId === item.id).length} projects`
+                      ? `${
+                          data.projects.filter((p) => {
+                            return p.organizationId === item.id;
+                          }).length
+                        } projects`
                       : kind === "projects"
-                        ? `${data.tasks.filter((t) => t.projectId === item.id).length} tasks`
+                        ? `${
+                            data.tasks.filter((t) => {
+                              return t.projectId === item.id;
+                            }).length
+                          } tasks`
                         : ""}
                   </small>
                 </span>
@@ -404,11 +436,12 @@ export function EntityList({
       )}
     </section>
   );
-}
-
-function label(value: string) {
+};
+const label = (value: string) => {
   return value
     .split("-")
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .map((part) => {
+      return part.charAt(0).toUpperCase() + part.slice(1);
+    })
     .join(" ");
-}
+};

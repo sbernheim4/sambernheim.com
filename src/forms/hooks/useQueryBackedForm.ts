@@ -7,10 +7,9 @@ export type QueryBackedFormConfig<QueryData, Values, Mutation extends AsyncMutat
   Values,
   Mutation
 >;
-
-export function useQueryBackedForm<QueryData, Values, Mutation extends AsyncMutation>(
+export const useQueryBackedForm = <QueryData, Values, Mutation extends AsyncMutation>(
   config: QueryBackedFormConfig<QueryData, Values, Mutation>,
-) {
+) => {
   const binding = useComposableForm<"resource", QueryData, Values, Mutation>(
     Object.assign({}, config, { id: "resource" as const }),
   );
@@ -39,4 +38,4 @@ export function useQueryBackedForm<QueryData, Values, Mutation extends AsyncMuta
     isDirty: save.isDirty,
     error,
   };
-}
+};

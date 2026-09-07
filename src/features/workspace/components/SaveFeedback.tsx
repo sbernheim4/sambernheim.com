@@ -1,4 +1,4 @@
-export function SaveFeedback({ visible }: { visible: boolean }) {
+export const SaveFeedback = ({ visible }: { visible: boolean }) => {
   if (!visible) {
     return null;
   }
@@ -7,4 +7,4 @@ export function SaveFeedback({ visible }: { visible: boolean }) {
       Changes saved.
     </p>
   );
-}
+};

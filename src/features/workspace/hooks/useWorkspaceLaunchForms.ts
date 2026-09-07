@@ -28,8 +28,7 @@ const taskDefaults: Omit<SaveTaskInput, "organizationId" | "projectId"> = {
   status: "todo",
   dueWindow: "this-week",
 };
-
-export function useWorkspaceLaunchForms(appendActivity: (text: string) => void) {
+export const useWorkspaceLaunchForms = (appendActivity: (text: string) => void) => {
   const createOrganization = useCreateOrganization();
   const createProject = useCreateProject();
   const createTask = useCreateTask();
@@ -42,8 +41,9 @@ export function useWorkspaceLaunchForms(appendActivity: (text: string) => void) 
     endpoint: {
       mutationFn: createOrganization.mutateAsync,
     },
-    onSuccess: ({ response }) =>
-      appendActivity(`Saved organization: ${response.organization.name}`),
+    onSuccess: ({ response }) => {
+      return appendActivity(`Saved organization: ${response.organization.name}`);
+    },
   });
   const project = useComposableForm({
     id: "project",
@@ -51,13 +51,17 @@ export function useWorkspaceLaunchForms(appendActivity: (text: string) => void) 
     defaultValues: projectDefaults,
     dependencies: [organization] as const,
     toMutationPayload: (values, { results }) => {
-      if (!results.organization) throw new Error("Organization has not been saved.");
+      if (!results.organization) {
+        throw new Error("Organization has not been saved.");
+      }
       return { ...values, organizationId: results.organization.organization.id };
     },
     endpoint: {
       mutationFn: createProject.mutateAsync,
     },
-    onSuccess: ({ response }) => appendActivity(`Saved project: ${response.project.name}`),
+    onSuccess: ({ response }) => {
+      return appendActivity(`Saved project: ${response.project.name}`);
+    },
   });
   const task = useComposableForm({
     id: "task",
@@ -65,8 +69,9 @@ export function useWorkspaceLaunchForms(appendActivity: (text: string) => void) 
     defaultValues: taskDefaults,
     dependencies: [organization, project] as const,
     toMutationPayload: (values, { results }) => {
-      if (!results.organization || !results.project)
+      if (!results.organization || !results.project) {
         throw new Error("Organization and project have not been saved.");
+      }
       return {
         ...values,
         organizationId: results.organization.organization.id,
@@ -76,15 +81,22 @@ export function useWorkspaceLaunchForms(appendActivity: (text: string) => void) 
     endpoint: {
       mutationFn: createTask.mutateAsync,
     },
-    onSuccess: ({ response }) => appendActivity(`Saved task: ${response.task.title}`),
+    onSuccess: ({ response }) => {
+      return appendActivity(`Saved task: ${response.task.title}`);
+    },
   });
   const save = useFormOrchestrator({
     forms: [organization, project, task] as const,
     includePristine: true,
-    onSuccess: ({ result }) =>
-      appendActivity(`Workspace created: ${result.responses.organization?.organization.name}`),
-    onFailure: () => appendActivity("Workspace creation failed. See the save results."),
+    onSuccess: ({ result }) => {
+      return appendActivity(
+        `Workspace created: ${result.responses.organization?.organization.name}`,
+      );
+    },
+    onFailure: () => {
+      return appendActivity("Workspace creation failed. See the save results.");
+    },
   });
 
   return { organization, project, task, save, bootstrap };
-}
+};

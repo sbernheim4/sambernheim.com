@@ -2,13 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 
 import { useOrganizations } from "../features/workspace/organizations/hooks/queries";
 import { WorkspaceLayout } from "../features/workspace/components/WorkspaceLayout";
-
-export const Route = createFileRoute("/forms/")({
-  ssr: false,
-  component: FormsIndex,
-});
-
-function FormsIndex() {
+const FormsIndex = () => {
   const organizations = useOrganizations();
   const firstOrganization = organizations.data?.[0];
   return (
@@ -38,4 +32,8 @@ function FormsIndex() {
       </section>
     </WorkspaceLayout>
   );
-}
+};
+export const Route = createFileRoute("/forms/")({
+  ssr: false,
+  component: FormsIndex,
+});

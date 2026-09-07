@@ -3,6 +3,15 @@ import viteReact from "@vitejs/plugin-react";
 import { defineConfig, type PreviewServer, type ViteDevServer } from "vite";
 
 import { handleApiRequest } from "./server/example-api";
+const installExampleApi = (server: ViteDevServer | PreviewServer) => {
+  server.middlewares.use((request, response, next) => {
+    if (!request.url?.startsWith("/api/")) {
+      next();
+      return;
+    }
+    void handleApiRequest(request, response);
+  });
+};
 
 export default defineConfig({
   server: {
@@ -25,13 +34,3 @@ export default defineConfig({
     viteReact(),
   ],
 });
-
-function installExampleApi(server: ViteDevServer | PreviewServer) {
-  server.middlewares.use((request, response, next) => {
-    if (!request.url?.startsWith("/api/")) {
-      next();
-      return;
-    }
-    void handleApiRequest(request, response);
-  });
-}

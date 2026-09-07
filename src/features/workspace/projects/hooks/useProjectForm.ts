@@ -15,42 +15,55 @@ const defaultValues: ProjectFormValues = {
   phase: "planning",
   budget: "$50k",
 };
-
-export function useProjectForm({
+export const useProjectForm = ({
   resource,
   organizationId,
   ...callbacks
-}: { resource?: Project; organizationId: string } & OutcomeCallbacks<
+}: {
+  resource?: Project;
+  organizationId: string;
+} & OutcomeCallbacks<
   ProjectFormValues,
   Omit<SaveProjectInput, "organizationId">,
   SaveProjectResponse
->) {
+>) => {
   const query = useProject(resource?.id ?? "");
   const create = useCreateProject();
   const update = useUpdateProject(resource?.id ?? "");
   const form = useQueryBackedForm({
     query: resource ? query : undefined,
     defaultValues,
-    toFormData: (data: Project): ProjectFormValues => ({
-      name: data.name,
-      priority: data.priority,
-      phase: data.phase,
-      budget: data.budget,
-    }),
-    toMutationPayload: (values): SaveProjectInput => ({
-      organizationId,
-      name: values.name.trim(),
-      priority: option(values.priority, priorityOptions),
-      phase: option(values.phase, phaseOptions),
-      budget: values.budget,
-    }),
-    validate: (values) => (!values.name?.trim() ? "Project name is required." : undefined),
+    toFormData: (data: Project): ProjectFormValues => {
+      return {
+        name: data.name,
+        priority: data.priority,
+        phase: data.phase,
+        budget: data.budget,
+      };
+    },
+    toMutationPayload: (values): SaveProjectInput => {
+      return {
+        organizationId,
+        name: values.name.trim(),
+        priority: option(values.priority, priorityOptions),
+        phase: option(values.phase, phaseOptions),
+        budget: values.budget,
+      };
+    },
+    validate: (values) => {
+      return !values.name?.trim() ? "Project name is required." : undefined;
+    },
     endpoint: {
       mutationFn: resource ? update.mutateAsync : create.mutateAsync,
       retrySafe: !!resource,
     },
-    invalidateQueryKeys: [projectsKey(), organizationProjectsKey(organizationId), ...(resource ? [projectKey(resource.id)] : []), bootstrapKey()],
+    invalidateQueryKeys: [
+      projectsKey(),
+      organizationProjectsKey(organizationId),
+      ...(resource ? [projectKey(resource.id)] : []),
+      bootstrapKey(),
+    ],
     ...callbacks,
   });
   return form;
-}
+};

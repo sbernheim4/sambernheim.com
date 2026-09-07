@@ -5,7 +5,7 @@ import { dueWindowOptions, ownerOptions, taskStatusOptions } from "../fieldOptio
 import { useTaskForm } from "../hooks/useTaskForm";
 import { FormActions } from "../../components/FormActions";
 import { SaveFeedback } from "../../components/SaveFeedback";
-export function TaskForm({
+export const TaskForm = ({
   resource,
   project,
   onCreated,
@@ -13,7 +13,7 @@ export function TaskForm({
   resource?: Task;
   project: Project;
   onCreated?: () => void;
-}) {
+}) => {
   const [saved, setSaved] = useState(false);
   const editor = useTaskForm({
     resource,
@@ -27,7 +27,14 @@ export function TaskForm({
   });
 
   return (
-    <Form.Provider value={{ ...editor, onChange: () => setSaved(false) }}>
+    <Form.Provider
+      value={{
+        ...editor,
+        onChange: () => {
+          return setSaved(false);
+        },
+      }}
+    >
       <Form.Shell>
         <Form.Fields>
           <TaskFormFields />
@@ -38,24 +45,31 @@ export function TaskForm({
       </Form.Shell>
     </Form.Provider>
   );
-}
-
-export function TaskFormFields() {
+};
+export const TaskFormFields = () => {
   const typedForm = useFormContext<ReturnType<typeof useTaskForm>["form"]>("task");
   return (
     <>
       <typedForm.AppField name="title">
-        {(field) => <field.TextField label="Task title" required />}
+        {(field) => {
+          return <field.TextField label="Task title" required />;
+        }}
       </typedForm.AppField>
       <typedForm.AppField name="owner">
-        {(field) => <field.SelectField label="Owner" options={ownerOptions} />}
+        {(field) => {
+          return <field.SelectField label="Owner" options={ownerOptions} />;
+        }}
       </typedForm.AppField>
       <typedForm.AppField name="status">
-        {(field) => <field.RadioGroupField label="Status" options={taskStatusOptions} />}
+        {(field) => {
+          return <field.RadioGroupField label="Status" options={taskStatusOptions} />;
+        }}
       </typedForm.AppField>
       <typedForm.AppField name="dueWindow">
-        {(field) => <field.SelectField label="Due" options={dueWindowOptions} />}
+        {(field) => {
+          return <field.SelectField label="Due" options={dueWindowOptions} />;
+        }}
       </typedForm.AppField>
     </>
   );
-}
+};

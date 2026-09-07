@@ -25,5 +25,4 @@ export const apiHarness = () => {
       return { status, data };
     },
   };
-}
-;
+};

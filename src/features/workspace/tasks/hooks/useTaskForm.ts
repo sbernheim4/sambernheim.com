@@ -15,43 +15,56 @@ const defaultValues: TaskFormValues = {
   status: "todo",
   dueWindow: "this-week",
 };
-
-export function useTaskForm({
+export const useTaskForm = ({
   resource,
   project,
   ...callbacks
-}: { resource?: Task; project: Project } & OutcomeCallbacks<
+}: {
+  resource?: Task;
+  project: Project;
+} & OutcomeCallbacks<
   TaskFormValues,
   Omit<SaveTaskInput, "organizationId" | "projectId">,
   SaveTaskResponse
->) {
+>) => {
   const query = useTask(resource?.id ?? "");
   const create = useCreateTask();
   const update = useUpdateTask(resource?.id ?? "");
   const form = useQueryBackedForm({
     query: resource ? query : undefined,
     defaultValues,
-    toFormData: (data: Task): TaskFormValues => ({
-      title: data.title,
-      owner: data.owner,
-      status: data.status,
-      dueWindow: data.dueWindow,
-    }),
-    toMutationPayload: (values): SaveTaskInput => ({
-      organizationId: project.organizationId,
-      projectId: project.id,
-      title: values.title.trim(),
-      owner: option(values.owner, ownerOptions),
-      status: option(values.status, taskStatusOptions),
-      dueWindow: option(values.dueWindow, dueWindowOptions),
-    }),
-    validate: (values) => (!values.title?.trim() ? "Task title is required." : undefined),
+    toFormData: (data: Task): TaskFormValues => {
+      return {
+        title: data.title,
+        owner: data.owner,
+        status: data.status,
+        dueWindow: data.dueWindow,
+      };
+    },
+    toMutationPayload: (values): SaveTaskInput => {
+      return {
+        organizationId: project.organizationId,
+        projectId: project.id,
+        title: values.title.trim(),
+        owner: option(values.owner, ownerOptions),
+        status: option(values.status, taskStatusOptions),
+        dueWindow: option(values.dueWindow, dueWindowOptions),
+      };
+    },
+    validate: (values) => {
+      return !values.title?.trim() ? "Task title is required." : undefined;
+    },
     endpoint: {
       mutationFn: resource ? update.mutateAsync : create.mutateAsync,
       retrySafe: !!resource,
     },
-    invalidateQueryKeys: [tasksKey(), projectTasksKey(project.id), ...(resource ? [taskKey(resource.id)] : []), bootstrapKey()],
+    invalidateQueryKeys: [
+      tasksKey(),
+      projectTasksKey(project.id),
+      ...(resource ? [taskKey(resource.id)] : []),
+      bootstrapKey(),
+    ],
     ...callbacks,
   });
   return form;
-}
+};

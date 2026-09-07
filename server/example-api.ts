@@ -13,7 +13,9 @@ import type {
   UpdateOperationsInput,
 } from "../src/features/workspace/types.ts";
 type Store = {
-  organizations: { id: string }[];
+  organizations: {
+    id: string;
+  }[];
   profiles: OrganizationProfile[];
   operations: OrganizationOperations[];
   projects: Project[];
@@ -21,8 +23,7 @@ type Store = {
 };
 
 type RequestBody = Record<string, unknown>;
-
-export function createExampleApi() {
+export const createExampleApi = () => {
   let nextId = 2;
   let lastTimestamp = 0;
   const now = () => {
@@ -71,36 +72,42 @@ export function createExampleApi() {
       },
     ],
   };
-
-  async function handleApiRequest(request: IncomingMessage, response: ServerResponse) {
+  const handleApiRequest = async (request: IncomingMessage, response: ServerResponse) => {
     try {
       const path = new URL(request.url ?? "/", "http://localhost").pathname;
       const childMatch = path.match(/^\/api\/organizations\/([^/]+)\/(profile|operations)$/);
       if (childMatch && (request.method === "GET" || request.method === "PATCH")) {
         const id = decodeURIComponent(childMatch[1]);
-        const parent = store.organizations.find((item) => item.id === id);
-        if (!parent) return sendJson(response, { message: "Organization not found." }, 404);
-        const profile = store.profiles.find((item) => item.organizationId === id)!;
-        const operations = store.operations.find((item) => item.organizationId === id)!;
-        if (request.method === "GET")
+        const parent = store.organizations.find((item) => {
+          return item.id === id;
+        });
+        if (!parent) {
+          return sendJson(response, { message: "Organization not found." }, 404);
+        }
+        const profile = store.profiles.find((item) => {
+          return item.organizationId === id;
+        })!;
+        const operations = store.operations.find((item) => {
+          return item.organizationId === id;
+        })!;
+        if (request.method === "GET") {
           return sendJson(response, childMatch[2] === "profile" ? profile : operations);
+        }
         const body = await readJson(request);
-        if (childMatch[2] === "profile") updateProfile(profile, body);
-        else updateOperations(operations, body);
-        return sendJson(
-          response,
-          childMatch[2] === "profile"
-            ? { profile }
-            : { operations },
-        );
+        if (childMatch[2] === "profile") {
+          updateProfile(profile, body);
+        } else {
+          updateOperations(operations, body);
+        }
+        return sendJson(response, childMatch[2] === "profile" ? { profile } : { operations });
       }
       const editMatch = path.match(/^\/api\/(organizations|projects|tasks)\/([^/]+)$/);
       if (request.method === "GET") {
         if (editMatch) {
           const collection = editMatch[1] as "organizations" | "projects" | "tasks";
-          const entity = bootstrap(store)[collection].find(
-            (item) => item.id === decodeURIComponent(editMatch[2]),
-          );
+          const entity = bootstrap(store)[collection].find((item) => {
+            return item.id === decodeURIComponent(editMatch[2]);
+          });
           return sendJson(
             response,
             entity ?? { message: "Resource not found." },
@@ -108,36 +115,49 @@ export function createExampleApi() {
           );
         }
         const list = path.match(/^\/api\/(organizations|projects|tasks)$/);
-        if (list)
+        if (list) {
           return sendJson(
             response,
             bootstrap(store)[list[1] as "organizations" | "projects" | "tasks"],
           );
+        }
         const children = path.match(/^\/api\/(organizations|projects)\/([^/]+)\/(projects|tasks)$/);
         if (children) {
           const id = decodeURIComponent(children[2]);
-          if (children[1] === "organizations" && children[3] === "projects")
+          if (children[1] === "organizations" && children[3] === "projects") {
             return sendJson(
               response,
-              store.projects.filter((item) => item.organizationId === id),
+              store.projects.filter((item) => {
+                return item.organizationId === id;
+              }),
             );
-          if (children[1] === "projects" && children[3] === "tasks")
+          }
+          if (children[1] === "projects" && children[3] === "tasks") {
             return sendJson(
               response,
-              store.tasks.filter((item) => item.projectId === id),
+              store.tasks.filter((item) => {
+                return item.projectId === id;
+              }),
             );
+          }
         }
       }
       if (request.method === "PATCH" && editMatch) {
         const collection = editMatch[1] as "organizations" | "projects" | "tasks";
-        const entity = store[collection].find((item) => item.id === editMatch[2]);
-        if (!entity) return sendJson(response, { message: "Resource not found." }, 404);
+        const entity = store[collection].find((item) => {
+          return item.id === editMatch[2];
+        });
+        if (!entity) {
+          return sendJson(response, { message: "Resource not found." }, 404);
+        }
         if (collection === "organizations") {
           const body = (await readJson(request)) as UpdateOrganizationInput;
-          const profile = store.profiles.find((item) => item.organizationId === entity.id)!;
-          const operations = store.operations.find(
-            (item) => item.organizationId === entity.id,
-          )!;
+          const profile = store.profiles.find((item) => {
+            return item.organizationId === entity.id;
+          })!;
+          const operations = store.operations.find((item) => {
+            return item.organizationId === entity.id;
+          })!;
           updateProfile(profile, body);
           updateOperations(operations, body);
           const organization = projectOrganization(store, entity.id);
@@ -237,7 +257,11 @@ export function createExampleApi() {
         if (!organizationId || !name || !priority || !phase || !budget) {
           return sendJson(response, { message: "Missing project fields." }, 400);
         }
-        if (!store.organizations.some((item) => item.id === organizationId)) {
+        if (
+          !store.organizations.some((item) => {
+            return item.id === organizationId;
+          })
+        ) {
           return sendJson(response, { message: "Choose an existing organization." }, 400);
         }
         const project = {
@@ -270,7 +294,9 @@ export function createExampleApi() {
         if (!organizationId || !projectId || !title || !owner || !status || !dueWindow) {
           return sendJson(response, { message: "Missing task fields." }, 400);
         }
-        const parent = store.projects.find((item) => item.id === projectId);
+        const parent = store.projects.find((item) => {
+          return item.id === projectId;
+        });
         if (!parent || parent.organizationId !== organizationId) {
           return sendJson(
             response,
@@ -300,30 +326,32 @@ export function createExampleApi() {
       response.writeHead(500);
       response.end(error instanceof Error ? error.message : "Unknown error");
     }
-  }
-
-  function updateProfile(profile: OrganizationProfile, body: UpdateProfileInput) {
+  };
+  const updateProfile = (profile: OrganizationProfile, body: UpdateProfileInput) => {
     Object.assign(profile, {
       name: cleanString(body.name, profile.name),
       sector: oneOf(body.sector, ["healthcare", "finance", "education"], profile.sector),
       updatedAt: now(),
     });
-  }
-  function updateOperations(operations: OrganizationOperations, body: UpdateOperationsInput) {
+  };
+  const updateOperations = (operations: OrganizationOperations, body: UpdateOperationsInput) => {
     Object.assign(operations, {
       status: oneOf(body.status, ["active", "paused"], operations.status),
       region: oneOf(body.region, ["east", "central", "west"], operations.region),
       updatedAt: now(),
     });
-  }
+  };
   return {
     handleApiRequest,
   };
-}
-
-function projectOrganization(store: Store, id: string): Organization {
-  const profile = store.profiles.find((item) => item.organizationId === id)!;
-  const operations = store.operations.find((item) => item.organizationId === id)!;
+};
+const projectOrganization = (store: Store, id: string): Organization => {
+  const profile = store.profiles.find((item) => {
+    return item.organizationId === id;
+  })!;
+  const operations = store.operations.find((item) => {
+    return item.organizationId === id;
+  })!;
   return {
     id,
     name: profile.name,
@@ -334,35 +362,35 @@ function projectOrganization(store: Store, id: string): Organization {
     profileUpdatedAt: profile.updatedAt,
     operationsUpdatedAt: operations.updatedAt,
   };
-}
-function bootstrap(store: Store) {
+};
+const bootstrap = (store: Store) => {
   return {
-    organizations: store.organizations.map((item) => projectOrganization(store, item.id)),
+    organizations: store.organizations.map((item) => {
+      return projectOrganization(store, item.id);
+    }),
     projects: store.projects,
     tasks: store.tasks,
   };
-}
-function requiredString(body: RequestBody, key: string) {
+};
+const requiredString = (body: RequestBody, key: string) => {
   const value = body[key];
   return typeof value === "string" && value.trim() ? value.trim() : undefined;
-}
-function requiredOption<T extends string>(body: RequestBody, key: string, values: readonly T[]) {
+};
+const requiredOption = <T extends string>(body: RequestBody, key: string, values: readonly T[]) => {
   const value = body[key];
   return typeof value === "string" && (values as readonly string[]).includes(value)
     ? (value as T)
     : undefined;
-}
+};
 export const { handleApiRequest } = createExampleApi();
-
-function sendJson(response: ServerResponse, value: unknown, status = 200) {
+const sendJson = (response: ServerResponse, value: unknown, status = 200) => {
   response.writeHead(status, {
     "Content-Type": "application/json",
     "Access-Control-Allow-Origin": "*",
   });
   response.end(JSON.stringify(value));
-}
-
-async function readJson(request: IncomingMessage): Promise<RequestBody> {
+};
+const readJson = async (request: IncomingMessage): Promise<RequestBody> => {
   const chunks: Buffer[] = [];
 
   for await (const chunk of request) {
@@ -370,18 +398,16 @@ async function readJson(request: IncomingMessage): Promise<RequestBody> {
   }
 
   return JSON.parse(Buffer.concat(chunks).toString("utf8") || "{}");
-}
-
-function cleanString(value: unknown, fallback: string) {
+};
+const cleanString = (value: unknown, fallback: string) => {
   return typeof value === "string" && value.trim() ? value.trim() : fallback;
-}
-
-function oneOf<TValue extends string>(
+};
+const oneOf = <TValue extends string>(
   value: unknown,
   allowed: readonly TValue[],
   fallback: TValue,
-) {
+) => {
   return typeof value === "string" && allowed.includes(value as TValue)
     ? (value as TValue)
     : fallback;
-}
+};

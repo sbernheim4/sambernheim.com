@@ -1,5 +1,10 @@
 import { bootstrapKey } from "../../queryOptions";
-import { organizationListsKey, organizationKey, organizationProfileKey, organizationOperationsKey } from "../queryOptions";
+import {
+  organizationListsKey,
+  organizationKey,
+  organizationProfileKey,
+  organizationOperationsKey,
+} from "../queryOptions";
 import { useComposableForm } from "../../../../forms/hooks/useComposableForm";
 import type { OutcomeCallbacks } from "../../../../forms/orchestration/types";
 import type {
@@ -22,14 +27,12 @@ type OperationsValues = {
   isActive: boolean;
   region: OrganizationOperations["region"];
 };
-export function useOrganizationProfileForm({
+export const useOrganizationProfileForm = ({
   organizationId,
   ...callbacks
-}: { organizationId: string } & OutcomeCallbacks<
-  ProfileValues,
-  UpdateProfileInput,
-  ProfileResponse
->) {
+}: {
+  organizationId: string;
+} & OutcomeCallbacks<ProfileValues, UpdateProfileInput, ProfileResponse>) => {
   const query = useOrganizationProfile(organizationId);
   const mutation = useUpdateOrganizationProfile(organizationId);
 
@@ -41,33 +44,41 @@ export function useOrganizationProfileForm({
     } as ProfileValues,
     query,
     ...callbacks,
-    toFormData: (profile): ProfileValues => ({
-      displayName: profile.name,
-      selectedSector: profile.sector,
-    }),
-    toMutationPayload: (values) => ({
-      name: values.displayName.trim(),
-      sector: values.selectedSector,
-    }),
-    validate: (values) =>
-      !values.displayName.trim() ? "Organization name is required." : undefined,
+    toFormData: (profile): ProfileValues => {
+      return {
+        displayName: profile.name,
+        selectedSector: profile.sector,
+      };
+    },
+    toMutationPayload: (values) => {
+      return {
+        name: values.displayName.trim(),
+        sector: values.selectedSector,
+      };
+    },
+    validate: (values) => {
+      return !values.displayName.trim() ? "Organization name is required." : undefined;
+    },
     endpoint: {
       mutationFn: mutation.mutateAsync,
       retrySafe: true,
     },
-    invalidateQueryKeys: [organizationProfileKey(organizationId), organizationKey(organizationId), organizationListsKey(), bootstrapKey()],
+    invalidateQueryKeys: [
+      organizationProfileKey(organizationId),
+      organizationKey(organizationId),
+      organizationListsKey(),
+      bootstrapKey(),
+    ],
   });
 
   return { ...binding, retryRead: query.refetch };
-}
-export function useOrganizationOperationsForm({
+};
+export const useOrganizationOperationsForm = ({
   organizationId,
   ...callbacks
-}: { organizationId: string } & OutcomeCallbacks<
-  OperationsValues,
-  UpdateOperationsInput,
-  OperationsResponse
->) {
+}: {
+  organizationId: string;
+} & OutcomeCallbacks<OperationsValues, UpdateOperationsInput, OperationsResponse>) => {
   const query = useOrganizationOperations(organizationId);
   const mutation = useUpdateOrganizationOperations(organizationId);
   const binding = useComposableForm({
@@ -75,19 +86,28 @@ export function useOrganizationOperationsForm({
     defaultValues: { isActive: false, region: "east" } as OperationsValues,
     query,
     ...callbacks,
-    toFormData: (operations): OperationsValues => ({
-      isActive: operations.status === "active",
-      region: operations.region,
-    }),
-    toMutationPayload: (values): OperationsInput => ({
-      status: values.isActive ? "active" : "paused",
-      region: values.region,
-    }),
+    toFormData: (operations): OperationsValues => {
+      return {
+        isActive: operations.status === "active",
+        region: operations.region,
+      };
+    },
+    toMutationPayload: (values): OperationsInput => {
+      return {
+        status: values.isActive ? "active" : "paused",
+        region: values.region,
+      };
+    },
     endpoint: {
       mutationFn: mutation.mutateAsync,
       retrySafe: true,
     },
-    invalidateQueryKeys: [organizationOperationsKey(organizationId), organizationKey(organizationId), organizationListsKey(), bootstrapKey()],
+    invalidateQueryKeys: [
+      organizationOperationsKey(organizationId),
+      organizationKey(organizationId),
+      organizationListsKey(),
+      bootstrapKey(),
+    ],
   });
   return { ...binding, retryRead: query.refetch };
-}
+};

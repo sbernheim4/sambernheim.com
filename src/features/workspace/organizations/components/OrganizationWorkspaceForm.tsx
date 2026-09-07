@@ -6,7 +6,7 @@ import {
   useOrganizationOperationsForm,
   useOrganizationProfileForm,
 } from "../hooks/organizationConfigurationForms";
-export function OrganizationWorkspaceForm({ organizationId }: { organizationId: string }) {
+export const OrganizationWorkspaceForm = ({ organizationId }: { organizationId: string }) => {
   const profile = useOrganizationProfileForm({ organizationId });
   const operations = useOrganizationOperationsForm({ organizationId });
 
@@ -20,7 +20,9 @@ export function OrganizationWorkspaceForm({ organizationId }: { organizationId: 
   const ready = profile.isReady && operations.isReady;
   const readError = profile.readError || operations.readError;
   const aggregateForm = {
-    handleSubmit: () => formOrchestrator.submit(),
+    handleSubmit: () => {
+      return formOrchestrator.submit();
+    },
     reset: () => {
       profile.form.reset();
       operations.form.reset();
@@ -42,7 +44,9 @@ export function OrganizationWorkspaceForm({ organizationId }: { organizationId: 
           isReady: ready,
           isSaving: formOrchestrator.isSaving,
           isDirty: formOrchestrator.isDirty,
-          onChange: () => setSubmitError(undefined),
+          onChange: () => {
+            return setSubmitError(undefined);
+          },
           onSubmitError: setSubmitError,
         }}
       >
@@ -112,71 +116,86 @@ export function OrganizationWorkspaceForm({ organizationId }: { organizationId: 
       </Form.Provider>
     </section>
   );
-}
-
-function ProfileFields() {
+};
+const ProfileFields = () => {
   const form = useFormContext<ReturnType<typeof useOrganizationProfileForm>["form"]>("profile");
   return (
     <>
       <form.AppField
         name="displayName"
         validators={{
-          onSubmit: ({ value }) => (!value.trim() ? "Name is required." : undefined),
+          onSubmit: ({ value }) => {
+            return !value.trim() ? "Name is required." : undefined;
+          },
         }}
       >
-        {(field) => <field.TextField label="Name" required />}
+        {(field) => {
+          return <field.TextField label="Name" required />;
+        }}
       </form.AppField>
       <form.AppField name="selectedSector">
-        {(field) => <field.SelectField label="Sector" options={sectorOptions} />}
+        {(field) => {
+          return <field.SelectField label="Sector" options={sectorOptions} />;
+        }}
       </form.AppField>
     </>
   );
-}
-
-function OperationsFields() {
+};
+const OperationsFields = () => {
   const form =
     useFormContext<ReturnType<typeof useOrganizationOperationsForm>["form"]>("operations");
   return (
     <>
       <form.AppField name="isActive">
-        {(field) => (
-          <fieldset className="app-radio-group">
-            <legend>Status</legend>
-            <label>
-              <input
-                type="radio"
-                name="operations-status"
-                checked={field.state.value === true}
-                onChange={() => field.handleChange(true)}
-                onBlur={field.handleBlur}
-              />{" "}
-              Active
-            </label>
-            <label>
-              <input
-                type="radio"
-                name="operations-status"
-                checked={field.state.value === false}
-                onChange={() => field.handleChange(false)}
-                onBlur={field.handleBlur}
-              />{" "}
-              Paused
-            </label>
-          </fieldset>
-        )}
+        {(field) => {
+          return (
+            <fieldset className="app-radio-group">
+              <legend>Status</legend>
+              <label>
+                <input
+                  type="radio"
+                  name="operations-status"
+                  checked={field.state.value === true}
+                  onChange={() => {
+                    return field.handleChange(true);
+                  }}
+                  onBlur={field.handleBlur}
+                />{" "}
+                Active
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="operations-status"
+                  checked={field.state.value === false}
+                  onChange={() => {
+                    return field.handleChange(false);
+                  }}
+                  onBlur={field.handleBlur}
+                />{" "}
+                Paused
+              </label>
+            </fieldset>
+          );
+        }}
       </form.AppField>
       <form.AppField name="region">
-        {(field) => <field.SelectField label="Region" options={regionOptions} />}
+        {(field) => {
+          return <field.SelectField label="Region" options={regionOptions} />;
+        }}
       </form.AppField>
     </>
   );
-}
-
-function outcomeMessage(outcome?: string) {
-  if (outcome === "success") return "All changes saved.";
-  if (outcome === "saved-with-follow-up-errors")
+};
+const outcomeMessage = (outcome?: string) => {
+  if (outcome === "success") {
+    return "All changes saved.";
+  }
+  if (outcome === "saved-with-follow-up-errors") {
     return "All changes saved, but a follow-up action failed. The saved changes do not need to be submitted again.";
-  if (outcome === "partial-failure")
+  }
+  if (outcome === "partial-failure") {
     return "The save stopped. Saved sections remain persisted; failed and skipped sections retain their edits.";
+  }
   return "Please correct the form errors. No changes were saved.";
-}
+};

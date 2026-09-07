@@ -1,4 +1,9 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "ignorePatterns": ["src/wasm/ty/pkg/**", "src/routeTree.gen.ts"]
+  "ignorePatterns": ["src/wasm/ty/pkg/**", "src/routeTree.gen.ts"],
+  "rules": {
+    "func-style": ["error", "expression"],
+    "arrow-body-style": ["error", "always"],
+    "curly": ["error", "all"]
+  }
 }
