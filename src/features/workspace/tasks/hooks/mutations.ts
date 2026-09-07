@@ -1,16 +1,16 @@
+import { taskKey, taskListsKey } from "../queryOptions";
 import { useMutation } from "@tanstack/react-query";
 import * as api from "../../api";
-import { workspaceKeys } from "../../queries";
 export const useCreateTask = () =>
   useMutation({
-    mutationKey: [...workspaceKeys.tasks.all, "create"],
+    mutationKey: [...taskListsKey(), "create"],
     mutationFn: api.saveTask,
     retry: false,
   });
 
 export const useUpdateTask = (id: string) =>
   useMutation({
-    mutationKey: [...workspaceKeys.tasks.detail(id), "update"],
+    mutationKey: [...taskKey(id), "update"],
     mutationFn: (input: Parameters<typeof api.updateTask>[1]) => api.updateTask(id, input),
     retry: false,
   });

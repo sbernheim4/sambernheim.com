@@ -1,9 +1,9 @@
+import { workspaceKey } from "../queryOptions";
 import { useComposableForm } from "../../../forms/hooks/useComposableForm";
 import { useFormOrchestrator } from "../../../forms/hooks/useFormOrchestrator";
 import { organizationCacheUpdates, projectCacheUpdates, taskCacheUpdates } from "../cachePolicies";
 import { useCreateOrganization } from "../organizations/hooks/mutations";
 import { useCreateProject } from "../projects/hooks/mutations";
-import { workspaceKeys } from "../queries";
 import { useCreateTask } from "../tasks/hooks/mutations";
 import type { SaveOrganizationInput, SaveProjectInput, SaveTaskInput } from "../types";
 import { useWorkspaceResources } from "./useWorkspaceResources";
@@ -79,7 +79,7 @@ export function useWorkspaceLaunchForms(appendActivity: (text: string) => void) 
   const save = useFormOrchestrator({
     forms: [organization, project, task] as const,
     includePristine: true,
-    invalidateQueryKeys: [workspaceKeys.all],
+    invalidateQueryKeys: [workspaceKey()],
     onSuccess: ({ result }) =>
       appendActivity(`Workspace created: ${result.responses.organization?.organization.name}`),
     onFailure: () => appendActivity("Workspace creation failed. See the save results."),
