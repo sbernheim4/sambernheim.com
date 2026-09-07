@@ -33,11 +33,11 @@ export const useFormContext = <TForm = FormScopeValue["form"],>(id?: string) => 
   return ((id && scope.forms?.[id]) ?? scope.form) as TForm;
 };
 
-export const FormScope = ({ value, children }: { value: FormScopeValue; children: ReactNode }) => {
+const FormScope = ({ value, children }: { value: FormScopeValue; children: ReactNode }) => {
   return <formScopeContext.Provider value={value}>{children}</formScopeContext.Provider>;
 };
 
-export const FormShell = ({
+const FormShell = ({
   children,
   className = "resource-editor",
 }: {
@@ -62,7 +62,7 @@ export const FormShell = ({
   );
 };
 
-export const FormFields = ({
+const FormFields = ({
   children,
   className = "editor-fields",
 }: {
@@ -77,7 +77,7 @@ export const FormFields = ({
   );
 };
 
-export const FormSaveButton = ({
+const FormSaveButton = ({
   label = "Save changes",
 }: {
   label?: string;
@@ -94,7 +94,7 @@ export const FormSaveButton = ({
   );
 };
 
-export const FormDiscardButton = ({
+const FormDiscardButton = ({
   label = "Discard changes",
 }: {
   label?: string;
@@ -116,7 +116,7 @@ export const FormDiscardButton = ({
   );
 };
 
-export const FormFeedback = () => {
+const FormFeedback = () => {
   const scope = useFormScope();
   return (
     <>
