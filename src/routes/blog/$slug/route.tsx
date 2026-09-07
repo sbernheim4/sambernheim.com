@@ -1,6 +1,7 @@
+import "../styles/route.css";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { SiteNavbar } from "../components/SiteNavbar";
-import { findSitePost } from "../articles";
+import { SiteNavbar } from "../../../components/SiteNavbar";
+import { findSitePost } from "../../../articles";
 
 const BlogPost = () => {
   const { slug } = Route.useParams();
