@@ -1,9 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ProjectPage } from "../features/workspace/components/WorkspacePages";
-
-export const Route = createFileRoute("/projects/$projectId")({ ssr: false, component: Page });
-
-function Page() {
+const Page = () => {
   const { projectId } = Route.useParams();
   return <ProjectPage key={projectId} id={projectId} />;
-}
+};
+export const Route = createFileRoute("/projects/$projectId")({ ssr: false, component: Page });

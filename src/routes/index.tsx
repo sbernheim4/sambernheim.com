@@ -1,11 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-
-export const Route = createFileRoute("/")({
-  ssr: false,
-  component: Home,
-});
-
-function Home() {
+const Home = () => {
   return (
     <main className="home-shell">
       <header className="home-header">
@@ -25,4 +19,8 @@ function Home() {
       </section>
     </main>
   );
-}
+};
+export const Route = createFileRoute("/")({
+  ssr: false,
+  component: Home,
+});

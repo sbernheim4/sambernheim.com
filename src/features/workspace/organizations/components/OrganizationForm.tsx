@@ -5,13 +5,13 @@ import { regionOptions, sectorOptions, statusOptions } from "../fieldOptions";
 import { useOrganizationForm } from "../hooks/useOrganizationForm";
 import { FormActions } from "../../components/FormActions";
 import { SaveFeedback } from "../../components/SaveFeedback";
-export function OrganizationForm({
+export const OrganizationForm = ({
   resource,
   onCreated,
 }: {
   resource?: Organization;
   onCreated?: () => void;
-}) {
+}) => {
   const [saved, setSaved] = useState(false);
   const editor = useOrganizationForm({
     resource,
@@ -24,7 +24,14 @@ export function OrganizationForm({
   });
 
   return (
-    <Form.Provider value={{ ...editor, onChange: () => setSaved(false) }}>
+    <Form.Provider
+      value={{
+        ...editor,
+        onChange: () => {
+          return setSaved(false);
+        },
+      }}
+    >
       <Form.Shell>
         <Form.Fields>
           <OrganizationFormFields />
@@ -35,24 +42,31 @@ export function OrganizationForm({
       </Form.Shell>
     </Form.Provider>
   );
-}
-
-export function OrganizationFormFields() {
+};
+export const OrganizationFormFields = () => {
   const typedForm = useFormContext<ReturnType<typeof useOrganizationForm>["form"]>("organization");
   return (
     <>
       <typedForm.AppField name="name">
-        {(field) => <field.TextField label="Organization name" required />}
+        {(field) => {
+          return <field.TextField label="Organization name" required />;
+        }}
       </typedForm.AppField>
       <typedForm.AppField name="sector">
-        {(field) => <field.SelectField label="Sector" options={sectorOptions} />}
+        {(field) => {
+          return <field.SelectField label="Sector" options={sectorOptions} />;
+        }}
       </typedForm.AppField>
       <typedForm.AppField name="status">
-        {(field) => <field.RadioGroupField label="Status" options={statusOptions} />}
+        {(field) => {
+          return <field.RadioGroupField label="Status" options={statusOptions} />;
+        }}
       </typedForm.AppField>
       <typedForm.AppField name="region">
-        {(field) => <field.SelectField label="Region" options={regionOptions} />}
+        {(field) => {
+          return <field.SelectField label="Region" options={regionOptions} />;
+        }}
       </typedForm.AppField>
     </>
   );
-}
+};

@@ -8,19 +8,17 @@ import { ProjectFormFields } from "../features/workspace/projects/components/Pro
 import { TaskFormFields } from "../features/workspace/tasks/components/TaskForm";
 import { useWorkspaceLaunchForms } from "../features/workspace/hooks/useWorkspaceLaunchForms";
 import { Form } from "../forms/components/FormComponents";
-
-export const Route = createFileRoute("/forms/flow")({
-  ssr: false,
-  component: FlowFormRoute,
-});
-
-function FlowFormRoute() {
+const FlowFormRoute = () => {
   const [activity, setActivity] = useState<Array<ReturnType<typeof createActivity>>>([]);
   const { organization, project, task, save, bootstrap } = useWorkspaceLaunchForms((text) => {
-    setActivity((items) => [createActivity(text), ...items]);
+    setActivity((items) => {
+      return [createActivity(text), ...items];
+    });
   });
   const aggregateForm = {
-    handleSubmit: () => save.submit(),
+    handleSubmit: () => {
+      return save.submit();
+    },
     reset: () => {
       organization.form.reset();
       project.form.reset();
@@ -84,12 +82,14 @@ function FlowFormRoute() {
                       : "Workspace creation did not complete."}
                 </p>
                 <ul>
-                  {Object.entries(save.result.forms).map(([id, state]) => (
-                    <li key={id}>
-                      {id}: {state.status}
-                      {state.failure ? ` — ${String(state.failure.error)}` : ""}
-                    </li>
-                  ))}
+                  {Object.entries(save.result.forms).map(([id, state]) => {
+                    return (
+                      <li key={id}>
+                        {id}: {state.status}
+                        {state.failure ? ` — ${String(state.failure.error)}` : ""}
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
             )}
@@ -106,4 +106,8 @@ function FlowFormRoute() {
       </section>
     </WorkspaceLayout>
   );
-}
+};
+export const Route = createFileRoute("/forms/flow")({
+  ssr: false,
+  component: FlowFormRoute,
+});

@@ -5,7 +5,7 @@ import { budgetOptions, phaseOptions, priorityOptions } from "../fieldOptions";
 import { useProjectForm } from "../hooks/useProjectForm";
 import { FormActions } from "../../components/FormActions";
 import { SaveFeedback } from "../../components/SaveFeedback";
-export function ProjectForm({
+export const ProjectForm = ({
   resource,
   organizationId,
   onCreated,
@@ -13,7 +13,7 @@ export function ProjectForm({
   resource?: Project;
   organizationId: string;
   onCreated?: () => void;
-}) {
+}) => {
   const [saved, setSaved] = useState(false);
   const editor = useProjectForm({
     resource,
@@ -27,7 +27,14 @@ export function ProjectForm({
   });
 
   return (
-    <Form.Provider value={{ ...editor, onChange: () => setSaved(false) }}>
+    <Form.Provider
+      value={{
+        ...editor,
+        onChange: () => {
+          return setSaved(false);
+        },
+      }}
+    >
       <Form.Shell>
         <Form.Fields>
           <ProjectFormFields />
@@ -38,24 +45,31 @@ export function ProjectForm({
       </Form.Shell>
     </Form.Provider>
   );
-}
-
-export function ProjectFormFields() {
+};
+export const ProjectFormFields = () => {
   const typedForm = useFormContext<ReturnType<typeof useProjectForm>["form"]>("project");
   return (
     <>
       <typedForm.AppField name="name">
-        {(field) => <field.TextField label="Project name" required />}
+        {(field) => {
+          return <field.TextField label="Project name" required />;
+        }}
       </typedForm.AppField>
       <typedForm.AppField name="priority">
-        {(field) => <field.RadioGroupField label="Priority" options={priorityOptions} />}
+        {(field) => {
+          return <field.RadioGroupField label="Priority" options={priorityOptions} />;
+        }}
       </typedForm.AppField>
       <typedForm.AppField name="phase">
-        {(field) => <field.SelectField label="Phase" options={phaseOptions} />}
+        {(field) => {
+          return <field.SelectField label="Phase" options={phaseOptions} />;
+        }}
       </typedForm.AppField>
       <typedForm.AppField name="budget">
-        {(field) => <field.SelectField label="Budget" options={budgetOptions} />}
+        {(field) => {
+          return <field.SelectField label="Budget" options={budgetOptions} />;
+        }}
       </typedForm.AppField>
     </>
   );
-}
+};

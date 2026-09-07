@@ -1,13 +1,27 @@
 type TyModule = typeof import("ty_wasm") & {
   version?: () => string;
   initLogging?: (level: unknown) => void;
-  LogLevel?: { Info: unknown };
+  LogLevel?: {
+    Info: unknown;
+  };
 };
 
 export type TyState =
-  | { status: "loading"; version: null; message: string }
-  | { status: "ready"; version: string; message: string }
-  | { status: "error"; version: null; message: string };
+  | {
+      status: "loading";
+      version: null;
+      message: string;
+    }
+  | {
+      status: "ready";
+      version: string;
+      message: string;
+    }
+  | {
+      status: "error";
+      version: null;
+      message: string;
+    };
 
 export type TySession = {
   module: TyModule;
@@ -22,11 +36,10 @@ export type TySessionOptions = {
 
 let tyInitPromise: Promise<TyModule> | null = null;
 const ROOT = "/";
-
-export async function createTySession(
+export const createTySession = async (
   source: string,
   { filePath = "/main.py", pythonVersion = "3.13" }: TySessionOptions = {},
-): Promise<TySession> {
+): Promise<TySession> => {
   const ty = await initializeTy();
   const workspace = new ty.Workspace(ROOT, ty.PositionEncoding.Utf16, {
     environment: { "python-version": pythonVersion },
@@ -34,22 +47,18 @@ export async function createTySession(
   });
   const file = workspace.openFile(filePath, source);
   return { module: ty, workspace, file };
-}
-
-export function disposeTySession(session: TySession) {
+};
+export const disposeTySession = (session: TySession) => {
   session.workspace.closeFile(session.file);
   session.workspace.free();
-}
-
-export function updateTyFile(session: TySession, source: string) {
+};
+export const updateTyFile = (session: TySession, source: string) => {
   session.workspace.updateFile(session.file, source);
-}
-
-export function checkTyFile(session: TySession) {
+};
+export const checkTyFile = (session: TySession) => {
   return session.workspace.checkFile(session.file);
-}
-
-function initializeTy(): Promise<TyModule> {
+};
+const initializeTy = (): Promise<TyModule> => {
   if (tyInitPromise == null) {
     tyInitPromise = import("ty_wasm").then(async (module) => {
       const ty = module as TyModule;
@@ -59,4 +68,4 @@ function initializeTy(): Promise<TyModule> {
     });
   }
   return tyInitPromise;
-}
+};

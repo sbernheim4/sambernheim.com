@@ -2,8 +2,7 @@ type ActivityItem = {
   id: number;
   text: string;
 };
-
-export function ActivityPanel({ activity }: { activity: ActivityItem[] }) {
+export const ActivityPanel = ({ activity }: { activity: ActivityItem[] }) => {
   return (
     <section className="state-panel">
       <div className="panel-heading">
@@ -14,18 +13,17 @@ export function ActivityPanel({ activity }: { activity: ActivityItem[] }) {
         <p className="empty-copy">No saves yet.</p>
       ) : (
         <ul className="activity-list">
-          {activity.map((item) => (
-            <li key={item.id}>{item.text}</li>
-          ))}
+          {activity.map((item) => {
+            return <li key={item.id}>{item.text}</li>;
+          })}
         </ul>
       )}
     </section>
   );
-}
-
-export function createActivity(text: string): ActivityItem {
+};
+export const createActivity = (text: string): ActivityItem => {
   return {
     id: Date.now() + Math.random(),
     text,
   };
-}
+};

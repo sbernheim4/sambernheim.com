@@ -3,7 +3,7 @@ import * as monaco from "monaco-editor";
 
 if (typeof self !== "undefined") {
   self.MonacoEnvironment = {
-    getWorker() {
+    getWorker: () => {
       return new Worker(
         new URL(
           "../../../node_modules/monaco-editor/esm/vs/editor/editor.worker.js",

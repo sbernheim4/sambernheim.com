@@ -35,13 +35,12 @@ export type TyMonacoSession = {
   diagnostics: TyDiagnostic[];
   revealDiagnostic: (diagnostic: TyDiagnostic) => void;
 };
-
-export function useTyMonacoSession({
+export const useTyMonacoSession = ({
   predefinedPython,
   editableDefinitions,
   filePath,
   pythonVersion,
-}: UseTyMonacoSessionOptions): TyMonacoSession {
+}: UseTyMonacoSessionOptions): TyMonacoSession => {
   const initialSource = buildEditableSource(editableDefinitions);
   const [source, setSource] = useState(initialSource);
   const [tyState, setTyState] = useState<TyState>({
@@ -57,9 +56,13 @@ export function useTyMonacoSession({
   const lastGoodSourceRef = useRef(initialSource);
   const restoringRef = useRef(false);
   const diagnosticsTimerRef = useRef<number | null>(null);
-  const contentListenerRef = useRef<{ dispose: () => void } | null>(null);
+  const contentListenerRef = useRef<{
+    dispose: () => void;
+  } | null>(null);
   const providersDisposeRef = useRef<(() => void) | null>(null);
-  const languageDisposeRef = useRef<{ dispose: () => void } | null>(null);
+  const languageDisposeRef = useRef<{
+    dispose: () => void;
+  } | null>(null);
   const signatureDecorationsRef = useRef<string[]>([]);
   const commandKeyRef = useRef(false);
   const mountTokenRef = useRef(0);
@@ -90,8 +93,9 @@ export function useTyMonacoSession({
       }
     };
   }, []);
-
-  const toVirtualSource = (userSource: string) => normalizedPrelude + userSource;
+  const toVirtualSource = (userSource: string) => {
+    return normalizedPrelude + userSource;
+  };
 
   const runDiagnostics = () => {
     const monaco = monacoRef.current;
@@ -141,20 +145,22 @@ export function useTyMonacoSession({
     const updateSignatureDecorations = () => {
       signatureDecorationsRef.current = editorInstance.deltaDecorations(
         signatureDecorationsRef.current,
-        findSignatureLines(model, editableDefinitions).map((line) => ({
-          range: {
-            startLineNumber: line,
-            startColumn: 1,
-            endLineNumber: line,
-            endColumn: model.getLineMaxColumn(line),
-          },
-          options: {
-            isWholeLine: true,
-            className: "fixed-python-line",
-            linesDecorationsClassName: "fixed-python-decoration",
-            glyphMarginClassName: "fixed-python-glyph",
-          },
-        })),
+        findSignatureLines(model, editableDefinitions).map((line) => {
+          return {
+            range: {
+              startLineNumber: line,
+              startColumn: 1,
+              endLineNumber: line,
+              endColumn: model.getLineMaxColumn(line),
+            },
+            options: {
+              isWholeLine: true,
+              className: "fixed-python-line",
+              linesDecorationsClassName: "fixed-python-decoration",
+              glyphMarginClassName: "fixed-python-glyph",
+            },
+          };
+        }),
       );
     };
     updateSignatureDecorations();
@@ -217,7 +223,7 @@ export function useTyMonacoSession({
     });
     const previousContentListener = contentListenerRef.current;
     contentListenerRef.current = {
-      dispose() {
+      dispose: () => {
         keydownListener.dispose();
         keyupListener.dispose();
         blurListener.dispose();
@@ -306,22 +312,21 @@ export function useTyMonacoSession({
     diagnostics,
     revealDiagnostic,
   };
-}
-
-function formatError(error: unknown) {
+};
+const formatError = (error: unknown) => {
   return error instanceof Error ? error.message : String(error);
-}
-
-export function buildEditableSource(definitions: readonly EditablePythonDefinition[]) {
+};
+export const buildEditableSource = (definitions: readonly EditablePythonDefinition[]) => {
   return definitions
-    .map(({ signature, initialBody }) => `${signature}\n${initialBody}`)
+    .map(({ signature, initialBody }) => {
+      return `${signature}\n${initialBody}`;
+    })
     .join("\n\n");
-}
-
-function hasExpectedSignatures(
+};
+const hasExpectedSignatures = (
   model: editor.ITextModel,
   definitions: readonly EditablePythonDefinition[],
-) {
+) => {
   let nextSearchLine = 1;
 
   for (const { signature } of definitions) {
@@ -344,34 +349,36 @@ function hasExpectedSignatures(
   }
 
   return true;
-}
-
-function selectionTouchesSignature(
+};
+const selectionTouchesSignature = (
   selection: {
     startLineNumber: number;
     endLineNumber: number;
   },
   model: editor.ITextModel,
   definitions: readonly EditablePythonDefinition[],
-) {
+) => {
   const signatureLines = findSignatureLines(model, definitions);
-  return signatureLines.some(
-    (line) => line >= selection.startLineNumber && line <= selection.endLineNumber,
-  );
-}
-
-function findSignatureLines(
+  return signatureLines.some((line) => {
+    return line >= selection.startLineNumber && line <= selection.endLineNumber;
+  });
+};
+const findSignatureLines = (
   model: editor.ITextModel,
   definitions: readonly EditablePythonDefinition[],
-) {
+) => {
   const lines: number[] = [];
   let nextSearchLine = 1;
 
   for (const { signature } of definitions) {
     const matchingLine = Array.from(
       { length: model.getLineCount() - nextSearchLine + 1 },
-      (_, index) => nextSearchLine + index,
-    ).find((line) => model.getLineContent(line) === signature);
+      (_, index) => {
+        return nextSearchLine + index;
+      },
+    ).find((line) => {
+      return model.getLineContent(line) === signature;
+    });
 
     if (matchingLine == null) {
       return [];
@@ -382,9 +389,8 @@ function findSignatureLines(
   }
 
   return lines;
-}
-
-function isMutatingKey(event: KeyboardEvent) {
+};
+const isMutatingKey = (event: KeyboardEvent) => {
   const key = event.key;
   const modified = event.ctrlKey || event.metaKey;
 
@@ -393,4 +399,4 @@ function isMutatingKey(event: KeyboardEvent) {
   }
 
   return key.length === 1 || ["Backspace", "Delete", "Enter", "Tab"].includes(key);
-}
+};

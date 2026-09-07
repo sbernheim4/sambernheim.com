@@ -1,8 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { useClearEntities } from "../hooks/useClearEntities";
-
-export function WorkspaceLayout({
+export const WorkspaceLayout = ({
   title,
   description,
   children,
@@ -12,7 +11,7 @@ export function WorkspaceLayout({
   description: string;
   children: ReactNode;
   entity?: "organization" | "project" | "task" | "flow";
-}) {
+}) => {
   const clear = useClearEntities();
 
   return (
@@ -54,4 +53,4 @@ export function WorkspaceLayout({
       </fieldset>
     </main>
   );
-}
+};

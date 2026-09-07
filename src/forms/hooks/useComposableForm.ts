@@ -23,16 +23,20 @@ export type QuerySource<QueryData> = {
   isError: boolean;
   error?: unknown;
 };
-export type FormSource<QueryData, Values> = { defaultValues: Values } & (
-  | { query?: QuerySource<NoInfer<Values>>; toFormData?: never }
+export type FormSource<QueryData, Values> = {
+  defaultValues: Values;
+} & (
+  | {
+      query?: QuerySource<NoInfer<Values>>;
+      toFormData?: never;
+    }
   | {
       query?: QuerySource<QueryData>;
       toFormData: (data: QueryData) => NoInfer<Values>;
     }
 );
 type FormValidator<Values> = (values: Values) => string | undefined | Promise<string | undefined>;
-
-async function validateForm(form: AnyFormApi): Promise<ValidationResult> {
+const validateForm = async (form: AnyFormApi): Promise<ValidationResult> => {
   await form.validateAllFields("submit");
   await form.validate("submit");
 
@@ -44,19 +48,18 @@ async function validateForm(form: AnyFormApi): Promise<ValidationResult> {
     valid: false,
     error: new Error("Please correct the highlighted fields."),
   };
-}
-
-function isFormReady(initialized: boolean, readError: unknown, query?: QuerySource<unknown>) {
+};
+const isFormReady = (initialized: boolean, readError: unknown, query?: QuerySource<unknown>) => {
   return (
     initialized &&
     !readError &&
     (!query || (!query.isPending && !query.isError && query.data !== undefined))
   );
-}
+};
 
 // Sync backing query updates (including polling) while the form is clean.
 // TanStack owns the saved defaults and dirty state; no separate values are stored.
-function useQueryFormSync<QueryData, Values>({
+const useQueryFormSync = <QueryData, Values>({
   source,
   form,
   inFlight,
@@ -64,7 +67,7 @@ function useQueryFormSync<QueryData, Values>({
   source: FormSource<QueryData, Values>;
   form: AnyFormApi;
   inFlight: RefObject<boolean>;
-}) {
+}) => {
   const [queryState, setQueryState] = useState({
     initialized: !source.query,
     readError: undefined as unknown,
@@ -87,12 +90,14 @@ function useQueryFormSync<QueryData, Values>({
       resetFormValues(form, values);
       setQueryState({ initialized: true, readError: undefined });
     } catch (error) {
-      setQueryState((state) => ({ ...state, readError: error }));
+      setQueryState((state) => {
+        return { ...state, readError: error };
+      });
     }
   }, [source.query?.data, source.query?.isError, source.toFormData, form, inFlight]);
 
   return queryState;
-}
+};
 
 export type FormOptions<
   QueryData,
@@ -126,23 +131,32 @@ export type ComposableFormConfig<
   Values,
   Mutation extends AsyncMutation,
   Dependencies extends readonly AnyForm[] = readonly [],
-> = FormOptions<QueryData, Values, Mutation, Dependencies> & { id: Id };
-
-export function useComposableForm<
+> = FormOptions<QueryData, Values, Mutation, Dependencies> & {
+  id: Id;
+};
+export const useComposableForm = <
   const Id extends string,
   QueryData,
   Values,
   Mutation extends AsyncMutation,
   const Dependencies extends readonly AnyForm[] = readonly [],
->(config: ComposableFormConfig<Id, QueryData, Values, Mutation, Dependencies>) {
+>(
+  config: ComposableFormConfig<Id, QueryData, Values, Mutation, Dependencies>,
+) => {
   const inFlight = useRef(false);
   // Reuse TanStack's current defaults when React updates the form options.
   // This is a reference to the form, not another copy of its values.
-  const formRef = useRef<{ options: { defaultValues?: Values } } | null>(null);
+  const formRef = useRef<{
+    options: {
+      defaultValues?: Values;
+    };
+  } | null>(null);
   const form = useAppForm({
     defaultValues: formRef.current?.options.defaultValues ?? config.defaultValues,
     validators: {
-      onSubmitAsync: async ({ value }) => config.validate?.(value),
+      onSubmitAsync: async ({ value }) => {
+        return config.validate?.(value);
+      },
     },
   });
   formRef.current = form;
@@ -168,8 +182,12 @@ export function useComposableForm<
       inFlight.current = true;
       return form.state.values;
     },
-    validate: () => validateForm(form),
-    markSaved: (values: Values) => markFormSaved(form, values),
+    validate: () => {
+      return validateForm(form);
+    },
+    markSaved: (values: Values) => {
+      return markFormSaved(form, values);
+    },
   };
 
   return {
@@ -178,4 +196,4 @@ export function useComposableForm<
     isReady,
     readError: readError ?? config.query?.error,
   };
-}
+};

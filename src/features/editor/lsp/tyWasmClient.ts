@@ -12,16 +12,15 @@ export type TyDiagnostic = {
   startLineNumber: number;
   startColumn: number;
 };
-
-export function registerTyProviders(
+export const registerTyProviders = (
   monaco: typeof import("monaco-editor"),
   sessionRef: React.MutableRefObject<TySession | null>,
   lineOffset: number,
   commandKeyRef: React.MutableRefObject<boolean>,
-) {
+) => {
   const disposables = [
     monaco.languages.registerHoverProvider("python", {
-      provideHover(model, position) {
+      provideHover: (model, position) => {
         const session = sessionRef.current;
         if (session == null) {
           return undefined;
@@ -63,7 +62,7 @@ export function registerTyProviders(
     }),
     monaco.languages.registerCompletionItemProvider("python", {
       triggerCharacters: [".", "(", '"', "'"],
-      provideCompletionItems(model, position) {
+      provideCompletionItems: (model, position) => {
         const session = sessionRef.current;
         if (session == null) {
           return undefined;
@@ -84,34 +83,37 @@ export function registerTyProviders(
 
         return {
           incomplete: true,
-          suggestions: completions.map((completion, index) => ({
-            label: completion.name,
-            sortText: String(index).padStart(5, "0"),
-            kind: mapCompletionKind(monaco, completion.kind),
-            insertText: completion.insert_text ?? completion.name,
-            detail: completion.detail,
-            documentation: completion.documentation,
-            additionalTextEdits: completion.additional_text_edits
-              ?.map((edit) => {
-                if (edit.range.start.line <= lineOffset) {
-                  return null;
-                }
-
-                return {
-                  range: tyRangeToMonacoRange(edit.range, lineOffset),
-                  text: edit.new_text,
-                };
-              })
-              .filter((edit) => edit != null),
-            range: replacementRange,
-          })),
+          suggestions: completions.map((completion, index) => {
+            return {
+              label: completion.name,
+              sortText: String(index).padStart(5, "0"),
+              kind: mapCompletionKind(monaco, completion.kind),
+              insertText: completion.insert_text ?? completion.name,
+              detail: completion.detail,
+              documentation: completion.documentation,
+              additionalTextEdits: completion.additional_text_edits
+                ?.map((edit) => {
+                  if (edit.range.start.line <= lineOffset) {
+                    return null;
+                  }
+                  return {
+                    range: tyRangeToMonacoRange(edit.range, lineOffset),
+                    text: edit.new_text,
+                  };
+                })
+                .filter((edit) => {
+                  return edit != null;
+                }),
+              range: replacementRange,
+            };
+          }),
         };
       },
     }),
     monaco.languages.registerSignatureHelpProvider("python", {
       signatureHelpTriggerCharacters: ["(", ","],
       signatureHelpRetriggerCharacters: [","],
-      provideSignatureHelp(model, position) {
+      provideSignatureHelp: (model, position) => {
         const session = sessionRef.current;
         if (session == null) {
           return undefined;
@@ -128,24 +130,28 @@ export function registerTyProviders(
 
         return {
           value: {
-            signatures: help.signatures.map((signature) => ({
-              label: signature.label,
-              documentation: signature.documentation,
-              parameters: signature.parameters.map((parameter) => ({
-                label: parameter.label,
-                documentation: parameter.documentation,
-              })),
-              activeParameter: signature.active_parameter,
-            })),
+            signatures: help.signatures.map((signature) => {
+              return {
+                label: signature.label,
+                documentation: signature.documentation,
+                parameters: signature.parameters.map((parameter) => {
+                  return {
+                    label: parameter.label,
+                    documentation: parameter.documentation,
+                  };
+                }),
+                activeParameter: signature.active_parameter,
+              };
+            }),
             activeSignature: help.active_signature ?? 0,
             activeParameter: help.signatures[help.active_signature ?? 0]?.active_parameter ?? 0,
           },
-          dispose() {},
+          dispose: () => {},
         };
       },
     }),
     monaco.languages.registerDocumentSymbolProvider("python", {
-      provideDocumentSymbols(model) {
+      provideDocumentSymbols: (model) => {
         const functionLines: number[] = [];
         for (let line = 1; line <= model.getLineCount(); line += 1) {
           if (/^(?:async\s+)?def\s+[A-Za-z_]\w*/.test(model.getLineContent(line))) {
@@ -186,7 +192,7 @@ export function registerTyProviders(
       },
     }),
     monaco.languages.registerInlayHintsProvider("python", {
-      provideInlayHints(model, range) {
+      provideInlayHints: (model, range) => {
         const session = sessionRef.current;
         if (session == null) {
           return undefined;
@@ -201,19 +207,27 @@ export function registerTyProviders(
         );
 
         return {
-          dispose() {},
+          dispose: () => {},
           hints: hints
-            .filter((hint) => hint.position.line > lineOffset)
-            .map((hint) => ({
-              label: hint.label.map((part) => part.label).join(""),
-              position: {
-                lineNumber: hint.position.line - lineOffset,
-                column: hint.position.column,
-              },
-            })),
+            .filter((hint) => {
+              return hint.position.line > lineOffset;
+            })
+            .map((hint) => {
+              return {
+                label: hint.label
+                  .map((part) => {
+                    return part.label;
+                  })
+                  .join(""),
+                position: {
+                  lineNumber: hint.position.line - lineOffset,
+                  column: hint.position.column,
+                },
+              };
+            }),
         };
       },
-      resolveInlayHint() {
+      resolveInlayHint: () => {
         return undefined;
       },
     }),
@@ -224,14 +238,13 @@ export function registerTyProviders(
       disposable.dispose();
     }
   };
-}
-
-export function setDiagnostics(
+};
+export const setDiagnostics = (
   monaco: typeof import("monaco-editor"),
   model: editor.ITextModel,
   session: TySession,
   lineOffset: number,
-) {
+) => {
   const markers = checkTyFile(session).flatMap((diagnostic) => {
     const range = diagnostic.toRange(session.workspace);
 
@@ -253,26 +266,30 @@ export function setDiagnostics(
   monaco.editor.setModelMarkers(
     model,
     "ty",
-    markers.map((marker) => ({
-      ...marker,
-      severity: markerSeverity(monaco, marker.severity),
-    })),
+    markers.map((marker) => {
+      return {
+        ...marker,
+        severity: markerSeverity(monaco, marker.severity),
+      };
+    }),
   );
-
-  return markers.map(({ code, message, severity, startLineNumber, startColumn }) => ({
-    code,
-    message,
-    severity,
-    startLineNumber,
-    startColumn,
-  }));
-}
-
-function hiddenDefinition(session: TySession, line: number, column: number, lineOffset: number) {
+  return markers.map(({ code, message, severity, startLineNumber, startColumn }) => {
+    return {
+      code,
+      message,
+      severity,
+      startLineNumber,
+      startColumn,
+    };
+  });
+};
+const hiddenDefinition = (session: TySession, line: number, column: number, lineOffset: number) => {
   try {
     const definition = session.workspace
       .gotoDefinition(session.file, new session.module.Position(line, column))
-      .find((location) => location.path === session.file.path());
+      .find((location) => {
+        return location.path === session.file.path();
+      });
 
     if (definition == null || definition.full_range.start.line > lineOffset) {
       return undefined;
@@ -302,18 +319,16 @@ function hiddenDefinition(session: TySession, line: number, column: number, line
   } catch {
     return undefined;
   }
-}
-
-function tyRangeToMonacoRange(range: import("ty_wasm").Range, lineOffset: number) {
+};
+const tyRangeToMonacoRange = (range: import("ty_wasm").Range, lineOffset: number) => {
   return {
     startLineNumber: range.start.line - lineOffset,
     startColumn: range.start.column,
     endLineNumber: range.end.line - lineOffset,
     endColumn: range.end.column,
   };
-}
-
-function severityName(severity: import("ty_wasm").Severity): TyDiagnostic["severity"] {
+};
+const severityName = (severity: import("ty_wasm").Severity): TyDiagnostic["severity"] => {
   switch (severity) {
     case 0:
       return "info";
@@ -322,12 +337,11 @@ function severityName(severity: import("ty_wasm").Severity): TyDiagnostic["sever
     default:
       return "error";
   }
-}
-
-function markerSeverity(
+};
+const markerSeverity = (
   monaco: typeof import("monaco-editor"),
   severity: TyDiagnostic["severity"],
-) {
+) => {
   switch (severity) {
     case "info":
       return monaco.MarkerSeverity.Info;
@@ -336,12 +350,11 @@ function markerSeverity(
     default:
       return monaco.MarkerSeverity.Error;
   }
-}
-
-function mapCompletionKind(
+};
+const mapCompletionKind = (
   monaco: typeof import("monaco-editor"),
   kind: import("ty_wasm").CompletionKind | undefined,
-) {
+) => {
   switch (kind) {
     case 1:
       return monaco.languages.CompletionItemKind.Method;
@@ -362,4 +375,4 @@ function mapCompletionKind(
     default:
       return monaco.languages.CompletionItemKind.Text;
   }
-}
+};

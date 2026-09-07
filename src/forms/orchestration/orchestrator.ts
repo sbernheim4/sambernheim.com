@@ -28,38 +28,7 @@ export const createOrchestrator = <P extends readonly AnyForm[]>(
   onChange: (state: SaveState<P>) => void = () => {},
 ) => {
   let active: Promise<SaveResult<P>> | undefined;
-
-  return {
-    submit(config: SaveConfig<P>): Promise<SaveResult<P>> {
-      if (active) {
-        return active;
-      }
-
-      const { forms } = config;
-      const errors = preflightFormsChecks(forms);
-      if (errors.length) {
-        return Promise.reject(
-          new AggregateError(errors, errors.map((error) => error.message).join("; ")),
-        );
-      }
-
-      active = run(config).finally(() => {
-        active = undefined;
-      });
-
-      return active;
-    },
-
-    reset() {
-      if (active) {
-        return false;
-      }
-      onChange({ phase: "idle", isSaving: false });
-      return true;
-    },
-  };
-
-  async function run(config: SaveConfig<P>): Promise<SaveResult<P>> {
+  const run = async (config: SaveConfig<P>): Promise<SaveResult<P>> => {
     const { forms } = config;
     let states = snapshotForms(forms);
     let responses: Responses = {};
@@ -79,14 +48,16 @@ export const createOrchestrator = <P extends readonly AnyForm[]>(
     emit("validating");
 
     states = await validateForms(forms, states);
-
-    const validationPassed = !forms.some((form) => states[form.id].failure);
+    const validationPassed = !forms.some((form) => {
+      return states[form.id].failure;
+    });
     if (validationPassed) {
       const preparedForms = prepareIndependentPayloads(forms, states);
       states = preparedForms;
     }
-
-    const preflightPassed = !forms.some((form) => states[form.id].failure);
+    const preflightPassed = !forms.some((form) => {
+      return states[form.id].failure;
+    });
     if (preflightPassed) {
       const saved = await saveFormsInOrder(forms, states, responses, config, emit);
 
@@ -97,22 +68,24 @@ export const createOrchestrator = <P extends readonly AnyForm[]>(
     states = updateSkippedFormsState(states);
     result.forms = states as SaveResult<P>["forms"];
     result.responses = responses as SaveResult<P>["responses"];
-
-    const successful = forms.filter((form) => states[form.id].status === "saved");
+    const successful = forms.filter((form) => {
+      return states[form.id].status === "saved";
+    });
     const allSaved = successful.length === forms.length;
 
     result.outcome = getOutcome(!preflightPassed, allSaved);
-
-    const context = (form: FormInput) => ({
-      queryClient,
-      response: states[form.id].response,
-      variables: states[form.id].variables,
-      results: responses,
-      formValues: states[form.id].formValues,
-      formId: form.id,
-      attempts: states[form.id].attempts,
-      followUpErrors: result.followUpErrors,
-    });
+    const context = (form: FormInput) => {
+      return {
+        queryClient,
+        response: states[form.id].response,
+        variables: states[form.id].variables,
+        results: responses,
+        formValues: states[form.id].formValues,
+        formId: form.id,
+        attempts: states[form.id].attempts,
+        followUpErrors: result.followUpErrors,
+      };
+    };
 
     // After writes, refresh only successful forms, plus group-level queries.
     // This includes partial saves; failed and skipped forms have no follow-ups.
@@ -159,7 +132,39 @@ export const createOrchestrator = <P extends readonly AnyForm[]>(
     emit("complete");
 
     return result;
-  }
+  };
+  return {
+    submit: (config: SaveConfig<P>): Promise<SaveResult<P>> => {
+      if (active) {
+        return active;
+      }
+      const { forms } = config;
+      const errors = preflightFormsChecks(forms);
+      if (errors.length) {
+        return Promise.reject(
+          new AggregateError(
+            errors,
+            errors
+              .map((error) => {
+                return error.message;
+              })
+              .join("; "),
+          ),
+        );
+      }
+      active = run(config).finally(() => {
+        active = undefined;
+      });
+      return active;
+    },
+    reset: () => {
+      if (active) {
+        return false;
+      }
+      onChange({ phase: "idle", isSaving: false });
+      return true;
+    },
+  };
 };
 
 const preflightFormsChecks = <P extends readonly AnyForm[]>(forms: P): Error[] => {
@@ -170,8 +175,9 @@ const preflightFormsChecks = <P extends readonly AnyForm[]>(forms: P): Error[] =
     if (seen.has(form.id)) {
       errors.push(new Error(`Duplicate form ID: ${form.id}`));
     }
-
-    const isOutOfOrderDep = form.dependencies?.some(({ id }) => !seen.has(id));
+    const isOutOfOrderDep = form.dependencies?.some(({ id }) => {
+      return !seen.has(id);
+    });
 
     if (isOutOfOrderDep) {
       errors.push(new Error(`Dependencies for ${form.id} must precede it.`));
@@ -197,20 +203,31 @@ const isTransientError = (error: unknown) => {
 
 const settleRefreshes = async (
   queryClient: QueryClient,
-  sources: readonly (RefreshOptions & { formId?: string })[],
+  sources: readonly (RefreshOptions & {
+    formId?: string;
+  })[],
 ): Promise<FollowUpError[]> => {
-  const refetchAndInvalidationsQueue = sources.flatMap((source) => [
-    ...(source.invalidateQueryKeys ?? []).map((queryKey) => ({
-      formId: source.formId,
-      run: () =>
-        queryClient.invalidateQueries({ queryKey }, { cancelRefetch: false, throwOnError: true }),
-    })),
-
-    ...(source.refetchFunctions ?? []).map((run) => ({
-      formId: source.formId,
-      run,
-    })),
-  ]);
+  const refetchAndInvalidationsQueue = sources.flatMap((source) => {
+    return [
+      ...(source.invalidateQueryKeys ?? []).map((queryKey) => {
+        return {
+          formId: source.formId,
+          run: () => {
+            return queryClient.invalidateQueries(
+              { queryKey },
+              { cancelRefetch: false, throwOnError: true },
+            );
+          },
+        };
+      }),
+      ...(source.refetchFunctions ?? []).map((run) => {
+        return {
+          formId: source.formId,
+          run,
+        };
+      }),
+    ];
+  });
 
   const settled = await Promise.allSettled(
     refetchAndInvalidationsQueue.map(async ({ run }) => {
@@ -229,9 +246,8 @@ const settleRefreshes = async (
       }
     }),
   );
-
-  const erroredRefetchAndInvalidations = settled.flatMap((entry, index) =>
-    entry.status === "rejected"
+  const erroredRefetchAndInvalidations = settled.flatMap((entry, index) => {
+    return entry.status === "rejected"
       ? [
           {
             phase: "refresh" as const,
@@ -239,8 +255,8 @@ const settleRefreshes = async (
             error: entry.reason,
           },
         ]
-      : [],
-  );
+      : [];
+  });
 
   return erroredRefetchAndInvalidations;
 };
@@ -257,12 +273,14 @@ const updateCacheWithMutationResponse = <R, I, Results>(
       const key = cacheUpdate.queryKey(context);
 
       if (cacheUpdate.update) {
-        context.queryClient.setQueryData(key, (previous: unknown) =>
-          cacheUpdate.update!(previous, context),
-        );
+        context.queryClient.setQueryData(key, (previous: unknown) => {
+          return cacheUpdate.update!(previous, context);
+        });
       } else {
         const data = cacheUpdate.getData ? cacheUpdate.getData(context.response) : context.response;
-        context.queryClient.setQueryData(key, () => data);
+        context.queryClient.setQueryData(key, () => {
+          return data;
+        });
       }
     } catch (error) {
       errors.push({ phase: "cache", formId, error });
@@ -501,8 +519,9 @@ const saveFormWithRetry = async (
       } catch {
         return getFailedState(state, "save", error);
       }
-
-      await new Promise((resolve) => setTimeout(resolve, Math.max(0, delay)));
+      await new Promise((resolve) => {
+        return setTimeout(resolve, Math.max(0, delay));
+      });
     }
   }
 };
@@ -513,7 +532,10 @@ const saveFormsInOrder = async <P extends readonly AnyForm[]>(
   initialResponses: Responses,
   config: SaveConfig<P>,
   emit: (phase: Phase, states: FormStates, responses: Responses) => void,
-): Promise<{ states: FormStates; responses: Responses }> => {
+): Promise<{
+  states: FormStates;
+  responses: Responses;
+}> => {
   // These accumulators belong to this helper, never to its caller.
   const states = { ...initialStates };
   const responses = { ...initialResponses };
@@ -568,7 +590,9 @@ const emitProgress = <P extends readonly AnyForm[]>(
     result: {
       ...result,
       forms: Object.fromEntries(
-        Object.entries(states).map(([id, state]) => [id, { ...state }]),
+        Object.entries(states).map(([id, state]) => {
+          return [id, { ...state }];
+        }),
       ) as SaveResult<P>["forms"],
       responses: { ...responses } as SaveResult<P>["responses"],
       followUpErrors: [...result.followUpErrors],
@@ -580,18 +604,20 @@ const getFailedState = (
   state: FormState,
   phase: "validation" | "mapping" | "save",
   error: unknown,
-): FormState => ({
-  ...state,
-  status: phase === "validation" ? "invalid" : "failed",
-  failure: {
-    formId: state.formId,
-    phase,
-    error,
-    formValues: state.formValues,
-    variables: state.variables,
-    attempts: state.attempts,
-  },
-});
+): FormState => {
+  return {
+    ...state,
+    status: phase === "validation" ? "invalid" : "failed",
+    failure: {
+      formId: state.formId,
+      phase,
+      error,
+      formValues: state.formValues,
+      variables: state.variables,
+      attempts: state.attempts,
+    },
+  };
+};
 
 const refreshAndInvalidateCache = async <P extends readonly AnyForm[]>(
   successful: readonly FormInput[],
@@ -600,11 +626,13 @@ const refreshAndInvalidateCache = async <P extends readonly AnyForm[]>(
 ): Promise<FollowUpError[]> => {
   const refreshAndCacheInvalidationErrors = [
     ...(await settleRefreshes(queryClient, [
-      ...successful.map((form) => ({
-        refetchFunctions: form.refetchFunctions,
-        invalidateQueryKeys: form.invalidateQueryKeys,
-        formId: form.id,
-      })),
+      ...successful.map((form) => {
+        return {
+          refetchFunctions: form.refetchFunctions,
+          invalidateQueryKeys: form.invalidateQueryKeys,
+          formId: form.id,
+        };
+      }),
       config,
     ])),
   ];
@@ -614,10 +642,9 @@ const refreshAndInvalidateCache = async <P extends readonly AnyForm[]>(
 
 const updateSkippedFormsState = (states: FormStates): FormStates => {
   return Object.fromEntries(
-    Object.entries(states).map(([id, state]) => [
-      id,
-      state.status === "ready" ? { ...state, status: "skipped" } : state,
-    ]),
+    Object.entries(states).map(([id, state]) => {
+      return [id, state.status === "ready" ? { ...state, status: "skipped" } : state];
+    }),
   );
 };
 

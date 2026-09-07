@@ -1,7 +1,6 @@
 import { queryOptions } from "@tanstack/react-query";
 import * as api from "../api";
 import { workspaceKey } from "../queryOptions";
-
 export const projectListsKey = () => {
   return [...workspaceKey(), "projects", "list"] as const;
 };

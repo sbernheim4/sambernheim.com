@@ -1,5 +1,5 @@
 import { test } from "node:test";
-import assert from "node:assert/strict";
+import { strict as assert } from "node:assert";
 import { act, create, type ReactTestRenderer } from "react-test-renderer";
 import {
   QueryClient,

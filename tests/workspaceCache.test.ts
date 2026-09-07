@@ -35,7 +35,6 @@ import {
   taskQueryOptions,
   tasksQueryOptions,
 } from "../src/features/workspace/tasks/queryOptions";
-
 const organization = {
   id: "org-1",
   name: "Old",

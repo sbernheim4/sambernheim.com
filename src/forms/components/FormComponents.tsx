@@ -10,38 +10,36 @@ type FormScopeValue = {
   isSaving: boolean;
   isDirty: boolean;
   error?: unknown;
-  result?: { outcome?: string };
+  result?: {
+    outcome?: string;
+  };
   onDiscard?: () => void;
   onChange?: () => void;
   onSubmitError?: (error: unknown) => void;
 };
 
 const formScopeContext = createContext<FormScopeValue | null>(null);
-
-function useFormScope() {
+const useFormScope = () => {
   const scope = useContext(formScopeContext);
   if (!scope) {
     throw new Error("Form components must be rendered inside FormScope.");
   }
   return scope;
-}
-
-export function useFormContext<TForm = FormScopeValue["form"]>(id?: string) {
+};
+export const useFormContext = <TForm = FormScopeValue["form"],>(id?: string) => {
   const scope = useFormScope();
   return ((id && scope.forms?.[id]) ?? scope.form) as TForm;
-}
-
-export function FormScope({ value, children }: { value: FormScopeValue; children: ReactNode }) {
+};
+export const FormScope = ({ value, children }: { value: FormScopeValue; children: ReactNode }) => {
   return <formScopeContext.Provider value={value}>{children}</formScopeContext.Provider>;
-}
-
-export function FormShell({
+};
+export const FormShell = ({
   children,
   className = "resource-editor",
 }: {
   children: ReactNode;
   className?: string;
-}) {
+}) => {
   const scope = useFormScope();
   return (
     <form
@@ -58,24 +56,26 @@ export function FormShell({
       {children}
     </form>
   );
-}
-
-export function FormFields({
+};
+export const FormFields = ({
   children,
   className = "editor-fields",
 }: {
   children: ReactNode;
   className?: string;
-}) {
+}) => {
   const scope = useFormScope();
   return (
     <fieldset disabled={scope.isSaving || !scope.isReady} className={className}>
       {children}
     </fieldset>
   );
-}
-
-export function FormSaveButton({ label = "Save changes" }: { label?: string } = {}) {
+};
+export const FormSaveButton = ({
+  label = "Save changes",
+}: {
+  label?: string;
+} = {}) => {
   const scope = useFormScope();
   return (
     <button
@@ -86,9 +86,12 @@ export function FormSaveButton({ label = "Save changes" }: { label?: string } = 
       {scope.isSaving ? "Saving..." : scope.isDirty ? label : "No changes to save"}
     </button>
   );
-}
-
-export function FormDiscardButton({ label = "Discard changes" }: { label?: string } = {}) {
+};
+export const FormDiscardButton = ({
+  label = "Discard changes",
+}: {
+  label?: string;
+} = {}) => {
   const scope = useFormScope();
   return (
     <button
@@ -104,9 +107,8 @@ export function FormDiscardButton({ label = "Discard changes" }: { label?: strin
       {label}
     </button>
   );
-}
-
-export function FormFeedback() {
+};
+export const FormFeedback = () => {
   const scope = useFormScope();
   return (
     <>
@@ -120,7 +122,7 @@ export function FormFeedback() {
       )}
     </>
   );
-}
+};
 
 export const Form = {
   Provider: FormScope,

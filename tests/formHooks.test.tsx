@@ -18,14 +18,19 @@ import { useCreateOrganization } from "../src/features/workspace/organizations/h
 import { useWorkspaceLaunchForms } from "../src/features/workspace/hooks/useWorkspaceLaunchForms";
 
 Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
-const client = () =>
-  new QueryClient({
+const client = () => {
+  return new QueryClient({
     defaultOptions: {
       queries: { retry: false, gcTime: Infinity },
       mutations: { retry: 4, gcTime: Infinity },
     },
   });
-const delay = () => new Promise<void>((r) => setTimeout(r, 10));
+};
+const delay = () => {
+  return new Promise<void>((r) => {
+    return setTimeout(r, 10);
+  });
+};
 const gate = () => {
   let resolve!: () => void;
   const promise = new Promise<void>((r) => {
@@ -33,10 +38,10 @@ const gate = () => {
   });
   return { resolve, promise };
 };
-async function mount(qc: QueryClient, render: () => React.ReactNode) {
-  function Harness() {
+const mount = async (qc: QueryClient, render: () => React.ReactNode) => {
+  const Harness = () => {
     return render();
-  }
+  };
   let root!: ReactTestRenderer;
   await act(async () => {
     root = create(
@@ -56,11 +61,13 @@ async function mount(qc: QueryClient, render: () => React.ReactNode) {
       });
     },
     dispose: async () => {
-      await act(async () => root.unmount());
+      await act(async () => {
+        return root.unmount();
+      });
       qc.clear();
     },
   };
-}
+};
 
 test("saving awaits native live field and form validation and clears errors on correction", async () => {
   const qc = client();
@@ -94,7 +101,9 @@ test("saving awaits native live field and form validation and clears errors on c
           },
         }}
       >
-        {() => null}
+        {() => {
+          return null;
+        }}
       </current.form.AppField>
     );
   });
@@ -152,26 +161,51 @@ test("CRUD query selection initializes mapped values, preserves dirty edits and 
         await loaded.promise;
         return { envelope: { name: "server" } };
       },
-      select: (data) => data.envelope,
+      select: (data) => {
+        return data.envelope;
+      },
     });
     current = useQueryBackedForm({
       defaultValues: { display: "" },
       query,
-      toFormData: (data) => ({ display: data.name }),
-      toMutationPayload: (v) => ({ name: v.display }),
+      toFormData: (data) => {
+        return { display: data.name };
+      },
+      toMutationPayload: (v) => {
+        return { name: v.display };
+      },
       endpoint: {
         mutationFn: async (v: { name: string }) => {
           writes++;
           return v;
         },
       },
-      refetchFunctions: [() => refreshed.promise],
-      cacheUpdates: [{ queryKey: () => ["read"], getData: (r) => ({ envelope: r }) }],
+      refetchFunctions: [
+        () => {
+          return refreshed.promise;
+        },
+      ],
+      cacheUpdates: [
+        {
+          queryKey: () => {
+            return ["read"];
+          },
+          getData: (r) => {
+            return { envelope: r };
+          },
+        },
+      ],
       onSuccess: () => {
         callback++;
       },
     });
-    return <current.form.AppField name="display">{() => null}</current.form.AppField>;
+    return (
+      <current.form.AppField name="display">
+        {() => {
+          return null;
+        }}
+      </current.form.AppField>
+    );
   });
   try {
     assert.equal(current.isReady, false);
@@ -235,7 +269,11 @@ test("domain create mutateAsync owns one mutation, overrides inherited retries a
       endpoint: {
         mutationFn: mutation.mutateAsync,
       },
-      refetchFunctions: [() => refresh.promise],
+      refetchFunctions: [
+        () => {
+          return refresh.promise;
+        },
+      ],
       onSuccess: () => {
         successes++;
       },
@@ -285,7 +323,9 @@ test("composed domain forms retry only Operations, keep Profile success and pres
     const patch = options?.method === "PATCH";
     if (patch) {
       log.push(path.endsWith("profile") ? "profile request" : "operations request");
-      if (path.endsWith("operations")) return new Response("Unavailable", { status: 503 });
+      if (path.endsWith("operations")) {
+        return new Response("Unavailable", { status: 503 });
+      }
       Object.assign(organization, JSON.parse(String(options.body)), {
         updatedAt: "2",
         profileUpdatedAt: "2",
@@ -298,20 +338,22 @@ test("composed domain forms retry only Operations, keep Profile success and pres
         },
       });
     }
-    if (path.endsWith("/profile"))
+    if (path.endsWith("/profile")) {
       return Response.json({
         organizationId: "org-1",
         name: organization.name,
         sector: "healthcare",
         updatedAt: organization.profileUpdatedAt,
       });
-    if (path.endsWith("/operations"))
+    }
+    if (path.endsWith("/operations")) {
       return Response.json({
         organizationId: "org-1",
         status: "active",
         region: "east",
         updatedAt: "1",
       });
+    }
     return Response.json(organization);
   };
   const harness = await mount(qc, () => {
@@ -377,21 +419,23 @@ test("organization page orchestrator skips clean forms and only submits dirty fo
   globalThis.fetch = async (url, options) => {
     const path = String(url);
     const method = options?.method ?? "GET";
-    if (path.endsWith("/organizations/org-1/profile") && method === "GET")
+    if (path.endsWith("/organizations/org-1/profile") && method === "GET") {
       return Response.json({
         organizationId: "org-1",
         name: profileName,
         sector: "healthcare",
         updatedAt: "1",
       });
-    if (path.endsWith("/organizations/org-1/operations") && method === "GET")
+    }
+    if (path.endsWith("/organizations/org-1/operations") && method === "GET") {
       return Response.json({
         organizationId: "org-1",
         status: "active",
         region: "east",
         updatedAt: "1",
       });
-    if (path.endsWith("/organizations/org-1") && method === "GET")
+    }
+    if (path.endsWith("/organizations/org-1") && method === "GET") {
       return Response.json({
         id: "org-1",
         name: profileName,
@@ -402,6 +446,7 @@ test("organization page orchestrator skips clean forms and only submits dirty fo
         profileUpdatedAt: "1",
         operationsUpdatedAt: "1",
       });
+    }
     if (path.endsWith("/organizations/org-1") && method === "PATCH") {
       requests.push("organization patch");
       return Response.json({
@@ -510,10 +555,12 @@ test("query-backed creates resolve dynamic cache keys and run success after refr
     current = useQueryBackedForm({
       defaultValues: { name: "A", organizationId: "org-1" },
       endpoint: {
-        mutationFn: async (v: { name: string; organizationId: string }) => ({
-          id: "created-1",
-          name: v.name,
-        }),
+        mutationFn: async (v: { name: string; organizationId: string }) => {
+          return {
+            id: "created-1",
+            name: v.name,
+          };
+        },
       },
       refetchFunctions: [
         async () => {
@@ -522,12 +569,9 @@ test("query-backed creates resolve dynamic cache keys and run success after refr
       ],
       cacheUpdates: [
         {
-          queryKey: ({ response, variables }) => [
-            "organizations",
-            variables.organizationId,
-            "resources",
-            response.id,
-          ],
+          queryKey: ({ response, variables }) => {
+            return ["organizations", variables.organizationId, "resources", response.id];
+          },
         },
       ],
       onSuccess: ({ response, variables, queryClient }) => {
@@ -570,7 +614,9 @@ test("read errors and query mapping errors block writes and release the submissi
       const query = useQuery({
         queryKey: ["read-error"],
         queryFn: async () => {
-          if (!mappingError) throw new Error("read failed");
+          if (!mappingError) {
+            throw new Error("read failed");
+          }
           return { name: "A" };
         },
       });
@@ -579,11 +625,15 @@ test("read errors and query mapping errors block writes and release the submissi
         query,
         toFormData: (data) => {
           maps++;
-          if (mappingError) throw new Error("mapping failed");
+          if (mappingError) {
+            throw new Error("mapping failed");
+          }
           return { name: data.name };
         },
         endpoint: {
-          mutationFn: async (_input: { name: string }) => assert.fail("no writes"),
+          mutationFn: async (_input: { name: string }) => {
+            return assert.fail("no writes");
+          },
         },
         onFailure: () => {
           failures++;
@@ -600,7 +650,9 @@ test("read errors and query mapping errors block writes and release the submissi
       assert.equal(current.result.outcome, "validation-failed");
       assert.equal(current.isSaving, false);
       assert.equal(failures, 1);
-      if (!mappingError) assert.equal(maps, 0);
+      if (!mappingError) {
+        assert.equal(maps, 0);
+      }
     } finally {
       await harness.dispose();
     }
@@ -611,17 +663,23 @@ for (const failProject of [false, true]) {
   test(`workspace launch composes entity forms with dependent IDs (${failProject ? "partial failure" : "success"})`, async () => {
     const qc = client();
     const original = globalThis.fetch;
-    const writes: Array<{ path: string; input: Record<string, unknown> }> = [];
+    const writes: Array<{
+      path: string;
+      input: Record<string, unknown>;
+    }> = [];
     const activity: string[] = [];
     const saved = { organizations: [] as any[], projects: [] as any[], tasks: [] as any[] };
     let current!: ReturnType<typeof useWorkspaceLaunchForms>;
     globalThis.fetch = async (url, options) => {
       const path = String(url);
-      if (options?.method !== "POST") return Response.json(saved);
+      if (options?.method !== "POST") {
+        return Response.json(saved);
+      }
       const input = JSON.parse(String(options.body));
       writes.push({ path, input });
-      if (failProject && path === "/api/projects")
+      if (failProject && path === "/api/projects") {
         return new Response("Project creation failed", { status: 500 });
+      }
       const entity =
         path === "/api/organizations"
           ? "organization"
@@ -633,7 +691,9 @@ for (const failProject of [false, true]) {
       return Response.json({ [entity]: resource });
     };
     const harness = await mount(qc, () => {
-      current = useWorkspaceLaunchForms((text) => activity.push(text));
+      current = useWorkspaceLaunchForms((text) => {
+        return activity.push(text);
+      });
       return null;
     });
     try {
@@ -651,7 +711,9 @@ for (const failProject of [false, true]) {
       });
       const result = current.save.result!;
       assert.deepEqual(
-        writes.map(({ path }) => path),
+        writes.map(({ path }) => {
+          return path;
+        }),
         failProject
           ? ["/api/organizations", "/api/projects"]
           : ["/api/organizations", "/api/projects", "/api/tasks"],
@@ -697,15 +759,27 @@ test("query sync uses TanStack dirty state and retains saved defaults across rer
   const harness = await mount(qc, () => {
     const query = useQuery({
       queryKey: ["native-defaults"],
-      queryFn: async () => ({ name: serverName }),
+      queryFn: async () => {
+        return { name: serverName };
+      },
     });
     const binding = useQueryBackedForm({
       defaultValues: { name: "" },
       query,
-      endpoint: { mutationFn: async (values: { name: string }) => values },
+      endpoint: {
+        mutationFn: async (values: { name: string }) => {
+          return values;
+        },
+      },
     });
     current = { binding, query };
-    return <binding.form.AppField name="name">{() => null}</binding.form.AppField>;
+    return (
+      <binding.form.AppField name="name">
+        {() => {
+          return null;
+        }}
+      </binding.form.AppField>
+    );
   });
   const refetch = async (name: string) => {
     serverName = name;
@@ -736,7 +810,9 @@ test("query sync uses TanStack dirty state and retains saved defaults across rer
     assert.equal(current.binding.form.state.isDirty, false);
     assert.equal(current.binding.form.state.isDefaultValue, true);
     assert.deepEqual(current.binding.form.options.defaultValues, { name: "local edit" });
-    await act(async () => current.binding.form.reset());
+    await act(async () => {
+      return current.binding.form.reset();
+    });
     assert.equal(current.binding.form.state.values.name, "local edit");
 
     await refetch("latest remote update");

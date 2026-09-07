@@ -4,12 +4,16 @@ import { build } from "esbuild";
 import { readdir, mkdir, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { spawnSync } from "node:child_process";
-const tests = (await readdir("tests")).filter((file) => /\.test\.tsx?$/.test(file));
+const tests = (await readdir("tests")).filter((file) => {
+  return /\.test\.tsx?$/.test(file);
+});
 const outdir = resolve("node_modules/.cache/form-tests");
 await mkdir(outdir, { recursive: true });
 await writeFile(resolve(outdir, "package.json"), JSON.stringify({ type: "module" }));
 await build({
-  entryPoints: tests.map((file) => `tests/${file}`),
+  entryPoints: tests.map((file) => {
+    return `tests/${file}`;
+  }),
   outdir,
   bundle: true,
   platform: "node",
@@ -20,7 +24,12 @@ await build({
 });
 const result = spawnSync(
   process.execPath,
-  ["--test", ...tests.map((file) => `${outdir}/${file.replace(/\.tsx?$/, ".js")}`)],
+  [
+    "--test",
+    ...tests.map((file) => {
+      return `${outdir}/${file.replace(/\.tsx?$/, ".js")}`;
+    }),
+  ],
   { stdio: "inherit" },
 );
 process.exitCode = result.status ?? 1;
