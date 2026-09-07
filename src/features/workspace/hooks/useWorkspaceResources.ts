@@ -49,14 +49,28 @@ export const useTaskWorkspace = (id: string) => {
 };
 const workspaceRead = (
   queries: Array<{
+    data: unknown;
     isPending: boolean;
     isError: boolean;
+    isFetching: boolean;
+    errorUpdatedAt: number;
     refetch: () => unknown;
   }>,
   data: import("../types").BootstrapData,
 ) => {
   return {
     data,
+    hasData: queries.every((q) => {
+      return q.data !== undefined;
+    }),
+    isFetching: queries.some((q) => {
+      return q.isFetching;
+    }),
+    errorUpdatedAt: Math.max(
+      ...queries.map((q) => {
+        return q.isError ? q.errorUpdatedAt : 0;
+      }),
+    ),
     isPending: queries.some((q) => {
       return q.isPending;
     }),

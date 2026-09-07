@@ -22,6 +22,7 @@ import { ProjectForm } from "../projects/components/ProjectForm";
 import { TaskForm } from "../tasks/components/TaskForm";
 import type { BootstrapData, Organization, Project, Task } from "../types";
 import { WorkspaceLayout } from "./WorkspaceLayout";
+import { RefreshErrorBanner } from "./RefreshErrorBanner";
 export const OrganizationsPage = () => {
   const query = useOrganizationsWorkspace();
   return (
@@ -270,14 +271,14 @@ export const QueryState = ({
   missing?: boolean;
   children: ReactNode;
 }) => {
-  if (query.isPending) {
+  if (!query.hasData && query.isPending) {
     return (
       <p className="workspace-empty" role="status">
         Loading resources...
       </p>
     );
   }
-  if (query.isError) {
+  if (!query.hasData && query.isError) {
     return (
       <div className="workspace-empty" role="alert">
         <h2>Unable to load resources</h2>
@@ -303,7 +304,18 @@ export const QueryState = ({
       </div>
     );
   }
-  return children;
+  return (
+    <>
+      {query.isError && (
+        <RefreshErrorBanner
+          key={query.errorUpdatedAt}
+          isFetching={query.isFetching}
+          onRetry={query.refetch}
+        />
+      )}
+      {children}
+    </>
+  );
 };
 export const EntityList = ({
   title,
