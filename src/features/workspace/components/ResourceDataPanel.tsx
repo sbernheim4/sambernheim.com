@@ -24,6 +24,7 @@ export const ResourceDataPanel = ({
     </section>
   );
 };
+
 const ResourceList = ({
   data,
   focus,
@@ -108,6 +109,7 @@ const ResourceList = ({
     </div>
   );
 };
+
 const label = (value: string) => {
   return value
     .split("-")
@@ -116,6 +118,7 @@ const label = (value: string) => {
     })
     .join(" ");
 };
+
 const formatTime = (value: string) => {
   return new Intl.DateTimeFormat(undefined, {
     hour: "numeric",

@@ -1,9 +1,11 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { clearWorkspace } from "../clearWorkspace";
 import { useClearWorkspaceMutation } from "./useClearWorkspaceMutation";
+
 export const useClearEntities = () => {
   const queryClient = useQueryClient();
   const mutation = useClearWorkspaceMutation();
+
   return {
     ...mutation,
     isDisabled: mutation.isPending,

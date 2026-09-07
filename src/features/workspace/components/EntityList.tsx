@@ -16,18 +16,23 @@ export const EntityList = (props: EntityListProps) => {
   const { title, kind, items, create } = props;
   const [search, setSearch] = useState("");
   const [creating, setCreating] = useState(false);
+
   const singular =
     kind === "organizations" ? "organization" : kind === "projects" ? "project" : "task";
+
   const filtered = items.filter((item) => {
     return ("name" in item ? item.name : item.title).toLowerCase().includes(search.toLowerCase());
   });
+
   const Icon = kind === "organizations" ? Building2 : kind === "projects" ? Folder : ListTodo;
+
   return (
     <section className="workspace-section">
       <div className="workspace-section-heading">
         <h2>
           {title} <span className="workspace-count">{items.length}</span>
         </h2>
+
         <button
           className="workspace-button"
           type="button"
@@ -40,6 +45,7 @@ export const EntityList = (props: EntityListProps) => {
           {creating ? "Cancel" : `New ${singular}`}
         </button>
       </div>
+
       {creating && (
         <div className="workspace-create">
           <h3>New {singular}</h3>
@@ -49,6 +55,7 @@ export const EntityList = (props: EntityListProps) => {
           })}
         </div>
       )}
+
       <label className="workspace-search">
         <Search size={17} />
         <input
@@ -61,6 +68,7 @@ export const EntityList = (props: EntityListProps) => {
           }}
         />
       </label>
+
       {filtered.length === 0 ? (
         <div className="workspace-empty">
           <Icon size={28} />
@@ -133,6 +141,7 @@ export const EntityList = (props: EntityListProps) => {
     </section>
   );
 };
+
 const label = (value: string) => {
   return value
     .split("-")

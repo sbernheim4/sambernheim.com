@@ -19,6 +19,7 @@ export const QueryState = ({
       </p>
     );
   }
+
   if (!query.hasData && query.isError) {
     return (
       <div className="workspace-empty" role="alert">
@@ -36,6 +37,7 @@ export const QueryState = ({
       </div>
     );
   }
+
   if (missing) {
     return (
       <div className="workspace-empty">
@@ -45,6 +47,7 @@ export const QueryState = ({
       </div>
     );
   }
+
   return (
     <>
       {query.isError && (
