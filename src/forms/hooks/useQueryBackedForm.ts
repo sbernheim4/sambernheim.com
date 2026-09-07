@@ -7,6 +7,7 @@ export type QueryBackedFormConfig<QueryData, Values, Mutation extends AsyncMutat
   Values,
   Mutation
 >;
+
 export const useQueryBackedForm = <QueryData, Values, Mutation extends AsyncMutation>(
   config: QueryBackedFormConfig<QueryData, Values, Mutation>,
 ) => {

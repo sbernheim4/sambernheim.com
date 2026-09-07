@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+
 const Home = () => {
   return (
     <main className="home-shell">
@@ -20,6 +21,7 @@ const Home = () => {
     </main>
   );
 };
+
 export const Route = createFileRoute("/")({
   ssr: false,
   component: Home,

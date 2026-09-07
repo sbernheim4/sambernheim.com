@@ -8,6 +8,7 @@ type Option<TValue extends string = string> = {
   value: TValue;
   label: string;
 };
+
 export const TextField = ({
   label,
   placeholder,
@@ -40,6 +41,7 @@ export const TextField = ({
     </label>
   );
 };
+
 export const SelectField = <TValue extends string>({
   label,
   options,
@@ -91,6 +93,7 @@ export const SelectField = <TValue extends string>({
     </div>
   );
 };
+
 export const RadioGroupField = <TValue extends string>({
   label,
   options,
@@ -127,6 +130,7 @@ export const RadioGroupField = <TValue extends string>({
     </fieldset>
   );
 };
+
 export const SubmitButton = ({ label, isSaving }: { label: string; isSaving: boolean }) => {
   return (
     <button type="submit" className="primary-action" disabled={isSaving}>

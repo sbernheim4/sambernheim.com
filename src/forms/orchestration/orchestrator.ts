@@ -28,6 +28,7 @@ export const createOrchestrator = <P extends readonly AnyForm[]>(
   onChange: (state: SaveState<P>) => void = () => {},
 ) => {
   let active: Promise<SaveResult<P>> | undefined;
+
   const run = async (config: SaveConfig<P>): Promise<SaveResult<P>> => {
     const { forms } = config;
     let states = snapshotForms(forms);
@@ -133,37 +134,42 @@ export const createOrchestrator = <P extends readonly AnyForm[]>(
 
     return result;
   };
-  return {
-    submit: (config: SaveConfig<P>): Promise<SaveResult<P>> => {
-      if (active) {
-        return active;
-      }
-      const { forms } = config;
-      const errors = preflightFormsChecks(forms);
-      if (errors.length) {
-        return Promise.reject(
-          new AggregateError(
-            errors,
-            errors
-              .map((error) => {
-                return error.message;
-              })
-              .join("; "),
-          ),
-        );
-      }
-      active = run(config).finally(() => {
-        active = undefined;
-      });
+
+  const submit = (config: SaveConfig<P>): Promise<SaveResult<P>> => {
+    if (active) {
       return active;
-    },
-    reset: () => {
-      if (active) {
-        return false;
-      }
-      onChange({ phase: "idle", isSaving: false });
-      return true;
-    },
+    }
+    const { forms } = config;
+    const errors = preflightFormsChecks(forms);
+    if (errors.length) {
+      return Promise.reject(
+        new AggregateError(
+          errors,
+          errors
+            .map((error) => {
+              return error.message;
+            })
+            .join("; "),
+        ),
+      );
+    }
+    active = run(config).finally(() => {
+      active = undefined;
+    });
+    return active;
+  };
+
+  const reset = () => {
+    if (active) {
+      return false;
+    }
+    onChange({ phase: "idle", isSaving: false });
+    return true;
+  };
+
+  return {
+    submit,
+    reset,
   };
 };
 
@@ -208,25 +214,28 @@ const settleRefreshes = async (
   })[],
 ): Promise<FollowUpError[]> => {
   const refetchAndInvalidationsQueue = sources.flatMap((source) => {
-    return [
-      ...(source.invalidateQueryKeys ?? []).map((queryKey) => {
-        return {
-          formId: source.formId,
-          run: () => {
-            return queryClient.invalidateQueries(
-              { queryKey },
-              { cancelRefetch: false, throwOnError: true },
-            );
-          },
-        };
-      }),
-      ...(source.refetchFunctions ?? []).map((run) => {
-        return {
-          formId: source.formId,
-          run,
-        };
-      }),
-    ];
+    const { invalidateQueryKeys = [], refetchFunctions = [] } = source;
+
+    const queryKeyInvalidations = invalidateQueryKeys.map((queryKey) => {
+      return {
+        formId: source.formId,
+        run: () => {
+          return queryClient.invalidateQueries(
+            { queryKey },
+            { cancelRefetch: false, throwOnError: true },
+          );
+        },
+      };
+    });
+
+    const refetchFns = refetchFunctions.map((run) => {
+      return {
+        formId: source.formId,
+        run,
+      };
+    });
+
+    return [...queryKeyInvalidations, ...refetchFns];
   });
 
   const settled = await Promise.allSettled(
@@ -246,17 +255,16 @@ const settleRefreshes = async (
       }
     }),
   );
-  const erroredRefetchAndInvalidations = settled.flatMap((entry, index) => {
-    return entry.status === "rejected"
-      ? [
-          {
-            phase: "refresh" as const,
-            formId: refetchAndInvalidationsQueue[index].formId,
-            error: entry.reason,
-          },
-        ]
-      : [];
-  });
+
+  const erroredRefetchAndInvalidations = settled
+    .filter((x) => x.status === "rejected")
+    .map((entry, index) => {
+      return {
+        phase: "refresh" as const,
+        formId: refetchAndInvalidationsQueue[index].formId,
+        error: entry.reason,
+      };
+    });
 
   return erroredRefetchAndInvalidations;
 };
@@ -314,6 +322,7 @@ const validateForms = async (
       }
     }),
   );
+
   return Object.fromEntries(validated);
 };
 
@@ -410,6 +419,7 @@ const invokeConfigCallbacks = async <P extends readonly AnyForm[]>(
 ): Promise<FollowUpError[]> => {
   try {
     await (allSaved ? config.onSuccess : config.onFailure)?.({ result });
+
     return [];
   } catch (error) {
     return [
@@ -427,6 +437,7 @@ const markFormsSaved = async (
   states: FormStates,
 ): Promise<FollowUpError[]> => {
   const errors: FollowUpError[] = [];
+
   for (const form of forms) {
     try {
       await form.markSaved?.(structuredClone(states[form.id].formValues));
@@ -434,6 +445,7 @@ const markFormsSaved = async (
       errors.push({ phase: "form-state", formId: form.id, error });
     }
   }
+
   return errors;
 };
 
@@ -461,6 +473,7 @@ const getOutcome = (hasSomeFailure: boolean, allSaved: boolean) => {
 
 const invokeMutation = async (form: FormInput, state: FormState): Promise<FormState> => {
   const response = await form.endpoint.mutationFn(structuredClone(state.variables));
+
   return { ...state, response, status: "saved" };
 };
 
@@ -496,6 +509,7 @@ const saveFormWithRetry = async (
   onProgress: (state: FormState) => void,
 ): Promise<FormState> => {
   let state = initialState;
+
   while (true) {
     state = { ...state, status: "saving", attempts: state.attempts + 1 };
     onProgress(state);
@@ -519,6 +533,7 @@ const saveFormWithRetry = async (
       } catch {
         return getFailedState(state, "save", error);
       }
+
       await new Promise((resolve) => {
         return setTimeout(resolve, Math.max(0, delay));
       });
@@ -569,6 +584,7 @@ const saveFormsInOrder = async <P extends readonly AnyForm[]>(
     if (state.status === "saved") {
       responses[form.id] = state.response;
     }
+
     if (state.failure) {
       break;
     }
