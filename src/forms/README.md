@@ -35,8 +35,11 @@ implementations or `useComposableFormImpl` remain.
 Domain query/mutation/form hooks live under
 `src/features/workspace/{organizations,projects,tasks}/hooks`, alongside each
 entity’s `components` and field options. Profile and Operations belong to
-organizations. Shared workspace hooks compose those entity hooks; shared pages
-render their forms. Request hooks own URLs, mutation keys and `retry: false`;
+organizations. Each entity also owns its pages and page-level query composition
+hooks. Those hooks return named records and lists, with shared query status from
+`workspace/queryState.ts`. Breadcrumbs, details, lists, and query feedback remain
+shared workspace components. Entity lists tie their item types and child-count
+data to their `kind`. Request hooks own URLs, mutation keys and `retry: false`;
 form hooks pass their `mutateAsync` directly as `endpoint.mutationFn`. Do not wrap
 it in another mutation, put lifecycle effects in mutation callbacks, or watch
 transient mutation `data`/`isSuccess` to infer a response. Aggregate saving lasts
