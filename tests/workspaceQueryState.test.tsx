@@ -3,9 +3,9 @@ import { strict as assert } from "node:assert";
 import { useEffect } from "react";
 import { act, create, type ReactTestRenderer } from "react-test-renderer";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { QueryState } from "../src/features/workspace/components/WorkspacePages";
+import { QueryState } from "../src/features/workspace/components/QueryState";
 import { RefreshErrorBanner } from "../src/features/workspace/components/RefreshErrorBanner";
-import { useOrganizationsWorkspace } from "../src/features/workspace/hooks/useWorkspaceResources";
+import { useOrganizationsWorkspace } from "../src/features/workspace/organizations/hooks/useOrganizationsWorkspace";
 import { useOrganizationForm } from "../src/features/workspace/organizations/hooks/useOrganizationForm";
 import {
   organizationQueryOptions,
