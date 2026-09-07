@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { SiteNavbar } from "../components/site/SiteNavbar";
+import { SiteNavbar } from "../components/SiteNavbar";
 import { findSitePost } from "../articles";
 
 const BlogPost = () => {
