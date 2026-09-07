@@ -4,7 +4,7 @@ export type FormScopeValue = {
   form: {
     handleSubmit: () => Promise<unknown>;
     reset: () => void;
-    state?: { isDirty: boolean };
+    state?: { isDirty: boolean; isDefaultValue?: boolean };
   };
   forms?: Record<string, unknown>;
   isReady: boolean;
@@ -85,15 +85,19 @@ const FormSaveButton = ({
   label?: string;
 } = {}) => {
   const scope = useFormScope();
+  const isDirty =
+    scope.form.state?.isDefaultValue === true
+      ? false
+      : (scope.form.state?.isDirty ?? scope.isDirty);
   return (
     <button
       className="primary-action"
       type="submit"
-      disabled={scope.isSaving || !scope.isReady || (!scope.isDirty && !scope.allowPristineSave)}
+      disabled={scope.isSaving || !scope.isReady || (!isDirty && !scope.allowPristineSave)}
     >
       {scope.isSaving
         ? "Saving..."
-        : scope.isDirty || scope.allowPristineSave
+        : isDirty || scope.allowPristineSave
           ? label
           : "No changes to save"}
     </button>
@@ -108,7 +112,10 @@ const FormDiscardButton = ({
   pristineLabel?: string;
 } = {}) => {
   const scope = useFormScope();
-  const isDirty = scope.form.state?.isDirty ?? scope.isDirty;
+  const isDirty =
+    scope.form.state?.isDefaultValue === true
+      ? false
+      : (scope.form.state?.isDirty ?? scope.isDirty);
   const buttonLabel = label ?? (isDirty ? "Discard changes" : pristineLabel);
   return (
     <button
