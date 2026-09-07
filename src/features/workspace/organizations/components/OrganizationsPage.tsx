@@ -6,6 +6,7 @@ import { OrganizationForm } from "./OrganizationForm";
 
 export const OrganizationsPage = () => {
   const query = useOrganizationsWorkspace();
+
   return (
     <Workspace
       title="Organizations"

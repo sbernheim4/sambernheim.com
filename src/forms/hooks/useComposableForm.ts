@@ -149,6 +149,7 @@ export const useComposableForm = <
   config: ComposableFormConfig<Id, QueryData, Values, Mutation, Dependencies>,
 ) => {
   const inFlight = useRef(false);
+
   // Reuse TanStack's current defaults when React updates the form options.
   // This is a reference to the form, not another copy of its values.
   const formRef = useRef<{
@@ -156,6 +157,7 @@ export const useComposableForm = <
       defaultValues?: Values;
     };
   } | null>(null);
+
   const form = useAppForm({
     defaultValues: formRef.current?.options.defaultValues ?? config.defaultValues,
     validators: {
@@ -164,6 +166,7 @@ export const useComposableForm = <
       },
     },
   });
+
   formRef.current = form;
 
   const { initialized, readError } = useQueryFormSync({

@@ -16,18 +16,21 @@ const organizationDefaults: SaveOrganizationInput = {
   region: "east",
   status: "active",
 };
+
 const projectDefaults: Omit<SaveProjectInput, "organizationId"> = {
   name: "Patient Intake",
   priority: "high",
   phase: "planning",
   budget: "$125k",
 };
+
 const taskDefaults: Omit<SaveTaskInput, "organizationId" | "projectId"> = {
   title: "Provision workspace",
   owner: "alex",
   status: "todo",
   dueWindow: "this-week",
 };
+
 export const useWorkspaceLaunchForms = (appendActivity: (text: string) => void) => {
   const createOrganization = useCreateOrganization();
   const createProject = useCreateProject();
@@ -45,6 +48,7 @@ export const useWorkspaceLaunchForms = (appendActivity: (text: string) => void) 
       return appendActivity(`Saved organization: ${response.organization.name}`);
     },
   });
+
   const project = useComposableForm({
     id: "project",
     invalidateQueryKeys: [projectListsKey(), bootstrapKey()],
@@ -63,6 +67,7 @@ export const useWorkspaceLaunchForms = (appendActivity: (text: string) => void) 
       return appendActivity(`Saved project: ${response.project.name}`);
     },
   });
+
   const task = useComposableForm({
     id: "task",
     invalidateQueryKeys: [taskListsKey(), bootstrapKey()],
@@ -85,6 +90,7 @@ export const useWorkspaceLaunchForms = (appendActivity: (text: string) => void) 
       return appendActivity(`Saved task: ${response.task.title}`);
     },
   });
+
   const save = useFormOrchestrator({
     forms: [organization, project, task] as const,
     includePristine: true,

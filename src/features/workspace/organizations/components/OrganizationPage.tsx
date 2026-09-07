@@ -9,6 +9,7 @@ import { ProjectForm } from "../../projects/components/ProjectForm";
 export const OrganizationPage = ({ id }: { id: string }) => {
   const query = useOrganizationWorkspace(id);
   const { organization, projects, tasks } = query;
+
   return (
     <Workspace
       title={organization?.name ?? "Organization"}

@@ -38,16 +38,19 @@ export const WorkspaceLayout = ({
           </button>
         </nav>
       </header>
+
       {clear.isError && (
         <p className="form-error" role="alert">
           Could not clear entities. Please try again.
         </p>
       )}
+
       {clear.isSuccess && (
         <p className="clear-status" role="status">
           All entities cleared.
         </p>
       )}
+
       <fieldset className="forms-content" disabled={clear.isPending}>
         {children}
       </fieldset>
