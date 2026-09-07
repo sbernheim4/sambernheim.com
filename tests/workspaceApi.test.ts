@@ -1,36 +1,9 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { Readable } from "node:stream";
-import type { IncomingMessage, ServerResponse } from "node:http";
-import { createExampleApi } from "../server/example-api";
-
-function harness() {
-  const api = createExampleApi();
-  return {
-    ...api,
-    request: async (method: string, url: string, body?: unknown) => {
-      const request = Object.assign(
-        Readable.from(body ? [Buffer.from(JSON.stringify(body))] : []),
-        { method, url },
-      );
-      let status = 200;
-      let data: any;
-      const response = {
-        writeHead: (code: number) => {
-          status = code;
-        },
-        end: (text: string) => {
-          data = JSON.parse(text);
-        },
-      };
-      await api.handleApiRequest(request as IncomingMessage, response as unknown as ServerResponse);
-      return { status, data };
-    },
-  };
-}
+import { apiHarness } from "./workspaceApiHarness";
 
 test("child reads immediately reflect writes with independent field ownership and server composition", async () => {
-  const api = harness();
+  const api = apiHarness();
     const initial = await api.request("GET", "/api/organizations/org-1/profile");
     assert.equal(initial.data.name, "Existing Clinic");
     const operations = (await api.request("GET", "/api/organizations/org-1/operations")).data;
@@ -104,7 +77,7 @@ test("child reads immediately reflect writes with independent field ownership an
 });
 
 test("missing parents fail and clear removes all resources", async () => {
-  const api = harness();
+  const api = apiHarness();
     for (const child of ["profile", "operations"]) {
       assert.equal((await api.request("GET", `/api/organizations/missing/${child}`)).status, 404);
       assert.equal(
@@ -127,4 +100,22 @@ test("missing parents fail and clear removes all resources", async () => {
       projects: [],
       tasks: [],
     });
+});
+
+test("created and edited projects and tasks are immediately readable in detail, complete lists, parent lists and bootstrap", async () => {
+  const api = apiHarness();
+  const project = (await api.request("POST", "/api/projects", { organizationId: "org-1", name: "New project", priority: "high", phase: "planning", budget: "$50k" })).data.project;
+  const task = (await api.request("POST", "/api/tasks", { organizationId: "org-1", projectId: project.id, title: "New task", owner: "alex", status: "todo", dueWindow: "this-week" })).data.task;
+  for (const [collection, resource, parent, edits] of [
+    ["projects", project, "/api/organizations/org-1/projects", { name: "Edited project" }],
+    ["tasks", task, `/api/projects/${project.id}/tasks`, { title: "Edited task" }],
+  ] as const) {
+    assert.deepEqual((await api.request("GET", `/api/${collection}/${resource.id}`)).data, resource);
+    const saved = (await api.request("PATCH", `/api/${collection}/${resource.id}`, edits)).data[collection === "projects" ? "project" : "task"];
+    assert.deepEqual((await api.request("GET", `/api/${collection}/${resource.id}`)).data, saved);
+    for (const path of [`/api/${collection}`, parent]) {
+      assert.deepEqual((await api.request("GET", path)).data.find((item: { id: string }) => { return item.id === resource.id; }), saved);
+    }
+    assert.deepEqual((await api.request("GET", "/api/bootstrap")).data[collection].find((item: { id: string }) => { return item.id === resource.id; }), saved);
+  }
 });
