@@ -8,6 +8,7 @@ import { ProjectFormFields } from "../features/workspace/projects/components/Pro
 import { TaskFormFields } from "../features/workspace/tasks/components/TaskForm";
 import { useWorkspaceLaunchForms } from "../features/workspace/hooks/useWorkspaceLaunchForms";
 import { Form } from "../forms/components/FormComponents";
+import { useDependentField } from "../forms/hooks/useDependentField";
 
 const FlowFormRoute = () => {
   const [activity, setActivity] = useState<Array<ReturnType<typeof createActivity>>>([]);
@@ -16,6 +17,18 @@ const FlowFormRoute = () => {
     setActivity((items) => {
       return [createActivity(text), ...items];
     });
+  });
+  const projectName = useDependentField({
+    source: organization.form,
+    select: (values) => {
+      return values.name;
+    },
+    target: project.form,
+    targetField: "name",
+    format: (name, currentName) => {
+      const suffix = currentName.replace(/^\[[^\]]*\]\s*/, "");
+      return `[${name}] ${suffix}`;
+    },
   });
 
   return (
@@ -50,7 +63,7 @@ const FlowFormRoute = () => {
 
             <Form.Fields className="workspace-launch-fields">
               <div className="form-section-label">Organization</div>
-              <OrganizationFormFields />
+              <OrganizationFormFields onNameChange={projectName.onChange} />
 
               <div className="form-section-label">Project</div>
               <ProjectFormFields />

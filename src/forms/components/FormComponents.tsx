@@ -1,6 +1,6 @@
 import { createContext, useContext, type ReactNode } from "react";
 
-type FormScopeValue = {
+export type FormScopeValue = {
   form: {
     handleSubmit: () => Promise<unknown>;
     reset: () => void;
@@ -132,10 +132,43 @@ const FormFeedback = () => {
   );
 };
 
+const FormSingle = ({
+  value,
+  children,
+  saveLabel = "Save changes",
+  saved = false,
+}: {
+  value: FormScopeValue;
+  children: ReactNode;
+  saveLabel?: string;
+  saved?: boolean;
+}) => {
+  return (
+    <FormScope value={value}>
+      <FormShell>
+        <FormFields>
+          {children}
+          <div className="form-actions">
+            <FormSaveButton label={saveLabel} />
+            <FormDiscardButton />
+          </div>
+        </FormFields>
+        <FormFeedback />
+        {saved && (
+          <p className="save-feedback" role="status">
+            Changes saved.
+          </p>
+        )}
+      </FormShell>
+    </FormScope>
+  );
+};
+
 export const Form = {
   Provider: FormScope,
   Shell: FormShell,
   Fields: FormFields,
+  Single: FormSingle,
   SaveButton: FormSaveButton,
   DiscardButton: FormDiscardButton,
   Feedback: FormFeedback,

@@ -3,8 +3,7 @@ import { Form, useFormContext } from "../../../../forms/components/FormComponent
 import type { Project } from "../../types";
 import { budgetOptions, phaseOptions, priorityOptions } from "../fieldOptions";
 import { useProjectForm } from "../hooks/useProjectForm";
-import { FormActions } from "../../components/FormActions";
-import { SaveFeedback } from "../../components/SaveFeedback";
+
 export const ProjectForm = ({
   resource,
   organizationId,
@@ -27,27 +26,24 @@ export const ProjectForm = ({
   });
 
   return (
-    <Form.Provider
+    <Form.Single
       value={{
         ...editor,
         onChange: () => {
           return setSaved(false);
         },
       }}
+      saveLabel={resource ? "Save changes" : "Create"}
+      saved={saved}
     >
-      <Form.Shell>
-        <Form.Fields>
-          <ProjectFormFields />
-          <FormActions creating={!resource} />
-        </Form.Fields>
-        <Form.Feedback />
-        <SaveFeedback visible={saved} />
-      </Form.Shell>
-    </Form.Provider>
+      <ProjectFormFields />
+    </Form.Single>
   );
 };
+
 export const ProjectFormFields = () => {
   const typedForm = useFormContext<ReturnType<typeof useProjectForm>["form"]>("project");
+
   return (
     <>
       <typedForm.AppField name="name">

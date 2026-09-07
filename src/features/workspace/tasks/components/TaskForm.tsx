@@ -3,8 +3,6 @@ import { Form, useFormContext } from "../../../../forms/components/FormComponent
 import type { Project, Task } from "../../types";
 import { dueWindowOptions, ownerOptions, taskStatusOptions } from "../fieldOptions";
 import { useTaskForm } from "../hooks/useTaskForm";
-import { FormActions } from "../../components/FormActions";
-import { SaveFeedback } from "../../components/SaveFeedback";
 export const TaskForm = ({
   resource,
   project,
@@ -27,23 +25,18 @@ export const TaskForm = ({
   });
 
   return (
-    <Form.Provider
+    <Form.Single
       value={{
         ...editor,
         onChange: () => {
           return setSaved(false);
         },
       }}
+      saveLabel={resource ? "Save changes" : "Create"}
+      saved={saved}
     >
-      <Form.Shell>
-        <Form.Fields>
-          <TaskFormFields />
-          <FormActions creating={!resource} />
-        </Form.Fields>
-        <Form.Feedback />
-        <SaveFeedback visible={saved} />
-      </Form.Shell>
-    </Form.Provider>
+      <TaskFormFields />
+    </Form.Single>
   );
 };
 export const TaskFormFields = () => {

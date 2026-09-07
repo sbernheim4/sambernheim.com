@@ -3,8 +3,6 @@ import { Form, useFormContext } from "../../../../forms/components/FormComponent
 import type { Organization } from "../../types";
 import { regionOptions, sectorOptions, statusOptions } from "../fieldOptions";
 import { useOrganizationForm } from "../hooks/useOrganizationForm";
-import { FormActions } from "../../components/FormActions";
-import { SaveFeedback } from "../../components/SaveFeedback";
 export const OrganizationForm = ({
   resource,
   onCreated,
@@ -24,32 +22,32 @@ export const OrganizationForm = ({
   });
 
   return (
-    <Form.Provider
+    <Form.Single
       value={{
         ...editor,
         onChange: () => {
           return setSaved(false);
         },
       }}
+      saveLabel={resource ? "Save changes" : "Create"}
+      saved={saved}
     >
-      <Form.Shell>
-        <Form.Fields>
-          <OrganizationFormFields />
-          <FormActions creating={!resource} />
-        </Form.Fields>
-        <Form.Feedback />
-        <SaveFeedback visible={saved} />
-      </Form.Shell>
-    </Form.Provider>
+      <OrganizationFormFields />
+    </Form.Single>
   );
 };
-export const OrganizationFormFields = () => {
+export const OrganizationFormFields = ({
+  onNameChange,
+}: {
+  onNameChange?: (value: string) => void;
+} = {}) => {
   const typedForm = useFormContext<ReturnType<typeof useOrganizationForm>["form"]>("organization");
+
   return (
     <>
       <typedForm.AppField name="name">
         {(field) => {
-          return <field.TextField label="Organization name" required />;
+          return <field.TextField label="Organization name" required onChange={onNameChange} />;
         }}
       </typedForm.AppField>
       <typedForm.AppField name="sector">
