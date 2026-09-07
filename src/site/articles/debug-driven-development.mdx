@@ -1,0 +1,227 @@
+---
+meta:
+  title: Debug Driven Development
+  description: Write Debuggable Code
+  slug: debug-driven-development
+headers:
+  Cache-Control: max-age=60000
+---
+
+# Debug Driven Development
+
+#### Published on Jun 14, 2022
+
+You've likely heard of Test Driven Development, or maybe even Behavrioal Driven
+Development. I have a new phrase: Debug Driven Development(™).
+
+## What is Debug Driven Development
+
+Consider the following two code samples. Which would you rather face when
+locating a bug or making an update for a new feature. Which would you prefer to
+leave for your future self or coworker.
+
+```ts
+// Option 1.
+
+export const getNameFrequency = (myObj) => {
+    return myObj["prop"].map(res => res.name).reduce((acc, curr) => {
+
+        const value = acc[curr];
+
+        return {
+            ...acc,
+            ...{
+                [curr]: value !== undefined ?
+                    value + 1 :
+                    1;
+            }
+        };
+
+    }, {});
+
+// --------------------------------------------------------
+
+// Option 2.
+
+export const getNameFrequency = (myObj) => {
+
+    const users = myObj["prop"]
+    const userNames = users.map(res => res.name);
+    const userNamesToFrequency = userNames.reduce((acc, curr) => {
+
+        const value = acc[curr];
+        const currentCount = value !== undefined ?
+            value + 1 :
+            1;
+
+        const entry = {
+            [curr]: currentCount
+        };
+
+        const updatedAccumulator = {
+            ...acc,
+            ...entry
+        };
+
+        return updatedAccumulator;
+
+    }, {});
+
+    return userNamesToFrequency;
+};
+```
+
+The first snippet is readable but I wouldn't call it simple. The logic is
+straightforward and you figure out we're counting the frequency of the keys of a
+given object pretty quickly but I think you'll agree one is far easier to read
+(and work in) than the other.
+
+For any work in one of the snippets, you'll likely use some if not all of the
+following techniques.
+
+- `console.log()`
+- `debugger;`
+- Breakpoints
+- Tests
+
+Regardless of which method we use, we'll want to inspect the intermediate state
+of our data at various points. Seeing the intermediate transformations of our
+data is essential to narrow in on a bug or validate a change. **Debug Driven
+Development optimizes writing code to provide opportunities for future
+debugging and maintenance.**
+
+Hopefully you're building up an intuition for debug driven development.
+
+## Is Debug Driven Development Really a New Idea?
+
+I don't know but I haven't heard of it before though I'm sure some of the ideas
+in here have been codified and are part of other strategies for writing
+maintainable code (perhaps in Clean Code or similar places).
+
+Debug Driven Development might sound similar to `KISS`: Keep It Simple Stupid.
+The two are related, but Debug Driven Development goes further. Phrases like
+KISS (and I'd argue Clean Code too) focus on readability whereas Debug Driven
+Development focuses on writing code so that it is as easy to debug as possible.
+
+This principle manifests most concretely by storing intermediate states of
+computation in their own variables, avoiding nested logic, and avoiding inlining
+function calls. Avoiding these styles makes it easy to toss in a console.log,
+add a breakpoint between two function calls and modify existing code as part of
+new requirements.
+
+```ts
+// Nesting of logic:
+
+const data = myObj[!!key ? key : "fallbackKey"];
+
+const config = {
+  name: name > 5 ? name.slice(0, 5) : name,
+};
+
+// Inlining Function Calls
+
+const config = {
+  ...data,
+  name: userDataIsAvailableFromSession(session)
+    ? getUserNameFromSession(session)
+    : getRandomUserName(),
+};
+```
+
+These examples above are mostly obvious but I'd be surprised if you couldn't
+find similar ones in any project you work in regularly (and please, these are
+for illustration - writing fake code is hard!).
+
+Another obvious example where this can manifest is Array method chains (and
+broadly chainable method calls on any object). Of the two examples below, which
+would be easier to debug or modify? If you say the 2nd one, well, I'm at least
+thankful you're still reading.
+
+> You can imagine the filter predicates contain more gnarly conditionals than
+> these trivial examples but these examples are enough to convey the broader
+> point.
+
+```ts
+// Example 1
+
+const myArr = getArrayOfData();
+
+const nonEmptyValues = myArr.filter(entry => {
+	const isNotEmpty = entry !== null && entry !== undefined;
+	return isNotEmpty;
+});
+
+const lengthNames = nonEmptyValues.filter(entry => {
+	const entryIsLongEnough = entry.name.length > 5;
+	return entryIsLongEnough;
+});
+
+const over21 = lengthNames.filter(entry => {
+	const entryIsOldEnought = entry.age > 21
+	return entryIsOldEnought;
+});
+
+// --------------------------------------------------------
+
+// Example 2
+
+const filteredResults = getArrayOfData().filter(entry => {
+    return entry !== null && entry !== undefined &&
+		entry.name.length > 5 &&
+		entry.age 21
+});
+```
+
+You're probably bulking at the 3 repeated loops in the first example and just
+begging to refactor it to be closer to the 2nd example. While the 2 extra loops
+is certainly not great, the first is more debuggable than the second. If there
+were an issue with the end result, it would be due to one of the conditions
+being off. Having three separate filter calls allows us to easily go in and
+inspect which predicates(s) are wrong at any intermediate step.
+
+There is a middle ground of course, though it still fails to allow us to inspect
+the value of the entire array between each predicate.
+
+```ts
+const myArr = getArrayOfData();
+
+const filteredResults = myArr.filter(entry => {
+    const isNotEmpty = entry !== null && entry !== undefined
+    const entryIsLongEnough = entry.name.length > 5
+    const isOver21 = entry.age 21
+
+    return isNotEmpty && entryIsLongEnough && isOver21;
+});
+```
+
+So which do we use? The middle ground option or the triple loop. Does the array
+have under 1,000 values? If so I'd probably opt for the 3 filter calls,
+otherwise I may select the more optimized approach.
+
+It doesn't matter which you choose (to a degree - measure performance and adapt
+code as needed), so long as you make your choice debuggable.
+
+## Other Forms of Debug Driven Development
+
+Depending on the language or tools you're using another form of debug driven
+development manifests in a type system! Types help make your code debuggable
+especially when abiding by the make impossible states impossible principle by
+designing your types so that illegal states are not representable in your
+type system.
+
+Fundamentally types are powerful as they let us embed logic that is verified and
+provable by a compiler. Debugging an error when working in a typed project is
+significantly easier and can save you a few `console.log` and `debugger;` cycles
+to try and understand the exact shape of your data, a function call's arguments,
+or a class instance.
+
+And that's Debug Driven Development!
+
+## Wrapping Up
+
+Debug Driven Development is compatible with other methodologies like TDD, BDD,
+or Clean Code. We do aim for composition oriented solutions as engineers after
+all.
+
+Focusing on any code writing strategy will often include partly focusing on the
+others. Debug Driven Development is just another tool to help write better code.

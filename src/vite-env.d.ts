@@ -1,5 +1,17 @@
 /// <reference types="vite/client" />
 
+declare module "*.mdx" {
+  import type { ComponentType } from "react";
+
+  const Component: ComponentType;
+  export default Component;
+  export const meta: {
+    slug: string;
+    title: string;
+    description: string;
+  };
+}
+
 declare module "ty_wasm" {
   export default function init(
     input?: RequestInfo | URL | Response | BufferSource | WebAssembly.Module,

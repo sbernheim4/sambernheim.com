@@ -1,5 +1,8 @@
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
+import mdx from "@mdx-js/rollup";
+import remarkFrontmatter from "remark-frontmatter";
+import remarkMdxFrontmatter from "remark-mdx-frontmatter";
 import { defineConfig, type PreviewServer, type ViteDevServer } from "vite";
 
 import { handleApiRequest } from "./server/example-api";
@@ -23,6 +26,9 @@ export default defineConfig({
     },
   },
   plugins: [
+    mdx({
+      remarkPlugins: [remarkFrontmatter, remarkMdxFrontmatter],
+    }),
     {
       name: "example-api",
       configureServer: installExampleApi,
