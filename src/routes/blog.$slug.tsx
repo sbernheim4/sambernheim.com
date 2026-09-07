@@ -9,7 +9,7 @@ const BlogPost = () => {
     return (
       <>
         <SiteNavbar />
-        <main className="site-article">
+        <main className="article">
           <h1>404 - Article not found</h1>
           <Link to="/blog">Back to Blog</Link>
         </main>
@@ -20,7 +20,7 @@ const BlogPost = () => {
   return (
     <>
       <SiteNavbar />
-      <main className="site-article">
+      <main className="article">
         <Article />
       </main>
     </>

@@ -2,11 +2,13 @@ import { Link } from "@tanstack/react-router";
 
 export const SiteNavbar = () => {
   return (
-    <nav className="site-navbar">
-      <Link to="/" className="site-navbar-main">
+    <nav className="navbar">
+      <Link to="/" id="main">
         Home
       </Link>
-      <span className="site-navbar-line" />
+      <div className="navbar__line-container">
+        <hr />
+      </div>
       <Link to="/blog">Blog</Link>
     </nav>
   );
