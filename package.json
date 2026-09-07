@@ -32,6 +32,8 @@
     "react-dom": "^19.1.1"
   },
   "devDependencies": {
+    "@mdx-js/react": "^3.1.1",
+    "@mdx-js/rollup": "^3.1.1",
     "@types/node": "^24.3.0",
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
@@ -40,6 +42,10 @@
     "oxfmt": "0.66.0",
     "oxlint": "1.81.0",
     "react-test-renderer": "^19.2.8",
+    "rehype-highlight": "^7.0.2",
+    "remark-frontmatter": "^5.0.0",
+    "remark-gfm": "^4.0.1",
+    "remark-mdx-frontmatter": "^5.2.0",
     "typescript": "^5.9.2",
     "vite": "^7.1.4"
   },
