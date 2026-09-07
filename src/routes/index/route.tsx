@@ -1,3 +1,4 @@
+import "./styles/route.css";
 import { createFileRoute } from "@tanstack/react-router";
 import { About } from "./components/-About";
 import { LandingPage } from "./components/-LandingPage";
