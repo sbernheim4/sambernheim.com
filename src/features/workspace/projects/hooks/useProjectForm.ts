@@ -30,7 +30,14 @@ export const useProjectForm = ({
   const update = useUpdateProject(resource?.id ?? "");
   const form = useQueryBackedForm({
     query: resource ? query : undefined,
-    defaultValues,
+    defaultValues: resource
+      ? {
+          name: resource.name,
+          priority: resource.priority,
+          phase: resource.phase,
+          budget: resource.budget,
+        }
+      : defaultValues,
     toFormData: (data: Project): ProjectFormValues => {
       return {
         name: data.name,
