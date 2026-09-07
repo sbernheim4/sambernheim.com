@@ -6,10 +6,12 @@ export const resetFormValues = (form: AnyFormApi, values: unknown) => {
   form.reset(defaults);
   form.options = { ...form.options, defaultValues: defaults };
 };
+
 export const markFormSaved = (form: AnyFormApi, values: unknown) => {
   const current = form.state.values;
   const meta = form.baseStore.state.fieldMetaBase;
   const changed = !evaluate(current, values);
+
   resetFormValues(form, values);
 
   if (changed) {

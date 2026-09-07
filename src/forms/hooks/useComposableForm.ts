@@ -23,6 +23,7 @@ export type QuerySource<QueryData> = {
   isError: boolean;
   error?: unknown;
 };
+
 export type FormSource<QueryData, Values> = {
   defaultValues: Values;
 } & (
@@ -35,7 +36,9 @@ export type FormSource<QueryData, Values> = {
       toFormData: (data: QueryData) => NoInfer<Values>;
     }
 );
+
 type FormValidator<Values> = (values: Values) => string | undefined | Promise<string | undefined>;
+
 const validateForm = async (form: AnyFormApi): Promise<ValidationResult> => {
   await form.validateAllFields("submit");
   await form.validate("submit");
@@ -49,6 +52,7 @@ const validateForm = async (form: AnyFormApi): Promise<ValidationResult> => {
     error: new Error("Please correct the highlighted fields."),
   };
 };
+
 const isFormReady = (initialized: boolean, readError: unknown, query?: QuerySource<unknown>) => {
   return (
     initialized &&
@@ -134,6 +138,7 @@ export type ComposableFormConfig<
 > = FormOptions<QueryData, Values, Mutation, Dependencies> & {
   id: Id;
 };
+
 export const useComposableForm = <
   const Id extends string,
   QueryData,

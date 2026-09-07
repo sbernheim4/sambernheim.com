@@ -2,9 +2,11 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 
 import { useOrganizations } from "../features/workspace/organizations/hooks/queries";
 import { WorkspaceLayout } from "../features/workspace/components/WorkspaceLayout";
+
 const FormsIndex = () => {
   const organizations = useOrganizations();
   const firstOrganization = organizations.data?.[0];
+
   return (
     <WorkspaceLayout
       title="Query-Backed Form Examples"
@@ -33,6 +35,7 @@ const FormsIndex = () => {
     </WorkspaceLayout>
   );
 };
+
 export const Route = createFileRoute("/forms/")({
   ssr: false,
   component: FormsIndex,

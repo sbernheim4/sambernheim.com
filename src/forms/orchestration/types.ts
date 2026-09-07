@@ -1,28 +1,35 @@
 import type { QueryClient, QueryKey } from "@tanstack/react-query";
 
 export type AsyncMutation = (variables: any, ...options: any[]) => Promise<any>;
+
 export type Input<M extends AsyncMutation> = Parameters<M>[0];
+
 export type Response<M extends AsyncMutation> = Awaited<ReturnType<M>>;
+
 export type RefreshOptions = {
   readonly refetchFunctions?: readonly (() => unknown)[];
   readonly invalidateQueryKeys?: readonly QueryKey[];
 };
+
 export type RetryPolicy = {
   readonly maxRetries?: number;
   readonly delayMs?: number | ((attempt: number, error: unknown) => number);
   readonly shouldRetry?: (error: unknown) => boolean;
 };
+
 export type CacheContext<R, I, Results = {}> = {
   response: R;
   variables: I;
   results: Results;
   queryClient: QueryClient;
 };
+
 export type CacheTarget<R, I, Data = R, Results = {}> = {
   readonly queryKey: (context: CacheContext<R, I, Results>) => QueryKey;
 } & ([R] extends [Data]
   ? { readonly getData?: (response: R) => Data; readonly update?: never }
   : { readonly getData: (response: R) => Data; readonly update?: never });
+
 export type CacheUpdate<R, I, Results = {}> =
   | {
       readonly queryKey: (context: CacheContext<R, I, Results>) => QueryKey;
@@ -34,11 +41,13 @@ export type CacheUpdate<R, I, Results = {}> =
       readonly getData?: never;
       readonly update: (previous: unknown, context: CacheContext<R, I, Results>) => unknown;
     };
+
 export type FollowUpError = {
   phase: "refresh" | "cache" | "form-state" | "effect";
   formId?: string;
   error: unknown;
 };
+
 export type FailureContext<V, I> = {
   formId: string;
   formValues: V;
@@ -47,22 +56,27 @@ export type FailureContext<V, I> = {
   phase: "validation" | "mapping" | "save";
   error: unknown;
 };
+
 export type SuccessContext<V, I, R, Results = {}> = CacheContext<R, I, Results> & {
   formId: string;
   formValues: V;
   attempts: number;
   followUpErrors: readonly FollowUpError[];
 };
+
 export type OutcomeCallbacks<V, I, R, Results = {}> = {
   readonly onSuccess?: (context: SuccessContext<V, I, R, Results>) => void | Promise<void>;
   readonly onFailure?: (context: FailureContext<V, I>) => void | Promise<void>;
 };
+
 export type Endpoint<M extends AsyncMutation> = {
   readonly mutationFn: M;
   /** Only idempotent operations may opt into automatic retries. */
   readonly retrySafe?: boolean;
 };
+
 export type ValidationResult = { valid: true } | { valid: false; error: unknown };
+
 export type PayloadMapping<V, I, Results> = [V] extends [I]
   ? { readonly toMutationPayload?: (values: V, context: { results: Results }) => I }
   : { readonly toMutationPayload: (values: V, context: { results: Results }) => I };
@@ -87,6 +101,7 @@ export type AnyForm = {
     retrySafe?: boolean;
   };
 };
+
 /** Read-only view used while the orchestrator consumes a form definition. */
 export type FormInput<F extends AnyForm = AnyForm> = Readonly<F> & {
   readonly endpoint: Readonly<F["endpoint"]>;
@@ -95,6 +110,7 @@ export type FormInput<F extends AnyForm = AnyForm> = Readonly<F> & {
 export type ResponsesOf<F extends readonly AnyForm[]> = {
   [Form in F[number] as Form["id"]]: Response<Form["endpoint"]["mutationFn"]>;
 };
+
 export type FormConfig<
   Id extends string,
   V,
@@ -137,6 +153,7 @@ export type FormSaveState<V = unknown, I = unknown, R = unknown> = {
   response?: R;
   failure?: FailureContext<V, I>;
 };
+
 export type SaveResult<P extends readonly AnyForm[]> = {
   outcome: "validation-failed" | "success" | "partial-failure" | "saved-with-follow-up-errors";
   forms: {
@@ -149,6 +166,7 @@ export type SaveResult<P extends readonly AnyForm[]> = {
   responses: Partial<ResponsesOf<P>>;
   followUpErrors: FollowUpError[];
 };
+
 export type Phase =
   | "idle"
   | "validating"
@@ -157,6 +175,7 @@ export type Phase =
   | "reconciling"
   | "effects"
   | "complete";
+
 
 export type SaveConfig<P extends readonly AnyForm[]> = RefreshOptions & {
   readonly forms: Readonly<P>;
