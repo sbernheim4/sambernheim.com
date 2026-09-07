@@ -5,7 +5,7 @@ import type { Organization, Project, Task } from "../types";
 
 type EntityListProps = {
   title: string;
-  create: (close: () => void) => ReactNode;
+  create?: (close: () => void) => ReactNode;
 } & (
   | { kind: "organizations"; items: readonly Organization[]; projects: readonly Project[] }
   | { kind: "projects"; items: readonly Project[]; tasks: readonly Task[] }
@@ -33,23 +33,25 @@ export const EntityList = (props: EntityListProps) => {
           {title} <span className="workspace-count">{items.length}</span>
         </h2>
 
-        <button
-          className="workspace-button"
-          type="button"
-          onClick={() => {
-            return setCreating(!creating);
-          }}
-          aria-expanded={creating}
-        >
-          {creating ? <X size={16} /> : <Plus size={16} />}
-          {creating ? "Cancel" : `New ${singular}`}
-        </button>
+        {create && (
+          <button
+            className="workspace-button"
+            type="button"
+            onClick={() => {
+              return setCreating(!creating);
+            }}
+            aria-expanded={creating}
+          >
+            {creating ? <X size={16} /> : <Plus size={16} />}
+            {creating ? "Cancel" : `New ${singular}`}
+          </button>
+        )}
       </div>
 
       {creating && (
         <div className="workspace-create">
           <h3>New {singular}</h3>
-          {create(() => {
+          {create?.(() => {
             setCreating(false);
             setSearch("");
           })}

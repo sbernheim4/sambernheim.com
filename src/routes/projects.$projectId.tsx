@@ -3,8 +3,18 @@ import { ProjectPage } from "../features/workspace/projects/components/ProjectPa
 
 const Page = () => {
   const { projectId } = Route.useParams();
+  const { isEditing } = Route.useSearch();
 
-  return <ProjectPage key={projectId} id={projectId} />;
+  return <ProjectPage key={projectId} id={projectId} isEditing={isEditing} />;
 };
 
-export const Route = createFileRoute("/projects/$projectId")({ ssr: false, component: Page });
+export const Route = createFileRoute("/projects/$projectId")({
+  ssr: false,
+  validateSearch: (search: Record<string, unknown>): { isEditing?: boolean } => {
+    if (search.isEditing === true || search.isEditing === "true") {
+      return { isEditing: true };
+    }
+    return {};
+  },
+  component: Page,
+});

@@ -447,6 +447,25 @@ textarea {
   margin: 16px 0 0;
 }
 
+.resource-details-list {
+  display: grid;
+  grid-template-columns: minmax(110px, 0.35fr) minmax(0, 1fr);
+  gap: 10px 20px;
+  margin: 0 0 22px;
+  font-size: 14px;
+}
+
+.resource-details-list dt {
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.resource-details-list dd {
+  margin: 0;
+  color: #273442;
+  overflow-wrap: anywhere;
+}
+
 .editor-fields {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

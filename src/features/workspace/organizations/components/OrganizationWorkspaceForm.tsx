@@ -7,7 +7,13 @@ import {
   useOrganizationProfileForm,
 } from "../hooks/organizationConfigurationForms";
 
-export const OrganizationWorkspaceForm = ({ organizationId }: { organizationId: string }) => {
+export const OrganizationWorkspaceForm = ({
+  organizationId,
+  onDiscard,
+}: {
+  organizationId: string;
+  onDiscard?: () => void;
+}) => {
   const profile = useOrganizationProfileForm({ organizationId });
   const operations = useOrganizationOperationsForm({ organizationId });
 
@@ -40,6 +46,7 @@ export const OrganizationWorkspaceForm = ({ organizationId }: { organizationId: 
             return setSubmitError(undefined);
           },
           onSubmitError: setSubmitError,
+          onDiscard,
         }}
       >
         <Form.Shell>
@@ -61,7 +68,7 @@ export const OrganizationWorkspaceForm = ({ organizationId }: { organizationId: 
             </section>
             <div className="form-actions">
               <Form.SaveButton />
-              <Form.DiscardButton />
+              <Form.DiscardButton pristineLabel="Stop editing" />
             </div>
           </Form.Fields>
           {conductor.phase !== "idle" && (

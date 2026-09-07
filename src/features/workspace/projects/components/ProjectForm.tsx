@@ -8,10 +8,12 @@ export const ProjectForm = ({
   resource,
   organizationId,
   onCreated,
+  onDiscard,
 }: {
   resource?: Project;
   organizationId: string;
   onCreated?: () => void;
+  onDiscard?: () => void;
 }) => {
   const [saved, setSaved] = useState(false);
   const editor = useProjectForm({
@@ -32,8 +34,10 @@ export const ProjectForm = ({
         onChange: () => {
           return setSaved(false);
         },
+        onDiscard,
       }}
       saveLabel={resource ? "Save changes" : "Create"}
+      pristineLabel={resource ? "Stop editing" : "Go back"}
       saved={saved}
     >
       <ProjectFormFields />
