@@ -100,6 +100,9 @@ export type AnyForm = {
     mutationFn: AsyncMutation;
     retrySafe?: boolean;
   };
+  form: {
+    reset: (...args: any[]) => void;
+  };
 };
 
 /** Read-only view used while the orchestrator consumes a form definition. */
@@ -175,7 +178,6 @@ export type Phase =
   | "reconciling"
   | "effects"
   | "complete";
-
 
 export type SaveConfig<P extends readonly AnyForm[]> = RefreshOptions & {
   readonly forms: Readonly<P>;

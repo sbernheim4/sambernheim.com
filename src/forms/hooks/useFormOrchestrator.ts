@@ -59,12 +59,11 @@ export const useFormOrchestrator = <const T extends readonly SavableForm[]>(
     phase: "idle",
     isSaving: false,
   });
-  const [conductor] = useState(() => {
+  const [orchestrator] = useState(() => {
     return createOrchestrator<T>(client, setState);
   });
 
   const latest = useRef(config);
-
   latest.current = config;
 
   const submit = () => {
@@ -82,16 +81,28 @@ export const useFormOrchestrator = <const T extends readonly SavableForm[]>(
 
     const { includePristine: _includePristine, ...submitConfig } = latest.current;
 
-    return conductor.submit({
+    return orchestrator.submit({
       ...submitConfig,
       forms,
     });
   };
 
-  return {
+  const conductor = {
     ...state,
     isDirty,
     submit,
-    reset: conductor.reset,
+    reset: () => {
+      return orchestrator.reset(config);
+    },
+    provider: {
+      handleSubmit: () => {
+        return submit();
+      },
+      reset: () => {
+        return orchestrator.reset(config);
+      },
+    },
   };
+
+  return conductor;
 };

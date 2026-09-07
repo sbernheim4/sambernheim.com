@@ -71,7 +71,7 @@ export const useOrganizationProfileForm = ({
     ],
   });
 
-  return { ...binding, retryRead: query.refetch };
+  return binding;
 };
 export const useOrganizationOperationsForm = ({
   organizationId,
@@ -81,6 +81,7 @@ export const useOrganizationOperationsForm = ({
 } & OutcomeCallbacks<OperationsValues, UpdateOperationsInput, OperationsResponse>) => {
   const query = useOrganizationOperations(organizationId);
   const mutation = useUpdateOrganizationOperations(organizationId);
+
   const binding = useComposableForm({
     id: "operations",
     defaultValues: { isActive: false, region: "east" } as OperationsValues,
@@ -109,5 +110,6 @@ export const useOrganizationOperationsForm = ({
       bootstrapKey(),
     ],
   });
-  return { ...binding, retryRead: query.refetch };
+
+  return binding;
 };
