@@ -95,23 +95,28 @@ const FormSaveButton = ({
 };
 
 const FormDiscardButton = ({
-  label = "Discard changes",
+  label,
+  pristineLabel = "Go back",
 }: {
   label?: string;
+  pristineLabel?: string;
 } = {}) => {
   const scope = useFormScope();
+  const buttonLabel = label ?? (scope.isDirty ? "Discard changes" : pristineLabel);
   return (
     <button
       className="workspace-button"
       type="button"
-      disabled={scope.isSaving || !scope.isDirty}
+      disabled={scope.isSaving}
       onClick={() => {
-        scope.form.reset();
+        if (scope.isDirty) {
+          scope.form.reset();
+        }
         scope.onChange?.();
         scope.onDiscard?.();
       }}
     >
-      {label}
+      {buttonLabel}
     </button>
   );
 };
@@ -136,11 +141,13 @@ const FormSingle = ({
   value,
   children,
   saveLabel = "Save changes",
+  pristineLabel = "Go back",
   saved = false,
 }: {
   value: FormScopeValue;
   children: ReactNode;
   saveLabel?: string;
+  pristineLabel?: string;
   saved?: boolean;
 }) => {
   return (
@@ -150,7 +157,7 @@ const FormSingle = ({
           {children}
           <div className="form-actions">
             <FormSaveButton label={saveLabel} />
-            <FormDiscardButton />
+            <FormDiscardButton pristineLabel={pristineLabel} />
           </div>
         </FormFields>
         <FormFeedback />

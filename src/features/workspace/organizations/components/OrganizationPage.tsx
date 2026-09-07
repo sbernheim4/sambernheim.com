@@ -5,9 +5,17 @@ import { EntityList } from "../../components/EntityList";
 import { Details } from "../../components/Details";
 import { OrganizationWorkspaceForm } from "./OrganizationWorkspaceForm";
 import { ProjectForm } from "../../projects/components/ProjectForm";
+import { Link, useNavigate } from "@tanstack/react-router";
 
-export const OrganizationPage = ({ id }: { id: string }) => {
+export const OrganizationPage = ({
+  id,
+  isEditing = false,
+}: {
+  id: string;
+  isEditing?: boolean;
+}) => {
   const query = useOrganizationWorkspace(id);
+  const navigate = useNavigate({ from: "/organizations/$organizationId" });
   const { organization, projects, tasks } = query;
 
   return (
@@ -20,24 +28,55 @@ export const OrganizationPage = ({ id }: { id: string }) => {
       <QueryState query={query} missing={!organization}>
         {organization && (
           <div className="workspace-columns">
-            <Details
-              title="Organization details"
-              id={organization.id}
-              updatedAt={organization.updatedAt}
-            >
-              <p className="workspace-edit-hint">
-                Organization details are composed from the Profile and Operations records below.
-              </p>
-            </Details>
-            <OrganizationWorkspaceForm organizationId={organization.id} />
+            {isEditing ? (
+              <OrganizationWorkspaceForm
+                organizationId={organization.id}
+                onDiscard={() => {
+                  void navigate({
+                    search: (previous) => {
+                      return { ...previous, isEditing: false };
+                    },
+                  });
+                }}
+              />
+            ) : (
+              <Details
+                title="Organization details"
+                id={organization.id}
+                updatedAt={organization.updatedAt}
+              >
+                <dl className="resource-details-list">
+                  <dt>Name</dt>
+                  <dd>{organization.name}</dd>
+                  <dt>Sector</dt>
+                  <dd>{organization.sector}</dd>
+                  <dt>Status</dt>
+                  <dd>{organization.status}</dd>
+                  <dt>Region</dt>
+                  <dd>{organization.region}</dd>
+                </dl>
+                <Link
+                  className="workspace-button"
+                  to="/organizations/$organizationId"
+                  params={{ organizationId: organization.id }}
+                  search={{ isEditing: true }}
+                >
+                  Edit organization
+                </Link>
+              </Details>
+            )}
             <EntityList
               title="Projects"
               kind="projects"
               tasks={tasks}
               items={projects}
-              create={(close) => {
-                return <ProjectForm organizationId={organization.id} onCreated={close} />;
-              }}
+              create={
+                isEditing
+                  ? (close) => {
+                      return <ProjectForm organizationId={organization.id} onCreated={close} />;
+                    }
+                  : undefined
+              }
             />
           </div>
         )}
