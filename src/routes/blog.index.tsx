@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { SiteNavbar } from "../site/components/SiteNavbar";
-import { sitePosts } from "../site/articles";
+import { SiteNavbar } from "../components/site/SiteNavbar";
+import { sitePosts } from "../articles";
 
 const BlogIndex = () => {
   return (
