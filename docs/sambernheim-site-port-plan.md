@@ -12,10 +12,15 @@
 
 ## Implementation steps
 
-1. Add a site component area with the navbar, landing page, About section, and scoped styles.
-2. Add TanStack routes for the landing page, blog index, article details, and math demo.
-3. Audit dependencies and add only the focused MDX/GFM/highlighting packages needed for the article experience; remove `excoptional`-style indirection.
-4. Add an MDX build path for the existing article files and replace Remix loader data with typed route data.
-5. Replace Remix navigation, location, action, and loader APIs with TanStack Router state and a local mutation for the math demo.
-6. Update the root document metadata and navigation without affecting workspace layouts.
-7. Run lint, formatting, typecheck, and route smoke checks for both the existing workspace and the ported site.
+1. [x] Add a site component area with the navbar, landing page, About section, and scoped styles.
+2. [x] Add TanStack routes for the landing page, blog index, article details, and math demo.
+3. [x] Audit dependencies and add focused MDX/GFM/frontmatter packages; remove `excoptional`-style indirection.
+4. [x] Add an MDX build path for the existing article files and replace Remix loader data with typed route data.
+5. [x] Replace Remix navigation, location, action, and loader APIs with TanStack Router state and local math-demo state.
+6. [x] Update the root landing page and navigation without affecting workspace routes.
+7. [x] Run lint, formatting, typecheck, and production build checks.
+
+## Follow-up
+
+- Add richer article metadata and syntax highlighting themes as a separate visual polish pass.
+- Add route smoke tests for the new blog and demo paths.
