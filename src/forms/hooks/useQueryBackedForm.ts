@@ -1,4 +1,5 @@
 import type { AsyncMutation } from "../orchestration/types";
+import { useSelector } from "@tanstack/react-form";
 import { useFormOrchestrator } from "./useFormOrchestrator";
 import { useComposableForm, type FormOptions } from "./useComposableForm";
 
@@ -19,6 +20,9 @@ export const useQueryBackedForm = <QueryData, Values, Mutation extends AsyncMuta
     forms: [binding] as const,
     includePristine: true,
   });
+  const isDirty = useSelector(binding.form.store, (state) => {
+    return state.isDirty;
+  });
 
   // The orchestrator awaits native TanStack validation before executing writes.
   binding.form.handleSubmit = async () => {
@@ -36,7 +40,8 @@ export const useQueryBackedForm = <QueryData, Values, Mutation extends AsyncMuta
     result: save.result,
     submit: save.submit,
     isSaving: save.isSaving,
-    isDirty: save.isDirty,
+    isDirty,
+    allowPristineSave: config.query === undefined,
     error,
   };
 };

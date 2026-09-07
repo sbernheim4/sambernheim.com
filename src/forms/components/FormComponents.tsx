@@ -9,6 +9,7 @@ export type FormScopeValue = {
   isReady: boolean;
   isSaving: boolean;
   isDirty: boolean;
+  allowPristineSave?: boolean;
   error?: unknown;
   result?: {
     outcome?: string;
@@ -87,9 +88,13 @@ const FormSaveButton = ({
     <button
       className="primary-action"
       type="submit"
-      disabled={scope.isSaving || !scope.isReady || !scope.isDirty}
+      disabled={scope.isSaving || !scope.isReady || (!scope.isDirty && !scope.allowPristineSave)}
     >
-      {scope.isSaving ? "Saving..." : scope.isDirty ? label : "No changes to save"}
+      {scope.isSaving
+        ? "Saving..."
+        : scope.isDirty || scope.allowPristineSave
+          ? label
+          : "No changes to save"}
     </button>
   );
 };
