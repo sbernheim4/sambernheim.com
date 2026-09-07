@@ -67,8 +67,6 @@ export const useFormOrchestrator = <const T extends readonly SavableForm[]>(
   latest.current = config;
 
   const submit = () => {
-    // I'm also pretty sure the types AnyForm and SavableForm should be the same
-    // type with SavableForm being the winner
     const selectedForms = latest.current.includePristine
       ? latest.current.forms
       : latest.current.forms.filter((binding) => {
@@ -90,8 +88,6 @@ export const useFormOrchestrator = <const T extends readonly SavableForm[]>(
   };
 
   const reset = () => {
-    // I'm also pretty sure the types AnyForm and SavableForm should be the same
-    // type with SavableForm being the winner
     const allForms = latest.current.forms;
     const forms = allForms as unknown as T;
 
@@ -119,7 +115,7 @@ export const useFormOrchestrator = <const T extends readonly SavableForm[]>(
         return submit();
       },
       reset: () => {
-        return reset()
+        return reset();
       },
     },
   };

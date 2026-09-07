@@ -13,10 +13,12 @@ export const TextField = ({
   label,
   placeholder,
   required,
+  onChange,
 }: {
   label: string;
   placeholder?: string;
   required?: boolean;
+  onChange?: (value: string) => void;
 }) => {
   const field = useFieldContext<string>();
 
@@ -30,7 +32,9 @@ export const TextField = ({
         placeholder={placeholder}
         onBlur={field.handleBlur}
         onChange={(event) => {
-          return field.handleChange(event.target.value);
+          const value = event.target.value;
+          field.handleChange(value);
+          onChange?.(value);
         }}
       />
       {field.state.meta.errors.length > 0 && (
@@ -46,12 +50,12 @@ export const SelectField = <TValue extends string>({
   label,
   options,
   placeholder = "Select option",
-  onValueChange,
+  onChange,
 }: {
   label: string;
   options: ReadonlyArray<Option<TValue>>;
   placeholder?: string;
-  onValueChange?: (value: TValue) => void;
+  onChange?: (value: TValue) => void;
 }) => {
   const field = useFieldContext<TValue | "">();
   const labelId = useId();
@@ -62,8 +66,9 @@ export const SelectField = <TValue extends string>({
       <Select.Root
         value={field.state.value ?? ""}
         onValueChange={(value) => {
-          field.handleChange(value as TValue);
-          onValueChange?.(value as TValue);
+          const typedValue = value as TValue;
+          field.handleChange(typedValue);
+          onChange?.(typedValue);
         }}
       >
         <Select.Trigger
@@ -97,9 +102,11 @@ export const SelectField = <TValue extends string>({
 export const RadioGroupField = <TValue extends string>({
   label,
   options,
+  onChange,
 }: {
   label: string;
   options: ReadonlyArray<Option<TValue>>;
+  onChange?: (value: TValue) => void;
 }) => {
   const field = useFieldContext<TValue>();
   const labelId = useId();
@@ -113,7 +120,9 @@ export const RadioGroupField = <TValue extends string>({
         onBlur={field.handleBlur}
         value={field.state.value}
         onValueChange={(value) => {
-          return field.handleChange(value as TValue);
+          const typedValue = value as TValue;
+          field.handleChange(typedValue);
+          onChange?.(typedValue);
         }}
       >
         {options.map((option) => {

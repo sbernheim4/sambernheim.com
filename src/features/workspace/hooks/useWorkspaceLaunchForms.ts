@@ -18,7 +18,7 @@ const organizationDefaults: SaveOrganizationInput = {
 };
 
 const projectDefaults: Omit<SaveProjectInput, "organizationId"> = {
-  name: "Patient Intake",
+  name: "[Acme Health] Patient Intake",
   priority: "high",
   phase: "planning",
   budget: "$125k",
@@ -58,7 +58,11 @@ export const useWorkspaceLaunchForms = (appendActivity: (text: string) => void) 
       if (!results.organization) {
         throw new Error("Organization has not been saved.");
       }
-      return { ...values, organizationId: results.organization.organization.id };
+      return {
+        ...values,
+        name: values.name.trim(),
+        organizationId: results.organization.organization.id,
+      };
     },
     endpoint: {
       mutationFn: createProject.mutateAsync,
