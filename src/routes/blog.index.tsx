@@ -6,16 +6,12 @@ const BlogIndex = () => {
   return (
     <>
       <SiteNavbar />
-      <main className="site-blog">
-        <header>
-          <h1>My Blog</h1>
-          <p>I often write about functional programming and TypeScript.</p>
-        </header>
-        <div className="site-article-list">
+      <main className="blog">
+        <div className="article-container">
           {sitePosts.map((post) => {
             return (
               <Link
-                className="site-article-item"
+                className="article-item"
                 key={post.slug}
                 to="/blog/$slug"
                 params={{ slug: post.slug }}
