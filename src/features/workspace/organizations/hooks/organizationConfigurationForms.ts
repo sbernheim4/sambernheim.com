@@ -1,7 +1,7 @@
-import { organizationListsKey } from "../queryOptions";
+import { bootstrapKey } from "../../queryOptions";
+import { organizationListsKey, organizationKey, organizationProfileKey, organizationOperationsKey } from "../queryOptions";
 import { useComposableForm } from "../../../../forms/hooks/useComposableForm";
 import type { OutcomeCallbacks } from "../../../../forms/orchestration/types";
-import { operationsCacheUpdates, profileCacheUpdates } from "../../childCachePolicies";
 import type {
   OperationsInput,
   OperationsResponse,
@@ -12,7 +12,7 @@ import type {
   UpdateProfileInput,
 } from "../../types";
 import { useUpdateOrganizationOperations, useUpdateOrganizationProfile } from "./mutations";
-import { useOrganization, useOrganizationOperations, useOrganizationProfile } from "./queries";
+import { useOrganizationOperations, useOrganizationProfile } from "./queries";
 
 type ProfileValues = {
   displayName: string;
@@ -31,7 +31,6 @@ export function useOrganizationProfileForm({
   ProfileResponse
 >) {
   const query = useOrganizationProfile(organizationId);
-  const organization = useOrganization(organizationId);
   const mutation = useUpdateOrganizationProfile(organizationId);
 
   const binding = useComposableForm({
@@ -56,9 +55,7 @@ export function useOrganizationProfileForm({
       mutationFn: mutation.mutateAsync,
       retrySafe: true,
     },
-    refetchFunctions: [query.refetch],
-    invalidateQueryKeys: [organizationListsKey()],
-    cacheUpdates: profileCacheUpdates(organization.data),
+    invalidateQueryKeys: [organizationProfileKey(organizationId), organizationKey(organizationId), organizationListsKey(), bootstrapKey()],
   });
 
   return { ...binding, retryRead: query.refetch };
@@ -72,7 +69,6 @@ export function useOrganizationOperationsForm({
   OperationsResponse
 >) {
   const query = useOrganizationOperations(organizationId);
-  const organization = useOrganization(organizationId);
   const mutation = useUpdateOrganizationOperations(organizationId);
   const binding = useComposableForm({
     id: "operations",
@@ -91,9 +87,7 @@ export function useOrganizationOperationsForm({
       mutationFn: mutation.mutateAsync,
       retrySafe: true,
     },
-    refetchFunctions: [query.refetch],
-    invalidateQueryKeys: [organizationListsKey()],
-    cacheUpdates: operationsCacheUpdates(organization.data),
+    invalidateQueryKeys: [organizationOperationsKey(organizationId), organizationKey(organizationId), organizationListsKey(), bootstrapKey()],
   });
   return { ...binding, retryRead: query.refetch };
 }

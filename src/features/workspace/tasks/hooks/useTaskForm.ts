@@ -1,7 +1,7 @@
-import { workspaceKey } from "../../queryOptions";
+import { tasksKey, taskKey, projectTasksKey } from "../queryOptions";
+import { bootstrapKey } from "../../queryOptions";
 import { useQueryBackedForm } from "../../../../forms/hooks/useQueryBackedForm";
 import type { OutcomeCallbacks } from "../../../../forms/orchestration/types";
-import { taskCacheUpdates } from "../../cachePolicies";
 import type { Project, SaveTaskInput, SaveTaskResponse, Task } from "../../types";
 import { dueWindowOptions, ownerOptions, taskStatusOptions } from "../fieldOptions";
 import { option } from "../../formOptions";
@@ -50,8 +50,7 @@ export function useTaskForm({
       mutationFn: resource ? update.mutateAsync : create.mutateAsync,
       retrySafe: !!resource,
     },
-    invalidateQueryKeys: [workspaceKey()],
-    cacheUpdates: taskCacheUpdates(),
+    invalidateQueryKeys: [tasksKey(), projectTasksKey(project.id), ...(resource ? [taskKey(resource.id)] : []), bootstrapKey()],
     ...callbacks,
   });
   return form;

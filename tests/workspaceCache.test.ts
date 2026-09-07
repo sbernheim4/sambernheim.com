@@ -1,259 +1,96 @@
-import { bootstrapKey } from "../src/features/workspace/queryOptions";
-import { projectTasksKey, taskKey, tasksKey } from "../src/features/workspace/tasks/queryOptions";
-import { organizationProjectsKey, projectKey, projectsKey } from "../src/features/workspace/projects/queryOptions";
-import { organizationKey, organizationOperationsKey, organizationProfileKey, organizationsKey } from "../src/features/workspace/organizations/queryOptions";
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { QueryClient } from "@tanstack/react-query";
-import { createOrchestrator } from "../src/forms/orchestration/orchestrator";
-import { defineForm } from "./formConfig";
-import {
-  profileCacheUpdates,
-  operationsCacheUpdates,
-} from "../src/features/workspace/childCachePolicies";
-import {
-  organizationCacheUpdates,
-  projectCacheUpdates,
-  taskCacheUpdates,
-} from "../src/features/workspace/cachePolicies";
-import { reconcileWorkspaceRead } from "../src/features/workspace/cache";
-import { clearWorkspace } from "../src/features/workspace/clearWorkspace";
-import type { Organization } from "../src/features/workspace/types";
-const organization: Organization = {
-  id: "org-1",
-  name: "Old",
-  sector: "healthcare",
-  status: "active",
-  region: "east",
-  updatedAt: "1",
-  profileUpdatedAt: "1",
-  operationsUpdatedAt: "1",
-};
-const client = () =>
-  new QueryClient({
-    defaultOptions: {
-      queries: {
-        gcTime: Infinity,
-        retry: false,
-        structuralSharing: reconcileWorkspaceRead,
-      },
-    },
-  });
-
-test("two children merge owned fields into every summary and later stale navigation reads retain both", async () => {
-  const qc = client();
-  const organizationForm = defineForm({
-    id: "organization",
-    snapshot: () => organization,
-    validate: () => ({ valid: true }),
-    endpoint: {
-      mutationFn: async (_input: Organization) => ({ organization, readModelLagMs: 2500 }),
-    },
-    cacheUpdates: organizationCacheUpdates(),
-  });
-  const created = await createOrchestrator<readonly [typeof organizationForm]>(qc).submit({
-    forms: [organizationForm],
-  });
-  assert.equal(created.outcome, "success");
-  const profile = {
-    organizationId: "org-1",
-    name: "New",
-    sector: "education" as const,
-    updatedAt: "2",
-  };
-  const operations = {
-    organizationId: "org-1",
-    status: "paused" as const,
-    region: "west" as const,
-    updatedAt: "3",
-  };
-  const profileForm = defineForm({
-    id: "profile",
-    snapshot: () => profile,
-    validate: () => ({ valid: true }),
-    endpoint: {
-      mutationFn: async (_input: typeof profile) => ({ profile, readModelLagMs: 2500 }),
-    },
-    cacheUpdates: profileCacheUpdates(organization),
-  });
-  const operationsForm = defineForm({
-    id: "operations",
-    snapshot: () => operations,
-    validate: () => ({ valid: true }),
-    endpoint: {
-      mutationFn: async (_input: typeof operations) => ({ operations, readModelLagMs: 2500 }),
-    },
-    cacheUpdates: operationsCacheUpdates(organization),
-  });
-  const saved = await createOrchestrator<readonly [typeof profileForm, typeof operationsForm]>(
-    qc,
-  ).submit({ forms: [profileForm, operationsForm] });
-  assert.equal(saved.outcome, "success");
-  assert.deepEqual(saved.followUpErrors, []);
-  for (const key of [organizationKey("org-1"), organizationsKey(), bootstrapKey()]) {
-    const data: any = qc.getQueryData(key);
-    const summary = Array.isArray(data)
-      ? data[0]
-      : data.organizations
-        ? data.organizations[0]
-        : data;
-    assert.equal(summary.name, "New");
-    assert.equal(summary.region, "west");
-  }
-  await qc.fetchQuery({
-    queryKey: organizationKey("org-1"),
-    queryFn: async () => organization,
-  });
-  await qc.fetchQuery({
-    queryKey: organizationsKey(),
-    queryFn: async () => [],
-  });
-  const summary = qc.getQueryData<Organization>(organizationKey("org-1"))!;
-  assert.equal(summary.name, "New");
-  assert.equal(summary.status, "paused");
-  assert.equal(qc.getQueryData<Organization[]>(organizationsKey())!.length, 1);
-  assert.equal(qc.getQueryData<any>(organizationProfileKey("org-1")).name, "New");
-  assert.equal(qc.getQueryData<any>(organizationOperationsKey("org-1")).region, "west");
-});
-
-test("partial profile save preserves operations and newer operations timestamp cannot hide stale profile fields", () => {
-  const previous = {
-    ...organization,
-    name: "Saved profile",
-    profileUpdatedAt: "2",
-    updatedAt: "2",
-  };
-  const incoming = {
-    ...organization,
-    region: "west" as const,
-    operationsUpdatedAt: "3",
-    updatedAt: "3",
-  };
-  const merged = reconcileWorkspaceRead(previous, incoming) as Organization;
-  assert.equal(merged.name, "Saved profile");
-  assert.equal(merged.region, "west");
-});
-
-test("project/task saves populate parent lists, detail caches, and bootstrap", async () => {
-  const qc = client();
-  const project = {
-    id: "p",
-    organizationId: "org-1",
-    name: "P",
-    priority: "high" as const,
-    phase: "planning" as const,
-    budget: "$50k",
-    updatedAt: "1",
-  };
-  const task = {
-    id: "t",
-    organizationId: "org-1",
-    projectId: "p",
-    title: "T",
-    owner: "alex" as const,
-    status: "todo" as const,
-    dueWindow: "this-week" as const,
-    updatedAt: "1",
-  };
-  const projectForm = defineForm({
-    id: "project",
-    snapshot: () => project,
-    validate: () => ({ valid: true }),
-    endpoint: {
-      mutationFn: async (_input: typeof project) => ({ project, readModelLagMs: 2500 }),
-    },
-    cacheUpdates: projectCacheUpdates(),
-  });
-  const taskForm = defineForm({
-    id: "task",
-    snapshot: () => task,
-    validate: () => ({ valid: true }),
-    endpoint: {
-      mutationFn: async (_input: typeof task) => ({ task, readModelLagMs: 2500 }),
-    },
-    cacheUpdates: taskCacheUpdates(),
-  });
-  const saved = await createOrchestrator<readonly [typeof projectForm, typeof taskForm]>(qc).submit(
-    { forms: [projectForm, taskForm] },
-  );
-  assert.equal(saved.outcome, "success");
-  assert.deepEqual(saved.followUpErrors, []);
-  assert.deepEqual(qc.getQueryData(organizationProjectsKey("org-1")), [project]);
-  assert.deepEqual(qc.getQueryData(projectTasksKey("p")), [task]);
-  assert.deepEqual(qc.getQueryData(projectKey("p")), project);
-  assert.deepEqual(qc.getQueryData(taskKey("t")), task);
-});
-
-test("clear-all calls the backend and resets workspace caches", async () => {
-  const qc = client();
-  qc.setQueryData(organizationProfileKey("org-1"), { name: "saved" });
-  let calls = 0;
-  const request = async () => {
-    calls++;
-    return { organizations: [], projects: [], tasks: [] };
-  };
-  assert.equal(await clearWorkspace(qc, request), true);
-  assert.equal(calls, 1);
-  assert.equal(qc.getQueryData(organizationProfileKey("org-1")), undefined);
-  assert.deepEqual(qc.getQueryData(organizationsKey()), []);
-  assert.deepEqual(qc.getQueryData(projectsKey()), []);
-  assert.deepEqual(qc.getQueryData(tasksKey()), []);
-  assert.deepEqual(qc.getQueryData(bootstrapKey()), {
-    organizations: [],
-    projects: [],
-    tasks: [],
-  });
-});
-
-import { QueryObserver } from "@tanstack/react-query";
-import { readReplicaResource } from "../src/features/workspace/replicaRead";
+import { QueryClient, QueryObserver } from "@tanstack/react-query";
 import { ApiError } from "../src/features/workspace/api";
+import { clearWorkspace } from "../src/features/workspace/clearWorkspace";
+import { bootstrapKey, bootstrapQueryOptions, workspaceKey } from "../src/features/workspace/queryOptions";
+import { organizationKey, organizationProfileKey, organizationsKey, organizationQueryOptions, organizationProfileQueryOptions, organizationOperationsQueryOptions, organizationsQueryOptions } from "../src/features/workspace/organizations/queryOptions";
+import { organizationProjectsKey, projectKey, projectsKey, projectListsKey, organizationProjectsQueryOptions, projectQueryOptions, projectsQueryOptions } from "../src/features/workspace/projects/queryOptions";
+import { projectTasksKey, taskKey, tasksKey, taskListsKey, projectTasksQueryOptions, taskQueryOptions, tasksQueryOptions } from "../src/features/workspace/tasks/queryOptions";
 
-test("clear resets mounted list/detail observers, including version-aware query caches", async () => {
+const organization = { id: "org-1", name: "Old", sector: "healthcare", status: "active", region: "east", updatedAt: "1" } as const;
+const client = () => { return new QueryClient({ defaultOptions: { queries: { gcTime: Infinity, retry: false } } }); };
+
+test("keys separate complete lists, parent lists, details and collection prefixes", () => {
+  const keys = [workspaceKey(), bootstrapKey(), organizationsKey(), organizationKey("a"), organizationKey("b"), projectListsKey(), projectsKey(), organizationProjectsKey("a"), organizationProjectsKey("b"), projectKey("a"), projectKey("b"), taskListsKey(), tasksKey(), projectTasksKey("a"), projectTasksKey("b"), taskKey("a"), taskKey("b")];
+  assert.equal(new Set(keys.map((key) => { return JSON.stringify(key); })).size, keys.length);
   const qc = client();
-  let cleared = false;
-  const list = new QueryObserver(qc, {
-    queryKey: organizationsKey(),
-    queryFn: async () => (cleared ? [] : [organization]),
-  });
-  const detail = new QueryObserver(qc, {
-    queryKey: organizationKey("org-1"),
-    queryFn: () =>
-      readReplicaResource(qc, organizationKey("org-1"), async () => {
-        if (cleared) throw new ApiError(404, "missing");
-        return organization;
-      }),
-  });
-  const unsubscribeList = list.subscribe(() => {});
-  const unsubscribeDetail = detail.subscribe(() => {});
-  await Promise.all([list.refetch(), detail.refetch()]);
-  await clearWorkspace(qc, async () => {
-    cleared = true;
-    return { organizations: [], projects: [], tasks: [] };
-  });
-  assert.deepEqual(list.getCurrentResult().data, []);
-  assert.equal(detail.getCurrentResult().data, undefined);
-  assert.equal(detail.getCurrentResult().isError, true);
-  unsubscribeList();
-  unsubscribeDetail();
+  for (const key of keys.filter((key) => { return ![workspaceKey(), projectListsKey(), taskListsKey()].some((prefix) => { return JSON.stringify(key) === JSON.stringify(prefix); }); })) { qc.setQueryData(key, []); }
+  assert.equal(qc.getQueryCache().findAll({ queryKey: projectsKey() }).length, 1);
+  assert.equal(qc.getQueryCache().findAll({ queryKey: projectListsKey() }).length, 3);
+  assert.equal(qc.getQueryCache().findAll({ queryKey: tasksKey() }).length, 1);
+  assert.equal(qc.getQueryCache().findAll({ queryKey: taskListsKey() }).length, 3);
   qc.clear();
 });
 
-test("new resource navigation tolerates replica 404 only while an acknowledged cache value exists", async () => {
+test("shared options fetch the parameterized SDK endpoint through ensureQueryData and prefetchQuery", async () => {
   const qc = client();
-  const key = organizationKey("new");
-  const missing = async (): Promise<Organization> => {
-    throw new ApiError(404, "replica has not caught up");
-  };
-  await assert.rejects(readReplicaResource(qc, key, missing), /caught up/);
-  qc.setQueryData(key, organization);
-  assert.deepEqual(await readReplicaResource(qc, key, missing), organization);
-  await assert.rejects(
-    readReplicaResource(qc, key, async () => {
-      throw new ApiError(503, "unavailable");
-    }),
-    /unavailable/,
-  );
-  qc.removeQueries({ queryKey: key });
-  await assert.rejects(readReplicaResource(qc, key, missing), /caught up/);
+  const original = globalThis.fetch;
+  const paths: string[] = [];
+  globalThis.fetch = async (url) => { paths.push(String(url)); return Response.json({ marker: String(url) }); };
+  try {
+    const options = [bootstrapQueryOptions(), organizationsQueryOptions(), organizationQueryOptions("a/b"), organizationProfileQueryOptions("a/b"), organizationOperationsQueryOptions("a/b"), projectsQueryOptions(), organizationProjectsQueryOptions("a/b"), projectQueryOptions("a/b"), tasksQueryOptions(), projectTasksQueryOptions("a/b"), taskQueryOptions("a/b")];
+    const endpoints = ["/api/bootstrap", "/api/organizations", "/api/organizations/a%2Fb", "/api/organizations/a%2Fb/profile", "/api/organizations/a%2Fb/operations", "/api/projects", "/api/organizations/a%2Fb/projects", "/api/projects/a%2Fb", "/api/tasks", "/api/projects/a%2Fb/tasks", "/api/tasks/a%2Fb"];
+    for (const [index, option] of options.entries()) {
+      // Each factory retains its result type; this loop exercises their common runtime contract.
+      const shared = { ...option, staleTime: Infinity } as Parameters<QueryClient["ensureQueryData"]>[0];
+      await qc.ensureQueryData(shared);
+      await qc.prefetchQuery(shared);
+      assert.deepEqual(qc.getQueryData(option.queryKey), { marker: endpoints[index] });
+    }
+    assert.deepEqual(paths, endpoints);
+  } finally { globalThis.fetch = original; qc.clear(); }
+});
+
+test("missing IDs disable queries and detail options retain client/server retry behavior", () => {
+  for (const options of [organizationQueryOptions(""), organizationProfileQueryOptions(""), organizationOperationsQueryOptions(""), projectQueryOptions(""), taskQueryOptions("")]) {
+    assert.equal(options.enabled, false);
+    assert.equal(typeof options.retry, "function");
+    if (typeof options.retry !== "function") { throw new Error("Expected retry predicate"); }
+    assert.equal(options.retry(0, new ApiError(404, "missing")), false);
+    assert.equal(options.retry(0, new ApiError(503, "unavailable")), true);
+    assert.equal(options.retry(1, new ApiError(503, "unavailable")), false);
+  }
+  assert.equal(organizationProjectsQueryOptions("").enabled, false);
+  assert.equal(projectTasksQueryOptions("").enabled, false);
+});
+
+test("a genuine detail 404 rejects even when an older cache value exists", async () => {
+  const qc = client();
+  const original = globalThis.fetch;
+  globalThis.fetch = async () => { return new Response("missing", { status: 404 }); };
+  qc.setQueryData(organizationKey("gone"), { id: "gone" });
+  try {
+    await assert.rejects(qc.fetchQuery(organizationQueryOptions("gone")), (error: unknown) => { return error instanceof ApiError && error.status === 404; });
+    assert.equal(qc.getQueryState(organizationKey("gone"))?.status, "error");
+  } finally { globalThis.fetch = original; qc.clear(); }
+});
+
+test("Clear All resets active observers, cancels old reads and removes inactive workspace data only", async () => {
+  const qc = client();
+  let cleared = false;
+  let cancelled = false;
+  qc.setQueryData(["unrelated"], "keep");
+  qc.setQueryData(organizationProfileKey("org-1"), { name: "saved" });
+  const pending = qc.fetchQuery({ queryKey: projectKey("pending"), queryFn: ({ signal }) => { return new Promise((_resolve, reject) => { signal.addEventListener("abort", () => { cancelled = true; reject(new Error("cancelled")); }); }); } }).catch(() => {});
+  const list = new QueryObserver(qc, { ...organizationsQueryOptions(), queryFn: async () => { return cleared ? [] : [organization]; } });
+  const detail = new QueryObserver(qc, { ...organizationQueryOptions("org-1"), queryFn: async () => { if (cleared) { throw new ApiError(404, "missing"); } return organization; } });
+  const unsubscribeList = list.subscribe(() => {});
+  const unsubscribeDetail = detail.subscribe(() => {});
+  try {
+    await Promise.all([list.refetch(), detail.refetch()]);
+    let calls = 0;
+    assert.equal(await clearWorkspace(qc, async () => { calls++; cleared = true; return { organizations: [], projects: [], tasks: [] }; }), true);
+    await pending;
+    assert.equal(calls, 1);
+    assert.equal(cancelled, true);
+    assert.deepEqual(list.getCurrentResult().data, []);
+    assert.equal(detail.getCurrentResult().data, undefined);
+    assert.equal(detail.getCurrentResult().isError, true);
+    assert.equal(qc.getQueryData(organizationProfileKey("org-1")), undefined);
+    assert.deepEqual(qc.getQueryData(projectsKey()), []);
+    assert.deepEqual(qc.getQueryData(tasksKey()), []);
+    assert.deepEqual(qc.getQueryData(bootstrapKey()), { organizations: [], projects: [], tasks: [] });
+    assert.equal(qc.getQueryData(["unrelated"]), "keep");
+  } finally { unsubscribeList(); unsubscribeDetail(); qc.clear(); }
 });

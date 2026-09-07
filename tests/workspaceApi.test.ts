@@ -5,7 +5,7 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import { createExampleApi } from "../server/example-api";
 
 function harness() {
-  const api = createExampleApi({ readModelLagMs: 10 });
+  const api = createExampleApi();
   return {
     ...api,
     request: async (method: string, url: string, body?: unknown) => {
@@ -29,9 +29,8 @@ function harness() {
   };
 }
 
-test("child reads, independent ownership, legacy projection, initialization and replica lag", async () => {
+test("child reads immediately reflect writes with independent field ownership and server composition", async () => {
   const api = harness();
-  try {
     const initial = await api.request("GET", "/api/organizations/org-1/profile");
     assert.equal(initial.data.name, "Existing Clinic");
     const operations = (await api.request("GET", "/api/organizations/org-1/operations")).data;
@@ -46,9 +45,8 @@ test("child reads, independent ownership, legacy projection, initialization and 
     assert.equal(profile.status, undefined);
     assert.equal(
       (await api.request("GET", "/api/organizations/org-1/profile")).data.name,
-      "Existing Clinic",
+      "Renamed",
     );
-    await new Promise((r) => setTimeout(r, 15));
     const summary = (await api.request("GET", "/api/organizations/org-1")).data;
     assert.equal(summary.name, "Renamed");
     assert.equal(summary.status, operations.status);
@@ -82,7 +80,6 @@ test("child reads, independent ownership, legacy projection, initialization and 
         region: "west",
       })
     ).data.organization;
-    await new Promise((r) => setTimeout(r, 15));
     assert.equal(
       (await api.request("GET", `/api/organizations/${created.id}/profile`)).data.name,
       "New Org",
@@ -104,14 +101,10 @@ test("child reads, independent ownership, legacy projection, initialization and 
       "project-1",
     );
     assert.equal((await api.request("GET", "/api/projects/project-1/tasks")).data[0].id, "task-1");
-  } finally {
-    api.dispose();
-  }
 });
 
-test("missing parents fail, clear removes children and pending replica timers cannot restore data", async () => {
+test("missing parents fail and clear removes all resources", async () => {
   const api = harness();
-  try {
     for (const child of ["profile", "operations"]) {
       assert.equal((await api.request("GET", `/api/organizations/missing/${child}`)).status, 404);
       assert.equal(
@@ -127,7 +120,6 @@ test("missing parents fail, clear removes children and pending replica timers ca
       projects: [],
       tasks: [],
     });
-    await new Promise((r) => setTimeout(r, 15));
     assert.equal((await api.request("GET", "/api/organizations/org-1/profile")).status, 404);
     assert.equal((await api.request("GET", "/api/organizations/org-1/operations")).status, 404);
     assert.deepEqual((await api.request("GET", "/api/bootstrap")).data, {
@@ -135,7 +127,4 @@ test("missing parents fail, clear removes children and pending replica timers ca
       projects: [],
       tasks: [],
     });
-  } finally {
-    api.dispose();
-  }
 });

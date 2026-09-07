@@ -1,7 +1,9 @@
-import { workspaceKey } from "../queryOptions";
+import { bootstrapKey } from "../queryOptions";
+import { organizationListsKey } from "../organizations/queryOptions";
+import { projectListsKey } from "../projects/queryOptions";
+import { taskListsKey } from "../tasks/queryOptions";
 import { useComposableForm } from "../../../forms/hooks/useComposableForm";
 import { useFormOrchestrator } from "../../../forms/hooks/useFormOrchestrator";
-import { organizationCacheUpdates, projectCacheUpdates, taskCacheUpdates } from "../cachePolicies";
 import { useCreateOrganization } from "../organizations/hooks/mutations";
 import { useCreateProject } from "../projects/hooks/mutations";
 import { useCreateTask } from "../tasks/hooks/mutations";
@@ -35,16 +37,17 @@ export function useWorkspaceLaunchForms(appendActivity: (text: string) => void) 
 
   const organization = useComposableForm({
     id: "organization",
+    invalidateQueryKeys: [organizationListsKey(), bootstrapKey()],
     defaultValues: organizationDefaults,
     endpoint: {
       mutationFn: createOrganization.mutateAsync,
     },
-    cacheUpdates: organizationCacheUpdates(),
     onSuccess: ({ response }) =>
       appendActivity(`Saved organization: ${response.organization.name}`),
   });
   const project = useComposableForm({
     id: "project",
+    invalidateQueryKeys: [projectListsKey(), bootstrapKey()],
     defaultValues: projectDefaults,
     dependencies: [organization] as const,
     toMutationPayload: (values, { results }) => {
@@ -54,11 +57,11 @@ export function useWorkspaceLaunchForms(appendActivity: (text: string) => void) 
     endpoint: {
       mutationFn: createProject.mutateAsync,
     },
-    cacheUpdates: projectCacheUpdates(),
     onSuccess: ({ response }) => appendActivity(`Saved project: ${response.project.name}`),
   });
   const task = useComposableForm({
     id: "task",
+    invalidateQueryKeys: [taskListsKey(), bootstrapKey()],
     defaultValues: taskDefaults,
     dependencies: [organization, project] as const,
     toMutationPayload: (values, { results }) => {
@@ -73,13 +76,11 @@ export function useWorkspaceLaunchForms(appendActivity: (text: string) => void) 
     endpoint: {
       mutationFn: createTask.mutateAsync,
     },
-    cacheUpdates: taskCacheUpdates(),
     onSuccess: ({ response }) => appendActivity(`Saved task: ${response.task.title}`),
   });
   const save = useFormOrchestrator({
     forms: [organization, project, task] as const,
     includePristine: true,
-    invalidateQueryKeys: [workspaceKey()],
     onSuccess: ({ result }) =>
       appendActivity(`Workspace created: ${result.responses.organization?.organization.name}`),
     onFailure: () => appendActivity("Workspace creation failed. See the save results."),

@@ -22,15 +22,14 @@ type Store = {
 
 type RequestBody = Record<string, unknown>;
 
-export function createExampleApi({ readModelLagMs = 2500 }: { readModelLagMs?: number } = {}) {
+export function createExampleApi() {
   let nextId = 2;
   let lastTimestamp = 0;
   const now = () => {
     lastTimestamp = Math.max(Date.now(), lastTimestamp + 1);
     return new Date(lastTimestamp).toISOString();
   };
-  const timers = new Set<ReturnType<typeof setTimeout>>();
-  const writeStore: Store = {
+  const store: Store = {
     organizations: [{ id: "org-1" }],
     profiles: [
       {
@@ -72,14 +71,12 @@ export function createExampleApi({ readModelLagMs = 2500 }: { readModelLagMs?: n
       },
     ],
   };
-  let readStore: Store = structuredClone(writeStore);
 
   async function handleApiRequest(request: IncomingMessage, response: ServerResponse) {
     try {
       const path = new URL(request.url ?? "/", "http://localhost").pathname;
       const childMatch = path.match(/^\/api\/organizations\/([^/]+)\/(profile|operations)$/);
       if (childMatch && (request.method === "GET" || request.method === "PATCH")) {
-        const store = request.method === "GET" ? readStore : writeStore;
         const id = decodeURIComponent(childMatch[1]);
         const parent = store.organizations.find((item) => item.id === id);
         if (!parent) return sendJson(response, { message: "Organization not found." }, 404);
@@ -90,19 +87,18 @@ export function createExampleApi({ readModelLagMs = 2500 }: { readModelLagMs?: n
         const body = await readJson(request);
         if (childMatch[2] === "profile") updateProfile(profile, body);
         else updateOperations(operations, body);
-        scheduleReplicaSync();
         return sendJson(
           response,
           childMatch[2] === "profile"
-            ? { profile, readModelLagMs }
-            : { operations, readModelLagMs },
+            ? { profile }
+            : { operations },
         );
       }
       const editMatch = path.match(/^\/api\/(organizations|projects|tasks)\/([^/]+)$/);
       if (request.method === "GET") {
         if (editMatch) {
           const collection = editMatch[1] as "organizations" | "projects" | "tasks";
-          const entity = bootstrap(readStore)[collection].find(
+          const entity = bootstrap(store)[collection].find(
             (item) => item.id === decodeURIComponent(editMatch[2]),
           );
           return sendJson(
@@ -115,7 +111,7 @@ export function createExampleApi({ readModelLagMs = 2500 }: { readModelLagMs?: n
         if (list)
           return sendJson(
             response,
-            bootstrap(readStore)[list[1] as "organizations" | "projects" | "tasks"],
+            bootstrap(store)[list[1] as "organizations" | "projects" | "tasks"],
           );
         const children = path.match(/^\/api\/(organizations|projects)\/([^/]+)\/(projects|tasks)$/);
         if (children) {
@@ -123,30 +119,29 @@ export function createExampleApi({ readModelLagMs = 2500 }: { readModelLagMs?: n
           if (children[1] === "organizations" && children[3] === "projects")
             return sendJson(
               response,
-              readStore.projects.filter((item) => item.organizationId === id),
+              store.projects.filter((item) => item.organizationId === id),
             );
           if (children[1] === "projects" && children[3] === "tasks")
             return sendJson(
               response,
-              readStore.tasks.filter((item) => item.projectId === id),
+              store.tasks.filter((item) => item.projectId === id),
             );
         }
       }
       if (request.method === "PATCH" && editMatch) {
         const collection = editMatch[1] as "organizations" | "projects" | "tasks";
-        const entity = writeStore[collection].find((item) => item.id === editMatch[2]);
+        const entity = store[collection].find((item) => item.id === editMatch[2]);
         if (!entity) return sendJson(response, { message: "Resource not found." }, 404);
         if (collection === "organizations") {
           const body = (await readJson(request)) as UpdateOrganizationInput;
-          const profile = writeStore.profiles.find((item) => item.organizationId === entity.id)!;
-          const operations = writeStore.operations.find(
+          const profile = store.profiles.find((item) => item.organizationId === entity.id)!;
+          const operations = store.operations.find(
             (item) => item.organizationId === entity.id,
           )!;
           updateProfile(profile, body);
           updateOperations(operations, body);
-          const organization = projectOrganization(writeStore, entity.id);
-          scheduleReplicaSync();
-          return sendJson(response, { organization, readModelLagMs });
+          const organization = projectOrganization(store, entity.id);
+          return sendJson(response, { organization });
         }
         if (collection === "projects") {
           const body = (await readJson(request)) as UpdateProjectInput;
@@ -158,8 +153,7 @@ export function createExampleApi({ readModelLagMs = 2500 }: { readModelLagMs?: n
             budget: cleanString(body.budget, project.budget),
             updatedAt: now(),
           });
-          scheduleReplicaSync();
-          return sendJson(response, { project, readModelLagMs });
+          return sendJson(response, { project });
         }
         const body = (await readJson(request)) as UpdateTaskInput;
         const task = entity as Task;
@@ -174,24 +168,20 @@ export function createExampleApi({ readModelLagMs = 2500 }: { readModelLagMs?: n
           ),
           updatedAt: now(),
         });
-        scheduleReplicaSync();
-        return sendJson(response, { task, readModelLagMs });
+        return sendJson(response, { task });
       }
 
       if (request.method === "DELETE" && request.url === "/api/entities") {
-        writeStore.tasks = [];
-        writeStore.projects = [];
-        writeStore.organizations = [];
-        writeStore.profiles = [];
-        writeStore.operations = [];
-        for (const timer of timers) clearTimeout(timer);
-        timers.clear();
-        readStore = structuredClone(writeStore);
-        return sendJson(response, bootstrap(readStore));
+        store.tasks = [];
+        store.projects = [];
+        store.organizations = [];
+        store.profiles = [];
+        store.operations = [];
+        return sendJson(response, bootstrap(store));
       }
 
       if (request.method === "GET" && request.url === "/api/bootstrap") {
-        return sendJson(response, bootstrap(readStore));
+        return sendJson(response, bootstrap(store));
       }
 
       if (request.method === "POST" && request.url === "/api/organizations") {
@@ -216,22 +206,21 @@ export function createExampleApi({ readModelLagMs = 2500 }: { readModelLagMs?: n
           updatedAt: now(),
         };
 
-        writeStore.organizations.push({ id: organization.id });
-        writeStore.profiles.push({
+        store.organizations.push({ id: organization.id });
+        store.profiles.push({
           organizationId: organization.id,
           name: organization.name,
           sector: organization.sector,
           updatedAt: organization.updatedAt,
         });
-        writeStore.operations.push({
+        store.operations.push({
           organizationId: organization.id,
           status: organization.status,
           region: organization.region,
           updatedAt: organization.updatedAt,
         });
-        scheduleReplicaSync();
 
-        return sendJson(response, { organization, readModelLagMs });
+        return sendJson(response, { organization });
       }
 
       if (request.method === "POST" && request.url === "/api/projects") {
@@ -248,7 +237,7 @@ export function createExampleApi({ readModelLagMs = 2500 }: { readModelLagMs?: n
         if (!organizationId || !name || !priority || !phase || !budget) {
           return sendJson(response, { message: "Missing project fields." }, 400);
         }
-        if (!writeStore.organizations.some((item) => item.id === organizationId)) {
+        if (!store.organizations.some((item) => item.id === organizationId)) {
           return sendJson(response, { message: "Choose an existing organization." }, 400);
         }
         const project = {
@@ -261,10 +250,9 @@ export function createExampleApi({ readModelLagMs = 2500 }: { readModelLagMs?: n
           updatedAt: now(),
         };
 
-        writeStore.projects.push(project);
-        scheduleReplicaSync();
+        store.projects.push(project);
 
-        return sendJson(response, { project, readModelLagMs });
+        return sendJson(response, { project });
       }
 
       if (request.method === "POST" && request.url === "/api/tasks") {
@@ -282,7 +270,7 @@ export function createExampleApi({ readModelLagMs = 2500 }: { readModelLagMs?: n
         if (!organizationId || !projectId || !title || !owner || !status || !dueWindow) {
           return sendJson(response, { message: "Missing task fields." }, 400);
         }
-        const parent = writeStore.projects.find((item) => item.id === projectId);
+        const parent = store.projects.find((item) => item.id === projectId);
         if (!parent || parent.organizationId !== organizationId) {
           return sendJson(
             response,
@@ -301,10 +289,9 @@ export function createExampleApi({ readModelLagMs = 2500 }: { readModelLagMs?: n
           updatedAt: now(),
         };
 
-        writeStore.tasks.push(task);
-        scheduleReplicaSync();
+        store.tasks.push(task);
 
-        return sendJson(response, { task, readModelLagMs });
+        return sendJson(response, { task });
       }
 
       response.writeHead(404);
@@ -315,14 +302,6 @@ export function createExampleApi({ readModelLagMs = 2500 }: { readModelLagMs?: n
     }
   }
 
-  function scheduleReplicaSync() {
-    const timer = setTimeout(() => {
-      timers.delete(timer);
-      readStore = structuredClone(writeStore);
-    }, readModelLagMs);
-    timer.unref();
-    timers.add(timer);
-  }
   function updateProfile(profile: OrganizationProfile, body: UpdateProfileInput) {
     Object.assign(profile, {
       name: cleanString(body.name, profile.name),
@@ -339,10 +318,6 @@ export function createExampleApi({ readModelLagMs = 2500 }: { readModelLagMs?: n
   }
   return {
     handleApiRequest,
-    dispose: () => {
-      for (const timer of timers) clearTimeout(timer);
-      timers.clear();
-    },
   };
 }
 
