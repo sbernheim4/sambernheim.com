@@ -4,6 +4,7 @@ export type FormScopeValue = {
   form: {
     handleSubmit: () => Promise<unknown>;
     reset: () => void;
+    state?: { isDirty: boolean };
   };
   forms?: Record<string, unknown>;
   isReady: boolean;
@@ -107,14 +108,15 @@ const FormDiscardButton = ({
   pristineLabel?: string;
 } = {}) => {
   const scope = useFormScope();
-  const buttonLabel = label ?? (scope.isDirty ? "Discard changes" : pristineLabel);
+  const isDirty = scope.form.state?.isDirty ?? scope.isDirty;
+  const buttonLabel = label ?? (isDirty ? "Discard changes" : pristineLabel);
   return (
     <button
       className="workspace-button"
       type="button"
       disabled={scope.isSaving}
       onClick={() => {
-        if (scope.isDirty) {
+        if (isDirty) {
           scope.form.reset();
         }
         scope.onChange?.();
