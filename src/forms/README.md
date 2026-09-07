@@ -130,30 +130,23 @@ form dependencies to pass newly created organization/project IDs to later
 saves. Its orchestrator sets `includePristine: true` so create defaults are saved
 without requiring edits. There is no separate form-flow API.
 
-## Workspace replica and clear-all policy
+## Workspace queries and clear-all
 
-The example API maintains parent organization IDs plus one Profile and one
-Operations record per organization. Name/sector belong to Profile; status/region
-belong to Operations. Organization responses project both. Organization
-writes delegate to the child owners. Creation initializes both children; clear-all
-removes them. API handler factories make tests independent of the user's server.
-Create endpoints require the full payload for a new record, while edit endpoints
-accept partial bodies and keep missing fields unchanged.
+The example API uses one current store. Reads immediately reflect successful
+mutations. Name/sector belong to Profile; status/region belong to Operations.
+Separate child endpoints own those fields, and the server composes organization
+summaries. Organization writes delegate to both owners; creation initializes both.
+Create endpoints require full payloads, while edits preserve omitted fields.
 
-Child save policies inject the detail resource and merge owned fields into every
-organization summary. Workspace queries preserve acknowledged versions on later
-replica reads, including missing list entries. Separate Profile/Operations version
-timestamps prevent one child's version from hiding stale fields from the other.
-A replica 404 can use an existing cached resource, so immediate navigation after
-creation works. Clear-all resets active observers, removes inactive workspace
-caches, and repopulates empty lists. It is a developer reset convenience with no
-coordination with in-flight saves; use it once saves have settled.
+Entity query-key functions and query-options factories are shared by hooks and
+QueryClient consumers. Saves invalidate the affected lists, details, and bootstrap.
+Active queries refresh before save completion; inactive queries become stale.
+Workspace forms rely on these reads and TanStack Query's default structural
+sharing. The shared form system still supports optional generic cache updates.
 
-This policy fits the demo's clear-all deletion model. It does not guarantee
-monotonic reads across cache eviction, reloads, other clients, or external deletes.
-If individual deletion or server rendering is introduced, revisit the version,
-tombstone and QueryClient ownership policies. The API middleware remains
-**development-only**; a production bundle does not validate production hosting.
+Clear All cancels and resets workspace queries, removes inactive caches, and
+repopulates empty lists. Use this developer reset once saves have settled; it does
+not coordinate with in-flight saves. The API middleware remains development-only.
 
 ## Verification and semantic tools
 

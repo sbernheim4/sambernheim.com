@@ -1,4 +1,4 @@
-import { taskKey } from "../src/features/workspace/tasks/queryOptions";
+import { useOrganization } from "../src/features/workspace/organizations/hooks/queries";
 import {
   organizationKey,
   organizationProfileKey,
@@ -221,7 +221,7 @@ test("domain create mutateAsync owns one mutation, overrides inherited retries a
   let mutation: any;
   globalThis.fetch = async () => {
     calls++;
-    return Response.json({ organization: { id: "new" }, readModelLagMs: 2500 });
+    return Response.json({ organization: { id: "new" } });
   };
   const harness = await mount(qc, () => {
     mutation = useCreateOrganization();
@@ -286,21 +286,24 @@ test("composed domain forms retry only Operations, keep Profile success and pres
     if (patch) {
       log.push(path.endsWith("profile") ? "profile request" : "operations request");
       if (path.endsWith("operations")) return new Response("Unavailable", { status: 503 });
+      Object.assign(organization, JSON.parse(String(options.body)), {
+        updatedAt: "2",
+        profileUpdatedAt: "2",
+      });
       return Response.json({
         profile: {
           organizationId: "org-1",
           ...JSON.parse(String(options.body)),
           updatedAt: "2",
         },
-        readModelLagMs: 2500,
       });
     }
     if (path.endsWith("/profile"))
       return Response.json({
         organizationId: "org-1",
-        name: "Old",
+        name: organization.name,
         sector: "healthcare",
-        updatedAt: "1",
+        updatedAt: organization.profileUpdatedAt,
       });
     if (path.endsWith("/operations"))
       return Response.json({
@@ -312,6 +315,7 @@ test("composed domain forms retry only Operations, keep Profile success and pres
     return Response.json(organization);
   };
   const harness = await mount(qc, () => {
+    useOrganization("org-1");
     const profile = useOrganizationProfileForm({
       organizationId: "org-1",
       onSuccess: () => {
@@ -369,13 +373,14 @@ test("organization page orchestrator skips clean forms and only submits dirty fo
   const original = globalThis.fetch;
   const requests: string[] = [];
   let current: any;
+  let profileName = "Existing Clinic";
   globalThis.fetch = async (url, options) => {
     const path = String(url);
     const method = options?.method ?? "GET";
     if (path.endsWith("/organizations/org-1/profile") && method === "GET")
       return Response.json({
         organizationId: "org-1",
-        name: "Existing Clinic",
+        name: profileName,
         sector: "healthcare",
         updatedAt: "1",
       });
@@ -389,7 +394,7 @@ test("organization page orchestrator skips clean forms and only submits dirty fo
     if (path.endsWith("/organizations/org-1") && method === "GET")
       return Response.json({
         id: "org-1",
-        name: "Existing Clinic",
+        name: profileName,
         sector: "healthcare",
         status: "active",
         region: "east",
@@ -402,7 +407,7 @@ test("organization page orchestrator skips clean forms and only submits dirty fo
       return Response.json({
         organization: {
           id: "org-1",
-          name: "Existing Clinic",
+          name: profileName,
           sector: "healthcare",
           status: "active",
           region: "east",
@@ -410,18 +415,17 @@ test("organization page orchestrator skips clean forms and only submits dirty fo
           profileUpdatedAt: "1",
           operationsUpdatedAt: "1",
         },
-        readModelLagMs: 2500,
       });
     }
     if (path.endsWith("/organizations/org-1/profile") && method === "PATCH") {
       requests.push("profile patch");
+      profileName = JSON.parse(String(options?.body)).name;
       return Response.json({
         profile: {
           organizationId: "org-1",
           ...JSON.parse(String(options?.body)),
           updatedAt: "2",
         },
-        readModelLagMs: 2500,
       });
     }
     if (path.endsWith("/organizations/org-1/operations") && method === "PATCH") {
@@ -433,7 +437,6 @@ test("organization page orchestrator skips clean forms and only submits dirty fo
           region: "east",
           updatedAt: "2",
         },
-        readModelLagMs: 2500,
       });
     }
     throw new Error(`Unexpected request: ${method} ${path}`);
@@ -442,7 +445,7 @@ test("organization page orchestrator skips clean forms and only submits dirty fo
     const organization = useOrganizationForm({
       resource: {
         id: "org-1",
-        name: "Existing Clinic",
+        name: profileName,
         sector: "healthcare",
         status: "active",
         region: "east",
@@ -610,11 +613,11 @@ for (const failProject of [false, true]) {
     const original = globalThis.fetch;
     const writes: Array<{ path: string; input: Record<string, unknown> }> = [];
     const activity: string[] = [];
+    const saved = { organizations: [] as any[], projects: [] as any[], tasks: [] as any[] };
     let current!: ReturnType<typeof useWorkspaceLaunchForms>;
     globalThis.fetch = async (url, options) => {
       const path = String(url);
-      if (options?.method !== "POST")
-        return Response.json({ organizations: [], projects: [], tasks: [] });
+      if (options?.method !== "POST") return Response.json(saved);
       const input = JSON.parse(String(options.body));
       writes.push({ path, input });
       if (failProject && path === "/api/projects")
@@ -625,14 +628,9 @@ for (const failProject of [false, true]) {
           : path === "/api/projects"
             ? "project"
             : "task";
-      return Response.json({
-        [entity]: {
-          ...input,
-          id: `${entity}-new`,
-          updatedAt: "2026-09-05T12:00:00Z",
-        },
-        readModelLagMs: 2500,
-      });
+      const resource = { ...input, id: `${entity}-new`, updatedAt: "2026-09-05T12:00:00Z" };
+      saved[`${entity}s`].push(resource);
+      return Response.json({ [entity]: resource });
     };
     const harness = await mount(qc, () => {
       current = useWorkspaceLaunchForms((text) => activity.push(text));
@@ -660,10 +658,7 @@ for (const failProject of [false, true]) {
       );
       assert.equal(writes[1].input.organizationId, "organization-new");
       assert.equal(result.forms.organization.status, "saved");
-      assert.equal(
-        qc.getQueryData<{ id: string }>(organizationKey("organization-new"))?.id,
-        "organization-new",
-      );
+      assert.equal(current.bootstrap.data?.organizations[0]?.id, "organization-new");
       assert.equal(current.save.isSaving, false);
       if (failProject) {
         assert.equal(result.outcome, "partial-failure");
@@ -680,7 +675,7 @@ for (const failProject of [false, true]) {
         assert.equal(result.outcome, "success");
         assert.equal(writes[2].input.organizationId, "organization-new");
         assert.equal(writes[2].input.projectId, "project-new");
-        assert.equal(qc.getQueryData<{ id: string }>(taskKey("task-new"))?.id, "task-new");
+        assert.equal(current.bootstrap.data?.tasks[0]?.id, "task-new");
         assert.deepEqual(activity, [
           "Saved organization: Acme Health",
           "Saved project: Patient Intake",

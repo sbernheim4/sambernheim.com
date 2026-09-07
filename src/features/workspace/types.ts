@@ -65,17 +65,14 @@ export type UpdateTaskInput = Partial<Omit<SaveTaskInput, "organizationId" | "pr
 
 export type SaveOrganizationResponse = {
   organization: Organization;
-  readModelLagMs: number;
 };
 
 export type SaveProjectResponse = {
   project: Project;
-  readModelLagMs: number;
 };
 
 export type SaveTaskResponse = {
   task: Task;
-  readModelLagMs: number;
 };
 
 export type OrganizationProfile = Pick<Organization, "name" | "sector" | "updatedAt"> & {
@@ -90,9 +87,7 @@ export type OperationsInput = Pick<OrganizationOperations, "status" | "region">;
 export type UpdateOperationsInput = Partial<OperationsInput>;
 export type ProfileResponse = {
   profile: OrganizationProfile;
-  readModelLagMs: number;
 };
 export type OperationsResponse = {
   operations: OrganizationOperations;
-  readModelLagMs: number;
 };
