@@ -1,7 +1,7 @@
+import { workspaceKey } from "../../queryOptions";
 import { useQueryBackedForm } from "../../../../forms/hooks/useQueryBackedForm";
 import type { OutcomeCallbacks } from "../../../../forms/orchestration/types";
 import { organizationCacheUpdates } from "../../cachePolicies";
-import { workspaceKeys } from "../../queries";
 import type { Organization, SaveOrganizationInput, SaveOrganizationResponse } from "../../types";
 import { regionOptions, sectorOptions, statusOptions } from "../fieldOptions";
 import { option } from "../../formOptions";
@@ -47,7 +47,7 @@ export function useOrganizationForm({
       mutationFn: resource ? update.mutateAsync : create.mutateAsync,
       retrySafe: !!resource,
     },
-    invalidateQueryKeys: [workspaceKeys.all],
+    invalidateQueryKeys: [workspaceKey()],
     cacheUpdates: organizationCacheUpdates(),
     ...callbacks,
   });

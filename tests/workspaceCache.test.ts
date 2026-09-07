@@ -1,3 +1,7 @@
+import { bootstrapKey } from "../src/features/workspace/queryOptions";
+import { projectTasksKey, taskKey, tasksKey } from "../src/features/workspace/tasks/queryOptions";
+import { organizationProjectsKey, projectKey, projectsKey } from "../src/features/workspace/projects/queryOptions";
+import { organizationKey, organizationOperationsKey, organizationProfileKey, organizationsKey } from "../src/features/workspace/organizations/queryOptions";
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { QueryClient } from "@tanstack/react-query";
@@ -14,7 +18,6 @@ import {
 } from "../src/features/workspace/cachePolicies";
 import { reconcileWorkspaceRead } from "../src/features/workspace/cache";
 import { clearWorkspace } from "../src/features/workspace/clearWorkspace";
-import { workspaceKeys as keys, bootstrapKey } from "../src/features/workspace/queries";
 import type { Organization } from "../src/features/workspace/types";
 const organization: Organization = {
   id: "org-1",
@@ -87,7 +90,7 @@ test("two children merge owned fields into every summary and later stale navigat
   ).submit({ forms: [profileForm, operationsForm] });
   assert.equal(saved.outcome, "success");
   assert.deepEqual(saved.followUpErrors, []);
-  for (const key of [keys.organizations.detail("org-1"), keys.organizations.list(), bootstrapKey]) {
+  for (const key of [organizationKey("org-1"), organizationsKey(), bootstrapKey()]) {
     const data: any = qc.getQueryData(key);
     const summary = Array.isArray(data)
       ? data[0]
@@ -98,19 +101,19 @@ test("two children merge owned fields into every summary and later stale navigat
     assert.equal(summary.region, "west");
   }
   await qc.fetchQuery({
-    queryKey: keys.organizations.detail("org-1"),
+    queryKey: organizationKey("org-1"),
     queryFn: async () => organization,
   });
   await qc.fetchQuery({
-    queryKey: keys.organizations.list(),
+    queryKey: organizationsKey(),
     queryFn: async () => [],
   });
-  const summary = qc.getQueryData<Organization>(keys.organizations.detail("org-1"))!;
+  const summary = qc.getQueryData<Organization>(organizationKey("org-1"))!;
   assert.equal(summary.name, "New");
   assert.equal(summary.status, "paused");
-  assert.equal(qc.getQueryData<Organization[]>(keys.organizations.list())!.length, 1);
-  assert.equal(qc.getQueryData<any>(keys.organizationProfiles.detail("org-1")).name, "New");
-  assert.equal(qc.getQueryData<any>(keys.organizationOperations.detail("org-1")).region, "west");
+  assert.equal(qc.getQueryData<Organization[]>(organizationsKey())!.length, 1);
+  assert.equal(qc.getQueryData<any>(organizationProfileKey("org-1")).name, "New");
+  assert.equal(qc.getQueryData<any>(organizationOperationsKey("org-1")).region, "west");
 });
 
 test("partial profile save preserves operations and newer operations timestamp cannot hide stale profile fields", () => {
@@ -175,15 +178,15 @@ test("project/task saves populate parent lists, detail caches, and bootstrap", a
   );
   assert.equal(saved.outcome, "success");
   assert.deepEqual(saved.followUpErrors, []);
-  assert.deepEqual(qc.getQueryData(keys.projects.forOrganization("org-1")), [project]);
-  assert.deepEqual(qc.getQueryData(keys.tasks.forProject("p")), [task]);
-  assert.deepEqual(qc.getQueryData(keys.projects.detail("p")), project);
-  assert.deepEqual(qc.getQueryData(keys.tasks.detail("t")), task);
+  assert.deepEqual(qc.getQueryData(organizationProjectsKey("org-1")), [project]);
+  assert.deepEqual(qc.getQueryData(projectTasksKey("p")), [task]);
+  assert.deepEqual(qc.getQueryData(projectKey("p")), project);
+  assert.deepEqual(qc.getQueryData(taskKey("t")), task);
 });
 
 test("clear-all calls the backend and resets workspace caches", async () => {
   const qc = client();
-  qc.setQueryData(keys.organizationProfiles.detail("org-1"), { name: "saved" });
+  qc.setQueryData(organizationProfileKey("org-1"), { name: "saved" });
   let calls = 0;
   const request = async () => {
     calls++;
@@ -191,11 +194,11 @@ test("clear-all calls the backend and resets workspace caches", async () => {
   };
   assert.equal(await clearWorkspace(qc, request), true);
   assert.equal(calls, 1);
-  assert.equal(qc.getQueryData(keys.organizationProfiles.detail("org-1")), undefined);
-  assert.deepEqual(qc.getQueryData(keys.organizations.list()), []);
-  assert.deepEqual(qc.getQueryData(keys.projects.list()), []);
-  assert.deepEqual(qc.getQueryData(keys.tasks.list()), []);
-  assert.deepEqual(qc.getQueryData(bootstrapKey), {
+  assert.equal(qc.getQueryData(organizationProfileKey("org-1")), undefined);
+  assert.deepEqual(qc.getQueryData(organizationsKey()), []);
+  assert.deepEqual(qc.getQueryData(projectsKey()), []);
+  assert.deepEqual(qc.getQueryData(tasksKey()), []);
+  assert.deepEqual(qc.getQueryData(bootstrapKey()), {
     organizations: [],
     projects: [],
     tasks: [],
@@ -210,13 +213,13 @@ test("clear resets mounted list/detail observers, including version-aware query 
   const qc = client();
   let cleared = false;
   const list = new QueryObserver(qc, {
-    queryKey: keys.organizations.list(),
+    queryKey: organizationsKey(),
     queryFn: async () => (cleared ? [] : [organization]),
   });
   const detail = new QueryObserver(qc, {
-    queryKey: keys.organizations.detail("org-1"),
+    queryKey: organizationKey("org-1"),
     queryFn: () =>
-      readReplicaResource(qc, keys.organizations.detail("org-1"), async () => {
+      readReplicaResource(qc, organizationKey("org-1"), async () => {
         if (cleared) throw new ApiError(404, "missing");
         return organization;
       }),
@@ -238,7 +241,7 @@ test("clear resets mounted list/detail observers, including version-aware query 
 
 test("new resource navigation tolerates replica 404 only while an acknowledged cache value exists", async () => {
   const qc = client();
-  const key = keys.organizations.detail("new");
+  const key = organizationKey("new");
   const missing = async (): Promise<Organization> => {
     throw new ApiError(404, "replica has not caught up");
   };

@@ -93,27 +93,37 @@ export class ApiError extends Error {
   }
 }
 export const fetchOrganizations = () => request<Organization[]>("/api/organizations");
+
 export const fetchOrganization = (id: string) =>
   request<Organization>(`/api/organizations/${encodeURIComponent(id)}`);
+
 export const fetchProjects = () => request<Project[]>("/api/projects");
+
 export const fetchOrganizationProjects = (id: string) =>
   request<Project[]>(`/api/organizations/${encodeURIComponent(id)}/projects`);
+
 export const fetchProject = (id: string) =>
   request<Project>(`/api/projects/${encodeURIComponent(id)}`);
+
 export const fetchTasks = () => request<Task[]>("/api/tasks");
+
 export const fetchProjectTasks = (id: string) =>
   request<Task[]>(`/api/projects/${encodeURIComponent(id)}/tasks`);
+
 export const fetchTask = (id: string) => request<Task>(`/api/tasks/${encodeURIComponent(id)}`);
 
 export const fetchOrganizationProfile = (id: string) =>
   request<import("./types").OrganizationProfile>(
     `/api/organizations/${encodeURIComponent(id)}/profile`,
   );
+
 export const fetchOrganizationOperations = (id: string) =>
   request<import("./types").OrganizationOperations>(
     `/api/organizations/${encodeURIComponent(id)}/operations`,
   );
+
 export const updateOrganizationProfile = (id: string, input: UpdateProfileInput) =>
   patch<ProfileResponse>("organizations", id, input, "profile");
+
 export const updateOrganizationOperations = (id: string, input: UpdateOperationsInput) =>
   patch<OperationsResponse>("organizations", id, input, "operations");

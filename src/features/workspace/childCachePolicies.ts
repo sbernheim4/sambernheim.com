@@ -1,7 +1,8 @@
+import { bootstrapKey } from "./queryOptions";
+import { organizationKey, organizationOperationsKey, organizationProfileKey, organizationsKey } from "./organizations/queryOptions";
 import type { CacheUpdate } from "../../forms/orchestration/types";
 import { mergeOperations, mergeProfile, upsertBootstrap } from "./cache";
 import { upsertList } from "./cachePolicies";
-import { bootstrapKey, workspaceKeys as keys } from "./queries";
 import type {
   BootstrapData,
   OperationsResponse,
@@ -20,12 +21,12 @@ function summaryTargets<R, I, Child extends { organizationId: string }>(
 ): CacheUpdate<R, I>[] {
   return [
     {
-      queryKey: ({ response }) => keys.organizations.detail(select(response).organizationId),
+      queryKey: ({ response }) => organizationKey(select(response).organizationId),
       update: (previous, { response }) =>
         merge((previous as Organization | undefined) ?? fallback, select(response)),
     },
     {
-      queryKey: () => keys.organizations.list(),
+      queryKey: () => organizationsKey(),
       update: (previous, { response }) => {
         const child = select(response);
         const current = previous as Organization[] | undefined;
@@ -37,7 +38,7 @@ function summaryTargets<R, I, Child extends { organizationId: string }>(
       },
     },
     {
-      queryKey: () => bootstrapKey,
+      queryKey: () => bootstrapKey(),
       update: (previous, { response }) => {
         const child = select(response);
         const current = previous as BootstrapData | undefined;
@@ -57,7 +58,7 @@ export function profileCacheUpdates(
 ): CacheUpdate<ProfileResponse, UpdateProfileInput>[] {
   return [
     {
-      queryKey: ({ response }) => keys.organizationProfiles.detail(response.profile.organizationId),
+      queryKey: ({ response }) => organizationProfileKey(response.profile.organizationId),
       getData: (response) => response.profile,
     },
     ...summaryTargets<ProfileResponse, UpdateProfileInput, OrganizationProfile>(
@@ -73,7 +74,7 @@ export function operationsCacheUpdates(
   return [
     {
       queryKey: ({ response }) =>
-        keys.organizationOperations.detail(response.operations.organizationId),
+        organizationOperationsKey(response.operations.organizationId),
       getData: (response) => response.operations,
     },
     ...summaryTargets<OperationsResponse, UpdateOperationsInput, OrganizationOperations>(

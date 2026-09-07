@@ -1,7 +1,7 @@
+import { organizationListsKey } from "../queryOptions";
 import { useComposableForm } from "../../../../forms/hooks/useComposableForm";
 import type { OutcomeCallbacks } from "../../../../forms/orchestration/types";
 import { operationsCacheUpdates, profileCacheUpdates } from "../../childCachePolicies";
-import { workspaceKeys } from "../../queries";
 import type {
   OperationsInput,
   OperationsResponse,
@@ -33,6 +33,7 @@ export function useOrganizationProfileForm({
   const query = useOrganizationProfile(organizationId);
   const organization = useOrganization(organizationId);
   const mutation = useUpdateOrganizationProfile(organizationId);
+
   const binding = useComposableForm({
     id: "profile",
     defaultValues: {
@@ -56,7 +57,7 @@ export function useOrganizationProfileForm({
       retrySafe: true,
     },
     refetchFunctions: [query.refetch],
-    invalidateQueryKeys: [workspaceKeys.organizations.all],
+    invalidateQueryKeys: [organizationListsKey()],
     cacheUpdates: profileCacheUpdates(organization.data),
   });
 
@@ -91,7 +92,7 @@ export function useOrganizationOperationsForm({
       retrySafe: true,
     },
     refetchFunctions: [query.refetch],
-    invalidateQueryKeys: [workspaceKeys.organizations.all],
+    invalidateQueryKeys: [organizationListsKey()],
     cacheUpdates: operationsCacheUpdates(organization.data),
   });
   return { ...binding, retryRead: query.refetch };

@@ -1,5 +1,8 @@
+import { bootstrapKey, workspaceKey } from "./queryOptions";
+import { tasksKey } from "./tasks/queryOptions";
+import { projectsKey } from "./projects/queryOptions";
+import { organizationsKey } from "./organizations/queryOptions";
 import type { QueryClient } from "@tanstack/react-query";
-import { bootstrapKey, workspaceKeys } from "./queries";
 import type { BootstrapData } from "./types";
 
 export async function clearWorkspace(
@@ -7,14 +10,14 @@ export async function clearWorkspace(
   request: () => Promise<BootstrapData>,
 ) {
   const data = await request();
-  await queryClient.cancelQueries({ queryKey: workspaceKeys.all });
+  await queryClient.cancelQueries({ queryKey: workspaceKey() });
   // Reset active observers too: removing their cache entry alone leaves their
   // last rendered result visible until a later observer update.
-  await queryClient.resetQueries({ queryKey: workspaceKeys.all });
-  queryClient.removeQueries({ queryKey: workspaceKeys.all, type: "inactive" });
-  queryClient.setQueryData(bootstrapKey, data);
-  queryClient.setQueryData(workspaceKeys.organizations.list(), data.organizations);
-  queryClient.setQueryData(workspaceKeys.projects.list(), data.projects);
-  queryClient.setQueryData(workspaceKeys.tasks.list(), data.tasks);
+  await queryClient.resetQueries({ queryKey: workspaceKey() });
+  queryClient.removeQueries({ queryKey: workspaceKey(), type: "inactive" });
+  queryClient.setQueryData(bootstrapKey(), data);
+  queryClient.setQueryData(organizationsKey(), data.organizations);
+  queryClient.setQueryData(projectsKey(), data.projects);
+  queryClient.setQueryData(tasksKey(), data.tasks);
   return true;
 }

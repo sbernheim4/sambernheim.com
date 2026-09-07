@@ -1,3 +1,5 @@
+import { taskKey } from "../src/features/workspace/tasks/queryOptions";
+import { organizationKey, organizationProfileKey } from "../src/features/workspace/organizations/queryOptions";
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { act, create, type ReactTestRenderer } from "react-test-renderer";
@@ -11,7 +13,6 @@ import {
 } from "../src/features/workspace/organizations/hooks/organizationConfigurationForms";
 import { useCreateOrganization } from "../src/features/workspace/organizations/hooks/mutations";
 import { useWorkspaceLaunchForms } from "../src/features/workspace/hooks/useWorkspaceLaunchForms";
-import { workspaceKeys } from "../src/features/workspace/queries";
 
 Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
 const client = () =>
@@ -353,7 +354,7 @@ test("composed domain forms retry only Operations, keep Profile success and pres
     assert.equal(current.save.result.outcome, "partial-failure");
     assert.equal(current.profile.form.state.values.displayName, "Saved");
     assert.equal(current.operations.form.state.values.isActive, false);
-    assert.equal(qc.getQueryData<any>(workspaceKeys.organizations.detail("org-1")).name, "Saved");
+    assert.equal(qc.getQueryData<any>(organizationKey("org-1")).name, "Saved");
   } finally {
     globalThis.fetch = original;
     await harness.dispose();
@@ -489,7 +490,7 @@ test("organization page orchestrator skips clean forms and only submits dirty fo
     assert.equal(current.profile.form.state.isDirty, false);
     assert.equal(current.operations.form.state.isDirty, false);
     assert.equal(
-      qc.getQueryData<any>(workspaceKeys.organizationProfiles.detail("org-1")).name,
+      qc.getQueryData<any>(organizationProfileKey("org-1")).name,
       "Renamed Clinic",
     );
   } finally {
@@ -660,7 +661,7 @@ for (const failProject of [false, true]) {
       assert.equal(writes[1].input.organizationId, "organization-new");
       assert.equal(result.forms.organization.status, "saved");
       assert.equal(
-        qc.getQueryData<{ id: string }>(workspaceKeys.organizations.detail("organization-new"))?.id,
+        qc.getQueryData<{ id: string }>(organizationKey("organization-new"))?.id,
         "organization-new",
       );
       assert.equal(current.save.isSaving, false);
@@ -680,7 +681,7 @@ for (const failProject of [false, true]) {
         assert.equal(writes[2].input.organizationId, "organization-new");
         assert.equal(writes[2].input.projectId, "project-new");
         assert.equal(
-          qc.getQueryData<{ id: string }>(workspaceKeys.tasks.detail("task-new"))?.id,
+          qc.getQueryData<{ id: string }>(taskKey("task-new"))?.id,
           "task-new",
         );
         assert.deepEqual(activity, [

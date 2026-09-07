@@ -1,18 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchBootstrap } from "../api";
-import { reconcileWorkspaceRead } from "../cache";
 import { useOrganization, useOrganizations } from "../organizations/hooks/queries";
 import { useOrganizationProjects, useProject, useProjects } from "../projects/hooks/queries";
-import { bootstrapKey } from "../queries";
+import { bootstrapQueryOptions } from "../queryOptions";
 import { useProjectTasks, useTask, useTasks } from "../tasks/hooks/queries";
-export function useWorkspaceResources() {
-  return useQuery({
-    structuralSharing: reconcileWorkspaceRead,
-    queryKey: bootstrapKey,
-    queryFn: fetchBootstrap,
-    staleTime: 5_000,
-  });
-}
+export function useWorkspaceResources() { return useQuery(bootstrapQueryOptions()); }
 
 // Page-level read composition keeps resource ownership in domain queries.
 export function useOrganizationsWorkspace() {

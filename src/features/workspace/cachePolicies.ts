@@ -1,6 +1,9 @@
+import { bootstrapKey } from "./queryOptions";
+import { projectTasksKey, taskKey, tasksKey } from "./tasks/queryOptions";
+import { organizationProjectsKey, projectKey, projectsKey } from "./projects/queryOptions";
+import { organizationKey, organizationOperationsKey, organizationProfileKey, organizationsKey } from "./organizations/queryOptions";
 import type { CacheUpdate } from "../../forms/orchestration/types";
 import { reconcileWorkspaceRead, upsertBootstrap } from "./cache";
-import { bootstrapKey, workspaceKeys as keys } from "./queries";
 import type {
   Organization,
   Project,
@@ -13,20 +16,20 @@ import type {
 export function organizationCacheUpdates<I>(): CacheUpdate<SaveOrganizationResponse, I>[] {
   return [
     {
-      queryKey: () => bootstrapKey,
+      queryKey: () => bootstrapKey(),
       update: (previous, { response }) =>
         upsertBootstrap(previous, { organizations: [response.organization] }),
     },
     {
-      queryKey: () => keys.organizations.list(),
+      queryKey: () => organizationsKey(),
       update: (previous, { response }) => upsertList(previous, response.organization),
     },
     {
-      queryKey: ({ response }) => keys.organizations.detail(response.organization.id),
+      queryKey: ({ response }) => organizationKey(response.organization.id),
       getData: (response) => response.organization,
     },
     {
-      queryKey: ({ response }) => keys.organizationProfiles.detail(response.organization.id),
+      queryKey: ({ response }) => organizationProfileKey(response.organization.id),
       getData: ({ organization: o }) => ({
         organizationId: o.id,
         name: o.name,
@@ -35,7 +38,7 @@ export function organizationCacheUpdates<I>(): CacheUpdate<SaveOrganizationRespo
       }),
     },
     {
-      queryKey: ({ response }) => keys.organizationOperations.detail(response.organization.id),
+      queryKey: ({ response }) => organizationOperationsKey(response.organization.id),
       getData: ({ organization: o }) => ({
         organizationId: o.id,
         status: o.status,
@@ -48,20 +51,20 @@ export function organizationCacheUpdates<I>(): CacheUpdate<SaveOrganizationRespo
 export function projectCacheUpdates<I>(): CacheUpdate<SaveProjectResponse, I>[] {
   return [
     {
-      queryKey: () => bootstrapKey,
+      queryKey: () => bootstrapKey(),
       update: (previous, { response }) =>
         upsertBootstrap(previous, { projects: [response.project] }),
     },
     {
-      queryKey: () => keys.projects.list(),
+      queryKey: () => projectsKey(),
       update: (previous, { response }) => upsertList(previous, response.project),
     },
     {
-      queryKey: ({ response }) => keys.projects.forOrganization(response.project.organizationId),
+      queryKey: ({ response }) => organizationProjectsKey(response.project.organizationId),
       update: (previous, { response }) => upsertList(previous, response.project),
     },
     {
-      queryKey: ({ response }) => keys.projects.detail(response.project.id),
+      queryKey: ({ response }) => projectKey(response.project.id),
       getData: (response) => response.project,
     },
   ];
@@ -69,19 +72,19 @@ export function projectCacheUpdates<I>(): CacheUpdate<SaveProjectResponse, I>[] 
 export function taskCacheUpdates<I>(): CacheUpdate<SaveTaskResponse, I>[] {
   return [
     {
-      queryKey: () => bootstrapKey,
+      queryKey: () => bootstrapKey(),
       update: (previous, { response }) => upsertBootstrap(previous, { tasks: [response.task] }),
     },
     {
-      queryKey: () => keys.tasks.list(),
+      queryKey: () => tasksKey(),
       update: (previous, { response }) => upsertList(previous, response.task),
     },
     {
-      queryKey: ({ response }) => keys.tasks.forProject(response.task.projectId),
+      queryKey: ({ response }) => projectTasksKey(response.task.projectId),
       update: (previous, { response }) => upsertList(previous, response.task),
     },
     {
-      queryKey: ({ response }) => keys.tasks.detail(response.task.id),
+      queryKey: ({ response }) => taskKey(response.task.id),
       getData: (response) => response.task,
     },
   ];
