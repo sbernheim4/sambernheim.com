@@ -1,0 +1,10 @@
+@import "./landingPage.css";
+@import "./about.css";
+@import "./navbar.css";
+@import "./blog.css";
+@import "./article.css";
+
+.about {
+  --main-bg-color: #f2e65a;
+  color: #000;
+}

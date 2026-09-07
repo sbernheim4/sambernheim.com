@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import "../styles/site.css";
 
 export const SiteNavbar = () => {
   return (
