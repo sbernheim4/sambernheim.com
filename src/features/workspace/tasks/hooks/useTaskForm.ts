@@ -3,8 +3,6 @@ import { bootstrapKey } from "../../queryOptions";
 import { useQueryBackedForm } from "../../../../forms/hooks/useQueryBackedForm";
 import type { OutcomeCallbacks } from "../../../../forms/orchestration/types";
 import type { Project, SaveTaskInput, SaveTaskResponse, Task } from "../../types";
-import { dueWindowOptions, ownerOptions, taskStatusOptions } from "../fieldOptions";
-import { option } from "../../formOptions";
 import { useCreateTask, useUpdateTask } from "./mutations";
 import { useTask } from "./queries";
 export type TaskFormValues = Pick<Task, "title" | "owner" | "status" | "dueWindow">;
@@ -46,9 +44,9 @@ export const useTaskForm = ({
         organizationId: project.organizationId,
         projectId: project.id,
         title: values.title.trim(),
-        owner: option(values.owner, ownerOptions),
-        status: option(values.status, taskStatusOptions),
-        dueWindow: option(values.dueWindow, dueWindowOptions),
+        owner: values.owner,
+        status: values.status,
+        dueWindow: values.dueWindow,
       };
     },
     validate: (values) => {

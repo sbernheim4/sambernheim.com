@@ -8,8 +8,6 @@ import { bootstrapKey } from "../../queryOptions";
 import { useQueryBackedForm } from "../../../../forms/hooks/useQueryBackedForm";
 import type { OutcomeCallbacks } from "../../../../forms/orchestration/types";
 import type { Organization, SaveOrganizationInput, SaveOrganizationResponse } from "../../types";
-import { regionOptions, sectorOptions, statusOptions } from "../fieldOptions";
-import { option } from "../../formOptions";
 import { useCreateOrganization, useUpdateOrganization } from "./mutations";
 import { useOrganization } from "./queries";
 export type OrganizationFormValues = Pick<Organization, "name" | "sector" | "status" | "region">;
@@ -43,9 +41,9 @@ export const useOrganizationForm = ({
     toMutationPayload: (values): SaveOrganizationInput => {
       return {
         name: values.name.trim(),
-        sector: option(values.sector, sectorOptions),
-        status: option(values.status, statusOptions),
-        region: option(values.region, regionOptions),
+        sector: values.sector,
+        status: values.status,
+        region: values.region,
       };
     },
     validate: (values) => {

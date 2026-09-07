@@ -3,8 +3,6 @@ import { bootstrapKey } from "../../queryOptions";
 import { useQueryBackedForm } from "../../../../forms/hooks/useQueryBackedForm";
 import type { OutcomeCallbacks } from "../../../../forms/orchestration/types";
 import type { Project, SaveProjectInput, SaveProjectResponse } from "../../types";
-import { phaseOptions, priorityOptions } from "../fieldOptions";
-import { option } from "../../formOptions";
 import { useCreateProject, useUpdateProject } from "./mutations";
 import { useProject } from "./queries";
 export type ProjectFormValues = Pick<Project, "name" | "priority" | "phase" | "budget">;
@@ -45,8 +43,8 @@ export const useProjectForm = ({
       return {
         organizationId,
         name: values.name.trim(),
-        priority: option(values.priority, priorityOptions),
-        phase: option(values.phase, phaseOptions),
+        priority: values.priority,
+        phase: values.phase,
         budget: values.budget,
       };
     },
