@@ -7,3 +7,5 @@ src/routeTree.gen.ts
 src/wasm/ty/pkg
 .vendor
 .DS_Store
+
+.wrangler/
