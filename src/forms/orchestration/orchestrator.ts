@@ -159,11 +159,17 @@ export const createOrchestrator = <P extends readonly AnyForm[]>(
     return active;
   };
 
-  const reset = () => {
+  const reset = (config: SaveConfig<P>) => {
     if (active) {
       return false;
     }
+
     onChange({ phase: "idle", isSaving: false });
+
+    config.forms.map((form) => {
+      form.form.reset();
+    });
+
     return true;
   };
 
@@ -257,7 +263,9 @@ const settleRefreshes = async (
   );
 
   const erroredRefetchAndInvalidations = settled
-    .filter((x) => x.status === "rejected")
+    .filter((x) => {
+      return x.status === "rejected";
+    })
     .map((entry, index) => {
       return {
         phase: "refresh" as const,

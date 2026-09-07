@@ -12,22 +12,11 @@ import { Form } from "../forms/components/FormComponents";
 const FlowFormRoute = () => {
   const [activity, setActivity] = useState<Array<ReturnType<typeof createActivity>>>([]);
 
-  const { organization, project, task, save, bootstrap } = useWorkspaceLaunchForms((text) => {
+  const { organization, project, task, conductor, bootstrap } = useWorkspaceLaunchForms((text) => {
     setActivity((items) => {
       return [createActivity(text), ...items];
     });
   });
-
-  const aggregateForm = {
-    handleSubmit: () => {
-      return save.submit();
-    },
-    reset: () => {
-      organization.form.reset();
-      project.form.reset();
-      task.form.reset();
-    },
-  };
 
   return (
     <WorkspaceLayout
@@ -38,16 +27,16 @@ const FlowFormRoute = () => {
       <section className="forms-workspace app-workspace">
         <Form.Provider
           value={{
-            form: aggregateForm,
+            form: conductor.provider,
             forms: {
               organization: organization.form,
               project: project.form,
               task: task.form,
             },
             isReady: true,
-            isSaving: save.isSaving,
-            isDirty: save.isDirty,
-            result: save.result,
+            isSaving: conductor.isSaving,
+            isDirty: conductor.isDirty,
+            result: conductor.result,
           }}
         >
           <Form.Shell className="form-panel app-form-panel flow-form-panel">
@@ -56,7 +45,7 @@ const FlowFormRoute = () => {
                 <h2>Workspace Launch</h2>
                 <p>Account, project, and first task</p>
               </div>
-              <span>{save.isSaving ? "Saving" : "Ready"}</span>
+              <span>{conductor.isSaving ? "Saving" : "Ready"}</span>
             </div>
 
             <Form.Fields className="workspace-launch-fields">
@@ -75,17 +64,17 @@ const FlowFormRoute = () => {
               </div>
             </Form.Fields>
 
-            {save.result && (
+            {conductor.result && (
               <div role="status">
                 <p>
-                  {save.result.outcome === "success"
+                  {conductor.result.outcome === "success"
                     ? "Workspace created."
-                    : save.result.outcome === "saved-with-follow-up-errors"
+                    : conductor.result.outcome === "saved-with-follow-up-errors"
                       ? "Workspace created, but some follow-up actions failed."
                       : "Workspace creation did not complete."}
                 </p>
                 <ul>
-                  {Object.entries(save.result.forms).map(([id, state]) => {
+                  {Object.entries(conductor.result.forms).map(([id, state]) => {
                     return (
                       <li key={id}>
                         {id}: {state.status}

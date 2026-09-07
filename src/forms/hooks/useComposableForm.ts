@@ -139,6 +139,8 @@ export type ComposableFormConfig<
   id: Id;
 };
 
+export type ComposableForm = ReturnType<typeof useComposableForm>;
+
 export const useComposableForm = <
   const Id extends string,
   QueryData,
