@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { About } from "../site/components/About";
-import { LandingPage } from "../site/components/LandingPage";
-import { SiteNavbar } from "../site/components/SiteNavbar";
+import { About } from "../components/site/About";
+import { LandingPage } from "../components/site/LandingPage";
+import { SiteNavbar } from "../components/site/SiteNavbar";
 
 const Home = () => {
   return (
