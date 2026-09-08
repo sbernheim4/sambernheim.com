@@ -1,6 +1,10 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 const FormsLayout = () => {
-  return <Outlet />;
+  return (
+    <div className="forms-route">
+      <Outlet />
+    </div>
+  );
 };
 
 export const Route = createFileRoute("/forms")({

@@ -16,6 +16,7 @@ import type {
 } from "../orchestration/types";
 import { useAppForm } from "./useAppForm";
 import { markFormSaved, resetFormValues } from "./formState";
+import { useFormActionState } from "./useFormActionState";
 
 export type QuerySource<QueryData> = {
   data: QueryData | undefined;
@@ -179,6 +180,7 @@ export const useComposableForm = <
   });
 
   const isReady = isFormReady(initialized, readError, config.query);
+  const actionState = useFormActionState(form);
 
   const saveConfig = {
     ...config,
@@ -204,6 +206,12 @@ export const useComposableForm = <
   return {
     form,
     ...saveConfig,
+    actionState,
+    binding: {
+      ...saveConfig,
+      actionState,
+      isReady,
+    },
     isReady,
     readError: readError ?? config.query?.error,
   };

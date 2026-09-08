@@ -41,6 +41,8 @@ export const useQueryBackedForm = <QueryData, Values, Mutation extends AsyncMuta
     submit: save.submit,
     isSaving: save.isSaving,
     isDirty,
+    actions: save.actions,
+    reset: save.reset,
     allowPristineSave: config.query === undefined,
     error,
   };
