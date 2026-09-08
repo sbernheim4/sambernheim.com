@@ -2,8 +2,10 @@ import { useRef, useState, useSyncExternalStore } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import type { AnyForm, SaveConfig } from "../orchestration/types";
 import { createOrchestrator, type SaveState } from "../orchestration/orchestrator";
+import { combineFormEditorActionStates, type FormEditorActionStatus } from "./useFormActionState";
 
 type SavableForm = AnyForm & {
+  actionState?: FormEditorActionStatus;
   form: {
     state: {
       isDirty: boolean;
@@ -103,11 +105,28 @@ export const useFormOrchestrator = <const T extends readonly SavableForm[]>(
     });
   };
 
+  const actionState = combineFormEditorActionStates(
+    ...config.forms.map((form) => {
+      return form.actionState ?? {
+        canSubmit: true,
+        isSubmitting: state.isSaving,
+        isPristine: !form.form.state?.isDirty,
+        validationErrors: [],
+        submitErrors: [],
+      };
+    }),
+  );
+
   const conductor = {
     ...state,
     isDirty,
     submit,
     reset,
+    actions: {
+      ...actionState,
+      isSubmitting: state.isSaving,
+      onSubmit: submit,
+    },
     // This provider object is so this hook composes nicely with the Form UI
     // component
     provider: {

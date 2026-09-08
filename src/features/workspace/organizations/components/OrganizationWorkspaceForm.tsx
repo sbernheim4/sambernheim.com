@@ -1,5 +1,5 @@
-import { useState } from "react";
 import { Form, useFormContext } from "../../../../forms/components/FormComponents";
+import { FormEditor } from "../../../../forms/components";
 import { useFormOrchestrator } from "../../../../forms/hooks/useFormOrchestrator";
 import { regionOptions, sectorOptions } from "../fieldOptions";
 import {
@@ -22,8 +22,6 @@ export const OrganizationWorkspaceForm = ({
     retry: { maxRetries: 1, delayMs: 500 },
   });
 
-  const [submitError, setSubmitError] = useState<unknown>();
-
   const ready = profile.isReady && operations.isReady;
   const readError = profile.readError || operations.readError;
 
@@ -35,42 +33,64 @@ export const OrganizationWorkspaceForm = ({
       <Form.Provider
         value={{
           form: conductor.provider,
-          forms: {
-            profile: profile.form,
-            operations: operations.form,
-          },
+          forms: { profile: profile.form, operations: operations.form },
           isReady: ready,
           isSaving: conductor.isSaving,
           isDirty: conductor.isDirty,
-          onChange: () => {
-            return setSubmitError(undefined);
-          },
-          onSubmitError: setSubmitError,
           onDiscard,
         }}
       >
-        <Form.Shell>
-          {readError ? (
-            <p className="form-error" role="alert">
-              Unable to load configuration.{" "}
-            </p>
-          ) : (
-            !ready && <p role="status">Loading configuration...</p>
-          )}
-          <Form.Fields>
-            <section className="workspace-details">
-              <h3>Profile</h3>
-              <ProfileFields />
-            </section>
-            <section className="workspace-details">
-              <h3>Operations</h3>
-              <OperationsFields />
-            </section>
-            <div className="form-actions">
-              <Form.SaveButton />
-              <Form.DiscardButton pristineLabel="Stop editing" />
-            </div>
-          </Form.Fields>
+        <FormEditor.Provider
+          mode="edit"
+          defaultTab="profile"
+          actions={conductor.actions}
+          cancelLabel="Stop editing"
+          onCancel={() => {
+            conductor.reset();
+            onDiscard?.();
+          }}
+        >
+          <FormEditor.Layout className="form-panel app-form-panel">
+            <FormEditor.Main>
+              <FormEditor.Header>
+                <div className="panel-heading">
+                  <div>
+                    <h2>Organization configuration</h2>
+                    <p>Profile and operations</p>
+                  </div>
+                  <FormEditor.Actions />
+                </div>
+                <FormEditor.TabList>
+                  <FormEditor.TabTrigger name="profile" label="Profile" />
+                  <FormEditor.TabTrigger name="operations" label="Operations" />
+                </FormEditor.TabList>
+              </FormEditor.Header>
+              {readError ? (
+                <p className="form-error" role="alert">Unable to load configuration.</p>
+              ) : !ready ? (
+                <p role="status">Loading configuration...</p>
+              ) : null}
+              <FormEditor.Error />
+              <FormEditor.Content>
+                <FormEditor.Tab name="profile">
+                  <Form.Fields>
+                    <section className="workspace-details">
+                      <h3>Profile</h3>
+                      <ProfileFields />
+                    </section>
+                  </Form.Fields>
+                </FormEditor.Tab>
+                <FormEditor.Tab name="operations">
+                  <Form.Fields>
+                    <section className="workspace-details">
+                      <h3>Operations</h3>
+                      <OperationsFields />
+                    </section>
+                  </Form.Fields>
+                </FormEditor.Tab>
+              </FormEditor.Content>
+            </FormEditor.Main>
+          </FormEditor.Layout>
           {conductor.phase !== "idle" && (
             <div role="status" aria-live="polite">
               <p>
@@ -97,12 +117,7 @@ export const OrganizationWorkspaceForm = ({
               </ul>
             </div>
           )}
-          {!!submitError && (
-            <p className="form-error" role="alert">
-              {String(submitError)}
-            </p>
-          )}
-        </Form.Shell>
+        </FormEditor.Provider>
       </Form.Provider>
     </section>
   );
