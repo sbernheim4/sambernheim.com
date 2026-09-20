@@ -7,7 +7,7 @@ export type QueryBackedFormConfig<QueryData, Values, Mutation extends AsyncMutat
   QueryData,
   Values,
   Mutation
->;
+> & { persistDraftKey?: string };
 
 export const useQueryBackedForm = <QueryData, Values, Mutation extends AsyncMutation>(
   config: QueryBackedFormConfig<QueryData, Values, Mutation>,
@@ -19,6 +19,7 @@ export const useQueryBackedForm = <QueryData, Values, Mutation extends AsyncMuta
   const save = useFormOrchestrator({
     forms: [binding] as const,
     includePristine: true,
+    persistDraftKey: config.persistDraftKey,
   });
   const isDirty = useSelector(binding.form.store, (state) => {
     return state.isDirty;
@@ -43,6 +44,7 @@ export const useQueryBackedForm = <QueryData, Values, Mutation extends AsyncMuta
     isDirty,
     actions: save.actions,
     reset: save.reset,
+    draft: save.draft,
     allowPristineSave: config.query === undefined,
     error,
   };
