@@ -9,6 +9,9 @@ components, or notification libraries.
 - `hooks/useQueryBackedForm.ts` adds standalone saving to that same form. `save()`
   and `submit()` return the save result; `result`, `isSaving`, and `error` expose
   feedback. `form.handleSubmit()` also enters the orchestrator.
+- `hooks/usePersistedFormData.ts` optionally keeps dirty form values in
+  `localStorage`, exposes restore/discard controls, and clears drafts after a
+  successful save or explicit discard.
 - `hooks/useFormOrchestrator.ts` selects dirty forms and exposes save progress.
   It passes the form bindings directly to `createOrchestrator`; there is no
   participant wrapper or separate runtime form representation.
@@ -127,6 +130,12 @@ All form consumers use composable bindings and the shared orchestrator.
 `includePristine: true` includes unchanged defaults for creates. The standalone
 `useQueryBackedForm` exposes `submit`, `save`, `isSaving`, and `error`, with
 `form.handleSubmit` entering the same save executor.
+
+Pass `persistDraftKey` to `useFormOrchestrator` or `useQueryBackedForm` to enable
+draft persistence. Render `FormEditor.DraftBanner` with the returned `draft`
+controller. Draft values are captured only while a form is dirty; successful
+saves clear them, and `draft.discard()` resets the forms and removes the stored
+values for an explicit exit.
 
 The workspace launch demo uses three independent form bindings with typed
 form dependencies to pass newly created organization/project IDs to later

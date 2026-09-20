@@ -1,5 +1,5 @@
 import { FormEditorActions } from "./FormEditorActions";
-import { FormEditorContent } from "./FormEditorContent";
+import { FormEditorContent, FormEditorDraftBanner } from "./FormEditorContent";
 import { FormEditorError } from "./FormEditorError";
 import { FormEditorHeader } from "./FormEditorHeader";
 import { FormEditorLayout } from "./FormEditorLayout";
@@ -15,6 +15,7 @@ export { type FormEditorProviderProps, type FormEditorRegionProps } from "./form
 export const FormEditor = {
   Actions: FormEditorActions,
   Content: FormEditorContent,
+  DraftBanner: FormEditorDraftBanner,
   Error: FormEditorError,
   Header: FormEditorHeader,
   Layout: FormEditorLayout,

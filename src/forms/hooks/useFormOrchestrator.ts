@@ -1,8 +1,9 @@
-import { useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import type { AnyForm, SaveConfig } from "../orchestration/types";
 import { createOrchestrator, type SaveState } from "../orchestration/orchestrator";
 import { combineFormEditorActionStates, type FormEditorActionStatus } from "./useFormActionState";
+import { usePersistedFormData, type PersistedFormBinding } from "./usePersistedFormData";
 
 type SavableForm = AnyForm & {
   actionState?: FormEditorActionStatus;
@@ -52,10 +53,15 @@ const useFormsDirty = (forms: readonly SavableForm[], includePristine: boolean) 
 export const useFormOrchestrator = <const T extends readonly SavableForm[]>(
   config: SaveConfig<T> & {
     includePristine?: boolean;
+    persistDraftKey?: string;
   },
 ) => {
   const client = useQueryClient();
   const isDirty = useFormsDirty(config.forms, config.includePristine ?? false);
+  const draft = usePersistedFormData({
+    storageKey: config.persistDraftKey,
+    forms: config.forms as unknown as readonly PersistedFormBinding[],
+  });
 
   const [state, setState] = useState<SaveState<T>>({
     phase: "idle",
@@ -67,6 +73,13 @@ export const useFormOrchestrator = <const T extends readonly SavableForm[]>(
 
   const latest = useRef(config);
   latest.current = config;
+
+  useEffect(() => {
+    const outcome = state.result?.outcome;
+    if (outcome === "success" || outcome === "saved-with-follow-up-errors") {
+      draft.clear();
+    }
+  }, [draft.clear, state.result?.outcome]);
 
   const submit = () => {
     const selectedForms = latest.current.includePristine
@@ -81,7 +94,11 @@ export const useFormOrchestrator = <const T extends readonly SavableForm[]>(
       return Promise.resolve(undefined);
     }
 
-    const { includePristine: _includePristine, ...submitConfig } = latest.current;
+    const {
+      includePristine: _includePristine,
+      persistDraftKey: _persistDraftKey,
+      ...submitConfig
+    } = latest.current;
 
     return orchestrator.submit({
       ...submitConfig,
@@ -97,7 +114,7 @@ export const useFormOrchestrator = <const T extends readonly SavableForm[]>(
       return Promise.resolve(undefined);
     }
 
-    const submitConfig = latest.current;
+    const { persistDraftKey: _persistDraftKey, ...submitConfig } = latest.current;
 
     return orchestrator.reset({
       ...submitConfig,
@@ -122,6 +139,7 @@ export const useFormOrchestrator = <const T extends readonly SavableForm[]>(
     isDirty,
     submit,
     reset,
+    draft,
     actions: {
       ...actionState,
       isSubmitting: state.isSaving,
