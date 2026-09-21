@@ -130,6 +130,34 @@
   text-transform: uppercase;
 }
 
+.detail-properties {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+}
+
+.detail-property {
+  display: grid;
+  gap: 4px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e1e5df;
+}
+
+.detail-property:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.detail-property dt,
+.detail-property dd {
+  margin: 0;
+}
+
+.detail-property dd {
+  color: #1e2427;
+  line-height: 1.5;
+}
+
 .relationship-list {
   display: grid;
   gap: 10px;

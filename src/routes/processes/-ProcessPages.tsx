@@ -8,7 +8,11 @@ import { useTasks } from "../../domains/tasks/hooks/useTasks";
 import { useExecutionProfile } from "../../domains/execution-profiles/hooks/useExecutionProfile";
 import { ProcessFields } from "../../domains/processes/components/ProcessFields";
 import { DetailLayout, Loading, Missing, Status } from "../form-demo/components/-Layout";
-import { ChildList, ProfileSummary } from "../form-demo/components/-DetailHelpers";
+import {
+  ChildList,
+  DetailProperties,
+  ProfileSummary,
+} from "../form-demo/components/-DetailHelpers";
 import { DetailView } from "../form-demo/components/-DetailView";
 import { ViewModePicker, useViewModePreference } from "../form-demo/components/-ViewModePreference";
 
@@ -68,26 +72,28 @@ export const ProcessDetailPage = ({ id }: { id: string }) => {
             label: "Overview",
             children: (
               <section className="details">
-                <div className="summary-grid">
-                  <div>
-                    <span className="eyebrow">Task</span>
-                    {task ? (
-                      <Link to="/form-demo/tasks/$taskId" params={{ taskId: task.id }}>
-                        {task.name}
-                      </Link>
-                    ) : (
-                      <strong>{process.data.taskId}</strong>
-                    )}
-                  </div>
-                  <div>
-                    <span className="eyebrow">Command</span>
-                    <strong>{process.data.command}</strong>
-                  </div>
-                  <div>
-                    <span className="eyebrow">Status</span>
-                    <Status value={process.data.status} />
-                  </div>
-                </div>
+                <DetailProperties
+                  properties={[
+                    { label: "ID", value: process.data.id },
+                    { label: "Name", value: process.data.name },
+                    {
+                      label: "Task ID",
+                      value: task ? (
+                        <>
+                          {process.data.taskId}{" "}
+                          <Link to="/form-demo/tasks/$taskId" params={{ taskId: task.id }}>
+                            ({task.name})
+                          </Link>
+                        </>
+                      ) : (
+                        process.data.taskId
+                      ),
+                    },
+                    { label: "Command", value: process.data.command },
+                    { label: "Status", value: <Status value={process.data.status} /> },
+                    { label: "Execution profile ID", value: process.data.executionProfileId },
+                  ]}
+                />
               </section>
             ),
           },

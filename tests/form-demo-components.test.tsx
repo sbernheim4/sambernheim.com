@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { expect, test } from "vitest";
 import { DetailTabs } from "../src/routes/form-demo/components/-DetailTabs";
 import { DetailView } from "../src/routes/form-demo/components/-DetailView";
-import { ChildList } from "../src/routes/form-demo/components/-DetailHelpers";
+import { ChildList, DetailProperties } from "../src/routes/form-demo/components/-DetailHelpers";
 import { Loading, Missing, Status } from "../src/routes/form-demo/components/-Layout";
 import {
   ViewModePicker,
@@ -99,6 +99,24 @@ test("form-demo layout primitives render state labels", () => {
   expect(screen.getByText("Loading...")).toBeInTheDocument();
   expect(screen.getByText("Entity not found.")).toBeInTheDocument();
   expect(screen.getByText("child").parentElement).toHaveClass("relationship-list");
+});
+
+test("detail properties render every value as a separate labeled row", () => {
+  render(
+    <DetailProperties
+      properties={[
+        { label: "Runtime", value: "node-22" },
+        { label: "Region", value: "us-east" },
+        { label: "Timeout", value: "5000 ms" },
+      ]}
+    />,
+  );
+
+  expect(screen.getByText("Runtime").parentElement).toHaveTextContent("node-22");
+  expect(screen.getByText("Region").parentElement).toHaveTextContent("us-east");
+  expect(screen.getByText("Timeout").parentElement).toHaveTextContent("5000 ms");
+  expect(screen.getAllByRole("term")).toHaveLength(3);
+  expect(screen.getAllByRole("definition")).toHaveLength(3);
 });
 
 test("demo field conversion functions preserve records and convert numeric values", () => {

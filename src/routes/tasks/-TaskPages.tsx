@@ -7,7 +7,11 @@ import { useProcesses } from "../../domains/processes/hooks/useProcesses";
 import { useExecutionProfile } from "../../domains/execution-profiles/hooks/useExecutionProfile";
 import { TaskFields } from "../../domains/tasks/components/TaskFields";
 import { DetailLayout, Loading, Missing, Status } from "../form-demo/components/-Layout";
-import { ChildList, ProfileSummary } from "../form-demo/components/-DetailHelpers";
+import {
+  ChildList,
+  DetailProperties,
+  ProfileSummary,
+} from "../form-demo/components/-DetailHelpers";
 import { DetailView } from "../form-demo/components/-DetailView";
 import { ViewModePicker, useViewModePreference } from "../form-demo/components/-ViewModePreference";
 
@@ -61,20 +65,16 @@ export const TaskDetailPage = ({ id }: { id: string }) => {
             label: "Overview",
             children: (
               <section className="details">
-                <div className="summary-grid">
-                  <div>
-                    <span className="eyebrow">Description</span>
-                    <p>{task.data.description}</p>
-                  </div>
-                  <div>
-                    <span className="eyebrow">Priority</span>
-                    <strong>{task.data.priority}</strong>
-                  </div>
-                  <div>
-                    <span className="eyebrow">Status</span>
-                    <Status value={task.data.status} />
-                  </div>
-                </div>
+                <DetailProperties
+                  properties={[
+                    { label: "ID", value: task.data.id },
+                    { label: "Name", value: task.data.name },
+                    { label: "Description", value: task.data.description },
+                    { label: "Status", value: <Status value={task.data.status} /> },
+                    { label: "Priority", value: task.data.priority },
+                    { label: "Execution profile ID", value: task.data.executionProfileId },
+                  ]}
+                />
               </section>
             ),
           },
