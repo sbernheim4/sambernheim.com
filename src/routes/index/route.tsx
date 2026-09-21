@@ -2,7 +2,7 @@ import "./styles/route.css";
 import { createFileRoute } from "@tanstack/react-router";
 import { About } from "./components/-About";
 import { LandingPage } from "./components/-LandingPage";
-import { SiteNavbar } from "../../components/SiteNavbar";
+import { SiteNavbar } from "../../shared/components/SiteNavbar";
 
 const Home = () => {
   return (

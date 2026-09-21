@@ -1,7 +1,7 @@
 import "../styles/route.css";
 import "highlight.js/styles/atom-one-dark.css";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { SiteNavbar } from "../../../components/SiteNavbar";
+import { SiteNavbar } from "../../../shared/components/SiteNavbar";
 import { findSitePost } from "../../../articles";
 
 const BlogPost = () => {

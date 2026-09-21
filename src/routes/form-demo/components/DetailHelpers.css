@@ -1,0 +1,30 @@
+.relationship-list {
+  display: grid;
+  gap: 10px;
+}
+
+.relationship-list a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+  border: 1px solid #d8ded9;
+  border-radius: 8px;
+  background: #f8faf6;
+  color: #216b5e;
+  text-decoration: none;
+}
+
+.relationship-list a:hover {
+  border-color: #216b5e;
+  background: #f1f7f1;
+}
+
+.relationship-meta {
+  overflow: hidden;
+  color: #687671;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
