@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { useExecutionProfile } from "../domains/execution-profiles/hooks/useExecutionProfile";
+import { useExecutionProfile } from "../../../domains/execution-profiles/hooks/useExecutionProfile";
 
 export const ProfileSummary = ({ id }: { id: string }) => {
   const profile = useExecutionProfile(id);

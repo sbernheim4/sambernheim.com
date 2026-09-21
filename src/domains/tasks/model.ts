@@ -1,1 +1,1 @@
-export type { Task, TaskStatus } from "../shared/runtimeTypes";
+export type { Task, TaskStatus } from "../shared/types";

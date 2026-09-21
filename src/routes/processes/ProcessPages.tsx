@@ -7,13 +7,8 @@ import { useThreads } from "../../domains/threads/hooks/useThreads";
 import { useTasks } from "../../domains/tasks/hooks/useTasks";
 import { useExecutionProfile } from "../../domains/execution-profiles/hooks/useExecutionProfile";
 import { ProcessFields } from "../../domains/processes/components/ProcessFields";
-import {
-  RuntimeDetailLayout,
-  Loading,
-  Missing,
-  Status,
-} from "../../shared/components/RuntimeLayout";
-import { ChildList, ProfileSummary } from "../RuntimeDetailHelpers";
+import { DetailLayout, Loading, Missing, Status } from "../form-demo/components/Layout";
+import { ChildList, ProfileSummary } from "../form-demo/components/DetailHelpers";
 
 export const ProcessListPage = () => {
   const query = useProcesses();
@@ -24,11 +19,11 @@ export const ProcessListPage = () => {
       {query.isPending ? (
         <p>Loading...</p>
       ) : (
-        <div className="runtime-list">
+        <div className="list">
           {query.data?.map((process) => (
             <Link
               key={process.id}
-              className="runtime-card"
+              className="card"
               to="/form-demo/processes/$processId"
               params={{ processId: process.id }}
             >
@@ -59,8 +54,8 @@ export const ProcessDetailPage = ({ id }: { id: string }) => {
   const task = tasks.data?.find((item) => item.id === process.data?.taskId);
 
   return (
-    <RuntimeDetailLayout title={process.data.name} editTo={`/form-demo/processes/${id}/edit`}>
-      <section className="runtime-details">
+    <DetailLayout title={process.data.name} editTo={`/form-demo/processes/${id}/edit`}>
+      <section className="details">
         <p>
           Task:{" "}
           {task ? (
@@ -88,7 +83,7 @@ export const ProcessDetailPage = ({ id }: { id: string }) => {
           ))}
         </ChildList>
       </section>
-    </RuntimeDetailLayout>
+    </DetailLayout>
   );
 };
 
@@ -127,7 +122,7 @@ export const ProcessEditPage = ({
         })
       }
     >
-      <div className="runtime-editor-heading">
+      <div className="editor-heading">
         <h1>Edit Process</h1>
       </div>
 

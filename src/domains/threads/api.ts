@@ -1,5 +1,6 @@
-import { runtimeStore } from "../shared/runtimeStore";
-export const listThreads = (processId?: string) => runtimeStore.listThreads(processId);
-export const getThread = (id: string) => runtimeStore.getThread(id);
-export const updateThread = (id: string, input: Parameters<typeof runtimeStore.updateThread>[1]) =>
-  runtimeStore.updateThread(id, input);
+import { store } from "../shared/store";
+
+export const listThreads = (processId?: string) => store.listThreads(processId);
+export const getThread = (id: string) => store.getThread(id);
+export const updateThread = (id: string, input: Parameters<typeof store.updateThread>[1]) =>
+  store.updateThread(id, input);

@@ -6,13 +6,8 @@ import { useTaskEditForms } from "../../domains/tasks/hooks/useTaskEditForms";
 import { useProcesses } from "../../domains/processes/hooks/useProcesses";
 import { useExecutionProfile } from "../../domains/execution-profiles/hooks/useExecutionProfile";
 import { TaskFields } from "../../domains/tasks/components/TaskFields";
-import {
-  RuntimeDetailLayout,
-  Loading,
-  Missing,
-  Status,
-} from "../../shared/components/RuntimeLayout";
-import { ChildList, ProfileSummary } from "../RuntimeDetailHelpers";
+import { DetailLayout, Loading, Missing, Status } from "../form-demo/components/Layout";
+import { ChildList, ProfileSummary } from "../form-demo/components/DetailHelpers";
 
 export const TaskListPage = () => {
   const query = useTasks();
@@ -23,11 +18,11 @@ export const TaskListPage = () => {
       {query.isPending ? (
         <p>Loading...</p>
       ) : (
-        <div className="runtime-list">
+        <div className="list">
           {query.data?.map((task) => (
             <Link
               key={task.id}
-              className="runtime-card"
+              className="card"
               to="/form-demo/tasks/$taskId"
               params={{ taskId: task.id }}
             >
@@ -54,8 +49,8 @@ export const TaskDetailPage = ({ id }: { id: string }) => {
   }
 
   return (
-    <RuntimeDetailLayout title={task.data.name} editTo={`/form-demo/tasks/${id}/edit`}>
-      <section className="runtime-details">
+    <DetailLayout title={task.data.name} editTo={`/form-demo/tasks/${id}/edit`}>
+      <section className="details">
         <p>{task.data.description}</p>
         <Status value={task.data.status} />
         <p>Priority: {task.data.priority}</p>
@@ -74,7 +69,7 @@ export const TaskDetailPage = ({ id }: { id: string }) => {
           ))}
         </ChildList>
       </section>
-    </RuntimeDetailLayout>
+    </DetailLayout>
   );
 };
 
@@ -109,7 +104,7 @@ export const TaskEditPage = ({
         navigate({ to: "/form-demo/tasks/$taskId", params: { taskId: id }, search: {} })
       }
     >
-      <div className="runtime-editor-heading">
+      <div className="editor-heading">
         <h1>Edit Task</h1>
       </div>
       <FormEditor.TabList>

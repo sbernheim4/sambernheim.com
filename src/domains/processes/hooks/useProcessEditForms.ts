@@ -2,7 +2,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useComposableForm } from "../../../forms/hooks/useComposableForm";
 import { useFormOrchestrator } from "../../../forms/hooks/useFormOrchestrator";
 import { useExecutionProfileEditForm } from "../../execution-profiles/hooks/useExecutionProfileEditForm";
-import { emptyProcess } from "../../shared/runtimeTypes";
+import { emptyProcess } from "../../shared/types";
 import { processKeys, useProcess, useUpdateProcess } from "./useProcesses";
 
 export const useProcessEditForms = (id: string) => {

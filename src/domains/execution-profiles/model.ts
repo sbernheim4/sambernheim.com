@@ -1,1 +1,1 @@
-export type { ExecutionProfile } from "../shared/runtimeTypes";
+export type { ExecutionProfile } from "../shared/types";

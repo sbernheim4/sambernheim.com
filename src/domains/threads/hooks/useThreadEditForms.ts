@@ -2,7 +2,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useComposableForm } from "../../../forms/hooks/useComposableForm";
 import { useFormOrchestrator } from "../../../forms/hooks/useFormOrchestrator";
 import { useExecutionProfileEditForm } from "../../execution-profiles/hooks/useExecutionProfileEditForm";
-import { emptyThread, type ThreadFormValues } from "../../shared/runtimeTypes";
+import { emptyThread, type ThreadFormValues } from "../../shared/types";
 import { threadKeys, useThread, useUpdateThread } from "./useThreads";
 
 const numberValue = (input: string, fallback: number) => {

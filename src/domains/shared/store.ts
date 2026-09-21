@@ -1,4 +1,4 @@
-import type { ExecutionProfile, Process, Task, Thread } from "./runtimeTypes";
+import type { ExecutionProfile, Process, Task, Thread } from "./types";
 
 const profiles: ExecutionProfile[] = [
   {
@@ -117,7 +117,7 @@ const pause = () => Promise.resolve();
 const nextId = (prefix: string) =>
   `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 
-export const runtimeStore = {
+export const store = {
   async listTasks() {
     await pause();
     return clone(tasks);
@@ -173,4 +173,4 @@ function update<T extends { id: string }>(collection: T[], id: string, input: Om
   return clone(collection[index]);
 }
 
-export const createRuntimeId = nextId;
+export const createId = nextId;

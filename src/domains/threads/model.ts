@@ -1,1 +1,1 @@
-export type { Thread, ThreadStatus } from "../shared/runtimeTypes";
+export type { Thread, ThreadStatus } from "../shared/types";

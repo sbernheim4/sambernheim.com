@@ -2,7 +2,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useComposableForm } from "../../../forms/hooks/useComposableForm";
 import { useFormOrchestrator } from "../../../forms/hooks/useFormOrchestrator";
 import { useExecutionProfileEditForm } from "../../execution-profiles/hooks/useExecutionProfileEditForm";
-import { emptyTask, type TaskFormValues } from "../../shared/runtimeTypes";
+import { emptyTask, type TaskFormValues } from "../../shared/types";
 import { taskKeys, useTask, useUpdateTask } from "./useTasks";
 
 const numberValue = (input: string, fallback: number) => {

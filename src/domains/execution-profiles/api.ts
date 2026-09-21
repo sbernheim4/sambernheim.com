@@ -1,6 +1,7 @@
-import { runtimeStore } from "../shared/runtimeStore";
-export const getExecutionProfile = (id: string) => runtimeStore.getProfile(id);
+import { store } from "../shared/store";
+
+export const getExecutionProfile = (id: string) => store.getProfile(id);
 export const updateExecutionProfile = (
   id: string,
-  input: Parameters<typeof runtimeStore.updateProfile>[1],
-) => runtimeStore.updateProfile(id, input);
+  input: Parameters<typeof store.updateProfile>[1],
+) => store.updateProfile(id, input);

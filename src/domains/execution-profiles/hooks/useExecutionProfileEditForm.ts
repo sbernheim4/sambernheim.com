@@ -1,5 +1,5 @@
 import { useComposableForm } from "../../../forms/hooks/useComposableForm";
-import { emptyExecutionProfile, type ExecutionProfileFormValues } from "../../shared/runtimeTypes";
+import { emptyExecutionProfile, type ExecutionProfileFormValues } from "../../shared/types";
 import { profileKeys, useExecutionProfile, useUpdateExecutionProfile } from "./useExecutionProfile";
 
 export const useExecutionProfileEditForm = (profileId: string) => {
