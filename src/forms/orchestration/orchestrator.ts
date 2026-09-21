@@ -23,6 +23,23 @@ export type SaveState<P extends readonly AnyForm[]> = {
   result?: SaveResult<P>;
 };
 
+type RunContext<P extends readonly AnyForm[]> = {
+  forms: readonly FormInput[];
+  config: SaveConfig<P>;
+  queryClient: QueryClient;
+  states: FormStates;
+  responses: Responses;
+  result: SaveResult<P>;
+  successful: readonly FormInput[];
+  allSaved: boolean;
+  emit: (phase: Phase) => void;
+};
+
+type RunStage<P extends readonly AnyForm[]> = {
+  name: string;
+  run: (context: RunContext<P>) => Promise<void>;
+};
+
 export const createOrchestrator = <P extends readonly AnyForm[]>(
   queryClient: QueryClient,
   onChange: (state: SaveState<P>) => void = () => {},
@@ -30,120 +47,13 @@ export const createOrchestrator = <P extends readonly AnyForm[]>(
   let active: Promise<SaveResult<P>> | undefined;
 
   const run = async (config: SaveConfig<P>): Promise<SaveResult<P>> => {
-    const { forms } = config;
-    const undoState = config.undoPayloads ? undefined : captureUndoState(forms);
-    let states = snapshotForms(forms, config.undoFormValues);
-    let responses: Responses = {};
+    const context = createRunContext(config, queryClient, onChange);
 
-    const result = {
-      outcome: "validation-failed",
-      forms: states,
-      responses,
-      followUpErrors: [],
-      undoFormValues: undoState?.formValues,
-      undoPayloads: undoState?.payloads,
-    } as unknown as SaveResult<P>;
-
-    const emit = (phase: Phase, currentStates = states, currentResponses = responses) => {
-      emitProgress(onChange, phase, result, currentStates, currentResponses);
-    };
-
-    // Every snapshot is captured synchronously before any validation starts.
-    emit("validating");
-
-    states = await validateForms(forms, states);
-    const validationPassed = !forms.some((form) => {
-      return states[form.id].failure;
-    });
-
-    if (validationPassed) {
-      const preparedForms = prepareIndependentPayloads(forms, states, config.undoPayloads);
-      states = preparedForms;
+    for (const stage of runStages) {
+      await stage.run(context);
     }
 
-    if (validationPassed) {
-      const saved = await saveFormsInGraph(forms, states, responses, config, emit);
-
-      states = saved.states;
-      responses = saved.responses;
-    }
-
-    states = updateSkippedFormsState(states);
-    result.forms = states as SaveResult<P>["forms"];
-    result.responses = responses as SaveResult<P>["responses"];
-
-    const successful = forms.filter((form) => {
-      return states[form.id].status === "saved";
-    });
-
-    const allSaved = successful.length === forms.length;
-
-    result.outcome = getOutcome(!validationPassed, allSaved);
-
-    const context = (form: FormInput) => {
-      return {
-        queryClient,
-        response: states[form.id].response,
-        variables: states[form.id].variables,
-        results: responses,
-        formValues: states[form.id].formValues,
-        formId: form.id,
-        attempts: states[form.id].attempts,
-        followUpErrors: result.followUpErrors,
-      };
-    };
-
-    // After writes, refresh only successful forms, plus group-level queries.
-    // This includes partial saves; failed and skipped forms have no follow-ups.
-    if (validationPassed) {
-      await waitForProgress(config.progressDelayMs ?? 0);
-
-      emit("refreshing");
-
-      const refreshAndCacheInvalidationErrors = await refreshAndInvalidateCache(
-        successful,
-        config,
-        queryClient,
-      );
-
-      await waitForProgress(config.progressDelayMs ?? 0);
-
-      emit("reconciling");
-
-      const cacheUpdateErrors = reconcileCacheWithMutationResponses(
-        successful,
-        context,
-        result,
-        queryClient,
-        config,
-      );
-
-      const markSavedErrors = await markFormsSaved(successful, states);
-
-      result.followUpErrors.push(
-        ...refreshAndCacheInvalidationErrors,
-        ...cacheUpdateErrors,
-        ...markSavedErrors,
-      );
-    }
-
-    await waitForProgress(config.progressDelayMs ?? 0);
-
-    emit("effects");
-
-    const formCallbackErrors = await invokeFormCallbacks(forms, states, context);
-    const configCallbackErrors = await invokeConfigCallbacks(allSaved, config, result);
-    const formFinishErrors = invokeFormFinish(forms);
-
-    result.followUpErrors.push(...formCallbackErrors, ...configCallbackErrors, ...formFinishErrors);
-
-    if (allSaved && result.followUpErrors.length) {
-      result.outcome = "saved-with-follow-up-errors";
-    }
-
-    emit("complete");
-
-    return result;
+    return context.result;
   };
 
   const submit = (config: SaveConfig<P>): Promise<SaveResult<P>> => {
@@ -194,6 +104,193 @@ export const createOrchestrator = <P extends readonly AnyForm[]>(
     reset,
   };
 };
+
+const createRunContext = <P extends readonly AnyForm[]>(
+  config: SaveConfig<P>,
+  queryClient: QueryClient,
+  onChange: (state: SaveState<P>) => void,
+): RunContext<P> => {
+  const context = {
+    forms: config.forms,
+    config,
+    queryClient,
+    states: {},
+    responses: {},
+    result: {
+      outcome: "validation-failed",
+      forms: {},
+      responses: {},
+      followUpErrors: [],
+    },
+    successful: [],
+    allSaved: false,
+    emit: (phase: Phase) => {},
+  } as unknown as RunContext<P>;
+
+  context.emit = (phase) => {
+    emitProgress(onChange, phase, context.result, context.states, context.responses);
+  };
+
+  return context;
+};
+
+const snapshotStage = async <P extends readonly AnyForm[]>(context: RunContext<P>) => {
+  const undoState = context.config.undoPayloads ? undefined : captureUndoState(context.forms);
+
+  context.states = snapshotForms(context.forms, context.config.undoFormValues);
+  context.result = {
+    outcome: "validation-failed",
+    forms: context.states as SaveResult<P>["forms"],
+    responses: context.responses as SaveResult<P>["responses"],
+    followUpErrors: [],
+    undoFormValues: undoState?.formValues,
+    undoPayloads: undoState?.payloads,
+  };
+
+  // All snapshots are captured synchronously before validation starts.
+  context.emit("validating");
+};
+
+const validateStage = async <P extends readonly AnyForm[]>(context: RunContext<P>) => {
+  context.states = await validateForms(context.forms, context.states);
+};
+
+const hasValidationFailure = (context: RunContext<any>) => {
+  return context.forms.some((form) => context.states[form.id].failure?.phase === "validation");
+};
+
+const preparePayloadStage = async <P extends readonly AnyForm[]>(context: RunContext<P>) => {
+  if (!hasValidationFailure(context)) {
+    context.states = prepareIndependentPayloads(
+      context.forms,
+      context.states,
+      context.config.undoPayloads,
+    );
+  }
+};
+
+const saveStage = async <P extends readonly AnyForm[]>(context: RunContext<P>) => {
+  if (hasValidationFailure(context)) {
+    return;
+  }
+
+  const saved = await saveFormsInGraph(
+    context.forms,
+    context.states,
+    context.responses,
+    context.config,
+    (phase, states, responses) => {
+      context.states = states;
+      context.responses = responses;
+      context.emit(phase);
+    },
+  );
+
+  context.states = saved.states;
+  context.responses = saved.responses;
+};
+
+const finalizeStage = async <P extends readonly AnyForm[]>(context: RunContext<P>) => {
+  context.states = updateSkippedFormsState(context.states);
+  context.result.forms = context.states as SaveResult<P>["forms"];
+  context.result.responses = context.responses as SaveResult<P>["responses"];
+  context.successful = context.forms.filter((form) => context.states[form.id].status === "saved");
+  context.allSaved = context.successful.length === context.forms.length;
+  context.result.outcome = getOutcome(hasValidationFailure(context), context.allSaved);
+};
+
+const getFormContext = (context: RunContext<any>, form: FormInput) => ({
+  queryClient: context.queryClient,
+  response: context.states[form.id].response,
+  variables: context.states[form.id].variables,
+  results: context.responses,
+  formValues: context.states[form.id].formValues,
+  formId: form.id,
+  attempts: context.states[form.id].attempts,
+  followUpErrors: context.result.followUpErrors,
+});
+
+const refreshStage = async <P extends readonly AnyForm[]>(context: RunContext<P>) => {
+  if (hasValidationFailure(context)) {
+    return;
+  }
+
+  await waitForProgress(context.config.progressDelayMs ?? 0);
+  context.emit("refreshing");
+
+  context.result.followUpErrors.push(
+    ...(await refreshAndInvalidateCache(context.successful, context.config, context.queryClient)),
+  );
+};
+
+const reconcileStage = async <P extends readonly AnyForm[]>(context: RunContext<P>) => {
+  if (hasValidationFailure(context)) {
+    return;
+  }
+
+  await waitForProgress(context.config.progressDelayMs ?? 0);
+  context.emit("reconciling");
+
+  context.result.followUpErrors.push(
+    ...reconcileCacheWithMutationResponses(
+      context.successful,
+      (form) => getFormContext(context, form),
+      context.result,
+      context.queryClient,
+      context.config,
+    ),
+  );
+};
+
+const markSavedStage = async <P extends readonly AnyForm[]>(context: RunContext<P>) => {
+  if (hasValidationFailure(context)) {
+    return;
+  }
+
+  context.result.followUpErrors.push(...(await markFormsSaved(context.successful, context.states)));
+};
+
+const effectsStage = async <P extends readonly AnyForm[]>(context: RunContext<P>) => {
+  await waitForProgress(context.config.progressDelayMs ?? 0);
+  context.emit("effects");
+
+  const formCallbackErrors = await invokeFormCallbacks(context.forms, context.states, (form) =>
+    getFormContext(context, form),
+  );
+  const configCallbackErrors = await invokeConfigCallbacks(
+    context.allSaved,
+    context.config,
+    context.result,
+  );
+  const formFinishErrors = invokeFormFinish(context.forms);
+
+  context.result.followUpErrors.push(
+    ...formCallbackErrors,
+    ...configCallbackErrors,
+    ...formFinishErrors,
+  );
+
+  if (context.allSaved && context.result.followUpErrors.length) {
+    context.result.outcome = "saved-with-follow-up-errors";
+  }
+};
+
+const completeStage = async <P extends readonly AnyForm[]>(context: RunContext<P>) => {
+  context.emit("complete");
+};
+
+const runStages: readonly RunStage<any>[] = [
+  { name: "snapshot", run: snapshotStage },
+  { name: "validate", run: validateStage },
+  { name: "prepare-payloads", run: preparePayloadStage },
+  { name: "save", run: saveStage },
+  { name: "finalize", run: finalizeStage },
+  { name: "refresh", run: refreshStage },
+  { name: "reconcile", run: reconcileStage },
+  { name: "mark-saved", run: markSavedStage },
+  { name: "effects", run: effectsStage },
+  { name: "complete", run: completeStage },
+];
 
 const preflightFormsChecks = <P extends readonly AnyForm[]>(forms: P): Error[] => {
   const ids = new Set(
@@ -398,7 +495,6 @@ const validateForms = async (
             ? { ...state, status: "ready" }
             : getFailedState(state, "validation", validation.error),
         ];
-
       } catch (error) {
         return [form.id, getFailedState(state, "validation", error)];
       }
@@ -448,16 +544,12 @@ const prepareIndependentPayloads = (
       }
 
       try {
-
         return [
           form.id,
           { ...state, variables: getVariablesWithOverrides(form, state, {}, payloadOverrides) },
         ];
-
       } catch (error) {
-
         return [form.id, getFailedState(state, "mapping", error)];
-
       }
     }),
   );
@@ -493,7 +585,6 @@ const captureUndoState = (forms: readonly FormInput[]) => {
     );
 
     while (remaining.size) {
-
       const ready = forms.filter((form) => {
         return (
           remaining.has(form.id) &&
@@ -569,25 +660,19 @@ const invokeFormCallbacks = async (
   const callbackErrors: FollowUpError[] = [];
 
   for (const form of forms) {
-
     try {
-
       if (states[form.id].status === "saved") {
         await form.onSuccess?.(context(form));
       } else if (states[form.id].failure) {
         await form.onFailure?.(states[form.id].failure!);
       }
-
     } catch (error) {
-
       callbackErrors.push({
         phase: "effect",
         formId: form.id,
         error,
       });
-
     }
-
   }
 
   return callbackErrors;
