@@ -60,7 +60,7 @@ export const useThreadEditForms = (id: string) => {
   const save = useFormOrchestrator({
     forms: [profile.form, entityForm] as const,
     onSuccess: () => {
-      return navigate({ to: "/threads/$threadId", params: { threadId: id }, search: {} });
+      return navigate({ to: "/form-demo/threads/$threadId", params: { threadId: id }, search: {} });
     },
   });
 

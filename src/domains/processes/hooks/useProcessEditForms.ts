@@ -50,7 +50,11 @@ export const useProcessEditForms = (id: string) => {
   const save = useFormOrchestrator({
     forms: [profile.form, entityForm] as const,
     onSuccess: () => {
-      return navigate({ to: "/processes/$processId", params: { processId: id }, search: {} });
+      return navigate({
+        to: "/form-demo/processes/$processId",
+        params: { processId: id },
+        search: {},
+      });
     },
   });
 

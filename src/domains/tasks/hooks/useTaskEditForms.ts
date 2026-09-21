@@ -57,7 +57,7 @@ export const useTaskEditForms = (id: string) => {
   const save = useFormOrchestrator({
     forms: [profile.form, entityForm] as const,
     onSuccess: () => {
-      return navigate({ to: "/tasks/$taskId", params: { taskId: id }, search: {} });
+      return navigate({ to: "/form-demo/tasks/$taskId", params: { taskId: id }, search: {} });
     },
   });
 

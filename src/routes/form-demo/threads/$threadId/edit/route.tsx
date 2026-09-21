@@ -1,18 +1,21 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { TaskEditPage } from "../../TaskPages";
-const TaskEditRoute = () => {
-  const { taskId } = Route.useParams();
+import { ThreadEditPage } from "../../../../threads/ThreadPages";
+
+const ThreadEditRoute = () => {
+  const { threadId } = Route.useParams();
 
   const { tab } = Route.useSearch();
 
   const navigate = Route.useNavigate();
 
   return (
-    <TaskEditPage
-      id={taskId}
+    <ThreadEditPage
+      id={threadId}
       activeTab={tab === "profile" ? "profile" : "entity"}
       onActiveTabChange={(nextTab) => navigate({ search: { tab: nextTab } })}
     />
   );
 };
-export const Route = createFileRoute("/tasks/$taskId/edit")({ component: TaskEditRoute });
+export const Route = createFileRoute("/form-demo/threads/$threadId/edit")({
+  component: ThreadEditRoute,
+});

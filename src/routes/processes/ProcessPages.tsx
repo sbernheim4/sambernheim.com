@@ -9,7 +9,6 @@ import { useExecutionProfile } from "../../domains/execution-profiles/hooks/useE
 import { ProcessFields } from "../../domains/processes/components/ProcessFields";
 import {
   RuntimeDetailLayout,
-  RuntimeShell,
   Loading,
   Missing,
   Status,
@@ -20,7 +19,7 @@ export const ProcessListPage = () => {
   const query = useProcesses();
 
   return (
-    <RuntimeShell>
+    <>
       <h1>Processes</h1>
       {query.isPending ? (
         <p>Loading...</p>
@@ -30,7 +29,7 @@ export const ProcessListPage = () => {
             <Link
               key={process.id}
               className="runtime-card"
-              to="/processes/$processId"
+              to="/form-demo/processes/$processId"
               params={{ processId: process.id }}
             >
               <strong>{process.name}</strong>
@@ -40,7 +39,7 @@ export const ProcessListPage = () => {
           ))}
         </div>
       )}
-    </RuntimeShell>
+    </>
   );
 };
 
@@ -60,12 +59,12 @@ export const ProcessDetailPage = ({ id }: { id: string }) => {
   const task = tasks.data?.find((item) => item.id === process.data?.taskId);
 
   return (
-    <RuntimeDetailLayout title={process.data.name} editTo={`/processes/${id}/edit`}>
+    <RuntimeDetailLayout title={process.data.name} editTo={`/form-demo/processes/${id}/edit`}>
       <section className="runtime-details">
         <p>
           Task:{" "}
           {task ? (
-            <Link to="/tasks/$taskId" params={{ taskId: task.id }}>
+            <Link to="/form-demo/tasks/$taskId" params={{ taskId: task.id }}>
               {task.name}
             </Link>
           ) : (
@@ -79,7 +78,11 @@ export const ProcessDetailPage = ({ id }: { id: string }) => {
         <h2>Threads</h2>
         <ChildList>
           {threads.data?.map((thread) => (
-            <Link key={thread.id} to="/threads/$threadId" params={{ threadId: thread.id }}>
+            <Link
+              key={thread.id}
+              to="/form-demo/threads/$threadId"
+              params={{ threadId: thread.id }}
+            >
               {thread.name}
             </Link>
           ))}
@@ -109,37 +112,39 @@ export const ProcessEditPage = ({
   }
 
   return (
-    <RuntimeShell>
-      <FormEditor.Provider
-        mode="edit"
-        isEditing
-        defaultTab="entity"
-        activeTab={activeTab}
-        onActiveTabChange={onActiveTabChange}
-        actions={save.actions}
-        onCancel={() =>
-          navigate({ to: "/processes/$processId", params: { processId: id }, search: {} })
-        }
-      >
-        <div className="runtime-editor-heading">
-          <h1>Edit Process</h1>
-        </div>
+    <FormEditor.Provider
+      mode="edit"
+      isEditing
+      defaultTab="entity"
+      activeTab={activeTab}
+      onActiveTabChange={onActiveTabChange}
+      actions={save.actions}
+      onCancel={() =>
+        navigate({
+          to: "/form-demo/processes/$processId",
+          params: { processId: id },
+          search: {},
+        })
+      }
+    >
+      <div className="runtime-editor-heading">
+        <h1>Edit Process</h1>
+      </div>
 
-        <FormEditor.TabList>
-          <FormEditor.TabTrigger name="entity" label="Process" />
-          <FormEditor.TabTrigger name="profile" label="Execution Profile" />
-        </FormEditor.TabList>
+      <FormEditor.TabList>
+        <FormEditor.TabTrigger name="entity" label="Process" />
+        <FormEditor.TabTrigger name="profile" label="Execution Profile" />
+      </FormEditor.TabList>
 
-        <FormEditor.Tab name="entity">
-          <ProcessFields form={entityForm.form} />
-        </FormEditor.Tab>
+      <FormEditor.Tab name="entity">
+        <ProcessFields form={entityForm.form} />
+      </FormEditor.Tab>
 
-        <FormEditor.Tab name="profile">
-          <ExecutionProfileFields form={profileForm.form} />
-        </FormEditor.Tab>
+      <FormEditor.Tab name="profile">
+        <ExecutionProfileFields form={profileForm.form} />
+      </FormEditor.Tab>
 
-        <FormEditor.Actions />
-      </FormEditor.Provider>
-    </RuntimeShell>
+      <FormEditor.Actions />
+    </FormEditor.Provider>
   );
 };

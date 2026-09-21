@@ -8,7 +8,6 @@ import { useExecutionProfile } from "../../domains/execution-profiles/hooks/useE
 import { ThreadFields } from "../../domains/threads/components/ThreadFields";
 import {
   RuntimeDetailLayout,
-  RuntimeShell,
   Loading,
   Missing,
   Status,
@@ -19,7 +18,7 @@ export const ThreadListPage = () => {
   const query = useThreads();
 
   return (
-    <RuntimeShell>
+    <>
       <h1>Threads</h1>
       {query.isPending ? (
         <p>Loading...</p>
@@ -29,7 +28,7 @@ export const ThreadListPage = () => {
             <Link
               key={thread.id}
               className="runtime-card"
-              to="/threads/$threadId"
+              to="/form-demo/threads/$threadId"
               params={{ threadId: thread.id }}
             >
               <strong>{thread.name}</strong>
@@ -39,7 +38,7 @@ export const ThreadListPage = () => {
           ))}
         </div>
       )}
-    </RuntimeShell>
+    </>
   );
 };
 
@@ -57,7 +56,7 @@ export const ThreadDetailPage = ({ id }: { id: string }) => {
   const process = processes.data?.find((item) => item.id === thread.data?.processId);
 
   return (
-    <RuntimeDetailLayout title={thread.data.name} editTo={`/threads/${id}/edit`}>
+    <RuntimeDetailLayout title={thread.data.name} editTo={`/form-demo/threads/${id}/edit`}>
       <section className="runtime-details">
         <p>Entry point: {thread.data.entryPoint}</p>
         <Status value={thread.data.status} />
@@ -65,7 +64,7 @@ export const ThreadDetailPage = ({ id }: { id: string }) => {
         <p>
           Process:{" "}
           {process ? (
-            <Link to="/processes/$processId" params={{ processId: process.id }}>
+            <Link to="/form-demo/processes/$processId" params={{ processId: process.id }}>
               {process.name}
             </Link>
           ) : (
@@ -99,33 +98,35 @@ export const ThreadEditPage = ({
   }
 
   return (
-    <RuntimeShell>
-      <FormEditor.Provider
-        mode="edit"
-        isEditing
-        defaultTab="entity"
-        activeTab={activeTab}
-        onActiveTabChange={onActiveTabChange}
-        actions={save.actions}
-        onCancel={() =>
-          navigate({ to: "/threads/$threadId", params: { threadId: id }, search: {} })
-        }
-      >
-        <div className="runtime-editor-heading">
-          <h1>Edit Thread</h1>
-        </div>
-        <FormEditor.TabList>
-          <FormEditor.TabTrigger name="entity" label="Thread" />
-          <FormEditor.TabTrigger name="profile" label="Execution Profile" />
-        </FormEditor.TabList>
-        <FormEditor.Tab name="entity">
-          <ThreadFields form={entityForm.form} />
-        </FormEditor.Tab>
-        <FormEditor.Tab name="profile">
-          <ExecutionProfileFields form={profileForm.form} />
-        </FormEditor.Tab>
-        <FormEditor.Actions />
-      </FormEditor.Provider>
-    </RuntimeShell>
+    <FormEditor.Provider
+      mode="edit"
+      isEditing
+      defaultTab="entity"
+      activeTab={activeTab}
+      onActiveTabChange={onActiveTabChange}
+      actions={save.actions}
+      onCancel={() =>
+        navigate({
+          to: "/form-demo/threads/$threadId",
+          params: { threadId: id },
+          search: {},
+        })
+      }
+    >
+      <div className="runtime-editor-heading">
+        <h1>Edit Thread</h1>
+      </div>
+      <FormEditor.TabList>
+        <FormEditor.TabTrigger name="entity" label="Thread" />
+        <FormEditor.TabTrigger name="profile" label="Execution Profile" />
+      </FormEditor.TabList>
+      <FormEditor.Tab name="entity">
+        <ThreadFields form={entityForm.form} />
+      </FormEditor.Tab>
+      <FormEditor.Tab name="profile">
+        <ExecutionProfileFields form={profileForm.form} />
+      </FormEditor.Tab>
+      <FormEditor.Actions />
+    </FormEditor.Provider>
   );
 };
