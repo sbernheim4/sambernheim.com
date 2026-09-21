@@ -1,37 +1,38 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { FormEditor } from "../../forms/components";
 import { ExecutionProfileFields } from "../../domains/execution-profiles/components/ExecutionProfileFields";
-import { useTasks, useTask } from "../../domains/tasks/hooks/useTasks";
-import { useTaskEditForms } from "../../domains/tasks/hooks/useTaskEditForms";
-import { useProcesses } from "../../domains/processes/hooks/useProcesses";
+import { useProcesses, useProcess } from "../../domains/processes/hooks/useProcesses";
+import { useProcessEditForms } from "../../domains/processes/hooks/useProcessEditForms";
+import { useThreads } from "../../domains/threads/hooks/useThreads";
+import { useTasks } from "../../domains/tasks/hooks/useTasks";
 import { useExecutionProfile } from "../../domains/execution-profiles/hooks/useExecutionProfile";
-import { TaskFields } from "../../domains/tasks/components/TaskFields";
-import { DetailLayout, Loading, Missing, Status } from "../form-demo/components/Layout";
-import { ChildList, ProfileSummary } from "../form-demo/components/DetailHelpers";
-import { DetailView } from "../form-demo/components/DetailView";
-import { ViewModePicker, useViewModePreference } from "../form-demo/components/ViewModePreference";
+import { ProcessFields } from "../../domains/processes/components/ProcessFields";
+import { DetailLayout, Loading, Missing, Status } from "../form-demo/components/-Layout";
+import { ChildList, ProfileSummary } from "../form-demo/components/-DetailHelpers";
+import { DetailView } from "../form-demo/components/-DetailView";
+import { ViewModePicker, useViewModePreference } from "../form-demo/components/-ViewModePreference";
 
-export const TaskListPage = () => {
-  const query = useTasks();
+export const ProcessListPage = () => {
+  const query = useProcesses();
 
   return (
     <>
-      <h1>Tasks</h1>
+      <h1>Processes</h1>
       {query.isPending ? (
         <p>Loading...</p>
       ) : (
         <div className="list">
-          {query.data?.map((task) => {
+          {query.data?.map((process) => {
             return (
               <Link
-                key={task.id}
+                key={process.id}
                 className="card"
-                to="/form-demo/tasks/$taskId"
-                params={{ taskId: task.id }}
+                to="/form-demo/processes/$processId"
+                params={{ processId: process.id }}
               >
-                <strong>{task.name}</strong>
-                <Status value={task.status} />
-                <span>{task.description}</span>
+                <strong>{process.name}</strong>
+                <Status value={process.status} />
+                <span>{process.command}</span>
               </Link>
             );
           })}
@@ -41,19 +42,25 @@ export const TaskListPage = () => {
   );
 };
 
-export const TaskDetailPage = ({ id }: { id: string }) => {
-  const task = useTask(id);
-  const processes = useProcesses(id);
-  if (task.isPending) {
+export const ProcessDetailPage = ({ id }: { id: string }) => {
+  const process = useProcess(id);
+  const threads = useThreads(id);
+  const tasks = useTasks();
+
+  if (process.isPending) {
     return <Loading />;
   }
 
-  if (!task.data) {
+  if (!process.data) {
     return <Missing />;
   }
 
+  const task = tasks.data?.find((item) => {
+    return item.id === process.data?.taskId;
+  });
+
   return (
-    <DetailLayout title={task.data.name} editTo={`/form-demo/tasks/${id}/edit`}>
+    <DetailLayout title={process.data.name} editTo={`/form-demo/processes/${id}/edit`}>
       <DetailView
         tabs={[
           {
@@ -63,16 +70,22 @@ export const TaskDetailPage = ({ id }: { id: string }) => {
               <section className="details">
                 <div className="summary-grid">
                   <div>
-                    <span className="eyebrow">Description</span>
-                    <p>{task.data.description}</p>
+                    <span className="eyebrow">Task</span>
+                    {task ? (
+                      <Link to="/form-demo/tasks/$taskId" params={{ taskId: task.id }}>
+                        {task.name}
+                      </Link>
+                    ) : (
+                      <strong>{process.data.taskId}</strong>
+                    )}
                   </div>
                   <div>
-                    <span className="eyebrow">Priority</span>
-                    <strong>{task.data.priority}</strong>
+                    <span className="eyebrow">Command</span>
+                    <strong>{process.data.command}</strong>
                   </div>
                   <div>
                     <span className="eyebrow">Status</span>
-                    <Status value={task.data.status} />
+                    <Status value={process.data.status} />
                   </div>
                 </div>
               </section>
@@ -83,25 +96,25 @@ export const TaskDetailPage = ({ id }: { id: string }) => {
             label: "Execution Profile",
             children: (
               <section className="details">
-                <ProfileSummary id={task.data.executionProfileId} />
+                <ProfileSummary id={process.data.executionProfileId} />
               </section>
             ),
           },
           {
-            value: "processes",
-            label: "Processes",
+            value: "threads",
+            label: "Threads",
             children: (
               <section className="details">
                 <ChildList>
-                  {processes.data?.map((process) => {
+                  {threads.data?.map((thread) => {
                     return (
                       <Link
-                        key={process.id}
-                        to="/form-demo/processes/$processId"
-                        params={{ processId: process.id }}
+                        key={thread.id}
+                        to="/form-demo/threads/$threadId"
+                        params={{ threadId: thread.id }}
                       >
-                        <span>{process.name}</span>
-                        <span className="relationship-meta">{process.command}</span>
+                        <span>{thread.name}</span>
+                        <span className="relationship-meta">{thread.entryPoint}</span>
                       </Link>
                     );
                   })}
@@ -115,7 +128,7 @@ export const TaskDetailPage = ({ id }: { id: string }) => {
   );
 };
 
-export const TaskEditPage = ({
+export const ProcessEditPage = ({
   id,
   activeTab,
   onActiveTabChange,
@@ -125,11 +138,11 @@ export const TaskEditPage = ({
   onActiveTabChange: (tab: string) => void;
 }) => {
   const navigate = useNavigate();
-  const query = useTask(id);
+  const query = useProcess(id);
   const profile = useExecutionProfile(query.data?.executionProfileId ?? "");
   const { mode, updateMode } = useViewModePreference();
 
-  const { entityForm, profileForm, save } = useTaskEditForms(id);
+  const { entityForm, profileForm, save } = useProcessEditForms(id);
 
   if (query.isPending || profile.isPending) {
     return <Loading />;
@@ -145,23 +158,31 @@ export const TaskEditPage = ({
       onActiveTabChange={onActiveTabChange}
       actions={save.actions}
       onCancel={() => {
-        return navigate({ to: "/form-demo/tasks/$taskId", params: { taskId: id }, search: {} });
+        return navigate({
+          to: "/form-demo/processes/$processId",
+          params: { processId: id },
+          search: {},
+        });
       }}
     >
       <div className="editor-heading">
-        <h1>Edit Task</h1>
+        <h1>Edit Process</h1>
         <ViewModePicker mode={mode} onChange={updateMode} />
       </div>
+
       <FormEditor.TabList>
-        <FormEditor.TabTrigger name="entity" label="Task" />
+        <FormEditor.TabTrigger name="entity" label="Process" />
         <FormEditor.TabTrigger name="profile" label="Execution Profile" />
       </FormEditor.TabList>
+
       <FormEditor.Tab name="entity">
-        <TaskFields form={entityForm.form} />
+        <ProcessFields form={entityForm.form} />
       </FormEditor.Tab>
+
       <FormEditor.Tab name="profile">
         <ExecutionProfileFields form={profileForm.form} />
       </FormEditor.Tab>
+
       <FormEditor.OrchestratorProgress />
 
       <FormEditor.OrchestratorStatus />

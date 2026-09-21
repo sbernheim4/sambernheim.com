@@ -2,14 +2,14 @@ import assert from "node:assert/strict";
 import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { expect, test } from "vitest";
-import { DetailTabs } from "../src/routes/form-demo/components/DetailTabs";
-import { DetailView } from "../src/routes/form-demo/components/DetailView";
-import { ChildList } from "../src/routes/form-demo/components/DetailHelpers";
-import { Loading, Missing, Status } from "../src/routes/form-demo/components/Layout";
+import { DetailTabs } from "../src/routes/form-demo/components/-DetailTabs";
+import { DetailView } from "../src/routes/form-demo/components/-DetailView";
+import { ChildList } from "../src/routes/form-demo/components/-DetailHelpers";
+import { Loading, Missing, Status } from "../src/routes/form-demo/components/-Layout";
 import {
   ViewModePicker,
   useViewModePreference,
-} from "../src/routes/form-demo/components/ViewModePreference";
+} from "../src/routes/form-demo/components/-ViewModePreference";
 import { profileToForm } from "../src/domains/execution-profiles/components/ExecutionProfileFields";
 import { processToForm } from "../src/domains/processes/components/ProcessFields";
 import { taskToForm } from "../src/domains/tasks/components/TaskFields";
