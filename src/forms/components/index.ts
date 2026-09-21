@@ -8,6 +8,7 @@ import {
   FormEditorOrchestratorProgress,
   FormEditorOrchestratorStatus,
 } from "./FormEditorOrchestratorProgress";
+import { FormEditorUndo } from "./FormEditorUndo";
 import { FormEditorProvider } from "./FormEditorProvider";
 import { FormEditorTab } from "./FormEditorTab";
 import { FormEditorTabList } from "./FormEditorTabList";
@@ -26,6 +27,7 @@ export const FormEditor = {
   Main: FormEditorMain,
   OrchestratorProgress: FormEditorOrchestratorProgress,
   OrchestratorStatus: FormEditorOrchestratorStatus,
+  Undo: FormEditorUndo,
   Provider: FormEditorProvider,
   Tab: FormEditorTab,
   TabList: FormEditorTabList,

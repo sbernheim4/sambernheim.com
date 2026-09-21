@@ -195,6 +195,20 @@ export const useComposableForm = <
       inFlight.current = true;
       return form.state.values;
     },
+    undoSnapshot: () => {
+      const queryData = config.query?.data;
+
+      if (queryData === undefined) {
+        throw new Error("Form data is not available for undo.");
+      }
+
+      const toFormData = config.toFormData as ((data: QueryData) => Values) | undefined;
+
+      return toFormData ? toFormData(queryData as QueryData) : (queryData as Values);
+    },
+    undoResponse: () => {
+      return config.query?.data;
+    },
     validate: () => {
       return validateForm(form);
     },

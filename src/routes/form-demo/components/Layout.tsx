@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
+import { FormEditor } from "../../../forms/components";
 import "./Layout.css";
 
 export const Shell = ({ children }: { children: ReactNode }) => {
@@ -32,6 +33,7 @@ export const DetailLayout = ({
           Edit
         </Link>
       </div>
+      <FormEditor.Undo />
       {children}
     </>
   );

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import type { AnyForm, SaveConfig } from "../orchestration/types";
 import { createOrchestrator, type SaveState } from "../orchestration/orchestrator";
+import { setFormUndoTransaction } from "../orchestration/undoStore";
 import { combineFormEditorActionStates, type FormEditorActionStatus } from "./useFormActionState";
 import { usePersistedFormData, type PersistedFormBinding } from "./usePersistedFormData";
 
@@ -124,12 +125,50 @@ export const useFormOrchestrator = <const T extends readonly SavableForm[]>(
     const {
       includePristine: _includePristine,
       persistDraftKey: _persistDraftKey,
+      onProgressClose: _onProgressClose,
+      onSuccess,
       ...submitConfig
     } = latest.current;
+
+    const registerUndo = (result: NonNullable<Awaited<ReturnType<typeof orchestrator.submit>>>) => {
+      if (!result.undoFormValues || !result.undoPayloads) {
+        return;
+      }
+
+      const undoConfig = {
+        ...submitConfig,
+        forms,
+        progressDelayMs: 0,
+        onSuccess: undefined,
+        onFailure: undefined,
+        onProgressClose: undefined,
+        undoFormValues: result.undoFormValues,
+        undoPayloads: result.undoPayloads,
+      };
+
+      setFormUndoTransaction({
+        id: String(Date.now()),
+        expiresAt: Date.now() + 10_000,
+        formIds: forms.map((form) => {
+          return form.id;
+        }),
+        undo: async () => {
+          await orchestrator.submit(undoConfig);
+        },
+      });
+    };
 
     return orchestrator.submit({
       ...submitConfig,
       forms,
+      onProgressClose: _onProgressClose,
+      onSuccess: async ({ result }) => {
+        if (result.outcome === "success" || result.outcome === "saved-with-follow-up-errors") {
+          registerUndo(result);
+        }
+
+        return onSuccess?.({ result });
+      },
     });
   };
 
