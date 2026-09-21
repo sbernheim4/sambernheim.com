@@ -1,6 +1,6 @@
-import type { DetailTab } from "./DetailTabs";
-import { DetailTabs } from "./DetailTabs";
-import { ViewModePicker, useViewModePreference } from "./ViewModePreference";
+import type { DetailTab } from "./-DetailTabs";
+import { DetailTabs } from "./-DetailTabs";
+import { ViewModePicker, useViewModePreference } from "./-ViewModePreference";
 import "./DetailView.css";
 
 export const DetailView = ({ tabs }: { tabs: readonly DetailTab[] }) => {

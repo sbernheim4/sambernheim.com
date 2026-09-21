@@ -6,10 +6,10 @@ import { useThreadEditForms } from "../../domains/threads/hooks/useThreadEditFor
 import { useProcesses } from "../../domains/processes/hooks/useProcesses";
 import { useExecutionProfile } from "../../domains/execution-profiles/hooks/useExecutionProfile";
 import { ThreadFields } from "../../domains/threads/components/ThreadFields";
-import { DetailLayout, Loading, Missing, Status } from "../form-demo/components/Layout";
-import { ProfileSummary } from "../form-demo/components/DetailHelpers";
-import { DetailView } from "../form-demo/components/DetailView";
-import { ViewModePicker, useViewModePreference } from "../form-demo/components/ViewModePreference";
+import { DetailLayout, Loading, Missing, Status } from "../form-demo/components/-Layout";
+import { ProfileSummary } from "../form-demo/components/-DetailHelpers";
+import { DetailView } from "../form-demo/components/-DetailView";
+import { ViewModePicker, useViewModePreference } from "../form-demo/components/-ViewModePreference";
 
 export const ThreadListPage = () => {
   const query = useThreads();

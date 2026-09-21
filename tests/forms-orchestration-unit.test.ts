@@ -3,6 +3,7 @@ import { QueryClient } from "@tanstack/react-query";
 import { compileSavePlan } from "../src/forms/orchestration/plan";
 import { executeGraph } from "../src/forms/orchestration/scheduler";
 import { updateCacheWithMutationResponse } from "../src/forms/orchestration/effects";
+import { createOrchestrator } from "../src/forms/orchestration/orchestrator";
 import type { AnyForm } from "../src/forms/orchestration/types";
 
 const form = (id: string, dependencies: readonly string[] = []): AnyForm => {
@@ -161,4 +162,19 @@ test("does not overwrite cache data when a cache mapper returns undefined", () =
 
   expect(errors).toEqual([]);
   expect(queryClient.getQueryData(["resource"])).toEqual({ existing: true });
+});
+
+test("runs finish cleanup when a pipeline stage rejects", async () => {
+  let finishCalls = 0;
+  const failure = new Error("stage failed");
+  const saveForm = form("save");
+  saveForm.finish = () => {
+    finishCalls += 1;
+  };
+  const orchestrator = createOrchestrator(new QueryClient(), () => {
+    throw failure;
+  });
+
+  await expect(orchestrator.submit({ forms: [saveForm] })).rejects.toBe(failure);
+  expect(finishCalls).toBe(1);
 });

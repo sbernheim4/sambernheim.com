@@ -56,23 +56,23 @@ export const saveFormsInGraph = async <P extends readonly AnyForm[]>(
           throw new PayloadMappingError(error);
         }
 
-          const current = runtime.forms[id];
-          const retry = resolveRetryPolicy(node.form, config.retry);
-          return saveFormWithRetry(
-            node.form,
-            { ...current, variables },
-            retry,
-            (progress) => {
-              runtime = reduceRuntimeState(
-                runtime,
-                progress.status === "retrying"
-                  ? { type: "form.retrying", id }
-                  : { type: "form.saving", id, attempt: progress.attempts },
-              );
-              emit("saving", runtime.forms, runtime.responses);
-            },
-            config.progressDelayMs ?? 0,
-          );
+        const current = runtime.forms[id];
+        const retry = resolveRetryPolicy(node.form, config.retry);
+        return saveFormWithRetry(
+          node.form,
+          { ...current, variables },
+          retry,
+          (progress) => {
+            runtime = reduceRuntimeState(
+              runtime,
+              progress.status === "retrying"
+                ? { type: "form.retrying", id }
+                : { type: "form.saving", id, attempt: progress.attempts },
+            );
+            emit("saving", runtime.forms, runtime.responses);
+          },
+          config.progressDelayMs ?? 0,
+        );
       },
     });
   }

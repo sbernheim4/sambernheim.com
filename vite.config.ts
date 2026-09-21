@@ -24,9 +24,6 @@ export default defineConfig({
     }),
     tanstackStart({
       srcDirectory: "src",
-      router: {
-        routeFileIgnorePattern: "(TaskPages|ProcessPages|ThreadPages)\\.tsx$",
-      },
     }),
     viteReact(),
   ],
