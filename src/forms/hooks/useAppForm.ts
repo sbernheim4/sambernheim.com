@@ -1,6 +1,12 @@
 import { createFormHook } from "@tanstack/react-form";
 import { fieldContext, formContext } from "../context";
-import { TextField, SelectField, RadioGroupField, SubmitButton } from "../components/fields";
+import {
+  AutocompleteField,
+  TextField,
+  SelectField,
+  RadioGroupField,
+  SubmitButton,
+} from "../components/fields";
 
 export const { useAppForm } = createFormHook({
   fieldContext,
@@ -9,6 +15,7 @@ export const { useAppForm } = createFormHook({
     TextField,
     SelectField,
     RadioGroupField,
+    AutocompleteField,
   },
   formComponents: {
     SubmitButton,
