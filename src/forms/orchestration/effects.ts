@@ -18,32 +18,18 @@ export type EffectContext = CacheContext<any, any, any> & {
   followUpErrors?: FollowUpError[];
 };
 
-export const settleRefreshes = async (
-  queryClient: QueryClient,
-  sources: readonly (RefreshOptions & { formId?: string })[],
-): Promise<FollowUpError[]> => {
-  const queue = sources.flatMap((source) => {
-    return [
-      ...(source.invalidateQueryKeys ?? []).map((queryKey) => {
-        return {
-          formId: source.formId,
-          run: () => {
-            return queryClient.invalidateQueries(
-              { queryKey },
-              { cancelRefetch: false, throwOnError: true },
-            );
-          },
-        };
-      }),
-      ...(source.refetchFunctions ?? []).map((run) => {
-        return { formId: source.formId, run };
-      }),
-    ];
-  });
+export type Effect = {
+  phase: FollowUpError["phase"];
+  formId?: string;
+  run: () => unknown | Promise<unknown>;
+};
 
+export const executeSettledEffects = async (
+  effects: readonly Effect[],
+): Promise<FollowUpError[]> => {
   const settled = await Promise.allSettled(
-    queue.map(async ({ run }) => {
-      const value = await run();
+    effects.map(async (effect) => {
+      const value = await effect.run();
       if (
         value &&
         typeof value === "object" &&
@@ -55,12 +41,52 @@ export const settleRefreshes = async (
       }
     }),
   );
-
   return settled.flatMap((entry, index) => {
     return entry.status === "rejected"
-      ? [{ phase: "refresh" as const, formId: queue[index].formId, error: entry.reason }]
+      ? [{ phase: effects[index].phase, formId: effects[index].formId, error: entry.reason }]
       : [];
   });
+};
+
+export const executeOrderedEffects = async (
+  effects: readonly Effect[],
+): Promise<FollowUpError[]> => {
+  const errors: FollowUpError[] = [];
+  for (const effect of effects) {
+    try {
+      await effect.run();
+    } catch (error) {
+      errors.push({ phase: effect.phase, formId: effect.formId, error });
+    }
+  }
+  return errors;
+};
+
+export const settleRefreshes = async (
+  queryClient: QueryClient,
+  sources: readonly (RefreshOptions & { formId?: string })[],
+): Promise<FollowUpError[]> => {
+  const queue: Effect[] = sources.flatMap((source) => {
+    return [
+      ...(source.invalidateQueryKeys ?? []).map((queryKey) => {
+        return {
+          phase: "refresh" as const,
+          formId: source.formId,
+          run: () => {
+            return queryClient.invalidateQueries(
+              { queryKey },
+              { cancelRefetch: false, throwOnError: true },
+            );
+          },
+        };
+      }),
+      ...(source.refetchFunctions ?? []).map((run) => {
+        return { phase: "refresh" as const, formId: source.formId, run };
+      }),
+    ];
+  });
+
+  return executeSettledEffects(queue);
 };
 
 export const refreshAndInvalidateCache = async <P extends readonly AnyForm[]>(
@@ -132,15 +158,17 @@ export const markFormsSaved = async (
   forms: readonly FormInput[],
   states: Readonly<Record<string, FormSaveState<any, any, any>>>,
 ) => {
-  const errors: FollowUpError[] = [];
-  for (const form of forms) {
-    try {
-      await form.markSaved?.(structuredClone(states[form.id].formValues));
-    } catch (error) {
-      errors.push({ phase: "form-state", formId: form.id, error });
-    }
-  }
-  return errors;
+  return executeOrderedEffects(
+    forms.map((form) => {
+      return {
+        phase: "form-state" as const,
+        formId: form.id,
+        run: () => {
+          return form.markSaved?.(structuredClone(states[form.id].formValues));
+        },
+      };
+    }),
+  );
 };
 
 export const invokeFormCallbacks = async (
@@ -148,19 +176,22 @@ export const invokeFormCallbacks = async (
   states: Readonly<Record<string, FormSaveState<any, any, any>>>,
   context: (form: FormInput) => EffectContext,
 ) => {
-  const errors: FollowUpError[] = [];
-  for (const form of forms) {
-    try {
-      if (states[form.id].status === "saved") {
-        await form.onSuccess?.(context(form));
-      } else if (states[form.id].failure) {
-        await form.onFailure?.(states[form.id].failure);
-      }
-    } catch (error) {
-      errors.push({ phase: "effect", formId: form.id, error });
-    }
-  }
-  return errors;
+  return executeOrderedEffects(
+    forms.map((form) => {
+      return {
+        phase: "effect" as const,
+        formId: form.id,
+        run: () => {
+          if (states[form.id].status === "saved") {
+            return form.onSuccess?.(context(form));
+          }
+          if (states[form.id].failure) {
+            return form.onFailure?.(states[form.id].failure);
+          }
+        },
+      };
+    }),
+  );
 };
 
 export const invokeConfigCallbacks = async <P extends readonly AnyForm[]>(
@@ -168,22 +199,26 @@ export const invokeConfigCallbacks = async <P extends readonly AnyForm[]>(
   config: SaveConfig<P>,
   result: SaveResult<P>,
 ) => {
-  try {
-    await (allSaved ? config.onSuccess : config.onFailure)?.({ result });
-    return [];
-  } catch (error) {
-    return [{ phase: "effect" as const, error }];
-  }
+  return executeOrderedEffects([
+    {
+      phase: "effect",
+      run: () => {
+        return (allSaved ? config.onSuccess : config.onFailure)?.({ result });
+      },
+    },
+  ]);
 };
 
 export const invokeFormFinish = (forms: readonly FormInput[]) => {
-  const errors: FollowUpError[] = [];
-  for (const form of forms) {
-    try {
-      form.finish?.();
-    } catch (error) {
-      errors.push({ phase: "form-state", formId: form.id, error });
-    }
-  }
-  return errors;
+  return executeOrderedEffects(
+    forms.map((form) => {
+      return {
+        phase: "form-state" as const,
+        formId: form.id,
+        run: () => {
+          return form.finish?.();
+        },
+      };
+    }),
+  );
 };

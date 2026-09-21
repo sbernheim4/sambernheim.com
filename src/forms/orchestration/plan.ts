@@ -3,16 +3,22 @@ import type { AnyForm, FormInput } from "./types";
 export type SaveNode = {
   id: string;
   form: FormInput;
-  dependencies: readonly string[];
+  prerequisites: readonly string[];
   dependents: readonly string[];
+  /** @deprecated Use prerequisites and dependents. */
+  dependencies: readonly string[];
 };
 
 export type SavePlan = {
   nodes: ReadonlyMap<string, SaveNode>;
   order: readonly string[];
+  mode: "save" | "undo";
 };
 
-export const compileSavePlan = <P extends readonly AnyForm[]>(forms: P) => {
+export const compileSavePlan = <P extends readonly AnyForm[]>(
+  forms: P,
+  mode: "save" | "undo" = "save",
+) => {
   const errors: Error[] = [];
   const byId = new Map<string, FormInput>();
   const seen = new Set<string>();
@@ -74,20 +80,32 @@ export const compileSavePlan = <P extends readonly AnyForm[]>(forms: P) => {
     nodes.set(form.id, {
       id: form.id,
       form,
+      prerequisites: (() => {
+        return (
+          (mode === "undo"
+            ? dependents.get(form.id)
+            : form.dependencies?.map(({ id }) => {
+                return id;
+              })) ?? []
+        );
+      })(),
+      dependents: dependents.get(form.id) ?? [],
       dependencies: (form.dependencies ?? []).map(({ id }) => {
         return id;
       }),
-      dependents: dependents.get(form.id) ?? [],
     });
   }
 
   return {
-    plan: {
-      nodes,
-      order: forms.map(({ id }) => {
-        return id;
-      }),
-    },
+    plan: errors.length
+      ? undefined
+      : {
+          nodes,
+          order: forms.map(({ id }) => {
+            return id;
+          }),
+          mode,
+        },
     errors,
   };
 };

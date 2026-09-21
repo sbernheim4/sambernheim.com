@@ -50,16 +50,18 @@ export const saveFormWithRetry = async (
       return { ...state, response, status: "saved" };
     } catch (error) {
       let retryable = false;
+      let retryError: unknown;
       try {
         retryable =
           !!form.endpoint.retrySafe &&
           state.attempts <= retry.maxRetries &&
           retry.shouldRetry(error);
-      } catch {
+      } catch (policyError) {
+        retryError = policyError;
         retryable = false;
       }
       if (!retryable) {
-        return getFailedState(state, "save", error);
+        return getFailedState(state, "save", retryError ?? error);
       }
       state = { ...state, status: "retrying" };
       onProgress(state);
@@ -71,8 +73,8 @@ export const saveFormWithRetry = async (
         await new Promise((resolve) => {
           return setTimeout(resolve, Math.max(0, delay));
         });
-      } catch {
-        return getFailedState(state, "save", error);
+      } catch (delayError) {
+        return getFailedState(state, "save", delayError);
       }
     }
   }

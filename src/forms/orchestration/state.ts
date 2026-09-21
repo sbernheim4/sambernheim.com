@@ -30,6 +30,9 @@ export const reduceRuntimeState = (state: RuntimeState, event: StateEvent): Runt
   }
 
   const current = state.forms[event.id];
+  if (!current) {
+    throw new Error(`Unknown form ID in runtime event: ${event.id}`);
+  }
 
   switch (event.type) {
     case "form.ready":
