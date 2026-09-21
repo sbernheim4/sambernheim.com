@@ -8,6 +8,7 @@ import { useExecutionProfile } from "../../domains/execution-profiles/hooks/useE
 import { ThreadFields } from "../../domains/threads/components/ThreadFields";
 import { DetailLayout, Loading, Missing, Status } from "../form-demo/components/Layout";
 import { ProfileSummary } from "../form-demo/components/DetailHelpers";
+import { DetailTabs } from "../form-demo/components/DetailTabs";
 
 export const ThreadListPage = () => {
   const query = useThreads();
@@ -52,23 +53,56 @@ export const ThreadDetailPage = ({ id }: { id: string }) => {
 
   return (
     <DetailLayout title={thread.data.name} editTo={`/form-demo/threads/${id}/edit`}>
-      <section className="details">
-        <p>Entry point: {thread.data.entryPoint}</p>
-        <Status value={thread.data.status} />
-        <p>Priority: {thread.data.priority}</p>
-        <p>
-          Process:{" "}
-          {process ? (
-            <Link to="/form-demo/processes/$processId" params={{ processId: process.id }}>
-              {process.name}
-            </Link>
-          ) : (
-            thread.data.processId
-          )}
-        </p>
-        <h2>Execution profile</h2>
-        <ProfileSummary id={thread.data.executionProfileId} />
-      </section>
+      <DetailTabs
+        tabs={[
+          {
+            value: "overview",
+            label: "Overview",
+            children: (
+              <section className="details">
+                <div className="summary-grid">
+                  <div>
+                    <span className="eyebrow">Entry point</span>
+                    <strong>{thread.data.entryPoint}</strong>
+                  </div>
+                  <div>
+                    <span className="eyebrow">Priority</span>
+                    <strong>{thread.data.priority}</strong>
+                  </div>
+                  <div>
+                    <span className="eyebrow">Status</span>
+                    <Status value={thread.data.status} />
+                  </div>
+                </div>
+              </section>
+            ),
+          },
+          {
+            value: "profile",
+            label: "Execution Profile",
+            children: (
+              <section className="details">
+                <ProfileSummary id={thread.data.executionProfileId} />
+              </section>
+            ),
+          },
+          {
+            value: "process",
+            label: "Parent Process",
+            children: (
+              <section className="details">
+                {process ? (
+                  <Link to="/form-demo/processes/$processId" params={{ processId: process.id }}>
+                    {process.name}
+                  </Link>
+                ) : (
+                  <strong>{thread.data.processId}</strong>
+                )}
+              </section>
+            ),
+          },
+        ]}
+      />
     </DetailLayout>
   );
 };

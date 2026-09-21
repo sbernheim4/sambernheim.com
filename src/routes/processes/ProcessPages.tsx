@@ -9,6 +9,7 @@ import { useExecutionProfile } from "../../domains/execution-profiles/hooks/useE
 import { ProcessFields } from "../../domains/processes/components/ProcessFields";
 import { DetailLayout, Loading, Missing, Status } from "../form-demo/components/Layout";
 import { ChildList, ProfileSummary } from "../form-demo/components/DetailHelpers";
+import { DetailTabs } from "../form-demo/components/DetailTabs";
 
 export const ProcessListPage = () => {
   const query = useProcesses();
@@ -55,34 +56,67 @@ export const ProcessDetailPage = ({ id }: { id: string }) => {
 
   return (
     <DetailLayout title={process.data.name} editTo={`/form-demo/processes/${id}/edit`}>
-      <section className="details">
-        <p>
-          Task:{" "}
-          {task ? (
-            <Link to="/form-demo/tasks/$taskId" params={{ taskId: task.id }}>
-              {task.name}
-            </Link>
-          ) : (
-            process.data.taskId
-          )}
-        </p>
-        <p>Command: {process.data.command}</p>
-        <Status value={process.data.status} />
-        <h2>Execution profile</h2>
-        <ProfileSummary id={process.data.executionProfileId} />
-        <h2>Threads</h2>
-        <ChildList>
-          {threads.data?.map((thread) => (
-            <Link
-              key={thread.id}
-              to="/form-demo/threads/$threadId"
-              params={{ threadId: thread.id }}
-            >
-              {thread.name}
-            </Link>
-          ))}
-        </ChildList>
-      </section>
+      <DetailTabs
+        tabs={[
+          {
+            value: "overview",
+            label: "Overview",
+            children: (
+              <section className="details">
+                <div className="summary-grid">
+                  <div>
+                    <span className="eyebrow">Task</span>
+                    {task ? (
+                      <Link to="/form-demo/tasks/$taskId" params={{ taskId: task.id }}>
+                        {task.name}
+                      </Link>
+                    ) : (
+                      <strong>{process.data.taskId}</strong>
+                    )}
+                  </div>
+                  <div>
+                    <span className="eyebrow">Command</span>
+                    <strong>{process.data.command}</strong>
+                  </div>
+                  <div>
+                    <span className="eyebrow">Status</span>
+                    <Status value={process.data.status} />
+                  </div>
+                </div>
+              </section>
+            ),
+          },
+          {
+            value: "profile",
+            label: "Execution Profile",
+            children: (
+              <section className="details">
+                <ProfileSummary id={process.data.executionProfileId} />
+              </section>
+            ),
+          },
+          {
+            value: "threads",
+            label: "Threads",
+            children: (
+              <section className="details">
+                <ChildList>
+                  {threads.data?.map((thread) => (
+                    <Link
+                      key={thread.id}
+                      to="/form-demo/threads/$threadId"
+                      params={{ threadId: thread.id }}
+                    >
+                      <span>{thread.name}</span>
+                      <span className="relationship-meta">{thread.entryPoint}</span>
+                    </Link>
+                  ))}
+                </ChildList>
+              </section>
+            ),
+          },
+        ]}
+      />
     </DetailLayout>
   );
 };

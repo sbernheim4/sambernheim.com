@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { useExecutionProfile } from "../../../domains/execution-profiles/hooks/useExecutionProfile";
+import "./DetailHelpers.css";
 
 export const ProfileSummary = ({ id }: { id: string }) => {
   const profile = useExecutionProfile(id);
@@ -18,5 +19,5 @@ export const ProfileSummary = ({ id }: { id: string }) => {
 };
 
 export const ChildList = ({ children }: { children: ReactNode }) => {
-  return <div className="child-list">{children}</div>;
+  return <div className="relationship-list">{children}</div>;
 };
