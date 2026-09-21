@@ -25,6 +25,8 @@ await build({
 const result = spawnSync(
   process.execPath,
   [
+    "--import",
+    resolve("scripts/test-setup.mjs"),
     "--test",
     ...tests.map((file) => {
       return `${outdir}/${file.replace(/\.tsx?$/, ".js")}`;

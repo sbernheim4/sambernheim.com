@@ -9,6 +9,8 @@ import {
   type PersistedDraftController,
 } from "../src/forms/hooks/usePersistedFormData";
 
+Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
+
 const waitForEffects = async () => {
   await act(async () => {
     await new Promise((resolve) => {
@@ -84,7 +86,9 @@ test("query updates received while dirty are applied after discard", async () =>
 
   assert.equal(currentForm!.form.state.values.value, "server-2");
 
-  renderer!.unmount();
+  await act(async () => {
+    renderer!.unmount();
+  });
 });
 
 test("draft persistence stores and restores only dirty forms", async () => {
@@ -158,7 +162,9 @@ test("draft persistence stores and restores only dirty forms", async () => {
   assert.deepEqual(restoredDirtyValues, dirtyValues);
   assert.equal(cleanResetCount, 0);
 
-  renderer!.unmount();
+  await act(async () => {
+    renderer!.unmount();
+  });
 });
 
 test("version-one drafts are ignored", async () => {
@@ -186,5 +192,7 @@ test("version-one drafts are ignored", async () => {
 
   assert.equal(controller!.hasDraft, false);
 
-  renderer!.unmount();
+  await act(async () => {
+    renderer!.unmount();
+  });
 });

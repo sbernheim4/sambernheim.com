@@ -221,7 +221,9 @@ test("captures snapshots before asynchronous validation and uses captured values
 
   const form = makeForm({
     id: "form",
-    snapshot: () => currentValue,
+    snapshot: () => {
+      return currentValue;
+    },
     validate: async (value) => {
       await validationStarted;
       seen.push(value);
@@ -247,7 +249,9 @@ test("validation failure prevents mutations and invokes failure callbacks", asyn
   let failures = 0;
   const form = makeForm({
     id: "invalid",
-    validate: () => ({ valid: false, error: new Error("bad values") }),
+    validate: () => {
+      return { valid: false, error: new Error("bad values") };
+    },
     mutationFn: async () => {
       mutations += 1;
       return {};
@@ -309,8 +313,12 @@ test("refreshes, reconciles caches, marks forms saved, and runs callbacks in ord
   ];
   form.cacheUpdates = [
     {
-      queryKey: () => ["form", "saved"],
-      getData: (response) => response,
+      queryKey: () => {
+        return ["form", "saved"];
+      },
+      getData: (response) => {
+        return response;
+      },
     },
   ];
 
@@ -326,7 +334,9 @@ test("emits the lifecycle phases and coalesces concurrent submissions", async ()
   const deferredMutation = deferred<unknown>();
   const form = makeForm({
     id: "form",
-    mutationFn: async () => deferredMutation.promise,
+    mutationFn: async () => {
+      return deferredMutation.promise;
+    },
   });
   const orchestrator = createOrchestrator(new QueryClient(), ({ phase }) => {
     phases.push(phase);
