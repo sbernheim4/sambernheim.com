@@ -23,7 +23,9 @@ export const FormEditorTabTrigger = ({
       className="form-editor-tab-trigger"
       data-state={active ? "active" : "inactive"}
       disabled={disabled}
-      onClick={() => setActiveTab(name)}
+      onClick={() => {
+        return setActiveTab(name);
+      }}
     >
       {Icon && <Icon className="form-editor-tab-icon" />}
       {label}

@@ -42,17 +42,22 @@ export const createEntityEditorContext = <TRegistry extends EditorRegistry>() =>
     return editor as TRegistry[TName];
   };
 
-  const EntityEditor = ({ editors, children, ...props }: TypedEntityEditorProps<TRegistry>) => (
-    <EditorContext.Provider value={editors}>
-      <FormEditor.Provider {...props}>{children}</FormEditor.Provider>
-    </EditorContext.Provider>
-  );
+  const EntityEditor = ({ editors, children, ...props }: TypedEntityEditorProps<TRegistry>) => {
+    return (
+      <EditorContext.Provider value={editors}>
+        <FormEditor.Provider {...props}>{children}</FormEditor.Provider>
+      </EditorContext.Provider>
+    );
+  };
 
   return {
     EntityEditor,
     useEditor,
-    useEditorForm: <TName extends EditorName<TRegistry>>(name: TName) => useEditor(name).form,
-    useEditorLoadState: <TName extends EditorName<TRegistry>>(name: TName) =>
-      useEditor(name).loadState,
+    useEditorForm: <TName extends EditorName<TRegistry>>(name: TName) => {
+      return useEditor(name).form;
+    },
+    useEditorLoadState: <TName extends EditorName<TRegistry>>(name: TName) => {
+      return useEditor(name).loadState;
+    },
   };
 };

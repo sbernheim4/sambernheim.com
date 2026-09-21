@@ -8,8 +8,12 @@ const makeForm = ({
   id,
   dependencies = [],
   mutationFn,
-  undoSnapshot = () => {return { id }},
-  undoResponse = () => {return { id }},
+  undoSnapshot = () => {
+    return { id };
+  },
+  undoResponse = () => {
+    return { id };
+  },
 }: {
   id: string;
   dependencies?: readonly FormInput[];
@@ -20,10 +24,14 @@ const makeForm = ({
   return {
     id,
     dependencies,
-    snapshot: () => {return { id }},
+    snapshot: () => {
+      return { id };
+    },
     undoSnapshot,
     undoResponse,
-    validate: () => {return { valid: true }},
+    validate: () => {
+      return { valid: true };
+    },
     endpoint: { mutationFn },
     form: {
       reset: () => {},
@@ -72,7 +80,9 @@ test("executes independent forms in parallel and waits for graph dependencies", 
   const orchestrator = createOrchestrator(new QueryClient());
   const resultPromise = orchestrator.submit({ forms: [c, b, a] });
 
-  await new Promise((resolve) => {return setImmediate(resolve)});
+  await new Promise((resolve) => {
+    return setImmediate(resolve);
+  });
   assert.deepEqual(started, ["b", "a"]);
 
   aDeferred.resolve({ id: "a" });
@@ -93,8 +103,14 @@ test("rejects cycles before snapshots or mutations", async () => {
       snapshots += 1;
       return {};
     },
-    validate: () => {return { valid: true }},
-    endpoint: { mutationFn: async () => {return {}} },
+    validate: () => {
+      return { valid: true };
+    },
+    endpoint: {
+      mutationFn: async () => {
+        return {};
+      },
+    },
     form: { reset: () => {} },
   };
   const b: AnyForm = {
@@ -104,8 +120,14 @@ test("rejects cycles before snapshots or mutations", async () => {
       snapshots += 1;
       return {};
     },
-    validate: () => {return { valid: true }},
-    endpoint: { mutationFn: async () => {return {}} },
+    validate: () => {
+      return { valid: true };
+    },
+    endpoint: {
+      mutationFn: async () => {
+        return {};
+      },
+    },
     form: { reset: () => {} },
   };
   a.dependencies = [b];

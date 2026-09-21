@@ -131,15 +131,29 @@ const getGroupStatus = (
   phase: ProgressPhase,
   childStatuses: readonly ProgressStatus[] = [],
 ): ProgressStatus => {
-  if (childStatuses.some((status) => status === "failed")) {
+  if (
+    childStatuses.some((status) => {
+      return status === "failed";
+    })
+  ) {
     return "failed";
   }
 
-  if (childStatuses.length > 0 && childStatuses.every((status) => status === "skipped")) {
+  if (
+    childStatuses.length > 0 &&
+    childStatuses.every((status) => {
+      return status === "skipped";
+    })
+  ) {
     return "skipped";
   }
 
-  if (childStatuses.length > 0 && childStatuses.every((status) => status === "complete")) {
+  if (
+    childStatuses.length > 0 &&
+    childStatuses.every((status) => {
+      return status === "complete";
+    })
+  ) {
     return "complete";
   }
 

@@ -112,10 +112,15 @@ const threads: Thread[] = [
   },
 ];
 
-const clone = <T>(value: T): T => structuredClone(value);
-const pause = () => Promise.resolve();
-const nextId = (prefix: string) =>
-  `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+const clone = <T>(value: T): T => {
+  return structuredClone(value);
+};
+const pause = () => {
+  return Promise.resolve();
+};
+const nextId = (prefix: string) => {
+  return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+};
 
 export const store = {
   async listTasks() {
@@ -124,7 +129,11 @@ export const store = {
   },
   async getTask(id: string) {
     await pause();
-    return clone(tasks.find((item) => item.id === id));
+    return clone(
+      tasks.find((item) => {
+        return item.id === id;
+      }),
+    );
   },
   async updateTask(id: string, input: Omit<Task, "id">) {
     await pause();
@@ -132,11 +141,21 @@ export const store = {
   },
   async listProcesses(taskId?: string) {
     await pause();
-    return clone(taskId ? processes.filter((item) => item.taskId === taskId) : processes);
+    return clone(
+      taskId
+        ? processes.filter((item) => {
+            return item.taskId === taskId;
+          })
+        : processes,
+    );
   },
   async getProcess(id: string) {
     await pause();
-    return clone(processes.find((item) => item.id === id));
+    return clone(
+      processes.find((item) => {
+        return item.id === id;
+      }),
+    );
   },
   async updateProcess(id: string, input: Omit<Process, "id">) {
     await pause();
@@ -144,11 +163,21 @@ export const store = {
   },
   async listThreads(processId?: string) {
     await pause();
-    return clone(processId ? threads.filter((item) => item.processId === processId) : threads);
+    return clone(
+      processId
+        ? threads.filter((item) => {
+            return item.processId === processId;
+          })
+        : threads,
+    );
   },
   async getThread(id: string) {
     await pause();
-    return clone(threads.find((item) => item.id === id));
+    return clone(
+      threads.find((item) => {
+        return item.id === id;
+      }),
+    );
   },
   async updateThread(id: string, input: Omit<Thread, "id">) {
     await pause();
@@ -156,7 +185,11 @@ export const store = {
   },
   async getProfile(id: string) {
     await pause();
-    return clone(profiles.find((item) => item.id === id));
+    return clone(
+      profiles.find((item) => {
+        return item.id === id;
+      }),
+    );
   },
   async updateProfile(id: string, input: Omit<ExecutionProfile, "id">) {
     await pause();
@@ -164,13 +197,15 @@ export const store = {
   },
 };
 
-function update<T extends { id: string }>(collection: T[], id: string, input: Omit<T, "id">) {
-  const index = collection.findIndex((item) => item.id === id);
+const update = <T extends { id: string }>(collection: T[], id: string, input: Omit<T, "id">) => {
+  const index = collection.findIndex((item) => {
+    return item.id === id;
+  });
   if (index < 0) {
     throw new Error(`Record ${id} was not found.`);
   }
   collection[index] = { id, ...input } as T;
   return clone(collection[index]);
-}
+};
 
 export const createId = nextId;

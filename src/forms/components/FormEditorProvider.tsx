@@ -43,8 +43,8 @@ export const FormEditorProvider = ({
     onCancel?.();
   }, [onCancel]);
 
-  const controller = useMemo<FormEditorController>(
-    () => ({
+  const controller = useMemo<FormEditorController>(() => {
+    return {
       mode,
       viewMode,
       activeTab,
@@ -60,25 +60,24 @@ export const FormEditorProvider = ({
       setActiveTab,
       startEditing,
       cancelEditing,
-    }),
-    [
-      mode,
-      viewMode,
-      activeTab,
-      isEditing,
-      readOnly,
-      preventSaveWithoutChanges,
-      saveLabel,
-      saveButtonVariant,
-      cancelLabel,
-      cancelButtonVariant,
-      showCancel,
-      actions,
-      setActiveTab,
-      startEditing,
-      cancelEditing,
-    ],
-  );
+    };
+  }, [
+    mode,
+    viewMode,
+    activeTab,
+    isEditing,
+    readOnly,
+    preventSaveWithoutChanges,
+    saveLabel,
+    saveButtonVariant,
+    cancelLabel,
+    cancelButtonVariant,
+    showCancel,
+    actions,
+    setActiveTab,
+    startEditing,
+    cancelEditing,
+  ]);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();

@@ -22,18 +22,20 @@ export const ProcessListPage = () => {
         <p>Loading...</p>
       ) : (
         <div className="list">
-          {query.data?.map((process) => (
-            <Link
-              key={process.id}
-              className="card"
-              to="/form-demo/processes/$processId"
-              params={{ processId: process.id }}
-            >
-              <strong>{process.name}</strong>
-              <Status value={process.status} />
-              <span>{process.command}</span>
-            </Link>
-          ))}
+          {query.data?.map((process) => {
+            return (
+              <Link
+                key={process.id}
+                className="card"
+                to="/form-demo/processes/$processId"
+                params={{ processId: process.id }}
+              >
+                <strong>{process.name}</strong>
+                <Status value={process.status} />
+                <span>{process.command}</span>
+              </Link>
+            );
+          })}
         </div>
       )}
     </>
@@ -53,7 +55,9 @@ export const ProcessDetailPage = ({ id }: { id: string }) => {
     return <Missing />;
   }
 
-  const task = tasks.data?.find((item) => item.id === process.data?.taskId);
+  const task = tasks.data?.find((item) => {
+    return item.id === process.data?.taskId;
+  });
 
   return (
     <DetailLayout title={process.data.name} editTo={`/form-demo/processes/${id}/edit`}>
@@ -102,16 +106,18 @@ export const ProcessDetailPage = ({ id }: { id: string }) => {
             children: (
               <section className="details">
                 <ChildList>
-                  {threads.data?.map((thread) => (
-                    <Link
-                      key={thread.id}
-                      to="/form-demo/threads/$threadId"
-                      params={{ threadId: thread.id }}
-                    >
-                      <span>{thread.name}</span>
-                      <span className="relationship-meta">{thread.entryPoint}</span>
-                    </Link>
-                  ))}
+                  {threads.data?.map((thread) => {
+                    return (
+                      <Link
+                        key={thread.id}
+                        to="/form-demo/threads/$threadId"
+                        params={{ threadId: thread.id }}
+                      >
+                        <span>{thread.name}</span>
+                        <span className="relationship-meta">{thread.entryPoint}</span>
+                      </Link>
+                    );
+                  })}
                 </ChildList>
               </section>
             ),
@@ -151,13 +157,13 @@ export const ProcessEditPage = ({
       activeTab={activeTab}
       onActiveTabChange={onActiveTabChange}
       actions={save.actions}
-      onCancel={() =>
-        navigate({
+      onCancel={() => {
+        return navigate({
           to: "/form-demo/processes/$processId",
           params: { processId: id },
           search: {},
-        })
-      }
+        });
+      }}
     >
       <div className="editor-heading">
         <h1>Edit Process</h1>

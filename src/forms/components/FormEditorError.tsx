@@ -8,9 +8,9 @@ export const FormEditorError = () => {
   }
   return (
     <div className="form-editor-error" role="alert">
-      {errors.map((error, index) => (
-        <p key={index}>{String(error)}</p>
-      ))}
+      {errors.map((error, index) => {
+        return <p key={index}>{String(error)}</p>;
+      })}
     </div>
   );
 };
