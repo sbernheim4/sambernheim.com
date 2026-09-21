@@ -161,6 +161,8 @@ test("FormEditor tabs hide inactive content and page mode shows every section", 
       {tabs}
     </FormEditor.Provider>,
   );
+  expect(screen.getByRole("tablist")).toHaveClass("segmented-tabs-list");
+  expect(screen.getByRole("tab", { name: "One" })).toHaveClass("segmented-tab-trigger");
   expect(screen.getByText("first")).toBeVisible();
   expect(screen.queryByText("second")).not.toBeInTheDocument();
   rerender(

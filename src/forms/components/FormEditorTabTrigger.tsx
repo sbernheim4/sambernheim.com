@@ -1,6 +1,6 @@
 import type { ComponentType } from "react";
-import * as Tabs from "@radix-ui/react-tabs";
 import { useFormEditorContext } from "../hooks/useFormEditorContext";
+import { SegmentedTabTrigger } from "../../shared/components/SegmentedTabs";
 
 export type FormEditorTabTriggerProps = {
   name: string;
@@ -15,20 +15,17 @@ export const FormEditorTabTrigger = ({
   icon: Icon,
   disabled,
 }: FormEditorTabTriggerProps) => {
-  const { activeTab, setActiveTab } = useFormEditorContext();
-  const active = activeTab === name;
+  const { setActiveTab } = useFormEditorContext();
   return (
-    <Tabs.Trigger
+    <SegmentedTabTrigger
       value={name}
-      className="form-editor-tab-trigger"
-      data-state={active ? "active" : "inactive"}
+      icon={Icon}
       disabled={disabled}
       onClick={() => {
         return setActiveTab(name);
       }}
     >
-      {Icon && <Icon className="form-editor-tab-icon" />}
       {label}
-    </Tabs.Trigger>
+    </SegmentedTabTrigger>
   );
 };

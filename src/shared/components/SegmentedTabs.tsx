@@ -64,7 +64,10 @@ export const SegmentedTabContent = ({
   className?: string;
 }) => {
   return (
-    <Tabs.Content value={value} className={className ?? "segmented-tab-content"}>
+    <Tabs.Content
+      value={value}
+      className={className ? `segmented-tab-content ${className}` : "segmented-tab-content"}
+    >
       {children}
     </Tabs.Content>
   );
