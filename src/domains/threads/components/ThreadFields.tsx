@@ -3,7 +3,7 @@ import "./ThreadFields.css";
 
 export const ThreadFields = ({ form }: { form: any }) => {
   return (
-    <div className="fields">
+    <div className="thread-fields fields">
       <form.AppField name="name">
         {(field: any) => <field.TextField label="Thread name" required />}
       </form.AppField>

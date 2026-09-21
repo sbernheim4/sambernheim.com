@@ -3,7 +3,7 @@ import "./ExecutionProfileFields.css";
 
 export const ExecutionProfileFields = ({ form }: { form: any }) => {
   return (
-    <div className="fields">
+    <div className="execution-profile-fields fields">
       <form.AppField name="name">
         {(field: any) => <field.TextField label="Profile name" required />}
       </form.AppField>

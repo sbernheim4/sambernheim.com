@@ -13,6 +13,7 @@ export type FormEditorActionState = {
 
 export type FormEditorController = {
   mode: FormEditorMode;
+  viewMode: "tabs" | "page";
   activeTab: string;
   isEditing: boolean;
   readOnly?: boolean;

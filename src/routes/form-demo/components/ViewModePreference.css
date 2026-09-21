@@ -1,0 +1,30 @@
+.view-mode-picker {
+  display: inline-flex;
+  gap: 3px;
+  padding: 3px;
+  border: 1px solid #ccd5d0;
+  border-radius: 8px;
+  background: #e8e9df;
+}
+
+.view-mode-option {
+  padding: 7px 11px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: #53615d;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.view-mode-option:hover,
+.view-mode-option[data-selected="true"] {
+  color: #216b5e;
+}
+
+.view-mode-option[data-selected="true"] {
+  background: #fffdf8;
+  box-shadow: 0 1px 4px rgb(30 36 39 / 10%);
+}

@@ -8,7 +8,8 @@ import { useExecutionProfile } from "../../domains/execution-profiles/hooks/useE
 import { TaskFields } from "../../domains/tasks/components/TaskFields";
 import { DetailLayout, Loading, Missing, Status } from "../form-demo/components/Layout";
 import { ChildList, ProfileSummary } from "../form-demo/components/DetailHelpers";
-import { DetailTabs } from "../form-demo/components/DetailTabs";
+import { DetailView } from "../form-demo/components/DetailView";
+import { ViewModePicker, useViewModePreference } from "../form-demo/components/ViewModePreference";
 
 export const TaskListPage = () => {
   const query = useTasks();
@@ -51,7 +52,7 @@ export const TaskDetailPage = ({ id }: { id: string }) => {
 
   return (
     <DetailLayout title={task.data.name} editTo={`/form-demo/tasks/${id}/edit`}>
-      <DetailTabs
+      <DetailView
         tabs={[
           {
             value: "overview",
@@ -122,6 +123,7 @@ export const TaskEditPage = ({
   const navigate = useNavigate();
   const query = useTask(id);
   const profile = useExecutionProfile(query.data?.executionProfileId ?? "");
+  const { mode, updateMode } = useViewModePreference();
 
   const { entityForm, profileForm, save } = useTaskEditForms(id);
 
@@ -134,6 +136,7 @@ export const TaskEditPage = ({
       mode="edit"
       isEditing
       defaultTab="entity"
+      viewMode={mode}
       activeTab={activeTab}
       onActiveTabChange={onActiveTabChange}
       actions={save.actions}
@@ -143,6 +146,7 @@ export const TaskEditPage = ({
     >
       <div className="editor-heading">
         <h1>Edit Task</h1>
+        <ViewModePicker mode={mode} onChange={updateMode} />
       </div>
       <FormEditor.TabList>
         <FormEditor.TabTrigger name="entity" label="Task" />
