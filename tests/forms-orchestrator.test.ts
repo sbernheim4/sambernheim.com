@@ -146,6 +146,28 @@ test("maps dependent payloads after prerequisite responses are recorded", async 
   assert.deepEqual(seenResults, { parent: { generatedId: "created-parent" } });
 });
 
+test("maps an independent payload exactly once", async () => {
+  let mappings = 0;
+  const form = makeForm({
+    id: "form",
+    toMutationPayload: () => {
+      mappings += 1;
+      return { mapped: true };
+    },
+    mutationFn: async (variables) => {
+      assert.deepEqual(variables, { mapped: true });
+      return { ok: true };
+    },
+  });
+  form.undoSnapshot = undefined;
+  form.undoResponse = undefined;
+
+  const result = await createOrchestrator(new QueryClient()).submit({ forms: [form] });
+
+  assert.equal(result.outcome, "success");
+  assert.equal(mappings, 1);
+});
+
 test("rejects cycles before snapshots or mutations", async () => {
   let snapshots = 0;
   const a: AnyForm = {

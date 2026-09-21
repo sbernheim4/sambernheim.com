@@ -162,6 +162,115 @@ test("draft restoration restores nested field paths", async () => {
   assert.deepEqual(restored, { "address.city": "New York" });
 });
 
+test("switching draft keys reloads metadata without overwriting the new draft", async () => {
+  const firstSavedAt = "2026-01-01T00:00:00.000Z";
+  const secondSavedAt = "2026-02-01T00:00:00.000Z";
+  window.localStorage.setItem(
+    "draft-a",
+    JSON.stringify({
+      version: 2,
+      savedAt: firstSavedAt,
+      values: { form: { value: "a" } },
+      dirtyFormIds: ["form"],
+    }),
+  );
+  window.localStorage.setItem(
+    "draft-b",
+    JSON.stringify({
+      version: 2,
+      savedAt: secondSavedAt,
+      values: { form: { value: "b" } },
+      dirtyFormIds: ["form"],
+    }),
+  );
+
+  let controller: PersistedDraftController | undefined;
+  const binding: PersistedFormBinding = {
+    id: "form",
+    form: {
+      state: { values: { value: "local" }, isDirty: true },
+      store: {
+        subscribe: () => {
+          return { unsubscribe: () => {} };
+        },
+      },
+      reset: () => {},
+      setFieldValue: () => {},
+    },
+  };
+  const Harness = ({ storageKey }: { storageKey: string }) => {
+    controller = usePersistedFormData({ storageKey, forms: [binding] });
+    return null;
+  };
+
+  const renderer = render(<Harness storageKey="draft-a" />);
+  await waitFor(() => {
+    assert.equal(controller!.savedAt, firstSavedAt);
+  });
+
+  renderer.rerender(<Harness storageKey="draft-b" />);
+  await waitFor(() => {
+    assert.equal(controller!.hasDraft, true);
+    assert.equal(controller!.savedAt, secondSavedAt);
+  });
+
+  await new Promise((resolve) => {
+    return setTimeout(resolve, 250);
+  });
+  const stored = JSON.parse(window.localStorage.getItem("draft-b")!);
+  assert.equal(stored.savedAt, secondSavedAt);
+  assert.deepEqual(stored.values, { form: { value: "b" } });
+});
+
+test("unsupported primitive and array draft roots fail without dismissing the draft", () => {
+  for (const [storageKey, value] of [
+    ["primitive-draft", "unsupported"],
+    ["array-draft", ["unsupported"]],
+  ] as const) {
+    window.localStorage.setItem(
+      storageKey,
+      JSON.stringify({
+        version: 2,
+        savedAt: new Date().toISOString(),
+        values: { form: value },
+        dirtyFormIds: ["form"],
+      }),
+    );
+  }
+
+  let resets = 0;
+  let controller: PersistedDraftController | undefined;
+  const binding: PersistedFormBinding = {
+    id: "form",
+    form: {
+      state: { values: { value: "current" }, isDirty: false },
+      store: {
+        subscribe: () => {
+          return { unsubscribe: () => {} };
+        },
+      },
+      reset: () => {
+        resets += 1;
+      },
+      setFieldValue: () => {},
+    },
+  };
+  const Harness = ({ storageKey }: { storageKey: string }) => {
+    controller = usePersistedFormData({ storageKey, forms: [binding] });
+    return null;
+  };
+  const renderer = render(<Harness storageKey="primitive-draft" />);
+  assert.equal(controller!.hasDraft, true);
+  assert.equal(controller!.restore(), false);
+  assert.equal(controller!.hasDraft, true);
+
+  renderer.rerender(<Harness storageKey="array-draft" />);
+  assert.equal(controller!.hasDraft, true);
+  assert.equal(controller!.restore(), false);
+  assert.equal(controller!.hasDraft, true);
+  assert.equal(resets, 0);
+});
+
 test("version-one drafts are ignored", async () => {
   window.localStorage.setItem(
     "forms",

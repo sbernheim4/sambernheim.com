@@ -4,6 +4,7 @@ import { compileSavePlan } from "../src/forms/orchestration/plan";
 import { executeGraph } from "../src/forms/orchestration/scheduler";
 import { updateCacheWithMutationResponse } from "../src/forms/orchestration/effects";
 import { createOrchestrator } from "../src/forms/orchestration/orchestrator";
+import { reduceRuntimeState, type RuntimeState } from "../src/forms/orchestration/state";
 import type { AnyForm } from "../src/forms/orchestration/types";
 
 const form = (id: string, dependencies: readonly string[] = []): AnyForm => {
@@ -52,6 +53,68 @@ describe("compileSavePlan", () => {
     expect(save.nodes.get("c")?.prerequisites).toEqual(["b"]);
     expect(undo.nodes.get("b")?.prerequisites).toEqual(["c"]);
     expect(undo.nodes.get("a")?.prerequisites).toEqual(["b"]);
+  });
+});
+
+describe("runtime reducer", () => {
+  const initial = (): RuntimeState => {
+    return reduceRuntimeState(
+      { forms: {}, responses: {}, followUpErrors: [] },
+      {
+        type: "snapshot.initialized",
+        forms: { form: { formId: "form", status: "validating", attempts: 0 } },
+      },
+    );
+  };
+
+  test("accepts the complete validation, retry, and save lifecycle", () => {
+    let state = reduceRuntimeState(initial(), { type: "validation.succeeded", id: "form" });
+    state = reduceRuntimeState(state, {
+      type: "payload.prepared",
+      id: "form",
+      variables: { value: "mapped" },
+    });
+    state = reduceRuntimeState(state, { type: "saving.started", id: "form", attempt: 1 });
+    state = reduceRuntimeState(state, { type: "saving.retrying", id: "form" });
+    state = reduceRuntimeState(state, { type: "saving.started", id: "form", attempt: 2 });
+    state = reduceRuntimeState(state, { type: "saved", id: "form", response: { id: 1 } });
+
+    expect(state.forms.form).toMatchObject({
+      status: "saved",
+      attempts: 2,
+      variables: { value: "mapped" },
+      response: { id: 1 },
+    });
+    expect(state.responses).toEqual({ form: { id: 1 } });
+  });
+
+  test("rejects illegal lifecycle transitions", () => {
+    const saved = reduceRuntimeState(
+      reduceRuntimeState(
+        reduceRuntimeState(initial(), { type: "validation.succeeded", id: "form" }),
+        { type: "saving.started", id: "form", attempt: 1 },
+      ),
+      { type: "saved", id: "form", response: {} },
+    );
+
+    expect(() => {
+      return reduceRuntimeState(saved, { type: "saving.started", id: "form", attempt: 2 });
+    }).toThrow(/saved -> saving.started/);
+
+    const skipped = reduceRuntimeState(
+      reduceRuntimeState(initial(), { type: "validation.succeeded", id: "form" }),
+      { type: "skipped", id: "form", blockedBy: ["other"] },
+    );
+    expect(() => {
+      return reduceRuntimeState(skipped, { type: "saved", id: "form", response: {} });
+    }).toThrow(/skipped -> saved/);
+
+    expect(() => {
+      return reduceRuntimeState(initial(), {
+        type: "snapshot.initialized",
+        forms: { other: { formId: "other", status: "validating", attempts: 0 } },
+      });
+    }).toThrow(/initialized once/);
   });
 });
 
@@ -233,6 +296,53 @@ test("drains active nodes and preserves the first progress callback error", asyn
   await expect(observed).resolves.toBe(fatal);
 });
 
+test("draining a rejected mutation does not replace the first callback error", async () => {
+  let rejectActive!: (error: unknown) => void;
+  const active = new Promise<string>((_resolve, reject) => {
+    rejectActive = reject;
+  });
+  const progressError = new Error("progress failed first");
+  const mutationError = new Error("mutation failed second");
+  const promise = executeGraph(
+    [
+      {
+        id: "a",
+        prerequisites: [],
+        run: async () => {
+          return "a";
+        },
+      },
+      {
+        id: "b",
+        prerequisites: [],
+        run: async () => {
+          return active;
+        },
+      },
+    ],
+    {
+      concurrency: 2,
+      onNodeState: (event) => {
+        if (event.type === "completed" && event.id === "a") {
+          throw progressError;
+        }
+        if (event.type === "failed" && event.id === "b") {
+          throw mutationError;
+        }
+      },
+    },
+  );
+  const observed = promise.catch((error: unknown) => {
+    return error;
+  });
+
+  await new Promise((resolve) => {
+    return setImmediate(resolve);
+  });
+  rejectActive(mutationError);
+  await expect(observed).resolves.toBe(progressError);
+});
+
 test("runs finish cleanup when a pipeline stage rejects", async () => {
   let finishCalls = 0;
   const failure = new Error("stage failed");
@@ -246,4 +356,56 @@ test("runs finish cleanup when a pipeline stage rejects", async () => {
 
   await expect(orchestrator.submit({ forms: [saveForm] })).rejects.toBe(failure);
   expect(finishCalls).toBe(1);
+});
+
+test("runs finish once when final progress reporting fails", async () => {
+  let finishCalls = 0;
+  const progressError = new Error("complete progress failed");
+  const saveForm = form("save");
+  saveForm.finish = () => {
+    finishCalls += 1;
+  };
+  const orchestrator = createOrchestrator(new QueryClient(), ({ phase }) => {
+    if (phase === "complete") {
+      throw progressError;
+    }
+  });
+
+  await expect(orchestrator.submit({ forms: [saveForm] })).rejects.toBe(progressError);
+  expect(finishCalls).toBe(1);
+});
+
+test("collects finish errors as follow-up errors", async () => {
+  const finishError = new Error("finish failed");
+  const saveForm = form("save");
+  saveForm.finish = () => {
+    throw finishError;
+  };
+
+  const result = await createOrchestrator(new QueryClient()).submit({ forms: [saveForm] });
+
+  expect(result.outcome).toBe("saved-with-follow-up-errors");
+  expect(result.followUpErrors).toEqual([
+    { phase: "form-state", formId: "save", error: finishError },
+  ]);
+});
+
+test("skips dependent forms after payload mapping failure", async () => {
+  let childMutations = 0;
+  const parent = form("parent");
+  parent.toMutationPayload = () => {
+    throw new Error("cannot map parent");
+  };
+  const child = form("child", ["parent"]);
+  child.endpoint.mutationFn = async () => {
+    childMutations += 1;
+    return {};
+  };
+
+  const result = await createOrchestrator(new QueryClient()).submit({ forms: [child, parent] });
+
+  expect(result.outcome).toBe("partial-failure");
+  expect(result.forms.parent.failure?.phase).toBe("mapping");
+  expect(result.forms.child).toMatchObject({ status: "skipped", blockedBy: ["parent"] });
+  expect(childMutations).toBe(0);
 });
