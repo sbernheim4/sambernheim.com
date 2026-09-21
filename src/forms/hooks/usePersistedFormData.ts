@@ -25,12 +25,18 @@ type PersistedDraft = {
 };
 
 const readDraft = (storageKey: string): PersistedDraft | undefined => {
-  if (typeof window === "undefined") return undefined;
+  if (typeof window === "undefined") {
+    return undefined;
+  }
   try {
     const raw = window.localStorage.getItem(storageKey);
-    if (!raw) return undefined;
+    if (!raw) {
+      return undefined;
+    }
     const parsed = JSON.parse(raw) as Partial<PersistedDraft>;
-    if (parsed.version !== 1 || !parsed.savedAt || !parsed.values) return undefined;
+    if (parsed.version !== 1 || !parsed.savedAt || !parsed.values) {
+      return undefined;
+    }
     return { version: 1, savedAt: parsed.savedAt, values: parsed.values };
   } catch {
     return undefined;
@@ -66,7 +72,9 @@ export const usePersistedFormData = ({
   }, [storageKey]);
 
   const persist = useCallback(() => {
-    if (!storageKey || typeof window === "undefined") return;
+    if (!storageKey || typeof window === "undefined") {
+      return;
+    }
     if (!forms.some((binding) => binding.form.state.isDirty)) {
       return;
     }
@@ -87,7 +95,9 @@ export const usePersistedFormData = ({
   }, [forms, storageKey]);
 
   useEffect(() => {
-    if (!storageKey) return;
+    if (!storageKey) {
+      return;
+    }
 
     const schedulePersist = () => {
       if (timer.current) clearTimeout(timer.current);
@@ -103,13 +113,19 @@ export const usePersistedFormData = ({
   }, [forms, persist, storageKey]);
 
   const restore = useCallback(() => {
-    if (!storageKey) return false;
+    if (!storageKey) {
+      return false;
+    }
     const draft = readDraft(storageKey);
-    if (!draft) return false;
+    if (!draft) {
+      return false;
+    }
 
     for (const binding of forms) {
       const values = draft.values[binding.id];
-      if (values === undefined) continue;
+      if (values === undefined) {
+        continue;
+      }
       binding.form.reset();
       if (binding.form.setFieldValue && values && typeof values === "object") {
         for (const [field, value] of Object.entries(values)) {

@@ -6,11 +6,14 @@ export const FormEditorContent = ({ children, className }: FormEditorRegionProps
 );
 
 export const FormEditorDraftBanner = ({ draft }: { draft: PersistedDraftController }) => {
-  if (!draft.hasDraft) return null;
+  if (!draft.hasDraft) {
+    return null;
+  }
   return (
     <div className="form-editor-draft-banner" role="status">
       <span>
-        Unsaved form data is available{draft.savedAt ? ` from ${new Date(draft.savedAt).toLocaleString()}` : ""}.
+        Unsaved form data is available
+        {draft.savedAt ? ` from ${new Date(draft.savedAt).toLocaleString()}` : ""}.
       </span>
       <button type="button" className="workspace-button" onClick={draft.restore}>
         Restore draft

@@ -33,6 +33,7 @@ export const combineFormEditorActionStates = (
 });
 
 const getErrors = (error: unknown): string[] => {
-  if (Array.isArray(error)) return error.filter((value): value is string => typeof value === "string");
+  if (Array.isArray(error))
+    return error.filter((value): value is string => typeof value === "string");
   return typeof error === "string" ? [error] : [];
 };

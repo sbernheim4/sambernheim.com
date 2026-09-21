@@ -36,7 +36,9 @@ export const createEntityEditorContext = <TRegistry extends EditorRegistry>() =>
       throw new Error("Editor components must be rendered inside an entity editor root.");
     }
     const editor = editors[name];
-    if (!editor) throw new Error(`Editor "${name}" is not registered.`);
+    if (!editor) {
+      throw new Error(`Editor "${name}" is not registered.`);
+    }
     return editor as TRegistry[TName];
   };
 
@@ -50,6 +52,7 @@ export const createEntityEditorContext = <TRegistry extends EditorRegistry>() =>
     EntityEditor,
     useEditor,
     useEditorForm: <TName extends EditorName<TRegistry>>(name: TName) => useEditor(name).form,
-    useEditorLoadState: <TName extends EditorName<TRegistry>>(name: TName) => useEditor(name).loadState,
+    useEditorLoadState: <TName extends EditorName<TRegistry>>(name: TName) =>
+      useEditor(name).loadState,
   };
 };

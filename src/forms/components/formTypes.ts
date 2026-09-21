@@ -5,7 +5,8 @@ export type FormEditorProviderProps = {
   mode: FormEditorController["mode"];
   defaultTab: string;
   children: ReactNode;
-  tabQueryKey?: string;
+  activeTab?: string;
+  onActiveTabChange?: (tab: string) => void;
   isEditing?: boolean;
   onStartEditing?: () => void;
   onCancel?: () => void;

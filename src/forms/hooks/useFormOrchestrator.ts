@@ -82,11 +82,32 @@ export const useFormOrchestrator = <const T extends readonly SavableForm[]>(
   }, [draft.clear, state.result?.outcome]);
 
   const submit = () => {
-    const selectedForms = latest.current.includePristine
-      ? latest.current.forms
-      : latest.current.forms.filter((binding) => {
-          return binding.form.state.isDirty;
-        });
+    const allForms = latest.current.forms;
+    const selectedIds = new Set(
+      latest.current.includePristine
+        ? allForms.map((binding) => binding.id)
+        : allForms.filter((binding) => binding.form.state.isDirty).map((binding) => binding.id),
+    );
+
+    // A dirty form must bring its declared dependencies into the save set so
+    // the orchestrator can validate and save them in dependency order.
+    let changed = true;
+    while (changed) {
+      changed = false;
+      for (const binding of allForms) {
+        if (!selectedIds.has(binding.id)) {
+          continue;
+        }
+        for (const dependency of binding.dependencies ?? []) {
+          if (!selectedIds.has(dependency.id)) {
+            selectedIds.add(dependency.id);
+            changed = true;
+          }
+        }
+      }
+    }
+
+    const selectedForms = allForms.filter((binding) => selectedIds.has(binding.id));
 
     const forms = selectedForms as unknown as T;
 
@@ -124,13 +145,15 @@ export const useFormOrchestrator = <const T extends readonly SavableForm[]>(
 
   const actionState = combineFormEditorActionStates(
     ...config.forms.map((form) => {
-      return form.actionState ?? {
-        canSubmit: true,
-        isSubmitting: state.isSaving,
-        isPristine: !form.form.state?.isDirty,
-        validationErrors: [],
-        submitErrors: [],
-      };
+      return (
+        form.actionState ?? {
+          canSubmit: true,
+          isSubmitting: state.isSaving,
+          isPristine: !form.form.state?.isDirty,
+          validationErrors: [],
+          submitErrors: [],
+        }
+      );
     }),
   );
 
