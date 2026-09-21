@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 import * as Tabs from "@radix-ui/react-tabs";
 
-import { EditContext } from "../EditContext";
+import { EditContext } from "../context";
 import { FormEditorContext, type FormEditorController } from "../hooks/useFormEditorContext";
 import type { FormEditorProviderProps } from "./formTypes";
 
@@ -23,6 +23,8 @@ export const FormEditorProvider = ({
   defaultTab,
   children,
   tabQueryKey = "tab",
+  isEditing = mode === "edit",
+  onStartEditing,
   onCancel,
   readOnly = false,
   preventSaveWithoutChanges = mode === "edit",
@@ -31,11 +33,9 @@ export const FormEditorProvider = ({
   cancelLabel = "Cancel",
   cancelButtonVariant = "cancel",
   showCancel = true,
-  editQueryKey = "edit",
   actions,
 }: FormEditorProviderProps) => {
   const [activeTab, setActiveTabState] = useState(() => readQueryValue(tabQueryKey, defaultTab));
-  const [isEditing, setIsEditing] = useState(true);
 
   useEffect(() => {
     setActiveTabState(readQueryValue(tabQueryKey, defaultTab));
@@ -49,14 +49,11 @@ export const FormEditorProvider = ({
     [tabQueryKey],
   );
   const startEditing = useCallback(() => {
-    setIsEditing(true);
-    writeQueryValue(editQueryKey, "true");
-  }, [editQueryKey]);
+    onStartEditing?.();
+  }, [onStartEditing]);
   const cancelEditing = useCallback(() => {
-    setIsEditing(false);
-    writeQueryValue(editQueryKey, null);
     onCancel?.();
-  }, [editQueryKey, onCancel]);
+  }, [onCancel]);
 
   const controller = useMemo<FormEditorController>(
     () => ({

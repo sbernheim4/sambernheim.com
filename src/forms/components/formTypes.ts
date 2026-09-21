@@ -6,6 +6,8 @@ export type FormEditorProviderProps = {
   defaultTab: string;
   children: ReactNode;
   tabQueryKey?: string;
+  isEditing?: boolean;
+  onStartEditing?: () => void;
   onCancel?: () => void;
   readOnly?: boolean;
   preventSaveWithoutChanges?: boolean;
@@ -14,7 +16,6 @@ export type FormEditorProviderProps = {
   cancelLabel?: string;
   cancelButtonVariant?: FormEditorController["cancelButtonVariant"];
   showCancel?: boolean;
-  editQueryKey?: string;
   actions: FormEditorActionState;
 };
 
