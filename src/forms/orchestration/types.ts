@@ -156,6 +156,7 @@ export type FormSaveState<V = unknown, I = unknown, R = unknown> = {
   formValues?: V;
   variables?: I;
   response?: R;
+  blockedBy?: readonly string[];
   failure?: FailureContext<V, I>;
 };
 
@@ -186,6 +187,8 @@ export type Phase =
 export type SaveConfig<P extends readonly AnyForm[]> = RefreshOptions & {
   readonly forms: Readonly<P>;
   readonly progressDelayMs?: number;
+  /** Maximum number of ready graph nodes that may mutate concurrently. */
+  readonly maxConcurrency?: number;
   readonly onProgressClose?: () => void | Promise<void>;
   readonly undoFormValues?: Readonly<Record<string, unknown>>;
   readonly undoPayloads?: Readonly<Record<string, unknown>>;

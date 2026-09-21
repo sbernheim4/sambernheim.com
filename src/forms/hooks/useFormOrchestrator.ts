@@ -127,6 +127,7 @@ export const useFormOrchestrator = <const T extends readonly SavableForm[]>(
       persistDraftKey: _persistDraftKey,
       onProgressClose: _onProgressClose,
       onSuccess,
+      onFailure,
       ...submitConfig
     } = latest.current;
 
@@ -135,27 +136,83 @@ export const useFormOrchestrator = <const T extends readonly SavableForm[]>(
         return;
       }
 
+      const formResults = result.forms as Readonly<Record<string, { status: string }>>;
+      const undoForms = forms.filter((form) => {
+        return formResults[form.id]?.status === "saved";
+      });
+      if (
+        !undoForms.length ||
+        undoForms.some((form) => {
+          return (
+            !Object.hasOwn(result.undoFormValues!, form.id) ||
+            !Object.hasOwn(result.undoPayloads!, form.id)
+          );
+        })
+      ) {
+        return;
+      }
+
+      const undoFormValues = Object.fromEntries(
+        undoForms.map((form) => {
+          return [form.id, result.undoFormValues![form.id]];
+        }),
+      );
+      const undoPayloads = Object.fromEntries(
+        undoForms.map((form) => {
+          return [form.id, result.undoPayloads![form.id]];
+        }),
+      );
+      const undoFormSet = new Set(
+        undoForms.map((form) => {
+          return form.id;
+        }),
+      );
+      const filteredUndoForms = undoForms.filter((form) => {
+        return (form.dependencies ?? []).every((dependency) => {
+          return undoFormSet.has(dependency.id);
+        });
+      });
+      if (filteredUndoForms.length !== undoForms.length) {
+        return;
+      }
+
       const undoConfig = {
         ...submitConfig,
-        forms,
+        forms: filteredUndoForms as unknown as T,
         progressDelayMs: 0,
         onSuccess: undefined,
         onFailure: undefined,
         onProgressClose: undefined,
-        undoFormValues: result.undoFormValues,
-        undoPayloads: result.undoPayloads,
+        undoFormValues,
+        undoPayloads,
       };
 
       setFormUndoTransaction({
         id: String(Date.now()),
         expiresAt: Date.now() + 10_000,
-        formIds: forms.map((form) => {
+        formIds: filteredUndoForms.map((form) => {
           return form.id;
         }),
         undo: async () => {
-          await orchestrator.submit(undoConfig);
+          const undoResult = await orchestrator.submit(undoConfig);
+          if (
+            undoResult.outcome !== "success" &&
+            undoResult.outcome !== "saved-with-follow-up-errors"
+          ) {
+            throw new Error("Some changes could not be undone.");
+          }
         },
       });
+    };
+
+    const handleResult = (result: NonNullable<Awaited<ReturnType<typeof orchestrator.submit>>>) => {
+      if (
+        result.outcome === "success" ||
+        result.outcome === "saved-with-follow-up-errors" ||
+        result.outcome === "partial-failure"
+      ) {
+        registerUndo(result);
+      }
     };
 
     return orchestrator.submit({
@@ -163,11 +220,12 @@ export const useFormOrchestrator = <const T extends readonly SavableForm[]>(
       forms,
       onProgressClose: _onProgressClose,
       onSuccess: async ({ result }) => {
-        if (result.outcome === "success" || result.outcome === "saved-with-follow-up-errors") {
-          registerUndo(result);
-        }
-
+        handleResult(result);
         return onSuccess?.({ result });
+      },
+      onFailure: async ({ result }) => {
+        handleResult(result);
+        return onFailure?.({ result });
       },
     });
   };
