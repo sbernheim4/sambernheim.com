@@ -6,7 +6,6 @@ import { emptyTask, type TaskFormValues } from "../../shared/runtimeTypes";
 import { taskKeys, useTask, useUpdateTask } from "./useTasks";
 
 const numberValue = (input: string, fallback: number) => {
-
   return Number(input) || fallback;
 };
 

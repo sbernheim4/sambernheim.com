@@ -1,4 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
+import { FormEditor } from "../../forms/components";
+import { ExecutionProfileFields } from "../../domains/execution-profiles/components/ExecutionProfileFields";
 import { useProcesses, useProcess } from "../../domains/processes/hooks/useProcesses";
 import { useProcessEditForms } from "../../domains/processes/hooks/useProcessEditForms";
 import { useThreads } from "../../domains/threads/hooks/useThreads";
@@ -12,7 +14,7 @@ import {
   Missing,
   Status,
 } from "../../shared/components/RuntimeLayout";
-import { ChildList, ProfileSummary, RuntimeEditor } from "../RuntimeEditor";
+import { ChildList, ProfileSummary } from "../RuntimeDetailHelpers";
 
 export const ProcessListPage = () => {
   const query = useProcesses();
@@ -46,6 +48,7 @@ export const ProcessDetailPage = ({ id }: { id: string }) => {
   const process = useProcess(id);
   const threads = useThreads(id);
   const tasks = useTasks();
+
   if (process.isPending) {
     return <Loading />;
   }
@@ -107,19 +110,36 @@ export const ProcessEditPage = ({
 
   return (
     <RuntimeShell>
-      <RuntimeEditor
-        entity="Process"
-        entityForm={entityForm}
-        profileForm={profileForm}
-        save={save}
+      <FormEditor.Provider
+        mode="edit"
+        isEditing
+        defaultTab="entity"
         activeTab={activeTab}
         onActiveTabChange={onActiveTabChange}
+        actions={save.actions}
         onCancel={() =>
           navigate({ to: "/processes/$processId", params: { processId: id }, search: {} })
         }
       >
-        <ProcessFields form={entityForm.form} />
-      </RuntimeEditor>
+        <div className="runtime-editor-heading">
+          <h1>Edit Process</h1>
+        </div>
+
+        <FormEditor.TabList>
+          <FormEditor.TabTrigger name="entity" label="Process" />
+          <FormEditor.TabTrigger name="profile" label="Execution Profile" />
+        </FormEditor.TabList>
+
+        <FormEditor.Tab name="entity">
+          <ProcessFields form={entityForm.form} />
+        </FormEditor.Tab>
+
+        <FormEditor.Tab name="profile">
+          <ExecutionProfileFields form={profileForm.form} />
+        </FormEditor.Tab>
+
+        <FormEditor.Actions />
+      </FormEditor.Provider>
     </RuntimeShell>
   );
 };

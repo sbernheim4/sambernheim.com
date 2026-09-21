@@ -6,7 +6,6 @@ import { emptyThread, type ThreadFormValues } from "../../shared/runtimeTypes";
 import { threadKeys, useThread, useUpdateThread } from "./useThreads";
 
 const numberValue = (input: string, fallback: number) => {
-
   return Number(input) || fallback;
 };
 

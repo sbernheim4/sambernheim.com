@@ -1,4 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
+import { FormEditor } from "../../forms/components";
+import { ExecutionProfileFields } from "../../domains/execution-profiles/components/ExecutionProfileFields";
 import { useThreads, useThread } from "../../domains/threads/hooks/useThreads";
 import { useThreadEditForms } from "../../domains/threads/hooks/useThreadEditForms";
 import { useProcesses } from "../../domains/processes/hooks/useProcesses";
@@ -11,7 +13,7 @@ import {
   Missing,
   Status,
 } from "../../shared/components/RuntimeLayout";
-import { ProfileSummary, RuntimeEditor } from "../RuntimeEditor";
+import { ProfileSummary } from "../RuntimeDetailHelpers";
 
 export const ThreadListPage = () => {
   const query = useThreads();
@@ -98,19 +100,32 @@ export const ThreadEditPage = ({
 
   return (
     <RuntimeShell>
-      <RuntimeEditor
-        entity="Thread"
-        entityForm={entityForm}
-        profileForm={profileForm}
-        save={save}
+      <FormEditor.Provider
+        mode="edit"
+        isEditing
+        defaultTab="entity"
         activeTab={activeTab}
         onActiveTabChange={onActiveTabChange}
+        actions={save.actions}
         onCancel={() =>
           navigate({ to: "/threads/$threadId", params: { threadId: id }, search: {} })
         }
       >
-        <ThreadFields form={entityForm.form} />
-      </RuntimeEditor>
+        <div className="runtime-editor-heading">
+          <h1>Edit Thread</h1>
+        </div>
+        <FormEditor.TabList>
+          <FormEditor.TabTrigger name="entity" label="Thread" />
+          <FormEditor.TabTrigger name="profile" label="Execution Profile" />
+        </FormEditor.TabList>
+        <FormEditor.Tab name="entity">
+          <ThreadFields form={entityForm.form} />
+        </FormEditor.Tab>
+        <FormEditor.Tab name="profile">
+          <ExecutionProfileFields form={profileForm.form} />
+        </FormEditor.Tab>
+        <FormEditor.Actions />
+      </FormEditor.Provider>
     </RuntimeShell>
   );
 };

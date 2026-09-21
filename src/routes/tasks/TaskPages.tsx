@@ -1,4 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
+import { FormEditor } from "../../forms/components";
+import { ExecutionProfileFields } from "../../domains/execution-profiles/components/ExecutionProfileFields";
 import { useTasks, useTask } from "../../domains/tasks/hooks/useTasks";
 import { useTaskEditForms } from "../../domains/tasks/hooks/useTaskEditForms";
 import { useProcesses } from "../../domains/processes/hooks/useProcesses";
@@ -11,7 +13,7 @@ import {
   Missing,
   Status,
 } from "../../shared/components/RuntimeLayout";
-import { ChildList, ProfileSummary, RuntimeEditor } from "../RuntimeEditor";
+import { ChildList, ProfileSummary } from "../RuntimeDetailHelpers";
 
 export const TaskListPage = () => {
   const query = useTasks();
@@ -94,17 +96,30 @@ export const TaskEditPage = ({
 
   return (
     <RuntimeShell>
-      <RuntimeEditor
-        entity="Task"
-        entityForm={entityForm}
-        profileForm={profileForm}
-        save={save}
+      <FormEditor.Provider
+        mode="edit"
+        isEditing
+        defaultTab="entity"
         activeTab={activeTab}
         onActiveTabChange={onActiveTabChange}
+        actions={save.actions}
         onCancel={() => navigate({ to: "/tasks/$taskId", params: { taskId: id }, search: {} })}
       >
-        <TaskFields form={entityForm.form} />
-      </RuntimeEditor>
+        <div className="runtime-editor-heading">
+          <h1>Edit Task</h1>
+        </div>
+        <FormEditor.TabList>
+          <FormEditor.TabTrigger name="entity" label="Task" />
+          <FormEditor.TabTrigger name="profile" label="Execution Profile" />
+        </FormEditor.TabList>
+        <FormEditor.Tab name="entity">
+          <TaskFields form={entityForm.form} />
+        </FormEditor.Tab>
+        <FormEditor.Tab name="profile">
+          <ExecutionProfileFields form={profileForm.form} />
+        </FormEditor.Tab>
+        <FormEditor.Actions />
+      </FormEditor.Provider>
     </RuntimeShell>
   );
 };
