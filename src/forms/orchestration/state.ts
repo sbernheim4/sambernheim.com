@@ -58,6 +58,9 @@ export const reduceRuntimeState = (state: RuntimeState, event: StateEvent): Runt
       };
     case "payload.prepared":
       requireStatus(event.id, event, current, ["ready"]);
+      if (Object.hasOwn(current, "variables")) {
+        throw new Error(`Payload for ${event.id} has already been prepared.`);
+      }
       return {
         ...state,
         forms: { ...state.forms, [event.id]: { ...current, variables: event.variables } },
