@@ -1,4 +1,6 @@
 import { useContext } from "react";
 import { EditContext } from "../context";
 
-export const useIsEditing = () => useContext(EditContext).isEditing;
+export const useIsEditing = () => {
+  return useContext(EditContext).isEditing;
+};

@@ -1,9 +1,9 @@
 import type { FormEditorRegionProps } from "./formTypes";
 import type { PersistedDraftController } from "../hooks/usePersistedFormData";
 
-export const FormEditorContent = ({ children, className }: FormEditorRegionProps) => (
-  <div className={className ?? "form-editor-content"}>{children}</div>
-);
+export const FormEditorContent = ({ children, className }: FormEditorRegionProps) => {
+  return <div className={className ?? "form-editor-content"}>{children}</div>;
+};
 
 export const FormEditorDraftBanner = ({ draft }: { draft: PersistedDraftController }) => {
   if (!draft.hasDraft) {

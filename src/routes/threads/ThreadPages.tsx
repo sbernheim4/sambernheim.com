@@ -21,18 +21,20 @@ export const ThreadListPage = () => {
         <p>Loading...</p>
       ) : (
         <div className="list">
-          {query.data?.map((thread) => (
-            <Link
-              key={thread.id}
-              className="card"
-              to="/form-demo/threads/$threadId"
-              params={{ threadId: thread.id }}
-            >
-              <strong>{thread.name}</strong>
-              <Status value={thread.status} />
-              <span>{thread.entryPoint}</span>
-            </Link>
-          ))}
+          {query.data?.map((thread) => {
+            return (
+              <Link
+                key={thread.id}
+                className="card"
+                to="/form-demo/threads/$threadId"
+                params={{ threadId: thread.id }}
+              >
+                <strong>{thread.name}</strong>
+                <Status value={thread.status} />
+                <span>{thread.entryPoint}</span>
+              </Link>
+            );
+          })}
         </div>
       )}
     </>
@@ -50,7 +52,9 @@ export const ThreadDetailPage = ({ id }: { id: string }) => {
     return <Missing />;
   }
 
-  const process = processes.data?.find((item) => item.id === thread.data?.processId);
+  const process = processes.data?.find((item) => {
+    return item.id === thread.data?.processId;
+  });
 
   return (
     <DetailLayout title={thread.data.name} editTo={`/form-demo/threads/${id}/edit`}>
@@ -137,13 +141,13 @@ export const ThreadEditPage = ({
       activeTab={activeTab}
       onActiveTabChange={onActiveTabChange}
       actions={save.actions}
-      onCancel={() =>
-        navigate({
+      onCancel={() => {
+        return navigate({
           to: "/form-demo/threads/$threadId",
           params: { threadId: id },
           search: {},
-        })
-      }
+        });
+      }}
     >
       <div className="editor-heading">
         <h1>Edit Thread</h1>

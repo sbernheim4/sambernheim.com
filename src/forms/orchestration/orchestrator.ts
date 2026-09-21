@@ -454,12 +454,18 @@ const captureUndoState = (forms: readonly FormInput[]) => {
     }
 
     const payloads: Record<string, unknown> = {};
-    const remaining = new Set(forms.map((form) => form.id));
+    const remaining = new Set(
+      forms.map((form) => {
+        return form.id;
+      }),
+    );
     while (remaining.size) {
       const ready = forms.filter((form) => {
         return (
           remaining.has(form.id) &&
-          (form.dependencies ?? []).every((dependency) => Object.hasOwn(payloads, dependency.id))
+          (form.dependencies ?? []).every((dependency) => {
+            return Object.hasOwn(payloads, dependency.id);
+          })
         );
       });
 
@@ -707,11 +713,15 @@ const saveFormsInGraph = async <P extends readonly AnyForm[]>(
   const prerequisites = (form: FormInput) => {
     return undo
       ? (dependents.get(form.id) ?? [])
-      : (form.dependencies ?? []).map((dependency) => dependency.id);
+      : (form.dependencies ?? []).map((dependency) => {
+          return dependency.id;
+        });
   };
 
   while (true) {
-    const pending = forms.filter((form) => states[form.id].status === "ready");
+    const pending = forms.filter((form) => {
+      return states[form.id].status === "ready";
+    });
     if (!pending.length) {
       break;
     }

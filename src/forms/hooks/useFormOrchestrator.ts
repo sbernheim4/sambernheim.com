@@ -92,8 +92,16 @@ export const useFormOrchestrator = <const T extends readonly SavableForm[]>(
     const allForms = latest.current.forms;
     const selectedIds = new Set(
       latest.current.includePristine
-        ? allForms.map((binding) => binding.id)
-        : allForms.filter((binding) => binding.form.state.isDirty).map((binding) => binding.id),
+        ? allForms.map((binding) => {
+            return binding.id;
+          })
+        : allForms
+            .filter((binding) => {
+              return binding.form.state.isDirty;
+            })
+            .map((binding) => {
+              return binding.id;
+            }),
     );
 
     // A dirty form must bring its declared dependencies into the save set so
@@ -114,7 +122,9 @@ export const useFormOrchestrator = <const T extends readonly SavableForm[]>(
       }
     }
 
-    const selectedForms = allForms.filter((binding) => selectedIds.has(binding.id));
+    const selectedForms = allForms.filter((binding) => {
+      return selectedIds.has(binding.id);
+    });
 
     const forms = selectedForms as unknown as T;
 

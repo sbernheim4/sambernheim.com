@@ -12,7 +12,9 @@ const ThreadEditRoute = () => {
     <ThreadEditPage
       id={threadId}
       activeTab={tab === "profile" ? "profile" : "entity"}
-      onActiveTabChange={(nextTab) => navigate({ search: { tab: nextTab } })}
+      onActiveTabChange={(nextTab) => {
+        return navigate({ search: { tab: nextTab } });
+      }}
     />
   );
 };

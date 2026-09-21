@@ -65,7 +65,9 @@ export const usePersistedFormData = ({
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const clear = useCallback(() => {
-    if (storageKey) removeDraft(storageKey);
+    if (storageKey) {
+      removeDraft(storageKey);
+    }
     setHasDraft(false);
     setSavedAt(undefined);
     setDismissed(false);
@@ -75,14 +77,22 @@ export const usePersistedFormData = ({
     if (!storageKey || typeof window === "undefined") {
       return;
     }
-    if (!forms.some((binding) => binding.form.state.isDirty)) {
+    if (
+      !forms.some((binding) => {
+        return binding.form.state.isDirty;
+      })
+    ) {
       return;
     }
 
     const draft: PersistedDraft = {
       version: 1,
       savedAt: new Date().toISOString(),
-      values: Object.fromEntries(forms.map((binding) => [binding.id, binding.form.state.values])),
+      values: Object.fromEntries(
+        forms.map((binding) => {
+          return [binding.id, binding.form.state.values];
+        }),
+      ),
     };
 
     try {
@@ -100,15 +110,23 @@ export const usePersistedFormData = ({
     }
 
     const schedulePersist = () => {
-      if (timer.current) clearTimeout(timer.current);
+      if (timer.current) {
+        clearTimeout(timer.current);
+      }
       timer.current = setTimeout(persist, 200);
     };
-    const subscriptions = forms.map((binding) => binding.form.store.subscribe(schedulePersist));
+    const subscriptions = forms.map((binding) => {
+      return binding.form.store.subscribe(schedulePersist);
+    });
     schedulePersist();
 
     return () => {
-      if (timer.current) clearTimeout(timer.current);
-      subscriptions.forEach((subscription) => subscription.unsubscribe());
+      if (timer.current) {
+        clearTimeout(timer.current);
+      }
+      subscriptions.forEach((subscription) => {
+        return subscription.unsubscribe();
+      });
     };
   }, [forms, persist, storageKey]);
 
@@ -139,7 +157,9 @@ export const usePersistedFormData = ({
   }, [forms, storageKey]);
 
   const discard = useCallback(() => {
-    for (const binding of forms) binding.form.reset();
+    for (const binding of forms) {
+      binding.form.reset();
+    }
     clear();
   }, [clear, forms]);
 

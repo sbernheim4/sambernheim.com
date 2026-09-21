@@ -5,26 +5,34 @@ export const ThreadFields = ({ form }: { form: any }) => {
   return (
     <div className="thread-fields fields">
       <form.AppField name="name">
-        {(field: any) => <field.TextField label="Thread name" required />}
+        {(field: any) => {
+          return <field.TextField label="Thread name" required />;
+        }}
       </form.AppField>
       <form.AppField name="entryPoint">
-        {(field: any) => <field.TextField label="Entry point" required />}
+        {(field: any) => {
+          return <field.TextField label="Entry point" required />;
+        }}
       </form.AppField>
       <form.AppField name="status">
-        {(field: any) => (
-          <field.SelectField
-            label="Status"
-            options={[
-              { value: "new", label: "New" },
-              { value: "running", label: "Running" },
-              { value: "blocked", label: "Blocked" },
-              { value: "finished", label: "Finished" },
-            ]}
-          />
-        )}
+        {(field: any) => {
+          return (
+            <field.SelectField
+              label="Status"
+              options={[
+                { value: "new", label: "New" },
+                { value: "running", label: "Running" },
+                { value: "blocked", label: "Blocked" },
+                { value: "finished", label: "Finished" },
+              ]}
+            />
+          );
+        }}
       </form.AppField>
       <form.AppField name="priority">
-        {(field: any) => <field.TextField label="Priority" />}
+        {(field: any) => {
+          return <field.TextField label="Priority" />;
+        }}
       </form.AppField>
     </div>
   );

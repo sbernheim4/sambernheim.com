@@ -21,18 +21,20 @@ export const TaskListPage = () => {
         <p>Loading...</p>
       ) : (
         <div className="list">
-          {query.data?.map((task) => (
-            <Link
-              key={task.id}
-              className="card"
-              to="/form-demo/tasks/$taskId"
-              params={{ taskId: task.id }}
-            >
-              <strong>{task.name}</strong>
-              <Status value={task.status} />
-              <span>{task.description}</span>
-            </Link>
-          ))}
+          {query.data?.map((task) => {
+            return (
+              <Link
+                key={task.id}
+                className="card"
+                to="/form-demo/tasks/$taskId"
+                params={{ taskId: task.id }}
+              >
+                <strong>{task.name}</strong>
+                <Status value={task.status} />
+                <span>{task.description}</span>
+              </Link>
+            );
+          })}
         </div>
       )}
     </>
@@ -91,16 +93,18 @@ export const TaskDetailPage = ({ id }: { id: string }) => {
             children: (
               <section className="details">
                 <ChildList>
-                  {processes.data?.map((process) => (
-                    <Link
-                      key={process.id}
-                      to="/form-demo/processes/$processId"
-                      params={{ processId: process.id }}
-                    >
-                      <span>{process.name}</span>
-                      <span className="relationship-meta">{process.command}</span>
-                    </Link>
-                  ))}
+                  {processes.data?.map((process) => {
+                    return (
+                      <Link
+                        key={process.id}
+                        to="/form-demo/processes/$processId"
+                        params={{ processId: process.id }}
+                      >
+                        <span>{process.name}</span>
+                        <span className="relationship-meta">{process.command}</span>
+                      </Link>
+                    );
+                  })}
                 </ChildList>
               </section>
             ),
@@ -140,9 +144,9 @@ export const TaskEditPage = ({
       activeTab={activeTab}
       onActiveTabChange={onActiveTabChange}
       actions={save.actions}
-      onCancel={() =>
-        navigate({ to: "/form-demo/tasks/$taskId", params: { taskId: id }, search: {} })
-      }
+      onCancel={() => {
+        return navigate({ to: "/form-demo/tasks/$taskId", params: { taskId: id }, search: {} });
+      }}
     >
       <div className="editor-heading">
         <h1>Edit Task</h1>
