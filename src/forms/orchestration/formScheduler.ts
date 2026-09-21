@@ -1,7 +1,7 @@
 import type { AnyForm, Phase, SaveConfig } from "./types";
 import { getVariablesWithOverrides } from "./validation";
 import { resolveRetryPolicy, saveFormWithRetry } from "./mutation";
-import { reduceRuntimeState, type FormStates, type Responses, type RuntimeState } from "./state";
+import { reduceRuntimeState, type FormStates, type RuntimeState } from "./state";
 import type { SavePlan } from "./plan";
 import { executeGraph, type RunnableNode } from "./scheduler";
 
@@ -15,16 +15,11 @@ class PayloadMappingError extends Error {
 
 export const saveFormsInGraph = async <P extends readonly AnyForm[]>(
   plan: SavePlan,
-  initialStates: FormStates,
-  initialResponses: Responses,
+  initialRuntime: RuntimeState,
   config: SaveConfig<P>,
-  emit: (phase: Phase, states: FormStates, responses: Responses) => void,
-) => {
-  let runtime: RuntimeState = {
-    forms: { ...initialStates },
-    responses: { ...initialResponses },
-    followUpErrors: [],
-  };
+  emit: (phase: Phase, runtime: RuntimeState) => void,
+): Promise<RuntimeState> => {
+  let runtime = initialRuntime;
 
   const pending = plan.order.filter((id) => {
     return runtime.forms[id]?.status === "ready";
@@ -45,13 +40,18 @@ export const saveFormsInGraph = async <P extends readonly AnyForm[]>(
       run: async () => {
         let variables: unknown;
         try {
-          variables = getVariablesWithOverrides(
-            node.form,
-            runtime.forms[id],
-            runtime.responses,
-            config.undoPayloads,
-          );
-          runtime = reduceRuntimeState(runtime, { type: "payload.prepared", id, variables });
+          const current = runtime.forms[id];
+          if (Object.hasOwn(current, "variables")) {
+            variables = current.variables;
+          } else {
+            variables = getVariablesWithOverrides(
+              node.form,
+              current,
+              runtime.responses,
+              config.undoPayloads,
+            );
+            runtime = reduceRuntimeState(runtime, { type: "payload.prepared", id, variables });
+          }
         } catch (error) {
           throw new PayloadMappingError(error);
         }
@@ -69,7 +69,7 @@ export const saveFormsInGraph = async <P extends readonly AnyForm[]>(
                 ? { type: "saving.retrying", id }
                 : { type: "saving.started", id, attempt: progress.attempts },
             );
-            emit("saving", runtime.forms, runtime.responses);
+            emit("saving", runtime);
           },
           config.progressDelayMs ?? 0,
         );
@@ -95,7 +95,7 @@ export const saveFormsInGraph = async <P extends readonly AnyForm[]>(
             error: event.value.failure?.error,
           });
         }
-        emit("saving", runtime.forms, runtime.responses);
+        emit("saving", runtime);
       } else if (event.type === "failed") {
         runtime = reduceRuntimeState(runtime, {
           type: "failed",
@@ -103,7 +103,7 @@ export const saveFormsInGraph = async <P extends readonly AnyForm[]>(
           phase: event.error instanceof PayloadMappingError ? "mapping" : "save",
           error: event.error instanceof PayloadMappingError ? event.error.cause : event.error,
         });
-        emit("saving", runtime.forms, runtime.responses);
+        emit("saving", runtime);
       } else if (event.type === "skipped") {
         runtime = reduceRuntimeState(runtime, {
           type: "skipped",
@@ -114,5 +114,5 @@ export const saveFormsInGraph = async <P extends readonly AnyForm[]>(
     },
   });
 
-  return { states: runtime.forms, responses: runtime.responses };
+  return runtime;
 };

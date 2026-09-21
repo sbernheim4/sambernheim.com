@@ -75,11 +75,10 @@ export type PipelineOperations<P extends readonly AnyForm[]> = {
   ) => FormStates;
   saveFormsInGraph: (
     plan: SavePlan,
-    states: FormStates,
-    responses: Responses,
+    runtime: RuntimeState,
     config: SaveConfig<P>,
-    emit: (phase: Phase, states: FormStates, responses: Responses) => void,
-  ) => Promise<{ states: FormStates; responses: Responses }>;
+    emit: (phase: Phase, runtime: RuntimeState) => void,
+  ) => Promise<RuntimeState>;
   refreshAndInvalidateCache: (
     successful: readonly FormInput[],
     config: SaveConfig<P>,
@@ -328,7 +327,7 @@ const preparePayloadStage = async <P extends readonly AnyForm[]>(
         }
         continue;
       }
-      if (next.variables !== undefined) {
+      if (!form.dependencies?.length) {
         context.runtime = reduceRuntimeState(context.runtime, {
           type: "payload.prepared",
           id: form.id,
@@ -350,16 +349,15 @@ const saveStage = async <P extends readonly AnyForm[]>(
 
   const saved = await operations.saveFormsInGraph(
     context.plan,
-    context.runtime.forms,
-    context.runtime.responses,
+    context.runtime,
     context.config,
-    (phase, states, responses) => {
-      context.runtime = { ...context.runtime, forms: states, responses };
+    (phase, runtime) => {
+      context.runtime = runtime;
       context.emit(phase);
     },
   );
 
-  context.runtime = { ...context.runtime, forms: saved.states, responses: saved.responses };
+  context.runtime = saved;
 };
 
 const finalizeStage = async <P extends readonly AnyForm[]>(
