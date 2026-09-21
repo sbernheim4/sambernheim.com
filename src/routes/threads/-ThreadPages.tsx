@@ -7,7 +7,7 @@ import { useProcesses } from "../../domains/processes/hooks/useProcesses";
 import { useExecutionProfile } from "../../domains/execution-profiles/hooks/useExecutionProfile";
 import { ThreadFields } from "../../domains/threads/components/ThreadFields";
 import { DetailLayout, Loading, Missing, Status } from "../form-demo/components/-Layout";
-import { ProfileSummary } from "../form-demo/components/-DetailHelpers";
+import { DetailProperties, ProfileSummary } from "../form-demo/components/-DetailHelpers";
 import { DetailView } from "../form-demo/components/-DetailView";
 import { ViewModePicker, useViewModePreference } from "../form-demo/components/-ViewModePreference";
 
@@ -65,20 +65,17 @@ export const ThreadDetailPage = ({ id }: { id: string }) => {
             label: "Overview",
             children: (
               <section className="details">
-                <div className="summary-grid">
-                  <div>
-                    <span className="eyebrow">Entry point</span>
-                    <strong>{thread.data.entryPoint}</strong>
-                  </div>
-                  <div>
-                    <span className="eyebrow">Priority</span>
-                    <strong>{thread.data.priority}</strong>
-                  </div>
-                  <div>
-                    <span className="eyebrow">Status</span>
-                    <Status value={thread.data.status} />
-                  </div>
-                </div>
+                <DetailProperties
+                  properties={[
+                    { label: "ID", value: thread.data.id },
+                    { label: "Name", value: thread.data.name },
+                    { label: "Entry point", value: thread.data.entryPoint },
+                    { label: "Status", value: <Status value={thread.data.status} /> },
+                    { label: "Priority", value: thread.data.priority },
+                    { label: "Process ID", value: thread.data.processId },
+                    { label: "Execution profile ID", value: thread.data.executionProfileId },
+                  ]}
+                />
               </section>
             ),
           },

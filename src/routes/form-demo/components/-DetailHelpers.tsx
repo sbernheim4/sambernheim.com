@@ -9,12 +9,40 @@ export const ProfileSummary = ({ id }: { id: string }) => {
     return <p>Loading profile...</p>;
   }
 
+  if (!profile.data) {
+    return <p>No profile</p>;
+  }
+
   return (
-    <p>
-      {profile.data
-        ? `${profile.data.name} · ${profile.data.runtime} · ${profile.data.region}`
-        : "No profile"}
-    </p>
+    <DetailProperties
+      properties={[
+        { label: "ID", value: profile.data.id },
+        { label: "Name", value: profile.data.name },
+        { label: "Runtime", value: profile.data.runtime },
+        { label: "Region", value: profile.data.region },
+        { label: "Timeout", value: `${profile.data.timeoutMs} ms` },
+        { label: "Memory limit", value: `${profile.data.memoryLimitMb} MB` },
+      ]}
+    />
+  );
+};
+
+export const DetailProperties = ({
+  properties,
+}: {
+  properties: readonly { label: string; value: ReactNode }[];
+}) => {
+  return (
+    <dl className="detail-properties">
+      {properties.map((property) => {
+        return (
+          <div className="detail-property" key={property.label}>
+            <dt className="eyebrow">{property.label}</dt>
+            <dd>{property.value}</dd>
+          </div>
+        );
+      })}
+    </dl>
   );
 };
 
