@@ -55,10 +55,12 @@ export const createOrchestrator = <P extends readonly AnyForm[]>(
     const validationPassed = !forms.some((form) => {
       return states[form.id].failure;
     });
+
     if (validationPassed) {
       const preparedForms = prepareIndependentPayloads(forms, states, config.undoPayloads);
       states = preparedForms;
     }
+
     if (validationPassed) {
       const saved = await saveFormsInGraph(forms, states, responses, config, emit);
 
@@ -69,12 +71,15 @@ export const createOrchestrator = <P extends readonly AnyForm[]>(
     states = updateSkippedFormsState(states);
     result.forms = states as SaveResult<P>["forms"];
     result.responses = responses as SaveResult<P>["responses"];
+
     const successful = forms.filter((form) => {
       return states[form.id].status === "saved";
     });
+
     const allSaved = successful.length === forms.length;
 
     result.outcome = getOutcome(!validationPassed, allSaved);
+
     const context = (form: FormInput) => {
       return {
         queryClient,
@@ -92,6 +97,7 @@ export const createOrchestrator = <P extends readonly AnyForm[]>(
     // This includes partial saves; failed and skipped forms have no follow-ups.
     if (validationPassed) {
       await waitForProgress(config.progressDelayMs ?? 0);
+
       emit("refreshing");
 
       const refreshAndCacheInvalidationErrors = await refreshAndInvalidateCache(
@@ -101,6 +107,7 @@ export const createOrchestrator = <P extends readonly AnyForm[]>(
       );
 
       await waitForProgress(config.progressDelayMs ?? 0);
+
       emit("reconciling");
 
       const cacheUpdateErrors = reconcileCacheWithMutationResponses(
@@ -121,6 +128,7 @@ export const createOrchestrator = <P extends readonly AnyForm[]>(
     }
 
     await waitForProgress(config.progressDelayMs ?? 0);
+
     emit("effects");
 
     const formCallbackErrors = await invokeFormCallbacks(forms, states, context);
@@ -142,8 +150,11 @@ export const createOrchestrator = <P extends readonly AnyForm[]>(
     if (active) {
       return active;
     }
+
     const { forms } = config;
+
     const errors = preflightFormsChecks(forms);
+
     if (errors.length) {
       return Promise.reject(
         new AggregateError(
@@ -156,9 +167,11 @@ export const createOrchestrator = <P extends readonly AnyForm[]>(
         ),
       );
     }
+
     active = run(config).finally(() => {
       active = undefined;
     });
+
     return active;
   };
 
@@ -188,17 +201,21 @@ const preflightFormsChecks = <P extends readonly AnyForm[]>(forms: P): Error[] =
       return form.id;
     }),
   );
+
   const seen = new Set<string>();
+
   const errors: Error[] = [];
 
   for (const form of forms) {
     if (seen.has(form.id)) {
       errors.push(new Error(`Duplicate form ID: ${form.id}`));
     }
+
     for (const dependency of form.dependencies ?? []) {
       if (!ids.has(dependency.id)) {
         errors.push(new Error(`Missing dependency ${dependency.id} for ${form.id}.`));
       }
+
       if (dependency.id === form.id) {
         errors.push(new Error(`Form ${form.id} cannot depend on itself.`));
       }
@@ -209,26 +226,31 @@ const preflightFormsChecks = <P extends readonly AnyForm[]>(forms: P): Error[] =
 
   const visiting = new Set<string>();
   const visited = new Set<string>();
+
   const byId = new Map(
     forms.map((form) => {
       return [form.id, form];
     }),
   );
+
   const visit = (id: string, path: readonly string[]) => {
     if (visiting.has(id)) {
       errors.push(new Error(`Circular dependency detected: ${[...path, id].join(" -> ")}.`));
       return;
     }
+
     if (visited.has(id)) {
       return;
     }
 
     visiting.add(id);
+
     for (const dependency of byId.get(id)?.dependencies ?? []) {
       if (byId.has(dependency.id)) {
         visit(dependency.id, [...path, id]);
       }
     }
+
     visiting.delete(id);
     visited.add(id);
   };
@@ -362,18 +384,21 @@ const validateForms = async (
   const validated = await Promise.all(
     forms.map(async (form): Promise<[string, FormState]> => {
       const state = states[form.id];
+
       if (state.failure) {
         return [form.id, state];
       }
 
       try {
         const validation = await form.validate(structuredClone(state.formValues));
+
         return [
           form.id,
           validation.valid
             ? { ...state, status: "ready" }
             : getFailedState(state, "validation", validation.error),
         ];
+
       } catch (error) {
         return [form.id, getFailedState(state, "validation", error)];
       }
@@ -417,17 +442,22 @@ const prepareIndependentPayloads = (
   return Object.fromEntries(
     forms.map((form) => {
       const state = states[form.id];
+
       if (form.dependencies?.length) {
         return [form.id, state];
       }
 
       try {
+
         return [
           form.id,
           { ...state, variables: getVariablesWithOverrides(form, state, {}, payloadOverrides) },
         ];
+
       } catch (error) {
+
         return [form.id, getFailedState(state, "mapping", error)];
+
       }
     }),
   );
@@ -448,18 +478,22 @@ const captureUndoState = (forms: readonly FormInput[]) => {
       formValues[form.id] = structuredClone(values);
 
       const response = form.undoResponse?.();
+
       if (response !== undefined) {
         responses[form.id] = structuredClone(response);
       }
     }
 
     const payloads: Record<string, unknown> = {};
+
     const remaining = new Set(
       forms.map((form) => {
         return form.id;
       }),
     );
+
     while (remaining.size) {
+
       const ready = forms.filter((form) => {
         return (
           remaining.has(form.id) &&
@@ -535,19 +569,25 @@ const invokeFormCallbacks = async (
   const callbackErrors: FollowUpError[] = [];
 
   for (const form of forms) {
+
     try {
+
       if (states[form.id].status === "saved") {
         await form.onSuccess?.(context(form));
       } else if (states[form.id].failure) {
         await form.onFailure?.(states[form.id].failure!);
       }
+
     } catch (error) {
+
       callbackErrors.push({
         phase: "effect",
         formId: form.id,
         error,
       });
+
     }
+
   }
 
   return callbackErrors;
