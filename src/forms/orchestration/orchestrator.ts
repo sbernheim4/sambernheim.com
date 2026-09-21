@@ -31,7 +31,8 @@ export const createOrchestrator = <P extends readonly AnyForm[]>(
 
   const run = async (config: SaveConfig<P>): Promise<SaveResult<P>> => {
     const { forms } = config;
-    let states = snapshotForms(forms);
+    const undoState = config.undoPayloads ? undefined : captureUndoState(forms);
+    let states = snapshotForms(forms, config.undoFormValues);
     let responses: Responses = {};
 
     const result = {
@@ -39,6 +40,8 @@ export const createOrchestrator = <P extends readonly AnyForm[]>(
       forms: states,
       responses,
       followUpErrors: [],
+      undoFormValues: undoState?.formValues,
+      undoPayloads: undoState?.payloads,
     } as unknown as SaveResult<P>;
 
     const emit = (phase: Phase, currentStates = states, currentResponses = responses) => {
@@ -53,7 +56,7 @@ export const createOrchestrator = <P extends readonly AnyForm[]>(
       return states[form.id].failure;
     });
     if (validationPassed) {
-      const preparedForms = prepareIndependentPayloads(forms, states);
+      const preparedForms = prepareIndependentPayloads(forms, states, config.undoPayloads);
       states = preparedForms;
     }
     const preflightPassed = !forms.some((form) => {
@@ -359,9 +362,23 @@ const getVariables = (form: FormInput, state: FormState, responses: Responses) =
   return variables;
 };
 
+const getVariablesWithOverrides = (
+  form: FormInput,
+  state: FormState,
+  responses: Responses,
+  payloadOverrides?: Readonly<Record<string, unknown>>,
+) => {
+  if (payloadOverrides && Object.hasOwn(payloadOverrides, form.id)) {
+    return structuredClone(payloadOverrides[form.id]);
+  }
+
+  return getVariables(form, state, responses);
+};
+
 const prepareIndependentPayloads = (
   forms: readonly FormInput[],
   states: FormStates,
+  payloadOverrides?: Readonly<Record<string, unknown>>,
 ): FormStates => {
   // Discover independent mapping errors before issuing any writes.
   return Object.fromEntries(
@@ -372,7 +389,10 @@ const prepareIndependentPayloads = (
       }
 
       try {
-        return [form.id, { ...state, variables: getVariables(form, state, {}) }];
+        return [
+          form.id,
+          { ...state, variables: getVariablesWithOverrides(form, state, {}, payloadOverrides) },
+        ];
       } catch (error) {
         return [form.id, getFailedState(state, "mapping", error)];
       }
@@ -380,7 +400,48 @@ const prepareIndependentPayloads = (
   );
 };
 
-const snapshotForms = (forms: readonly FormInput[]): FormStates => {
+const captureUndoState = (forms: readonly FormInput[]) => {
+  const formValues: Record<string, unknown> = {};
+  const responses: Record<string, unknown> = {};
+
+  try {
+    for (const form of forms) {
+      const values = form.undoSnapshot?.();
+
+      if (values === undefined) {
+        return undefined;
+      }
+
+      formValues[form.id] = structuredClone(values);
+
+      const response = form.undoResponse?.();
+      if (response !== undefined) {
+        responses[form.id] = structuredClone(response);
+      }
+    }
+
+    const payloads: Record<string, unknown> = {};
+    for (const form of forms) {
+      const state: FormState = {
+        formId: form.id,
+        status: "ready",
+        attempts: 0,
+        formValues: formValues[form.id],
+      };
+
+      payloads[form.id] = getVariables(form, state, responses);
+    }
+
+    return { formValues, payloads };
+  } catch {
+    return undefined;
+  }
+};
+
+const snapshotForms = (
+  forms: readonly FormInput[],
+  formValueOverrides?: Readonly<Record<string, unknown>>,
+): FormStates => {
   return Object.fromEntries(
     forms.map((form) => {
       const state: FormState = {
@@ -390,7 +451,12 @@ const snapshotForms = (forms: readonly FormInput[]): FormStates => {
       };
 
       try {
-        return [form.id, { ...state, formValues: structuredClone(form.snapshot()) }];
+        const formValues =
+          formValueOverrides && Object.hasOwn(formValueOverrides, form.id)
+            ? formValueOverrides[form.id]
+            : form.snapshot();
+
+        return [form.id, { ...state, formValues: structuredClone(formValues) }];
       } catch (error) {
         return [form.id, getFailedState(state, "validation", error)];
       }
@@ -584,7 +650,10 @@ const saveFormsInOrder = async <P extends readonly AnyForm[]>(
 
     if (form.dependencies?.length) {
       try {
-        state = { ...state, variables: getVariables(form, state, responses) };
+        state = {
+          ...state,
+          variables: getVariablesWithOverrides(form, state, responses, config.undoPayloads),
+        };
       } catch (error) {
         states[form.id] = getFailedState(state, "mapping", error);
         break;

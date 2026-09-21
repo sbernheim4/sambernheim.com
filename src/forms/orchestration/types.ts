@@ -86,6 +86,8 @@ export type AnyForm = {
   id: string;
   dependencies?: readonly { id: string }[];
   snapshot: () => any;
+  undoSnapshot?: () => any;
+  undoResponse?: () => any;
   validate: (...args: any[]) => ValidationResult | Promise<ValidationResult>;
   toMutationPayload?: (...args: any[]) => any;
   markSaved?: (...args: any[]) => void | Promise<void>;
@@ -168,6 +170,8 @@ export type SaveResult<P extends readonly AnyForm[]> = {
   };
   responses: Partial<ResponsesOf<P>>;
   followUpErrors: FollowUpError[];
+  undoFormValues?: Readonly<Record<string, unknown>>;
+  undoPayloads?: Readonly<Record<string, unknown>>;
 };
 
 export type Phase =
@@ -183,6 +187,8 @@ export type SaveConfig<P extends readonly AnyForm[]> = RefreshOptions & {
   readonly forms: Readonly<P>;
   readonly progressDelayMs?: number;
   readonly onProgressClose?: () => void | Promise<void>;
+  readonly undoFormValues?: Readonly<Record<string, unknown>>;
+  readonly undoPayloads?: Readonly<Record<string, unknown>>;
   readonly retry?: RetryPolicy;
   readonly cacheUpdates?: readonly CacheUpdate<
     Partial<ResponsesOf<P>>,
