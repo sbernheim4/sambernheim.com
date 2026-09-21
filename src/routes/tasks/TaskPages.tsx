@@ -8,7 +8,6 @@ import { useExecutionProfile } from "../../domains/execution-profiles/hooks/useE
 import { TaskFields } from "../../domains/tasks/components/TaskFields";
 import {
   RuntimeDetailLayout,
-  RuntimeShell,
   Loading,
   Missing,
   Status,
@@ -19,7 +18,7 @@ export const TaskListPage = () => {
   const query = useTasks();
 
   return (
-    <RuntimeShell>
+    <>
       <h1>Tasks</h1>
       {query.isPending ? (
         <p>Loading...</p>
@@ -29,7 +28,7 @@ export const TaskListPage = () => {
             <Link
               key={task.id}
               className="runtime-card"
-              to="/tasks/$taskId"
+              to="/form-demo/tasks/$taskId"
               params={{ taskId: task.id }}
             >
               <strong>{task.name}</strong>
@@ -39,7 +38,7 @@ export const TaskListPage = () => {
           ))}
         </div>
       )}
-    </RuntimeShell>
+    </>
   );
 };
 
@@ -55,7 +54,7 @@ export const TaskDetailPage = ({ id }: { id: string }) => {
   }
 
   return (
-    <RuntimeDetailLayout title={task.data.name} editTo={`/tasks/${id}/edit`}>
+    <RuntimeDetailLayout title={task.data.name} editTo={`/form-demo/tasks/${id}/edit`}>
       <section className="runtime-details">
         <p>{task.data.description}</p>
         <Status value={task.data.status} />
@@ -65,7 +64,11 @@ export const TaskDetailPage = ({ id }: { id: string }) => {
         <h2>Processes</h2>
         <ChildList>
           {processes.data?.map((process) => (
-            <Link key={process.id} to="/processes/$processId" params={{ processId: process.id }}>
+            <Link
+              key={process.id}
+              to="/form-demo/processes/$processId"
+              params={{ processId: process.id }}
+            >
               {process.name}
             </Link>
           ))}
@@ -95,31 +98,31 @@ export const TaskEditPage = ({
   }
 
   return (
-    <RuntimeShell>
-      <FormEditor.Provider
-        mode="edit"
-        isEditing
-        defaultTab="entity"
-        activeTab={activeTab}
-        onActiveTabChange={onActiveTabChange}
-        actions={save.actions}
-        onCancel={() => navigate({ to: "/tasks/$taskId", params: { taskId: id }, search: {} })}
-      >
-        <div className="runtime-editor-heading">
-          <h1>Edit Task</h1>
-        </div>
-        <FormEditor.TabList>
-          <FormEditor.TabTrigger name="entity" label="Task" />
-          <FormEditor.TabTrigger name="profile" label="Execution Profile" />
-        </FormEditor.TabList>
-        <FormEditor.Tab name="entity">
-          <TaskFields form={entityForm.form} />
-        </FormEditor.Tab>
-        <FormEditor.Tab name="profile">
-          <ExecutionProfileFields form={profileForm.form} />
-        </FormEditor.Tab>
-        <FormEditor.Actions />
-      </FormEditor.Provider>
-    </RuntimeShell>
+    <FormEditor.Provider
+      mode="edit"
+      isEditing
+      defaultTab="entity"
+      activeTab={activeTab}
+      onActiveTabChange={onActiveTabChange}
+      actions={save.actions}
+      onCancel={() =>
+        navigate({ to: "/form-demo/tasks/$taskId", params: { taskId: id }, search: {} })
+      }
+    >
+      <div className="runtime-editor-heading">
+        <h1>Edit Task</h1>
+      </div>
+      <FormEditor.TabList>
+        <FormEditor.TabTrigger name="entity" label="Task" />
+        <FormEditor.TabTrigger name="profile" label="Execution Profile" />
+      </FormEditor.TabList>
+      <FormEditor.Tab name="entity">
+        <TaskFields form={entityForm.form} />
+      </FormEditor.Tab>
+      <FormEditor.Tab name="profile">
+        <ExecutionProfileFields form={profileForm.form} />
+      </FormEditor.Tab>
+      <FormEditor.Actions />
+    </FormEditor.Provider>
   );
 };
