@@ -181,6 +181,8 @@ export type Phase =
 
 export type SaveConfig<P extends readonly AnyForm[]> = RefreshOptions & {
   readonly forms: Readonly<P>;
+  readonly progressDelayMs?: number;
+  readonly onProgressClose?: () => void | Promise<void>;
   readonly retry?: RetryPolicy;
   readonly cacheUpdates?: readonly CacheUpdate<
     Partial<ResponsesOf<P>>,

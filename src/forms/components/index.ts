@@ -4,6 +4,10 @@ import { FormEditorError } from "./FormEditorError";
 import { FormEditorHeader } from "./FormEditorHeader";
 import { FormEditorLayout } from "./FormEditorLayout";
 import { FormEditorMain } from "./FormEditorMain";
+import {
+  FormEditorOrchestratorProgress,
+  FormEditorOrchestratorStatus,
+} from "./FormEditorOrchestratorProgress";
 import { FormEditorProvider } from "./FormEditorProvider";
 import { FormEditorTab } from "./FormEditorTab";
 import { FormEditorTabList } from "./FormEditorTabList";
@@ -20,6 +24,8 @@ export const FormEditor = {
   Header: FormEditorHeader,
   Layout: FormEditorLayout,
   Main: FormEditorMain,
+  OrchestratorProgress: FormEditorOrchestratorProgress,
+  OrchestratorStatus: FormEditorOrchestratorStatus,
   Provider: FormEditorProvider,
   Tab: FormEditorTab,
   TabList: FormEditorTabList,

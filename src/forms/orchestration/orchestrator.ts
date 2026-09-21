@@ -91,6 +91,7 @@ export const createOrchestrator = <P extends readonly AnyForm[]>(
     // After writes, refresh only successful forms, plus group-level queries.
     // This includes partial saves; failed and skipped forms have no follow-ups.
     if (preflightPassed) {
+      await waitForProgress(config.progressDelayMs ?? 0);
       emit("refreshing");
 
       const refreshAndCacheInvalidationErrors = await refreshAndInvalidateCache(
@@ -99,6 +100,7 @@ export const createOrchestrator = <P extends readonly AnyForm[]>(
         queryClient,
       );
 
+      await waitForProgress(config.progressDelayMs ?? 0);
       emit("reconciling");
 
       const cacheUpdateErrors = reconcileCacheWithMutationResponses(
@@ -118,6 +120,7 @@ export const createOrchestrator = <P extends readonly AnyForm[]>(
       );
     }
 
+    await waitForProgress(config.progressDelayMs ?? 0);
     emit("effects");
 
     const formCallbackErrors = await invokeFormCallbacks(forms, states, context);
@@ -211,6 +214,16 @@ const isTransientError = (error: unknown) => {
   }
 
   return error instanceof TypeError; // fetch network failures; only used by retry-safe endpoints
+};
+
+const waitForProgress = async (delayMs: number) => {
+  if (delayMs <= 0) {
+    return;
+  }
+
+  await new Promise((resolve) => {
+    return setTimeout(resolve, delayMs);
+  });
 };
 
 const settleRefreshes = async (
@@ -515,6 +528,7 @@ const saveFormWithRetry = async (
     shouldRetry: (error: unknown) => boolean;
   },
   onProgress: (state: FormState) => void,
+  progressDelayMs: number,
 ): Promise<FormState> => {
   let state = initialState;
 
@@ -523,6 +537,8 @@ const saveFormWithRetry = async (
     onProgress(state);
 
     try {
+      await waitForProgress(progressDelayMs);
+
       return await invokeMutation(form, state);
     } catch (error) {
       if (!getRetryable(form, state, error, retry)) {
@@ -583,9 +599,15 @@ const saveFormsInOrder = async <P extends readonly AnyForm[]>(
       ...form.retry,
     };
 
-    state = await saveFormWithRetry(form, state, retry, (progress) => {
-      emit("saving", { ...states, [form.id]: progress }, { ...responses });
-    });
+    state = await saveFormWithRetry(
+      form,
+      state,
+      retry,
+      (progress) => {
+        emit("saving", { ...states, [form.id]: progress }, { ...responses });
+      },
+      config.progressDelayMs ?? 0,
+    );
     states[form.id] = state;
 
     // Record persistence before the next dependent mapping or any follow-up.

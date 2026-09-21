@@ -67,12 +67,14 @@ export const useFormOrchestrator = <const T extends readonly SavableForm[]>(
     phase: "idle",
     isSaving: false,
   });
+  const [progressDelayMs, setProgressDelayMs] = useState(config.progressDelayMs ?? 0);
+  const [progressOpen, setProgressOpen] = useState(false);
   const [orchestrator] = useState(() => {
     return createOrchestrator<T>(client, setState);
   });
 
   const latest = useRef(config);
-  latest.current = config;
+  latest.current = { ...config, progressDelayMs };
 
   useEffect(() => {
     const outcome = state.result?.outcome;
@@ -82,6 +84,10 @@ export const useFormOrchestrator = <const T extends readonly SavableForm[]>(
   }, [draft.clear, state.result?.outcome]);
 
   const submit = () => {
+    if (progressDelayMs > 0) {
+      setProgressOpen(true);
+    }
+
     const allForms = latest.current.forms;
     const selectedIds = new Set(
       latest.current.includePristine
@@ -143,6 +149,12 @@ export const useFormOrchestrator = <const T extends readonly SavableForm[]>(
     });
   };
 
+  const closeProgress = () => {
+    setProgressOpen(false);
+
+    return latest.current.onProgressClose?.();
+  };
+
   const actionState = combineFormEditorActionStates(
     ...config.forms.map((form) => {
       return (
@@ -157,9 +169,28 @@ export const useFormOrchestrator = <const T extends readonly SavableForm[]>(
     }),
   );
 
+  const orchestratorProgress = {
+    phase: state.phase,
+    isSubmitting: state.isSaving,
+    forms: config.forms.map((form) => {
+      return {
+        id: form.id,
+        invalidateQueryKeys: form.invalidateQueryKeys ?? [],
+        refetchCount: form.refetchFunctions?.length ?? 0,
+        cacheUpdateCount: form.cacheUpdates?.length ?? 0,
+      };
+    }),
+    result: state.result,
+    progressDelayMs,
+    isOpen: progressOpen,
+    setProgressDelayMs,
+    close: closeProgress,
+  };
+
   const conductor = {
     ...state,
     isDirty,
+    orchestratorProgress,
     submit,
     reset,
     draft,
@@ -167,6 +198,7 @@ export const useFormOrchestrator = <const T extends readonly SavableForm[]>(
       ...actionState,
       isSubmitting: state.isSaving,
       onSubmit: submit,
+      orchestrator: orchestratorProgress,
     },
     // This provider object is so this hook composes nicely with the Form UI
     // component
