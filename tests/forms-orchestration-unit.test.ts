@@ -1,6 +1,8 @@
 import { describe, expect, test } from "vitest";
+import { QueryClient } from "@tanstack/react-query";
 import { compileSavePlan } from "../src/forms/orchestration/plan";
 import { executeGraph } from "../src/forms/orchestration/scheduler";
+import { updateCacheWithMutationResponse } from "../src/forms/orchestration/effects";
 import type { AnyForm } from "../src/forms/orchestration/types";
 
 const form = (id: string, dependencies: readonly string[] = []): AnyForm => {
@@ -132,4 +134,31 @@ describe("executeGraph", () => {
     await executeGraph(nodes, { concurrency: 2 });
     expect(maximum).toBe(2);
   });
+});
+
+test("does not overwrite cache data when a cache mapper returns undefined", () => {
+  const queryClient = new QueryClient();
+  queryClient.setQueryData(["resource"], { existing: true });
+
+  const errors = updateCacheWithMutationResponse(
+    {
+      queryClient,
+      response: { updated: true },
+      variables: undefined,
+      results: {},
+    },
+    [
+      {
+        queryKey: () => {
+          return ["resource"];
+        },
+        getData: () => {
+          return undefined;
+        },
+      },
+    ],
+  );
+
+  expect(errors).toEqual([]);
+  expect(queryClient.getQueryData(["resource"])).toEqual({ existing: true });
 });

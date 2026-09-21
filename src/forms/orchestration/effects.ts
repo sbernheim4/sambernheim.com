@@ -121,9 +121,11 @@ export const updateCacheWithMutationResponse = (
         });
       } else {
         const data = cacheUpdate.getData ? cacheUpdate.getData(context.response) : context.response;
-        context.queryClient.setQueryData(key, () => {
-          return data;
-        });
+        if (data !== undefined) {
+          context.queryClient.setQueryData(key, () => {
+            return data;
+          });
+        }
       }
     } catch (error) {
       errors.push({ phase: "cache", formId, error });
