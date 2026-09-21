@@ -10,6 +10,21 @@ import type {
   SaveResult,
 } from "./types";
 import type { SavePlan } from "./plan";
+import { reduceRuntimeState, type RuntimeState } from "./state";
+import { captureUndoState, snapshotForms } from "./snapshot";
+import { prepareIndependentPayloads, validateForms } from "./validation";
+import { saveFormsInGraph } from "./formScheduler";
+import {
+  invokeConfigCallbacks,
+  invokeFormCallbacks,
+  invokeFormFinish,
+  markFormsSaved,
+  reconcileCacheWithMutationResponses,
+  refreshAndInvalidateCache,
+} from "./effects";
+import { updateSkippedFormsState } from "./state";
+import { emitProgress } from "./progress";
+import { waitForProgress } from "./mutation";
 
 export type FormState = Readonly<FormSaveState<any, any, any>>;
 export type FormStates = Readonly<Record<string, FormState>>;
@@ -28,6 +43,7 @@ type RunContext<P extends readonly AnyForm[]> = {
   queryClient: QueryClient;
   states: FormStates;
   responses: Responses;
+  runtime: RuntimeState;
   result: SaveResult<P>;
   successful: readonly FormInput[];
   allSaved: boolean;
@@ -89,7 +105,7 @@ export type PipelineOperations<P extends readonly AnyForm[]> = {
     config: SaveConfig<P>,
     result: SaveResult<P>,
   ) => Promise<FollowUpError[]>;
-  invokeFormFinish: (forms: readonly FormInput[]) => FollowUpError[];
+  invokeFormFinish: (forms: readonly FormInput[]) => Promise<FollowUpError[]>;
   getOutcome: (hasSomeFailure: boolean, allSaved: boolean) => SaveResult<P>["outcome"];
   waitForProgress: (delayMs: number) => Promise<void>;
   emitProgress: (
@@ -107,10 +123,28 @@ type Stage<P extends readonly AnyForm[]> = {
 };
 
 export const createSavePipeline = <P extends readonly AnyForm[]>(
-  operations: PipelineOperations<P>,
   queryClient: QueryClient,
   onChange: (state: SaveState<P>) => void,
 ) => {
+  const operations: PipelineOperations<P> = {
+    captureUndoState,
+    snapshotForms,
+    validateForms,
+    prepareIndependentPayloads,
+    saveFormsInGraph,
+    updateSkippedFormsState,
+    refreshAndInvalidateCache,
+    reconcileCacheWithMutationResponses,
+    markFormsSaved,
+    invokeFormCallbacks,
+    invokeConfigCallbacks,
+    invokeFormFinish,
+    getOutcome: (hasSomeFailure, allSaved) => {
+      return hasSomeFailure ? "validation-failed" : allSaved ? "success" : "partial-failure";
+    },
+    waitForProgress,
+    emitProgress,
+  };
   const stages: readonly Stage<P>[] = [
     { name: "snapshot", run: snapshotStage },
     { name: "validate", run: validateStage },
@@ -149,6 +183,7 @@ const createRunContext = <P extends readonly AnyForm[]>(
     queryClient,
     states: {},
     responses: {},
+    runtime: { forms: {}, responses: {}, followUpErrors: [] },
     result: {
       outcome: "validation-failed",
       forms: {},
@@ -167,6 +202,26 @@ const createRunContext = <P extends readonly AnyForm[]>(
   return context;
 };
 
+const setStates = (context: RunContext<any>, states: FormStates) => {
+  context.states = states;
+  context.runtime = { ...context.runtime, forms: states };
+};
+
+const setResponses = (context: RunContext<any>, responses: Responses) => {
+  context.responses = responses;
+  context.runtime = { ...context.runtime, responses };
+};
+
+const recordFollowUpErrors = (context: RunContext<any>, errors: readonly FollowUpError[]) => {
+  for (const error of errors) {
+    context.runtime = reduceRuntimeState(context.runtime, {
+      type: "follow-up.failed",
+      error,
+    });
+  }
+  context.result.followUpErrors = [...context.runtime.followUpErrors];
+};
+
 const hasValidationFailure = (context: RunContext<any>) => {
   return context.forms.some((form) => {
     return context.states[form.id].failure?.phase === "validation";
@@ -181,12 +236,12 @@ const snapshotStage = async <P extends readonly AnyForm[]>(
     ? undefined
     : operations.captureUndoState(context.forms);
 
-  context.states = operations.snapshotForms(context.forms, context.config.undoFormValues);
+  setStates(context, operations.snapshotForms(context.forms, context.config.undoFormValues));
   context.result = {
     outcome: "validation-failed",
     forms: context.states as SaveResult<P>["forms"],
     responses: context.responses as SaveResult<P>["responses"],
-    followUpErrors: [],
+    followUpErrors: [...context.runtime.followUpErrors],
     undoFormValues: undoState?.formValues,
     undoPayloads: undoState?.payloads,
   };
@@ -198,7 +253,7 @@ const validateStage = async <P extends readonly AnyForm[]>(
   context: RunContext<P>,
   operations: PipelineOperations<P>,
 ) => {
-  context.states = await operations.validateForms(context.forms, context.states);
+  setStates(context, await operations.validateForms(context.forms, context.states));
 };
 
 const preparePayloadStage = async <P extends readonly AnyForm[]>(
@@ -206,10 +261,13 @@ const preparePayloadStage = async <P extends readonly AnyForm[]>(
   operations: PipelineOperations<P>,
 ) => {
   if (!hasValidationFailure(context)) {
-    context.states = operations.prepareIndependentPayloads(
-      context.forms,
-      context.states,
-      context.config.undoPayloads,
+    setStates(
+      context,
+      operations.prepareIndependentPayloads(
+        context.forms,
+        context.states,
+        context.config.undoPayloads,
+      ),
     );
   }
 };
@@ -228,21 +286,21 @@ const saveStage = async <P extends readonly AnyForm[]>(
     context.responses,
     context.config,
     (phase, states, responses) => {
-      context.states = states;
-      context.responses = responses;
+      setStates(context, states);
+      setResponses(context, responses);
       context.emit(phase);
     },
   );
 
-  context.states = saved.states;
-  context.responses = saved.responses;
+  setStates(context, saved.states);
+  setResponses(context, saved.responses);
 };
 
 const finalizeStage = async <P extends readonly AnyForm[]>(
   context: RunContext<P>,
   operations: PipelineOperations<P>,
 ) => {
-  context.states = operations.updateSkippedFormsState(context.states);
+  setStates(context, operations.updateSkippedFormsState(context.states));
   context.result.forms = context.states as SaveResult<P>["forms"];
   context.result.responses = context.responses as SaveResult<P>["responses"];
   context.successful = context.forms.filter((form) => {
@@ -261,7 +319,7 @@ const getFormContext = (context: RunContext<any>, form: FormInput): FormContext 
     formValues: context.states[form.id].formValues,
     formId: form.id,
     attempts: context.states[form.id].attempts,
-    followUpErrors: context.result.followUpErrors,
+    followUpErrors: [...context.runtime.followUpErrors],
   };
 };
 
@@ -275,12 +333,13 @@ const refreshStage = async <P extends readonly AnyForm[]>(
 
   await operations.waitForProgress(context.config.progressDelayMs ?? 0);
   context.emit("refreshing");
-  context.result.followUpErrors.push(
-    ...(await operations.refreshAndInvalidateCache(
+  recordFollowUpErrors(
+    context,
+    await operations.refreshAndInvalidateCache(
       context.successful,
       context.config,
       context.queryClient,
-    )),
+    ),
   );
 };
 
@@ -294,8 +353,9 @@ const reconcileStage = async <P extends readonly AnyForm[]>(
 
   await operations.waitForProgress(context.config.progressDelayMs ?? 0);
   context.emit("reconciling");
-  context.result.followUpErrors.push(
-    ...operations.reconcileCacheWithMutationResponses(
+  recordFollowUpErrors(
+    context,
+    operations.reconcileCacheWithMutationResponses(
       context.successful,
       (form) => {
         return getFormContext(context, form);
@@ -312,8 +372,9 @@ const markSavedStage = async <P extends readonly AnyForm[]>(
   operations: PipelineOperations<P>,
 ) => {
   if (!hasValidationFailure(context)) {
-    context.result.followUpErrors.push(
-      ...(await operations.markFormsSaved(context.successful, context.states)),
+    recordFollowUpErrors(
+      context,
+      await operations.markFormsSaved(context.successful, context.states),
     );
   }
 };
@@ -325,13 +386,13 @@ const effectsStage = async <P extends readonly AnyForm[]>(
   await operations.waitForProgress(context.config.progressDelayMs ?? 0);
   context.emit("effects");
 
-  context.result.followUpErrors.push(
+  recordFollowUpErrors(context, [
     ...(await operations.invokeFormCallbacks(context.forms, context.states, (form) => {
       return getFormContext(context, form);
     })),
     ...(await operations.invokeConfigCallbacks(context.allSaved, context.config, context.result)),
-    ...operations.invokeFormFinish(context.forms),
-  );
+    ...(await operations.invokeFormFinish(context.forms)),
+  ]);
 
   if (context.allSaved && context.result.followUpErrors.length) {
     context.result.outcome = "saved-with-follow-up-errors";

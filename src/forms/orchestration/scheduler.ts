@@ -1,198 +1,141 @@
-import type { AnyForm, Phase, SaveConfig } from "./types";
-import { getVariablesWithOverrides } from "./validation";
-import { resolveRetryPolicy, saveFormWithRetry } from "./mutation";
-import { reduceRuntimeState, type FormStates, type Responses, type RuntimeState } from "./state";
-import type { SavePlan } from "./plan";
-
 export type RunnableNode<T> = {
   id: string;
-  dependencies: readonly string[];
+  prerequisites: readonly string[];
   run: () => Promise<T>;
 };
+
+export type NodeResult<T> =
+  | { status: "completed"; value: T }
+  | { status: "failed"; error: unknown }
+  | { status: "skipped"; blockedBy: readonly string[] };
 
 export type SchedulerEvent<T> =
   | { type: "started"; id: string }
   | { type: "completed"; id: string; value: T }
-  | { type: "failed"; id: string; error: unknown };
+  | { type: "failed"; id: string; error: unknown }
+  | { type: "skipped"; id: string; blockedBy: readonly string[] };
+
+type SchedulerOptions<T> = {
+  concurrency?: number;
+  onNodeState?: (event: SchedulerEvent<T>) => void;
+};
+
+const normalizeConcurrency = (value: number | undefined) => {
+  if (value === undefined || value === Infinity) {
+    return Infinity;
+  }
+  if (Number.isNaN(value)) {
+    return 1;
+  }
+  return Math.max(1, Math.floor(value));
+};
 
 export const executeGraph = async <T>(
   nodes: readonly RunnableNode<T>[],
-  options: {
-    concurrency: number;
-    onNodeState?: (event: SchedulerEvent<T>) => void;
-  },
-): Promise<ReadonlyMap<string, T | { error: unknown }>> => {
-  const results = new Map<string, T | { error: unknown }>();
-  let nextIndex = 0;
-  const count = Math.min(
-    nodes.length,
-    Number.isFinite(options.concurrency) ? options.concurrency : nodes.length,
+  options: SchedulerOptions<T> = {},
+): Promise<ReadonlyMap<string, NodeResult<T>>> => {
+  const byId = new Map<string, RunnableNode<T>>();
+  for (const node of nodes) {
+    if (byId.has(node.id)) {
+      throw new Error(`Duplicate runnable node ID: ${node.id}`);
+    }
+    byId.set(node.id, node);
+  }
+  for (const node of nodes) {
+    for (const prerequisite of node.prerequisites) {
+      if (!byId.has(prerequisite)) {
+        throw new Error(`Missing prerequisite ${prerequisite} for ${node.id}.`);
+      }
+      if (prerequisite === node.id) {
+        throw new Error(`Runnable node ${node.id} cannot depend on itself.`);
+      }
+    }
+  }
+
+  const results = new Map<string, NodeResult<T>>();
+  const pending = new Set(
+    nodes.map(({ id }) => {
+      return id;
+    }),
   );
+  const active = new Set<string>();
+  const running = new Set<Promise<void>>();
+  const concurrency = normalizeConcurrency(options.concurrency);
 
-  const worker = async () => {
-    while (true) {
-      const node = nodes[nextIndex++];
-      if (!node) {
-        return;
+  const emit = (event: SchedulerEvent<T>) => {
+    options.onNodeState?.(event);
+  };
+
+  while (pending.size || active.size) {
+    let changed = false;
+
+    for (const node of nodes) {
+      if (!pending.has(node.id)) {
+        continue;
       }
-      options.onNodeState?.({ type: "started", id: node.id });
-      try {
-        const value = await node.run();
-        results.set(node.id, value);
-        options.onNodeState?.({ type: "completed", id: node.id, value });
-      } catch (error) {
-        results.set(node.id, { error });
-        options.onNodeState?.({ type: "failed", id: node.id, error });
+      const blockedBy = node.prerequisites.filter((id) => {
+        const result = results.get(id);
+        return result?.status === "failed" || result?.status === "skipped";
+      });
+      if (blockedBy.length) {
+        pending.delete(node.id);
+        results.set(node.id, { status: "skipped", blockedBy });
+        emit({ type: "skipped", id: node.id, blockedBy });
+        changed = true;
       }
     }
-  };
 
-  await Promise.all(Array.from({ length: count }, worker));
-  return results;
-};
-
-export const normalizeConcurrency = (value: number | undefined) => {
-  return value === undefined || value === Infinity ? Infinity : Math.max(1, Math.floor(value));
-};
-
-export const saveFormsInGraph = async <P extends readonly AnyForm[]>(
-  plan: SavePlan,
-  initialStates: FormStates,
-  initialResponses: Responses,
-  config: SaveConfig<P>,
-  emit: (phase: Phase, states: FormStates, responses: Responses) => void,
-) => {
-  let runtime: RuntimeState = {
-    forms: { ...initialStates },
-    responses: { ...initialResponses },
-    followUpErrors: [],
-  };
-  const undo = config.undoPayloads !== undefined;
-  const prerequisites = (
-    node: SavePlan["nodes"] extends ReadonlyMap<string, infer N> ? N : never,
-  ) => {
-    return undo ? node.dependents : node.dependencies;
-  };
-
-  while (true) {
-    const pending = plan.order
-      .map((id) => {
-        return plan.nodes.get(id)!;
-      })
-      .filter((node) => {
-        return runtime.forms[node.id].status === "ready";
-      });
-    if (!pending.length) {
-      break;
-    }
-
-    const blocked = pending.filter((node) => {
-      return prerequisites(node).some((id) => {
-        return ["failed", "skipped"].includes(runtime.forms[id]?.status ?? "");
-      });
-    });
-    for (const node of blocked) {
-      runtime = reduceRuntimeState(runtime, {
-        type: "form.skipped",
-        id: node.id,
-        blockedBy: prerequisites(node).filter((id) => {
-          return ["failed", "skipped"].includes(runtime.forms[id]?.status ?? "");
-        }),
-      });
-    }
-
-    const ready = pending.filter((node) => {
+    const available = nodes.filter((node) => {
       return (
-        !blocked.includes(node) &&
-        prerequisites(node).every((id) => {
-          return runtime.forms[id]?.status === "saved";
+        pending.has(node.id) &&
+        !active.has(node.id) &&
+        node.prerequisites.every((id) => {
+          return results.get(id)?.status === "completed";
         })
       );
     });
-    if (!ready.length) {
-      for (const node of pending) {
-        runtime = reduceRuntimeState(runtime, {
-          type: "form.skipped",
-          id: node.id,
-          blockedBy: prerequisites(node),
-        });
-      }
-      break;
+    const slots =
+      concurrency === Infinity ? available.length : Math.max(0, concurrency - active.size);
+    const toStart = available.slice(0, slots);
+
+    for (const node of toStart) {
+      pending.delete(node.id);
+      active.add(node.id);
+      emit({ type: "started", id: node.id });
+      const task = node.run().then(
+        (value) => {
+          active.delete(node.id);
+          results.set(node.id, { status: "completed", value });
+          emit({ type: "completed", id: node.id, value });
+        },
+        (error: unknown) => {
+          active.delete(node.id);
+          results.set(node.id, { status: "failed", error });
+          emit({ type: "failed", id: node.id, error });
+        },
+      );
+      running.add(task);
+      void task.finally(() => {
+        running.delete(task);
+      });
+      changed = true;
     }
 
-    const executable: RunnableNode<FormStates[string]>[] = [];
-    for (const node of ready) {
-      const state = runtime.forms[node.id];
-      try {
-        const variables = getVariablesWithOverrides(
-          node.form,
-          state,
-          runtime.responses,
-          config.undoPayloads,
-        );
-        runtime = reduceRuntimeState(runtime, { type: "form.ready", id: node.id, variables });
-        executable.push({
-          id: node.id,
-          dependencies: prerequisites(node),
-          run: async () => {
-            let finalState = runtime.forms[node.id];
-            const retry = resolveRetryPolicy(node.form, config.retry);
-            try {
-              finalState = await saveFormWithRetry(
-                node.form,
-                { ...finalState, variables },
-                retry,
-                (progress) => {
-                  runtime = reduceRuntimeState(runtime, {
-                    type: progress.status === "retrying" ? "form.retrying" : "form.saving",
-                    id: node.id,
-                    ...(progress.status === "retrying" ? {} : { attempt: progress.attempts }),
-                  } as any);
-                  emit("saving", runtime.forms, runtime.responses);
-                },
-                config.progressDelayMs ?? 0,
-              );
-            } catch (error) {
-              runtime = reduceRuntimeState(runtime, {
-                type: "form.failed",
-                id: node.id,
-                phase: "save",
-                error,
-              });
-              return runtime.forms[node.id];
-            }
-            if (finalState.status === "saved") {
-              runtime = reduceRuntimeState(runtime, {
-                type: "form.saved",
-                id: node.id,
-                response: finalState.response,
-              });
-            } else {
-              runtime = reduceRuntimeState(runtime, {
-                type: "form.failed",
-                id: node.id,
-                phase: "save",
-                error: finalState.failure?.error,
-              });
-            }
-            emit("saving", runtime.forms, runtime.responses);
-            return runtime.forms[node.id];
-          },
-        });
-      } catch (error) {
-        runtime = reduceRuntimeState(runtime, {
-          type: "form.failed",
-          id: node.id,
-          phase: "mapping",
-          error,
-        });
-      }
+    if (active.size) {
+      await Promise.race(running);
+      continue;
     }
 
-    await executeGraph(executable, {
-      concurrency: normalizeConcurrency(config.maxConcurrency),
-    });
+    if (pending.size && !changed) {
+      throw new Error("Runnable graph cannot make progress; check for a dependency cycle.");
+    }
   }
 
-  return { states: runtime.forms, responses: runtime.responses };
+  return new Map(
+    nodes.map(({ id }) => {
+      return [id, results.get(id)!];
+    }),
+  );
 };
+
+export { normalizeConcurrency };
