@@ -133,9 +133,10 @@ All form consumers use composable bindings and the shared orchestrator.
 
 Pass `persistDraftKey` to `useFormOrchestrator` or `useQueryBackedForm` to enable
 draft persistence. Render `FormEditor.DraftBanner` with the returned `draft`
-controller. Draft values are captured only while a form is dirty; successful
-saves clear them, and `draft.discard()` resets the forms and removes the stored
-values for an explicit exit.
+controller. Only dirty forms are captured in a versioned draft; successful saves
+clear them, and `draft.discard()` resets the forms and removes the stored values
+for an explicit exit. Older draft versions are ignored because they do not record
+which forms were dirty.
 
 The workspace launch demo uses three independent form bindings with typed
 form dependencies to pass newly created organization/project IDs to later

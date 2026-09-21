@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type RefObject } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { AnyFormApi } from "@tanstack/form-core";
 import type {
   AnyForm,
@@ -71,36 +71,48 @@ const useQueryFormSync = <QueryData, Values>({
 }: {
   source: FormSource<QueryData, Values>;
   form: AnyFormApi;
-  inFlight: RefObject<boolean>;
+  inFlight: boolean;
 }) => {
   const [queryState, setQueryState] = useState({
     initialized: !source.query,
     readError: undefined as unknown,
   });
-  const lastData = useRef<unknown>(undefined);
+  const lastAppliedData = useRef<unknown>(undefined);
 
   useEffect(() => {
     const { query, toFormData } = source;
-    if (!query || query.data === undefined || query.isError || lastData.current === query.data) {
+    if (
+      !query ||
+      query.data === undefined ||
+      query.isError ||
+      lastAppliedData.current === query.data
+    ) {
       return;
     }
 
-    const isInitialData = lastData.current === undefined;
-    lastData.current = query.data;
-    if (inFlight.current || (!isInitialData && form.state.isDirty)) {
+    const isInitialData = lastAppliedData.current === undefined;
+    if (inFlight || (!isInitialData && form.state.isDirty)) {
       return;
     }
 
     try {
       const values = toFormData ? toFormData(query.data) : query.data;
       resetFormValues(form, values);
+      lastAppliedData.current = query.data;
       setQueryState({ initialized: true, readError: undefined });
     } catch (error) {
       setQueryState((state) => {
         return { ...state, readError: error };
       });
     }
-  }, [source.query?.data, source.query?.isError, source.toFormData, form, inFlight]);
+  }, [
+    source.query?.data,
+    source.query?.isError,
+    source.toFormData,
+    form,
+    inFlight,
+    form.state.isDirty,
+  ]);
 
   return queryState;
 };
@@ -152,7 +164,7 @@ export const useComposableForm = <
 >(
   config: ComposableFormConfig<Id, QueryData, Values, Mutation, Dependencies>,
 ) => {
-  const inFlight = useRef(false);
+  const [inFlight, setInFlight] = useState(false);
 
   // Reuse TanStack's current defaults when React updates the form options.
   // This is a reference to the form, not another copy of its values.
@@ -186,13 +198,13 @@ export const useComposableForm = <
     ...config,
     // Called for every form after the complete save, including skipped forms.
     finish: () => {
-      inFlight.current = false;
+      setInFlight(false);
     },
     snapshot: () => {
       if (!isReady) {
         throw readError ?? config.query?.error ?? new Error("Form data is not ready.");
       }
-      inFlight.current = true;
+      setInFlight(true);
       return form.state.values;
     },
     undoSnapshot: () => {
