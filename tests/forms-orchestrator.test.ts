@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { test } from "node:test";
+import { test } from "vitest";
 import { QueryClient } from "@tanstack/react-query";
 import { createOrchestrator } from "../src/forms/orchestration/orchestrator";
 import type { AnyForm, FormInput } from "../src/forms/orchestration/types";
