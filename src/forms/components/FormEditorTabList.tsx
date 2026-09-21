@@ -1,6 +1,6 @@
 import type { FormEditorRegionProps } from "./formTypes";
-import * as Tabs from "@radix-ui/react-tabs";
 import { useFormEditorContext } from "../hooks/useFormEditorContext";
+import { SegmentedTabList } from "../../shared/components/SegmentedTabs";
 
 export const FormEditorTabList = ({ children, className }: FormEditorRegionProps) => {
   const { viewMode } = useFormEditorContext();
@@ -9,5 +9,5 @@ export const FormEditorTabList = ({ children, className }: FormEditorRegionProps
     return null;
   }
 
-  return <Tabs.List className={className ?? "form-editor-tab-list"}>{children}</Tabs.List>;
+  return <SegmentedTabList className={className}>{children}</SegmentedTabList>;
 };

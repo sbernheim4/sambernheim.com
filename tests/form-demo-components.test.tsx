@@ -60,6 +60,8 @@ test("DetailTabs shows the first panel and exposes the other tab", () => {
       ]}
     />,
   );
+  expect(screen.getByRole("tablist")).toHaveClass("segmented-tabs-list");
+  expect(screen.getByRole("tab", { name: "Overview" })).toHaveClass("segmented-tab-trigger");
   expect(screen.getByText("Overview content")).toBeVisible();
   expect(screen.queryByText("Activity content")).not.toBeInTheDocument();
   expect(screen.getByRole("tab", { name: "Activity" })).toBeInTheDocument();

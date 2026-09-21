@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
-import * as Tabs from "@radix-ui/react-tabs";
 import { useFormEditorContext } from "../hooks/useFormEditorContext";
+import { SegmentedTabContent } from "../../shared/components/SegmentedTabs";
 import "./FormEditorTab.css";
 
 export type FormEditorTabProps = { name: string; children: ReactNode; forceReload?: boolean };
@@ -22,8 +22,8 @@ export const FormEditorTab = ({ name, children }: FormEditorTabProps) => {
   }
 
   return (
-    <Tabs.Content value={name} className="form-editor-tab" data-state="active">
+    <SegmentedTabContent value={name} className="form-editor-tab">
       {children}
-    </Tabs.Content>
+    </SegmentedTabContent>
   );
 };
