@@ -89,16 +89,14 @@ export const usePersistedFormData = ({
   const [dismissed, setDismissed] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const didMount = useRef(false);
-  const skipPersist = useRef(false);
+  const suppressedKey = useRef<string | undefined>(undefined);
 
   useEffect(() => {
     const draft = storageKey ? readDraft(storageKey) : undefined;
     if (!didMount.current) {
       didMount.current = true;
-      skipPersist.current = draft !== undefined;
-    } else {
-      skipPersist.current = true;
     }
+    suppressedKey.current = draft ? storageKey : undefined;
     if (timer.current) {
       clearTimeout(timer.current);
       timer.current = undefined;
@@ -156,6 +154,7 @@ export const usePersistedFormData = ({
     }
 
     const schedulePersist = () => {
+      suppressedKey.current = undefined;
       if (timer.current) {
         clearTimeout(timer.current);
       }
@@ -164,9 +163,7 @@ export const usePersistedFormData = ({
     const subscriptions = forms.map((binding) => {
       return binding.form.store.subscribe(schedulePersist);
     });
-    if (skipPersist.current) {
-      skipPersist.current = false;
-    } else {
+    if (suppressedKey.current !== storageKey) {
       schedulePersist();
     }
     return () => {
