@@ -102,6 +102,45 @@ export const SelectField = <TValue extends string>({
   );
 };
 
+export const AutocompleteField = <TValue extends string>({
+  label,
+  options,
+  placeholder,
+}: {
+  label: string;
+  options: ReadonlyArray<Option<TValue>>;
+  placeholder?: string;
+}) => {
+  const field = useFieldContext<TValue>();
+  const listId = useId();
+
+  return (
+    <label className="app-field">
+      <span>{label}</span>
+      <input
+        aria-invalid={field.state.meta.errors.length > 0}
+        value={field.state.value ?? ""}
+        placeholder={placeholder}
+        list={listId}
+        onBlur={field.handleBlur}
+        onChange={(event) => {
+          field.handleChange(event.target.value as TValue);
+        }}
+      />
+      <datalist id={listId}>
+        {options.map((option) => {
+          return <option key={option.value} value={option.value} label={option.label} />;
+        })}
+      </datalist>
+      {field.state.meta.errors.length > 0 && (
+        <span className="form-error" role="alert">
+          {field.state.meta.errors.map(String).join(", ")}
+        </span>
+      )}
+    </label>
+  );
+};
+
 export const RadioGroupField = <TValue extends string>({
   label,
   options,
