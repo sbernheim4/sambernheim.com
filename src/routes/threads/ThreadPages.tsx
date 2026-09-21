@@ -6,13 +6,8 @@ import { useThreadEditForms } from "../../domains/threads/hooks/useThreadEditFor
 import { useProcesses } from "../../domains/processes/hooks/useProcesses";
 import { useExecutionProfile } from "../../domains/execution-profiles/hooks/useExecutionProfile";
 import { ThreadFields } from "../../domains/threads/components/ThreadFields";
-import {
-  RuntimeDetailLayout,
-  Loading,
-  Missing,
-  Status,
-} from "../../shared/components/RuntimeLayout";
-import { ProfileSummary } from "../RuntimeDetailHelpers";
+import { DetailLayout, Loading, Missing, Status } from "../form-demo/components/Layout";
+import { ProfileSummary } from "../form-demo/components/DetailHelpers";
 
 export const ThreadListPage = () => {
   const query = useThreads();
@@ -23,11 +18,11 @@ export const ThreadListPage = () => {
       {query.isPending ? (
         <p>Loading...</p>
       ) : (
-        <div className="runtime-list">
+        <div className="list">
           {query.data?.map((thread) => (
             <Link
               key={thread.id}
-              className="runtime-card"
+              className="card"
               to="/form-demo/threads/$threadId"
               params={{ threadId: thread.id }}
             >
@@ -56,8 +51,8 @@ export const ThreadDetailPage = ({ id }: { id: string }) => {
   const process = processes.data?.find((item) => item.id === thread.data?.processId);
 
   return (
-    <RuntimeDetailLayout title={thread.data.name} editTo={`/form-demo/threads/${id}/edit`}>
-      <section className="runtime-details">
+    <DetailLayout title={thread.data.name} editTo={`/form-demo/threads/${id}/edit`}>
+      <section className="details">
         <p>Entry point: {thread.data.entryPoint}</p>
         <Status value={thread.data.status} />
         <p>Priority: {thread.data.priority}</p>
@@ -74,7 +69,7 @@ export const ThreadDetailPage = ({ id }: { id: string }) => {
         <h2>Execution profile</h2>
         <ProfileSummary id={thread.data.executionProfileId} />
       </section>
-    </RuntimeDetailLayout>
+    </DetailLayout>
   );
 };
 
@@ -113,7 +108,7 @@ export const ThreadEditPage = ({
         })
       }
     >
-      <div className="runtime-editor-heading">
+      <div className="editor-heading">
         <h1>Edit Thread</h1>
       </div>
       <FormEditor.TabList>

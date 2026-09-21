@@ -3,7 +3,7 @@ import "./ProcessFields.css";
 
 export const ProcessFields = ({ form }: { form: any }) => {
   return (
-    <div className="runtime-fields">
+    <div className="fields">
       <form.AppField name="name">
         {(field: any) => <field.TextField label="Process name" required />}
       </form.AppField>

@@ -1,1 +1,1 @@
-export type { Process, ProcessStatus } from "../shared/runtimeTypes";
+export type { Process, ProcessStatus } from "../shared/types";

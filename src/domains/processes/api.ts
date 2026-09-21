@@ -1,7 +1,6 @@
-import { runtimeStore } from "../shared/runtimeStore";
-export const listProcesses = (taskId?: string) => runtimeStore.listProcesses(taskId);
-export const getProcess = (id: string) => runtimeStore.getProcess(id);
-export const updateProcess = (
-  id: string,
-  input: Parameters<typeof runtimeStore.updateProcess>[1],
-) => runtimeStore.updateProcess(id, input);
+import { store } from "../shared/store";
+
+export const listProcesses = (taskId?: string) => store.listProcesses(taskId);
+export const getProcess = (id: string) => store.getProcess(id);
+export const updateProcess = (id: string, input: Parameters<typeof store.updateProcess>[1]) =>
+  store.updateProcess(id, input);

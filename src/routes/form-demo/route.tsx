@@ -1,11 +1,11 @@
 import { Outlet, createFileRoute } from "@tanstack/react-router";
-import { RuntimeShell } from "../../shared/components/RuntimeLayout";
+import { Shell } from "./components/Layout";
 
 const FormDemoLayout = () => {
   return (
-    <RuntimeShell>
+    <Shell>
       <Outlet />
-    </RuntimeShell>
+    </Shell>
   );
 };
 

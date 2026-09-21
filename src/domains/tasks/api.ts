@@ -1,5 +1,6 @@
-import { runtimeStore } from "../shared/runtimeStore";
-export const listTasks = () => runtimeStore.listTasks();
-export const getTask = (id: string) => runtimeStore.getTask(id);
-export const updateTask = (id: string, input: Parameters<typeof runtimeStore.updateTask>[1]) =>
-  runtimeStore.updateTask(id, input);
+import { store } from "../shared/store";
+
+export const listTasks = () => store.listTasks();
+export const getTask = (id: string) => store.getTask(id);
+export const updateTask = (id: string, input: Parameters<typeof store.updateTask>[1]) =>
+  store.updateTask(id, input);

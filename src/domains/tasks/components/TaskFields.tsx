@@ -3,7 +3,7 @@ import "./TaskFields.css";
 
 export const TaskFields = ({ form }: { form: any }) => {
   return (
-    <div className="runtime-fields">
+    <div className="fields">
       <form.AppField name="name">
         {(field: any) => <field.TextField label="Task name" required />}
       </form.AppField>
