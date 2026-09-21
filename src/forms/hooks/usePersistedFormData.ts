@@ -18,10 +18,11 @@ export type PersistedDraftController = {
   clear: () => void;
 };
 
-type PersistedDraft = {
-  version: 1;
+export type PersistedDraft = {
+  version: 2;
   savedAt: string;
   values: Record<string, unknown>;
+  dirtyFormIds: string[];
 };
 
 const readDraft = (storageKey: string): PersistedDraft | undefined => {
@@ -34,10 +35,24 @@ const readDraft = (storageKey: string): PersistedDraft | undefined => {
       return undefined;
     }
     const parsed = JSON.parse(raw) as Partial<PersistedDraft>;
-    if (parsed.version !== 1 || !parsed.savedAt || !parsed.values) {
+    if (
+      parsed.version !== 2 ||
+      typeof parsed.savedAt !== "string" ||
+      !parsed.values ||
+      typeof parsed.values !== "object" ||
+      !Array.isArray(parsed.dirtyFormIds) ||
+      !parsed.dirtyFormIds.every((id): id is string => {
+        return typeof id === "string";
+      })
+    ) {
       return undefined;
     }
-    return { version: 1, savedAt: parsed.savedAt, values: parsed.values };
+    return {
+      version: 2,
+      savedAt: parsed.savedAt,
+      values: parsed.values,
+      dirtyFormIds: parsed.dirtyFormIds,
+    };
   } catch {
     return undefined;
   }
@@ -77,22 +92,24 @@ export const usePersistedFormData = ({
     if (!storageKey || typeof window === "undefined") {
       return;
     }
-    if (
-      !forms.some((binding) => {
-        return binding.form.state.isDirty;
-      })
-    ) {
+    const dirtyForms = forms.filter((binding) => {
+      return binding.form.state.isDirty;
+    });
+    if (!dirtyForms.length) {
       return;
     }
 
     const draft: PersistedDraft = {
-      version: 1,
+      version: 2,
       savedAt: new Date().toISOString(),
       values: Object.fromEntries(
-        forms.map((binding) => {
+        dirtyForms.map((binding) => {
           return [binding.id, binding.form.state.values];
         }),
       ),
+      dirtyFormIds: dirtyForms.map((binding) => {
+        return binding.id;
+      }),
     };
 
     try {
@@ -140,6 +157,9 @@ export const usePersistedFormData = ({
     }
 
     for (const binding of forms) {
+      if (!draft.dirtyFormIds.includes(binding.id)) {
+        continue;
+      }
       const values = draft.values[binding.id];
       if (values === undefined) {
         continue;
