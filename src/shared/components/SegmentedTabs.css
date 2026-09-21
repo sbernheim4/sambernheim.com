@@ -1,0 +1,55 @@
+.segmented-tabs {
+  min-width: 0;
+}
+
+.segmented-tabs-list {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  padding: 4px;
+  border: 1px solid #ccd5d0;
+  border-radius: 10px;
+  background: #e8e9df;
+}
+
+.segmented-tab-trigger {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #53615d;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.segmented-tab-trigger:hover {
+  color: #1e2427;
+}
+
+.segmented-tab-trigger[data-state="active"] {
+  background: #fffdf8;
+  color: #216b5e;
+  box-shadow: 0 2px 8px rgb(30 36 39 / 10%);
+}
+
+.segmented-tab-trigger:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.segmented-tab-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.segmented-tab-content {
+  margin-top: 14px;
+}
