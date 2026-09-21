@@ -5,6 +5,7 @@ import "./FormEditorUndo.css";
 export const FormEditorUndo = () => {
   const transaction = useFormUndoTransaction();
   const [isUndoing, setIsUndoing] = useState(false);
+  const [error, setError] = useState<string | undefined>();
 
   if (!transaction) {
     return null;
@@ -16,10 +17,13 @@ export const FormEditorUndo = () => {
     }
 
     setIsUndoing(true);
-    clearFormUndoTransaction();
+    setError(undefined);
 
     try {
       await transaction.undo();
+      clearFormUndoTransaction();
+    } catch (undoError) {
+      setError(undoError instanceof Error ? undoError.message : String(undoError));
     } finally {
       setIsUndoing(false);
     }
@@ -27,7 +31,7 @@ export const FormEditorUndo = () => {
 
   return (
     <div className="form-editor-undo" role="status" aria-live="polite">
-      <span>Changes saved. Undo?</span>
+      <span>{error ?? "Changes saved. Undo?"}</span>
       <button type="button" onClick={handleUndo} disabled={isUndoing}>
         {isUndoing ? "Undoing…" : "Undo"}
       </button>

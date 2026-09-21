@@ -59,11 +59,8 @@ export const createOrchestrator = <P extends readonly AnyForm[]>(
       const preparedForms = prepareIndependentPayloads(forms, states, config.undoPayloads);
       states = preparedForms;
     }
-    const preflightPassed = !forms.some((form) => {
-      return states[form.id].failure;
-    });
-    if (preflightPassed) {
-      const saved = await saveFormsInOrder(forms, states, responses, config, emit);
+    if (validationPassed) {
+      const saved = await saveFormsInGraph(forms, states, responses, config, emit);
 
       states = saved.states;
       responses = saved.responses;
@@ -77,7 +74,7 @@ export const createOrchestrator = <P extends readonly AnyForm[]>(
     });
     const allSaved = successful.length === forms.length;
 
-    result.outcome = getOutcome(!preflightPassed, allSaved);
+    result.outcome = getOutcome(!validationPassed, allSaved);
     const context = (form: FormInput) => {
       return {
         queryClient,
@@ -93,7 +90,7 @@ export const createOrchestrator = <P extends readonly AnyForm[]>(
 
     // After writes, refresh only successful forms, plus group-level queries.
     // This includes partial saves; failed and skipped forms have no follow-ups.
-    if (preflightPassed) {
+    if (validationPassed) {
       await waitForProgress(config.progressDelayMs ?? 0);
       emit("refreshing");
 
@@ -186,6 +183,11 @@ export const createOrchestrator = <P extends readonly AnyForm[]>(
 };
 
 const preflightFormsChecks = <P extends readonly AnyForm[]>(forms: P): Error[] => {
+  const ids = new Set(
+    forms.map((form) => {
+      return form.id;
+    }),
+  );
   const seen = new Set<string>();
   const errors: Error[] = [];
 
@@ -193,15 +195,46 @@ const preflightFormsChecks = <P extends readonly AnyForm[]>(forms: P): Error[] =
     if (seen.has(form.id)) {
       errors.push(new Error(`Duplicate form ID: ${form.id}`));
     }
-    const isOutOfOrderDep = form.dependencies?.some(({ id }) => {
-      return !seen.has(id);
-    });
-
-    if (isOutOfOrderDep) {
-      errors.push(new Error(`Dependencies for ${form.id} must precede it.`));
+    for (const dependency of form.dependencies ?? []) {
+      if (!ids.has(dependency.id)) {
+        errors.push(new Error(`Missing dependency ${dependency.id} for ${form.id}.`));
+      }
+      if (dependency.id === form.id) {
+        errors.push(new Error(`Form ${form.id} cannot depend on itself.`));
+      }
     }
 
     seen.add(form.id);
+  }
+
+  const visiting = new Set<string>();
+  const visited = new Set<string>();
+  const byId = new Map(
+    forms.map((form) => {
+      return [form.id, form];
+    }),
+  );
+  const visit = (id: string, path: readonly string[]) => {
+    if (visiting.has(id)) {
+      errors.push(new Error(`Circular dependency detected: ${[...path, id].join(" -> ")}.`));
+      return;
+    }
+    if (visited.has(id)) {
+      return;
+    }
+
+    visiting.add(id);
+    for (const dependency of byId.get(id)?.dependencies ?? []) {
+      if (byId.has(dependency.id)) {
+        visit(dependency.id, [...path, id]);
+      }
+    }
+    visiting.delete(id);
+    visited.add(id);
+  };
+
+  for (const form of forms) {
+    visit(form.id, []);
   }
 
   return errors;
@@ -421,15 +454,30 @@ const captureUndoState = (forms: readonly FormInput[]) => {
     }
 
     const payloads: Record<string, unknown> = {};
-    for (const form of forms) {
-      const state: FormState = {
-        formId: form.id,
-        status: "ready",
-        attempts: 0,
-        formValues: formValues[form.id],
-      };
+    const remaining = new Set(forms.map((form) => form.id));
+    while (remaining.size) {
+      const ready = forms.filter((form) => {
+        return (
+          remaining.has(form.id) &&
+          (form.dependencies ?? []).every((dependency) => Object.hasOwn(payloads, dependency.id))
+        );
+      });
 
-      payloads[form.id] = getVariables(form, state, responses);
+      if (!ready.length) {
+        return undefined;
+      }
+
+      for (const form of ready) {
+        const state: FormState = {
+          formId: form.id,
+          status: "ready",
+          attempts: 0,
+          formValues: formValues[form.id],
+        };
+
+        payloads[form.id] = getVariables(form, state, responses);
+        remaining.delete(form.id);
+      }
     }
 
     return { formValues, payloads };
@@ -631,7 +679,7 @@ const saveFormWithRetry = async (
   }
 };
 
-const saveFormsInOrder = async <P extends readonly AnyForm[]>(
+const saveFormsInGraph = async <P extends readonly AnyForm[]>(
   forms: readonly FormInput[],
   initialStates: FormStates,
   initialResponses: Responses,
@@ -641,55 +689,156 @@ const saveFormsInOrder = async <P extends readonly AnyForm[]>(
   states: FormStates;
   responses: Responses;
 }> => {
-  // These accumulators belong to this helper, never to its caller.
   const states = { ...initialStates };
   const responses = { ...initialResponses };
 
+  const undo = config.undoPayloads !== undefined;
+  const maxConcurrency = normalizeConcurrency(config.maxConcurrency);
+  const dependents = new Map<string, string[]>();
   for (const form of forms) {
-    let state = states[form.id];
-
-    if (form.dependencies?.length) {
-      try {
-        state = {
-          ...state,
-          variables: getVariablesWithOverrides(form, state, responses, config.undoPayloads),
-        };
-      } catch (error) {
-        states[form.id] = getFailedState(state, "mapping", error);
-        break;
-      }
-    }
-
-    const retry = {
-      maxRetries: 1,
-      delayMs: 500,
-      shouldRetry: isTransientError,
-      ...config.retry,
-      ...form.retry,
-    };
-
-    state = await saveFormWithRetry(
-      form,
-      state,
-      retry,
-      (progress) => {
-        emit("saving", { ...states, [form.id]: progress }, { ...responses });
-      },
-      config.progressDelayMs ?? 0,
-    );
-    states[form.id] = state;
-
-    // Record persistence before the next dependent mapping or any follow-up.
-    if (state.status === "saved") {
-      responses[form.id] = state.response;
-    }
-
-    if (state.failure) {
-      break;
+    dependents.set(form.id, []);
+  }
+  for (const form of forms) {
+    for (const dependency of form.dependencies ?? []) {
+      dependents.get(dependency.id)?.push(form.id);
     }
   }
 
+  const prerequisites = (form: FormInput) => {
+    return undo
+      ? (dependents.get(form.id) ?? [])
+      : (form.dependencies ?? []).map((dependency) => dependency.id);
+  };
+
+  while (true) {
+    const pending = forms.filter((form) => states[form.id].status === "ready");
+    if (!pending.length) {
+      break;
+    }
+
+    const blocked = pending.filter((form) => {
+      return prerequisites(form).some((dependencyId) => {
+        const dependency = states[dependencyId];
+        return dependency?.status === "failed" || dependency?.status === "skipped";
+      });
+    });
+
+    for (const form of blocked) {
+      states[form.id] = {
+        ...states[form.id],
+        status: "skipped",
+        blockedBy: prerequisites(form).filter((dependencyId) => {
+          const dependency = states[dependencyId];
+          return dependency?.status === "failed" || dependency?.status === "skipped";
+        }),
+      };
+    }
+
+    const ready = pending.filter((form) => {
+      return (
+        !blocked.includes(form) &&
+        prerequisites(form).every((dependencyId) => {
+          return states[dependencyId]?.status === "saved";
+        })
+      );
+    });
+
+    if (!ready.length) {
+      for (const form of pending) {
+        states[form.id] = {
+          ...states[form.id],
+          status: "skipped",
+          blockedBy: prerequisites(form),
+        };
+      }
+      break;
+    }
+
+    const executable: FormInput[] = [];
+    for (const form of ready) {
+      const state = states[form.id];
+      try {
+        states[form.id] = {
+          ...state,
+          variables: getVariablesWithOverrides(form, state, responses, config.undoPayloads),
+        };
+        executable.push(form);
+      } catch (error) {
+        states[form.id] = getFailedState(state, "mapping", error);
+      }
+    }
+
+    await runReadyForms(executable, states, responses, config, emit, maxConcurrency);
+  }
+
   return { states, responses };
+};
+
+const normalizeConcurrency = (value: number | undefined) => {
+  if (value === undefined || value === Infinity) {
+    return Infinity;
+  }
+
+  const normalized = Math.max(1, Math.floor(value));
+
+  return normalized;
+};
+
+const runReadyForms = async <P extends readonly AnyForm[]>(
+  forms: readonly FormInput[],
+  states: Record<string, FormState>,
+  responses: Record<string, any>,
+  config: SaveConfig<P>,
+  emit: (phase: Phase, states: FormStates, responses: Responses) => void,
+  maxConcurrency: number,
+) => {
+  let nextIndex = 0;
+  const workerCount = Math.min(
+    forms.length,
+    Number.isFinite(maxConcurrency) ? maxConcurrency : forms.length,
+  );
+
+  const worker = async () => {
+    while (true) {
+      const form = forms[nextIndex++];
+      if (!form) {
+        return;
+      }
+
+      const retry = {
+        maxRetries: 1,
+        delayMs: 500,
+        shouldRetry: isTransientError,
+        ...config.retry,
+        ...form.retry,
+      };
+      const initialState = states[form.id];
+      let state: FormState;
+
+      try {
+        state = await saveFormWithRetry(
+          form,
+          initialState,
+          retry,
+          (progress) => {
+            states[form.id] = progress;
+            emit("saving", { ...states }, { ...responses });
+          },
+          config.progressDelayMs ?? 0,
+        );
+      } catch (error) {
+        state = getFailedState(initialState, "save", error);
+      }
+
+      states[form.id] = state;
+      if (state.status === "saved") {
+        responses[form.id] = state.response;
+      }
+      emit("saving", { ...states }, { ...responses });
+    }
+  };
+
+  await Promise.all(Array.from({ length: workerCount }, worker));
 };
 
 const emitProgress = <P extends readonly AnyForm[]>(
