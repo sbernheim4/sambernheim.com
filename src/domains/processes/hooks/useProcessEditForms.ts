@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useComposableForm } from "../../../forms/hooks/useComposableForm";
 import { useFormOrchestrator } from "../../../forms/hooks/useFormOrchestrator";
@@ -7,6 +8,7 @@ import { processKeys, useProcess, useUpdateProcess } from "./useProcesses";
 
 export const useProcessEditForms = (id: string) => {
   const navigate = useNavigate();
+  const progressDelayRef = useRef(0);
 
   const query = useProcess(id);
 
@@ -50,6 +52,17 @@ export const useProcessEditForms = (id: string) => {
   const save = useFormOrchestrator({
     forms: [profile.form, entityForm] as const,
     onSuccess: () => {
+      if (progressDelayRef.current > 0) {
+        return;
+      }
+
+      return navigate({
+        to: "/form-demo/processes/$processId",
+        params: { processId: id },
+        search: {},
+      });
+    },
+    onProgressClose: () => {
       return navigate({
         to: "/form-demo/processes/$processId",
         params: { processId: id },
@@ -57,6 +70,8 @@ export const useProcessEditForms = (id: string) => {
       });
     },
   });
+
+  progressDelayRef.current = save.orchestratorProgress.progressDelayMs;
 
   return { entityForm, profileForm: profile.form, save };
 };

@@ -177,6 +177,10 @@ export const ProcessEditPage = ({
         <ExecutionProfileFields form={profileForm.form} />
       </FormEditor.Tab>
 
+      <FormEditor.OrchestratorProgress />
+
+      <FormEditor.OrchestratorStatus />
+
       <FormEditor.Actions />
     </FormEditor.Provider>
   );

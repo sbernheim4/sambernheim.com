@@ -1,3 +1,4 @@
+import type { QueryKey } from "@tanstack/react-query";
 import { createContext, useContext } from "react";
 
 export type FormEditorMode = "create" | "edit";
@@ -9,6 +10,25 @@ export type FormEditorActionState = {
   canSubmit: boolean;
   validationErrors?: string[];
   submitErrors?: unknown[];
+  orchestrator?: FormEditorOrchestrator;
+};
+
+export type FormEditorOrchestrator = {
+  phase: string;
+  isSubmitting: boolean;
+  forms: readonly {
+    id: string;
+    invalidateQueryKeys: readonly QueryKey[];
+    refetchCount: number;
+    cacheUpdateCount: number;
+  }[];
+  result?: {
+    forms: Readonly<Record<string, { status: string }>>;
+  };
+  progressDelayMs: number;
+  isOpen: boolean;
+  setProgressDelayMs: (value: number) => void;
+  close: () => void | Promise<void>;
 };
 
 export type FormEditorController = {

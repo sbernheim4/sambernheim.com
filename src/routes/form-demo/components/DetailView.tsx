@@ -9,7 +9,6 @@ export const DetailView = ({ tabs }: { tabs: readonly DetailTab[] }) => {
   return (
     <div className="detail-view">
       <div className="detail-view-toolbar">
-        <span className="eyebrow">View</span>
         <ViewModePicker mode={mode} onChange={updateMode} />
       </div>
 

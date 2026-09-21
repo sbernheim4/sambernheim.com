@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useComposableForm } from "../../../forms/hooks/useComposableForm";
 import { useFormOrchestrator } from "../../../forms/hooks/useFormOrchestrator";
@@ -11,6 +12,7 @@ const numberValue = (input: string, fallback: number) => {
 
 export const useThreadEditForms = (id: string) => {
   const navigate = useNavigate();
+  const progressDelayRef = useRef(0);
 
   const query = useThread(id);
 
@@ -59,9 +61,18 @@ export const useThreadEditForms = (id: string) => {
   const save = useFormOrchestrator({
     forms: [profile.form, entityForm] as const,
     onSuccess: () => {
+      if (progressDelayRef.current > 0) {
+        return;
+      }
+
+      return navigate({ to: "/form-demo/threads/$threadId", params: { threadId: id }, search: {} });
+    },
+    onProgressClose: () => {
       return navigate({ to: "/form-demo/threads/$threadId", params: { threadId: id }, search: {} });
     },
   });
+
+  progressDelayRef.current = save.orchestratorProgress.progressDelayMs;
 
   return { entityForm, profileForm: profile.form, save };
 };
