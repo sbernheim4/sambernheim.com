@@ -22,7 +22,9 @@ export const useTaskEditForms = (id: string) => {
 
   const entityForm = useComposableForm({
     id: "task",
-    defaultValues: { ...emptyTask, priority: String(emptyTask.priority) } satisfies TaskFormValues,
+    defaultValues: query.data
+      ? { ...query.data, priority: String(query.data.priority) }
+      : { ...emptyTask, priority: String(emptyTask.priority) },
     query,
     toFormData: (data): TaskFormValues => {
       return { ...data, priority: String(data.priority) };

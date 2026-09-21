@@ -22,10 +22,9 @@ export const useThreadEditForms = (id: string) => {
 
   const entityForm = useComposableForm({
     id: "thread",
-    defaultValues: {
-      ...emptyThread,
-      priority: String(emptyThread.priority),
-    } satisfies ThreadFormValues,
+    defaultValues: query.data
+      ? { ...query.data, priority: String(query.data.priority) }
+      : { ...emptyThread, priority: String(emptyThread.priority) },
     query,
     toFormData: (data): ThreadFormValues => {
       return { ...data, priority: String(data.priority) };
