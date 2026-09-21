@@ -5,6 +5,12 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "../styles.css";
 
 const queryClient = new QueryClient();
+
+type RootSearch = { tab?: string };
+const validateSearch = (search: Record<string, unknown>): RootSearch => {
+  return typeof search.tab === "string" ? { tab: search.tab } : {};
+};
+
 const RootComponent = () => {
   return (
     <QueryClientProvider client={queryClient}>
@@ -32,6 +38,7 @@ const RootDocument = ({
 };
 
 export const Route = createRootRoute({
+  validateSearch,
   head: () => {
     return {
       meta: [

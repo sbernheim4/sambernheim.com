@@ -6,7 +6,9 @@ export const FormEditorContent = ({ children, className }: FormEditorRegionProps
 );
 
 export const FormEditorDraftBanner = ({ draft }: { draft: PersistedDraftController }) => {
-  if (!draft.hasDraft) return null;
+  if (!draft.hasDraft) {
+    return null;
+  }
   return (
     <div className="form-editor-draft-banner" role="status">
       <span>

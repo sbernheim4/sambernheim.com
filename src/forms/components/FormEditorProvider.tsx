@@ -1,28 +1,16 @@
-import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
+import { useCallback, useMemo, useState, type FormEvent } from "react";
 import * as Tabs from "@radix-ui/react-tabs";
 
 import { EditContext } from "../context";
 import { FormEditorContext, type FormEditorController } from "../hooks/useFormEditorContext";
 import type { FormEditorProviderProps } from "./formTypes";
 
-const readQueryValue = (key: string, fallback: string) => {
-  if (typeof window === "undefined") return fallback;
-  return new URLSearchParams(window.location.search).get(key) || fallback;
-};
-
-const writeQueryValue = (key: string, value: string | null) => {
-  if (typeof window === "undefined") return;
-  const url = new URL(window.location.href);
-  if (value === null) url.searchParams.delete(key);
-  else url.searchParams.set(key, value);
-  window.history.replaceState({}, "", url);
-};
-
 export const FormEditorProvider = ({
   mode,
   defaultTab,
   children,
-  tabQueryKey = "tab",
+  activeTab: controlledActiveTab,
+  onActiveTabChange,
   isEditing = mode === "edit",
   onStartEditing,
   onCancel,
@@ -35,18 +23,17 @@ export const FormEditorProvider = ({
   showCancel = true,
   actions,
 }: FormEditorProviderProps) => {
-  const [activeTab, setActiveTabState] = useState(() => readQueryValue(tabQueryKey, defaultTab));
-
-  useEffect(() => {
-    setActiveTabState(readQueryValue(tabQueryKey, defaultTab));
-  }, [defaultTab, tabQueryKey]);
+  const [uncontrolledActiveTab, setUncontrolledActiveTab] = useState(defaultTab);
+  const activeTab = controlledActiveTab ?? uncontrolledActiveTab;
 
   const setActiveTab = useCallback(
     (tab: string) => {
-      setActiveTabState(tab);
-      writeQueryValue(tabQueryKey, tab);
+      onActiveTabChange?.(tab);
+      if (!controlledActiveTab) {
+        setUncontrolledActiveTab(tab);
+      }
     },
-    [tabQueryKey],
+    [controlledActiveTab, onActiveTabChange],
   );
   const startEditing = useCallback(() => {
     onStartEditing?.();
@@ -92,7 +79,9 @@ export const FormEditorProvider = ({
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!readOnly && isEditing) void actions.onSubmit();
+    if (!readOnly && isEditing) {
+      actions.onSubmit();
+    }
   };
 
   return (

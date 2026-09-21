@@ -59,6 +59,9 @@ export const SelectField = <TValue extends string>({
 }) => {
   const field = useFieldContext<TValue | "">();
   const labelId = useId();
+  const selectedOption = options.find((option) => {
+    return option.value === field.state.value;
+  });
 
   return (
     <div className="app-field">
@@ -76,7 +79,7 @@ export const SelectField = <TValue extends string>({
           className="app-select-trigger"
           onBlur={field.handleBlur}
         >
-          <Select.Value placeholder={placeholder} />
+          <Select.Value placeholder={placeholder}>{selectedOption?.label}</Select.Value>
           <Select.Icon className="app-select-icon">
             <ChevronDown size={16} />
           </Select.Icon>
