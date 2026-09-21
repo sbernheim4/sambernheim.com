@@ -164,6 +164,75 @@ test("does not overwrite cache data when a cache mapper returns undefined", () =
   expect(queryClient.getQueryData(["resource"])).toEqual({ existing: true });
 });
 
+test("drains active nodes and preserves the first progress callback error", async () => {
+  let resolveActive!: (value: string) => void;
+  const active = new Promise<string>((resolve) => {
+    resolveActive = resolve;
+  });
+  let bStarted = false;
+  let cStarted = false;
+  const fatal = new Error("progress failed");
+  const promise = executeGraph(
+    [
+      {
+        id: "a",
+        prerequisites: [],
+        run: async () => {
+          return "a";
+        },
+      },
+      {
+        id: "b",
+        prerequisites: [],
+        run: async () => {
+          bStarted = true;
+          return active;
+        },
+      },
+      {
+        id: "c",
+        prerequisites: ["a"],
+        run: async () => {
+          cStarted = true;
+          return "c";
+        },
+      },
+    ],
+    {
+      concurrency: 2,
+      onNodeState: (event) => {
+        if (event.type === "completed" && event.id === "a") {
+          throw fatal;
+        }
+      },
+    },
+  );
+  const observed = promise.catch((error: unknown) => {
+    return error;
+  });
+
+  await new Promise((resolve) => {
+    return setImmediate(resolve);
+  });
+  expect(bStarted).toBe(true);
+  expect(cStarted).toBe(false);
+
+  let settled = false;
+  void observed.then(
+    () => {
+      settled = true;
+    },
+    () => {
+      settled = true;
+    },
+  );
+  await Promise.resolve();
+  expect(settled).toBe(false);
+
+  resolveActive("b");
+  await expect(observed).resolves.toBe(fatal);
+});
+
 test("runs finish cleanup when a pipeline stage rejects", async () => {
   let finishCalls = 0;
   const failure = new Error("stage failed");

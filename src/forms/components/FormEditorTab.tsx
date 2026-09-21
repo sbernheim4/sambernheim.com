@@ -3,7 +3,7 @@ import { useFormEditorContext } from "../hooks/useFormEditorContext";
 import { SegmentedTabContent } from "../../shared/components/SegmentedTabs";
 import "./FormEditorTab.css";
 
-export type FormEditorTabProps = { name: string; children: ReactNode; forceReload?: boolean };
+export type FormEditorTabProps = { name: string; children: ReactNode };
 
 export const FormEditorTab = ({ name, children }: FormEditorTabProps) => {
   const { activeTab, viewMode } = useFormEditorContext();

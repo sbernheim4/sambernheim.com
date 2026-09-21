@@ -60,75 +60,97 @@ export const executeGraph = async <T>(
   );
   const active = new Set<string>();
   const running = new Set<Promise<void>>();
+  const allTasks = new Set<Promise<void>>();
   const concurrency = normalizeConcurrency(options.concurrency);
+  let firstEventError: unknown;
+  let hasEventError = false;
 
   const emit = (event: SchedulerEvent<T>) => {
-    options.onNodeState?.(event);
+    try {
+      options.onNodeState?.(event);
+    } catch (error) {
+      if (!hasEventError) {
+        hasEventError = true;
+        firstEventError = error;
+      }
+      throw error;
+    }
   };
 
-  while (pending.size || active.size) {
-    let changed = false;
+  try {
+    while (pending.size || active.size) {
+      let changed = false;
 
-    for (const node of nodes) {
-      if (!pending.has(node.id)) {
-        continue;
+      for (const node of nodes) {
+        if (!pending.has(node.id)) {
+          continue;
+        }
+        const blockedBy = node.prerequisites.filter((id) => {
+          const result = results.get(id);
+          return result?.status === "failed" || result?.status === "skipped";
+        });
+        if (blockedBy.length) {
+          pending.delete(node.id);
+          results.set(node.id, { status: "skipped", blockedBy });
+          emit({ type: "skipped", id: node.id, blockedBy });
+          changed = true;
+        }
       }
-      const blockedBy = node.prerequisites.filter((id) => {
-        const result = results.get(id);
-        return result?.status === "failed" || result?.status === "skipped";
+
+      const available = nodes.filter((node) => {
+        return (
+          pending.has(node.id) &&
+          !active.has(node.id) &&
+          node.prerequisites.every((id) => {
+            return results.get(id)?.status === "completed";
+          })
+        );
       });
-      if (blockedBy.length) {
+      const slots =
+        concurrency === Infinity ? available.length : Math.max(0, concurrency - active.size);
+      const toStart = available.slice(0, slots);
+
+      for (const node of toStart) {
         pending.delete(node.id);
-        results.set(node.id, { status: "skipped", blockedBy });
-        emit({ type: "skipped", id: node.id, blockedBy });
+        active.add(node.id);
+        emit({ type: "started", id: node.id });
+        const task = node.run().then(
+          (value) => {
+            active.delete(node.id);
+            results.set(node.id, { status: "completed", value });
+            emit({ type: "completed", id: node.id, value });
+          },
+          (error: unknown) => {
+            active.delete(node.id);
+            results.set(node.id, { status: "failed", error });
+            emit({ type: "failed", id: node.id, error });
+          },
+        );
+        running.add(task);
+        allTasks.add(task);
+        void task.then(
+          () => {
+            running.delete(task);
+          },
+          () => {
+            running.delete(task);
+          },
+        );
         changed = true;
       }
-    }
 
-    const available = nodes.filter((node) => {
-      return (
-        pending.has(node.id) &&
-        !active.has(node.id) &&
-        node.prerequisites.every((id) => {
-          return results.get(id)?.status === "completed";
-        })
-      );
-    });
-    const slots =
-      concurrency === Infinity ? available.length : Math.max(0, concurrency - active.size);
-    const toStart = available.slice(0, slots);
+      if (active.size) {
+        await Promise.race(running);
+        continue;
+      }
 
-    for (const node of toStart) {
-      pending.delete(node.id);
-      active.add(node.id);
-      emit({ type: "started", id: node.id });
-      const task = node.run().then(
-        (value) => {
-          active.delete(node.id);
-          results.set(node.id, { status: "completed", value });
-          emit({ type: "completed", id: node.id, value });
-        },
-        (error: unknown) => {
-          active.delete(node.id);
-          results.set(node.id, { status: "failed", error });
-          emit({ type: "failed", id: node.id, error });
-        },
-      );
-      running.add(task);
-      void task.finally(() => {
-        running.delete(task);
-      });
-      changed = true;
+      if (pending.size && !changed) {
+        throw new Error("Runnable graph cannot make progress; check for a dependency cycle.");
+      }
     }
-
-    if (active.size) {
-      await Promise.race(running);
-      continue;
-    }
-
-    if (pending.size && !changed) {
-      throw new Error("Runnable graph cannot make progress; check for a dependency cycle.");
-    }
+  } catch (error) {
+    await Promise.allSettled(allTasks);
+    throw hasEventError ? firstEventError : error;
   }
 
   return new Map(

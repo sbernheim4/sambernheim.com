@@ -5,8 +5,6 @@ export type SaveNode = {
   form: FormInput;
   prerequisites: readonly string[];
   dependents: readonly string[];
-  /** @deprecated Use prerequisites and dependents. */
-  dependencies: readonly string[];
 };
 
 export type SavePlan = {
@@ -90,9 +88,6 @@ export const compileSavePlan = <P extends readonly AnyForm[]>(
         );
       })(),
       dependents: dependents.get(form.id) ?? [],
-      dependencies: (form.dependencies ?? []).map(({ id }) => {
-        return id;
-      }),
     });
   }
 
