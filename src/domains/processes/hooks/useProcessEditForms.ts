@@ -18,7 +18,7 @@ export const useProcessEditForms = (id: string) => {
 
   const entityForm = useComposableForm({
     id: "process",
-    defaultValues: emptyProcess,
+    defaultValues: query.data ?? emptyProcess,
     query,
     toFormData: (data) => {
       return data;

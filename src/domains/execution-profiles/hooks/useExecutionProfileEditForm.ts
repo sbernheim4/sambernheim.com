@@ -9,11 +9,17 @@ export const useExecutionProfileEditForm = (profileId: string) => {
 
   const form = useComposableForm({
     id: "profile",
-    defaultValues: {
-      ...emptyExecutionProfile,
-      timeoutMs: String(emptyExecutionProfile.timeoutMs),
-      memoryLimitMb: String(emptyExecutionProfile.memoryLimitMb),
-    } satisfies ExecutionProfileFormValues,
+    defaultValues: query.data
+      ? {
+          ...query.data,
+          timeoutMs: String(query.data.timeoutMs),
+          memoryLimitMb: String(query.data.memoryLimitMb),
+        }
+      : {
+          ...emptyExecutionProfile,
+          timeoutMs: String(emptyExecutionProfile.timeoutMs),
+          memoryLimitMb: String(emptyExecutionProfile.memoryLimitMb),
+        },
     query,
     toFormData: (data): ExecutionProfileFormValues => {
       return {
