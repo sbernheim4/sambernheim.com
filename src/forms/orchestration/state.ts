@@ -3,7 +3,6 @@ import type { FormSaveState, FollowUpError } from "./types";
 export type FormState = Readonly<FormSaveState<any, any, any>>;
 export type FormStates = Readonly<Record<string, FormState>>;
 export type Responses = Readonly<Record<string, any>>;
-
 export type RuntimeState = {
   forms: FormStates;
   responses: Responses;
@@ -11,39 +10,60 @@ export type RuntimeState = {
 };
 
 export type StateEvent =
-  | { type: "form.ready"; id: string; variables?: unknown }
-  | { type: "form.saving"; id: string; attempt: number }
-  | { type: "form.retrying"; id: string }
-  | { type: "form.saved"; id: string; response: unknown }
-  | {
-      type: "form.failed";
-      id: string;
-      phase: "validation" | "mapping" | "save";
-      error: unknown;
-    }
-  | { type: "form.skipped"; id: string; blockedBy: readonly string[] }
+  | { type: "snapshot.initialized"; forms: FormStates }
+  | { type: "validation.succeeded"; id: string }
+  | { type: "validation.failed"; id: string; error: unknown }
+  | { type: "payload.prepared"; id: string; variables: unknown }
+  | { type: "saving.started"; id: string; attempt: number }
+  | { type: "saving.retrying"; id: string }
+  | { type: "saved"; id: string; response: unknown }
+  | { type: "failed"; id: string; phase: "validation" | "mapping" | "save"; error: unknown }
+  | { type: "skipped"; id: string; blockedBy: readonly string[] }
   | { type: "follow-up.failed"; error: FollowUpError };
 
+const requireStatus = (
+  id: string,
+  event: StateEvent,
+  state: FormState,
+  allowed: readonly FormState["status"][],
+) => {
+  if (!allowed.includes(state.status)) {
+    throw new Error(`Invalid runtime transition for ${id}: ${state.status} -> ${event.type}.`);
+  }
+};
+
 export const reduceRuntimeState = (state: RuntimeState, event: StateEvent): RuntimeState => {
+  if (event.type === "snapshot.initialized") {
+    if (Object.keys(state.forms).length) {
+      throw new Error("Runtime snapshot can only be initialized once.");
+    }
+    return { ...state, forms: event.forms };
+  }
   if (event.type === "follow-up.failed") {
     return { ...state, followUpErrors: [...state.followUpErrors, event.error] };
   }
-
   const current = state.forms[event.id];
   if (!current) {
     throw new Error(`Unknown form ID in runtime event: ${event.id}`);
   }
-
   switch (event.type) {
-    case "form.ready":
+    case "validation.succeeded":
+      requireStatus(event.id, event, current, ["validating"]);
+      return { ...state, forms: { ...state.forms, [event.id]: { ...current, status: "ready" } } };
+    case "validation.failed":
+      requireStatus(event.id, event, current, ["validating"]);
       return {
         ...state,
-        forms: {
-          ...state.forms,
-          [event.id]: { ...current, status: "ready", variables: event.variables },
-        },
+        forms: { ...state.forms, [event.id]: getFailedState(current, "validation", event.error) },
       };
-    case "form.saving":
+    case "payload.prepared":
+      requireStatus(event.id, event, current, ["ready"]);
+      return {
+        ...state,
+        forms: { ...state.forms, [event.id]: { ...current, variables: event.variables } },
+      };
+    case "saving.started":
+      requireStatus(event.id, event, current, ["ready", "retrying"]);
       return {
         ...state,
         forms: {
@@ -51,12 +71,14 @@ export const reduceRuntimeState = (state: RuntimeState, event: StateEvent): Runt
           [event.id]: { ...current, status: "saving", attempts: event.attempt },
         },
       };
-    case "form.retrying":
+    case "saving.retrying":
+      requireStatus(event.id, event, current, ["saving"]);
       return {
         ...state,
         forms: { ...state.forms, [event.id]: { ...current, status: "retrying" } },
       };
-    case "form.saved":
+    case "saved":
+      requireStatus(event.id, event, current, ["saving"]);
       return {
         ...state,
         forms: {
@@ -65,15 +87,14 @@ export const reduceRuntimeState = (state: RuntimeState, event: StateEvent): Runt
         },
         responses: { ...state.responses, [event.id]: event.response },
       };
-    case "form.failed":
+    case "failed":
+      requireStatus(event.id, event, current, ["ready", "saving", "retrying"]);
       return {
         ...state,
-        forms: {
-          ...state.forms,
-          [event.id]: getFailedState(current, event.phase, event.error),
-        },
+        forms: { ...state.forms, [event.id]: getFailedState(current, event.phase, event.error) },
       };
-    case "form.skipped":
+    case "skipped":
+      requireStatus(event.id, event, current, ["ready"]);
       return {
         ...state,
         forms: {
@@ -101,12 +122,4 @@ export const getFailedState = (
       attempts: state.attempts,
     },
   };
-};
-
-export const updateSkippedFormsState = (states: FormStates): FormStates => {
-  return Object.fromEntries(
-    Object.entries(states).map(([id, state]) => {
-      return [id, state.status === "ready" ? { ...state, status: "skipped" } : state];
-    }),
-  );
 };

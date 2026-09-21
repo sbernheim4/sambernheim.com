@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 export type PersistedFormBinding = {
   id: string;
   form: {
-    state: { values: unknown; isDirty: boolean };
+    state: { values: Record<string, unknown>; isDirty: boolean };
     store: { subscribe: (listener: () => void) => { unsubscribe: () => void } };
     reset: (...args: any[]) => void;
     setFieldValue?: (field: any, value: any) => void;
@@ -88,6 +88,25 @@ export const usePersistedFormData = ({
   const [savedAt, setSavedAt] = useState(initial?.savedAt);
   const [dismissed, setDismissed] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const didMount = useRef(false);
+  const skipPersist = useRef(false);
+
+  useEffect(() => {
+    const draft = storageKey ? readDraft(storageKey) : undefined;
+    if (!didMount.current) {
+      didMount.current = true;
+      skipPersist.current = draft !== undefined;
+    } else {
+      skipPersist.current = true;
+    }
+    if (timer.current) {
+      clearTimeout(timer.current);
+      timer.current = undefined;
+    }
+    setHasDraft(draft !== undefined);
+    setSavedAt(draft?.savedAt);
+    setDismissed(false);
+  }, [storageKey]);
 
   const clear = useCallback(() => {
     if (storageKey) {
@@ -145,8 +164,11 @@ export const usePersistedFormData = ({
     const subscriptions = forms.map((binding) => {
       return binding.form.store.subscribe(schedulePersist);
     });
-    schedulePersist();
-
+    if (skipPersist.current) {
+      skipPersist.current = false;
+    } else {
+      schedulePersist();
+    }
     return () => {
       if (timer.current) {
         clearTimeout(timer.current);
@@ -174,8 +196,21 @@ export const usePersistedFormData = ({
       if (values === undefined) {
         continue;
       }
+      if (!values || typeof values !== "object" || Array.isArray(values)) {
+        return false;
+      }
+    }
+
+    for (const binding of forms) {
+      if (!draft.dirtyFormIds.includes(binding.id)) {
+        continue;
+      }
+      const values = draft.values[binding.id];
+      if (values === undefined) {
+        continue;
+      }
       binding.form.reset();
-      if (binding.form.setFieldValue && values && typeof values === "object") {
+      if (binding.form.setFieldValue) {
         for (const [field, value] of flattenValues(values)) {
           binding.form.setFieldValue(field, value);
         }

@@ -51,7 +51,7 @@ export const saveFormsInGraph = async <P extends readonly AnyForm[]>(
             runtime.responses,
             config.undoPayloads,
           );
-          runtime = reduceRuntimeState(runtime, { type: "form.ready", id, variables });
+          runtime = reduceRuntimeState(runtime, { type: "payload.prepared", id, variables });
         } catch (error) {
           throw new PayloadMappingError(error);
         }
@@ -66,8 +66,8 @@ export const saveFormsInGraph = async <P extends readonly AnyForm[]>(
             runtime = reduceRuntimeState(
               runtime,
               progress.status === "retrying"
-                ? { type: "form.retrying", id }
-                : { type: "form.saving", id, attempt: progress.attempts },
+                ? { type: "saving.retrying", id }
+                : { type: "saving.started", id, attempt: progress.attempts },
             );
             emit("saving", runtime.forms, runtime.responses);
           },
@@ -83,13 +83,13 @@ export const saveFormsInGraph = async <P extends readonly AnyForm[]>(
       if (event.type === "completed") {
         if (event.value.status === "saved") {
           runtime = reduceRuntimeState(runtime, {
-            type: "form.saved",
+            type: "saved",
             id: event.id,
             response: event.value.response,
           });
         } else {
           runtime = reduceRuntimeState(runtime, {
-            type: "form.failed",
+            type: "failed",
             id: event.id,
             phase: "save",
             error: event.value.failure?.error,
@@ -98,7 +98,7 @@ export const saveFormsInGraph = async <P extends readonly AnyForm[]>(
         emit("saving", runtime.forms, runtime.responses);
       } else if (event.type === "failed") {
         runtime = reduceRuntimeState(runtime, {
-          type: "form.failed",
+          type: "failed",
           id: event.id,
           phase: event.error instanceof PayloadMappingError ? "mapping" : "save",
           error: event.error instanceof PayloadMappingError ? event.error.cause : event.error,
@@ -106,7 +106,7 @@ export const saveFormsInGraph = async <P extends readonly AnyForm[]>(
         emit("saving", runtime.forms, runtime.responses);
       } else if (event.type === "skipped") {
         runtime = reduceRuntimeState(runtime, {
-          type: "form.skipped",
+          type: "skipped",
           id: event.id,
           blockedBy: event.blockedBy,
         });

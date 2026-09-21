@@ -138,6 +138,11 @@ clear them, and `draft.discard()` resets the forms and removes the stored values
 for an explicit exit. Older draft versions are ignored because they do not record
 which forms were dirty.
 
+Persisted draft values must be object-shaped form models so nested field paths can
+be restored. Primitive and array roots are rejected. `SaveNode.dependencies` and
+the unused `FormEditorTab.forceReload` prop were removed; use plan prerequisites/
+dependents and the tab's existing view-mode behavior instead.
+
 The workspace launch demo uses three independent form bindings with typed
 form dependencies to pass newly created organization/project IDs to later
 saves. Its orchestrator sets `includePristine: true` so create defaults are saved
