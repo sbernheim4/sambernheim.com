@@ -1,8 +1,10 @@
 import assert from "node:assert/strict";
 import { act, render, waitFor } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { test } from "vitest";
 import type { ReactNode } from "react";
 import { useComposableForm } from "../src/forms/hooks/useComposableForm";
+import { useFormOrchestrator } from "../src/forms/hooks/useFormOrchestrator";
 import {
   usePersistedFormData,
   type PersistedFormBinding,
@@ -118,6 +120,48 @@ test("draft persistence stores and restores only dirty forms", async () => {
   assert.equal(cleanResetCount, 0);
 });
 
+test("draft restoration restores nested field paths", async () => {
+  window.localStorage.setItem(
+    "nested-forms",
+    JSON.stringify({
+      version: 2,
+      savedAt: new Date().toISOString(),
+      values: { profile: { address: { city: "New York" } } },
+      dirtyFormIds: ["profile"],
+    }),
+  );
+
+  const restored: Record<string, unknown> = {};
+  let controller: PersistedDraftController | undefined;
+  const binding: PersistedFormBinding = {
+    id: "profile",
+    form: {
+      state: { values: {}, isDirty: false },
+      store: {
+        subscribe: () => {
+          return { unsubscribe: () => {} };
+        },
+      },
+      reset: () => {},
+      setFieldValue: (field, value) => {
+        restored[field] = value;
+      },
+    },
+  };
+
+  const Harness = () => {
+    controller = usePersistedFormData({ storageKey: "nested-forms", forms: [binding] });
+    return null;
+  };
+
+  render(<Harness />);
+  act(() => {
+    controller!.restore();
+  });
+
+  assert.deepEqual(restored, { "address.city": "New York" });
+});
+
 test("version-one drafts are ignored", async () => {
   window.localStorage.setItem(
     "forms",
@@ -137,4 +181,52 @@ test("version-one drafts are ignored", async () => {
   render(<Harness />);
 
   assert.equal(controller!.hasDraft, false);
+});
+
+test("a no-op submit closes progress immediately", async () => {
+  let orchestrator: ReturnType<typeof useFormOrchestrator> | undefined;
+  const form = {
+    id: "clean",
+    form: {
+      state: { isDirty: false },
+      store: {
+        subscribe: () => {
+          return { unsubscribe: () => {} };
+        },
+      },
+      reset: () => {},
+    },
+    snapshot: () => {
+      return {};
+    },
+    validate: () => {
+      return { valid: true as const };
+    },
+    endpoint: {
+      mutationFn: async () => {
+        return {};
+      },
+    },
+  };
+
+  const Harness = () => {
+    orchestrator = useFormOrchestrator({
+      forms: [form],
+      progressDelayMs: 100,
+    });
+    return null;
+  };
+
+  const queryClient = new QueryClient();
+  render(
+    <QueryClientProvider client={queryClient}>
+      <Harness />
+    </QueryClientProvider>,
+  );
+
+  await act(async () => {
+    await orchestrator!.submit();
+  });
+
+  assert.equal(orchestrator!.orchestratorProgress.isOpen, false);
 });

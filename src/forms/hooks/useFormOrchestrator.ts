@@ -129,6 +129,7 @@ export const useFormOrchestrator = <const T extends readonly SavableForm[]>(
     const forms = selectedForms as unknown as T;
 
     if (!forms.length) {
+      setProgressOpen(false);
       return Promise.resolve(undefined);
     }
 

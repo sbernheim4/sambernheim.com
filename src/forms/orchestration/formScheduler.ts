@@ -5,6 +5,14 @@ import { reduceRuntimeState, type FormStates, type Responses, type RuntimeState 
 import type { SavePlan } from "./plan";
 import { executeGraph, type RunnableNode } from "./scheduler";
 
+class PayloadMappingError extends Error {
+  readonly phase = "mapping" as const;
+
+  constructor(readonly cause: unknown) {
+    super("Payload mapping failed.");
+  }
+}
+
 export const saveFormsInGraph = async <P extends readonly AnyForm[]>(
   plan: SavePlan,
   initialStates: FormStates,
@@ -29,21 +37,25 @@ export const saveFormsInGraph = async <P extends readonly AnyForm[]>(
       throw new Error(`Missing plan node: ${id}`);
     }
 
-    const state = runtime.forms[id];
-    try {
-      const variables = getVariablesWithOverrides(
-        node.form,
-        state,
-        runtime.responses,
-        config.undoPayloads,
-      );
-      runtime = reduceRuntimeState(runtime, { type: "form.ready", id, variables });
-      nodes.push({
-        id,
-        prerequisites: node.prerequisites.filter((prerequisite) => {
-          return pending.includes(prerequisite);
-        }),
-        run: async () => {
+    nodes.push({
+      id,
+      prerequisites: node.prerequisites.filter((prerequisite) => {
+        return pending.includes(prerequisite);
+      }),
+      run: async () => {
+        let variables: unknown;
+        try {
+          variables = getVariablesWithOverrides(
+            node.form,
+            runtime.forms[id],
+            runtime.responses,
+            config.undoPayloads,
+          );
+          runtime = reduceRuntimeState(runtime, { type: "form.ready", id, variables });
+        } catch (error) {
+          throw new PayloadMappingError(error);
+        }
+
           const current = runtime.forms[id];
           const retry = resolveRetryPolicy(node.form, config.retry);
           return saveFormWithRetry(
@@ -61,19 +73,8 @@ export const saveFormsInGraph = async <P extends readonly AnyForm[]>(
             },
             config.progressDelayMs ?? 0,
           );
-        },
-      });
-    } catch (error) {
-      nodes.push({
-        id,
-        prerequisites: node.prerequisites.filter((prerequisite) => {
-          return pending.includes(prerequisite);
-        }),
-        run: async () => {
-          throw { phase: "mapping", cause: error };
-        },
-      });
-    }
+      },
+    });
   }
 
   await executeGraph(nodes, {
@@ -99,16 +100,8 @@ export const saveFormsInGraph = async <P extends readonly AnyForm[]>(
         runtime = reduceRuntimeState(runtime, {
           type: "form.failed",
           id: event.id,
-          phase:
-            event.error && typeof event.error === "object" && "phase" in event.error
-              ? event.error.phase === "mapping"
-                ? "mapping"
-                : "save"
-              : "save",
-          error:
-            event.error && typeof event.error === "object" && "cause" in event.error
-              ? event.error.cause
-              : event.error,
+          phase: event.error instanceof PayloadMappingError ? "mapping" : "save",
+          error: event.error instanceof PayloadMappingError ? event.error.cause : event.error,
         });
         emit("saving", runtime.forms, runtime.responses);
       } else if (event.type === "skipped") {

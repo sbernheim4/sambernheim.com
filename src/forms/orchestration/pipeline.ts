@@ -47,6 +47,7 @@ type RunContext<P extends readonly AnyForm[]> = {
   result: SaveResult<P>;
   successful: readonly FormInput[];
   allSaved: boolean;
+  finished: boolean;
   emit: (phase: Phase) => void;
 };
 
@@ -161,8 +162,16 @@ export const createSavePipeline = <P extends readonly AnyForm[]>(
   return async (config: SaveConfig<P>, plan: SavePlan): Promise<SaveResult<P>> => {
     const context = createRunContext(config, plan, queryClient, onChange, operations);
 
-    for (const stage of stages) {
-      await stage.run(context, operations);
+    try {
+      for (const stage of stages) {
+        await stage.run(context, operations);
+      }
+    } catch (error) {
+      if (!context.finished) {
+        await operations.invokeFormFinish(context.forms);
+        context.finished = true;
+      }
+      throw error;
     }
 
     return context.result;
@@ -192,6 +201,7 @@ const createRunContext = <P extends readonly AnyForm[]>(
     },
     successful: [],
     allSaved: false,
+    finished: false,
     emit: (_phase: Phase) => {},
   } as unknown as RunContext<P>;
 

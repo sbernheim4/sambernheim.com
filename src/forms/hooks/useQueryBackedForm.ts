@@ -1,4 +1,5 @@
 import type { AsyncMutation } from "../orchestration/types";
+import { useMemo } from "react";
 import { useSelector } from "@tanstack/react-form";
 import { useFormOrchestrator } from "./useFormOrchestrator";
 import { useComposableForm, type FormOptions } from "./useComposableForm";
@@ -25,10 +26,20 @@ export const useQueryBackedForm = <QueryData, Values, Mutation extends AsyncMuta
     return state.isDirty;
   });
 
-  // The orchestrator awaits native TanStack validation before executing writes.
-  binding.form.handleSubmit = async () => {
-    await save.submit();
-  };
+  // Keep the TanStack form instance immutable during render while exposing the
+  // orchestrated submit behavior through the returned form facade.
+  const form = useMemo(() => {
+    return new Proxy(binding.form, {
+      get(target, property, receiver) {
+        if (property === "handleSubmit") {
+          return async () => {
+            await save.submit();
+          };
+        }
+        return Reflect.get(target, property, receiver);
+      },
+    });
+  }, [binding.form, save.submit]);
 
   const failure = save.result?.forms.resource?.failure?.error ?? binding.readError;
 
@@ -37,6 +48,7 @@ export const useQueryBackedForm = <QueryData, Values, Mutation extends AsyncMuta
 
   return {
     ...binding,
+    form,
     save: save.submit,
     result: save.result,
     submit: save.submit,

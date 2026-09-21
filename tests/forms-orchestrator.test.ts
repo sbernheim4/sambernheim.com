@@ -117,6 +117,35 @@ test("executes independent forms in parallel and waits for graph dependencies", 
   assert.deepEqual(started, ["b", "a", "c"]);
 });
 
+test("maps dependent payloads after prerequisite responses are recorded", async () => {
+  let seenResults: Record<string, unknown> | undefined;
+  const parent = makeForm({
+    id: "parent",
+    mutationFn: async () => {
+      return { generatedId: "created-parent" };
+    },
+  });
+  const child = makeForm({
+    id: "child",
+    dependencies: [parent],
+    toMutationPayload: (_values, context) => {
+      seenResults = context.results;
+      return { parentId: (context.results.parent as { generatedId: string }).generatedId };
+    },
+    mutationFn: async (variables) => {
+      assert.deepEqual(variables, { parentId: "created-parent" });
+      return { created: true };
+    },
+  });
+
+  const result = await createOrchestrator(new QueryClient()).submit({
+    forms: [child, parent],
+  });
+
+  assert.equal(result.outcome, "success");
+  assert.deepEqual(seenResults, { parent: { generatedId: "created-parent" } });
+});
+
 test("rejects cycles before snapshots or mutations", async () => {
   let snapshots = 0;
   const a: AnyForm = {

@@ -66,6 +66,16 @@ const removeDraft = (storageKey: string) => {
   }
 };
 
+const flattenValues = (value: unknown, path = ""): [string, unknown][] => {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return path ? [[path, value]] : [];
+  }
+
+  return Object.entries(value).flatMap(([key, child]) => {
+    return flattenValues(child, path ? `${path}.${key}` : key);
+  });
+};
+
 export const usePersistedFormData = ({
   storageKey,
   forms,
@@ -166,7 +176,7 @@ export const usePersistedFormData = ({
       }
       binding.form.reset();
       if (binding.form.setFieldValue && values && typeof values === "object") {
-        for (const [field, value] of Object.entries(values)) {
+        for (const [field, value] of flattenValues(values)) {
           binding.form.setFieldValue(field, value);
         }
       }
