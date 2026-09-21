@@ -9,7 +9,8 @@ import { useExecutionProfile } from "../../domains/execution-profiles/hooks/useE
 import { ProcessFields } from "../../domains/processes/components/ProcessFields";
 import { DetailLayout, Loading, Missing, Status } from "../form-demo/components/Layout";
 import { ChildList, ProfileSummary } from "../form-demo/components/DetailHelpers";
-import { DetailTabs } from "../form-demo/components/DetailTabs";
+import { DetailView } from "../form-demo/components/DetailView";
+import { ViewModePicker, useViewModePreference } from "../form-demo/components/ViewModePreference";
 
 export const ProcessListPage = () => {
   const query = useProcesses();
@@ -56,7 +57,7 @@ export const ProcessDetailPage = ({ id }: { id: string }) => {
 
   return (
     <DetailLayout title={process.data.name} editTo={`/form-demo/processes/${id}/edit`}>
-      <DetailTabs
+      <DetailView
         tabs={[
           {
             value: "overview",
@@ -133,6 +134,7 @@ export const ProcessEditPage = ({
   const navigate = useNavigate();
   const query = useProcess(id);
   const profile = useExecutionProfile(query.data?.executionProfileId ?? "");
+  const { mode, updateMode } = useViewModePreference();
 
   const { entityForm, profileForm, save } = useProcessEditForms(id);
 
@@ -145,6 +147,7 @@ export const ProcessEditPage = ({
       mode="edit"
       isEditing
       defaultTab="entity"
+      viewMode={mode}
       activeTab={activeTab}
       onActiveTabChange={onActiveTabChange}
       actions={save.actions}
@@ -158,6 +161,7 @@ export const ProcessEditPage = ({
     >
       <div className="editor-heading">
         <h1>Edit Process</h1>
+        <ViewModePicker mode={mode} onChange={updateMode} />
       </div>
 
       <FormEditor.TabList>

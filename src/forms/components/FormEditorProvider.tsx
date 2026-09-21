@@ -8,6 +8,7 @@ import type { FormEditorProviderProps } from "./formTypes";
 export const FormEditorProvider = ({
   mode,
   defaultTab,
+  viewMode = "tabs",
   children,
   activeTab: controlledActiveTab,
   onActiveTabChange,
@@ -45,6 +46,7 @@ export const FormEditorProvider = ({
   const controller = useMemo<FormEditorController>(
     () => ({
       mode,
+      viewMode,
       activeTab,
       isEditing,
       readOnly,
@@ -61,6 +63,7 @@ export const FormEditorProvider = ({
     }),
     [
       mode,
+      viewMode,
       activeTab,
       isEditing,
       readOnly,
