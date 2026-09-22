@@ -280,6 +280,8 @@ export const useFormOrchestrator = <const T extends readonly SavableForm[]>(
   );
 
   const orchestratorProgress = {
+    correlationId: state.correlationId,
+    timestamp: state.timestamp,
     phase: state.phase,
     isSubmitting: state.isSaving,
     forms: config.forms.map((form) => {

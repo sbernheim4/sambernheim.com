@@ -164,19 +164,30 @@ const queryKeyLabel = (queryKey: readonly unknown[]) => {
   return queryKey.map(String).join(" / ");
 };
 
+const errorLabel = (error: unknown) => {
+  return error instanceof Error ? error.message : String(error);
+};
+
+const updatedAtLabel = (timestamp: number) => {
+  return new Date(timestamp).toLocaleTimeString();
+};
+
 const ProgressStep = ({
   label,
   detail,
   status,
   nested = false,
+  element = "li",
 }: {
   label: string;
   detail: string;
   status: ProgressStatus;
   nested?: boolean;
+  element?: "li" | "div";
 }) => {
+  const Element = element;
   return (
-    <li
+    <Element
       className={nested ? "form-editor-orchestrator-child" : "form-editor-orchestrator-step"}
       data-status={status}
     >
@@ -193,7 +204,7 @@ const ProgressStep = ({
       >
         {getStatusLabel(status)}
       </span>
-    </li>
+    </Element>
   );
 };
 
@@ -208,10 +219,18 @@ const FormStepList = ({
     <ol className="form-editor-orchestrator-children">
       {orchestrator.forms.map((form) => {
         const status = getFormStatus(orchestrator, form.id, phase);
+        const state = orchestrator.result?.forms[form.id];
+        const diagnostic = state?.failure
+          ? `Attempts: ${state.attempts} · ${state.failure.phase}: ${errorLabel(state.failure.error)}`
+          : state?.blockedBy?.length
+            ? `Blocked by: ${state.blockedBy.join(", ")}`
+            : phase === "validating"
+              ? "Validate fields and prepare payload"
+              : `Attempts: ${state?.attempts ?? 0} · Refetches: ${form.refetchCount} · Invalidations: ${form.invalidateQueryKeys.length}`;
         const detail =
-          phase === "validating"
+          phase === "validating" && !state?.failure && !state?.blockedBy?.length
             ? "Validate fields and prepare payload"
-            : `Refetches: ${form.refetchCount} · Invalidations: ${form.invalidateQueryKeys.length}`;
+            : diagnostic;
 
         return (
           <ProgressStep
@@ -261,12 +280,34 @@ export const FormEditorOrchestratorProgress = () => {
           )}
         </div>
       </div>
+      <div className="form-editor-orchestrator-diagnostics" data-testid="orchestrator-diagnostics">
+        <span title={orchestrator.correlationId}>
+          Run: <code>{orchestrator.correlationId}</code>
+        </span>
+        <span>Updated: {updatedAtLabel(orchestrator.timestamp)}</span>
+        {orchestrator.result && orchestrator.result.followUpErrors.length > 0 && (
+          <details>
+            <summary>{orchestrator.result.followUpErrors.length} follow-up error(s)</summary>
+            <ul>
+              {orchestrator.result.followUpErrors.map((error, index) => {
+                return (
+                  <li key={`${error.phase}-${error.formId ?? "run"}-${index}`}>
+                    {error.formId ? `${error.formId}: ` : ""}
+                    {error.phase}: {errorLabel(error.error)}
+                  </li>
+                );
+              })}
+            </ul>
+          </details>
+        )}
+      </div>
       <ol className="form-editor-orchestrator-steps">
         <li className="form-editor-orchestrator-group" data-status={validationStatus}>
           <ProgressStep
             label="Validate forms"
             detail="Check fields and prepare dependent payloads"
             status={validationStatus}
+            element="div"
           />
           <FormStepList orchestrator={orchestrator} phase="validating" />
         </li>
@@ -275,37 +316,47 @@ export const FormEditorOrchestratorProgress = () => {
             label="Save forms"
             detail="Submit each form in dependency order"
             status={savingStatus}
+            element="div"
           />
           <FormStepList orchestrator={orchestrator} phase="saving" />
         </li>
-        <ProgressStep
-          label="Refresh and invalidate queries"
-          detail={orchestrator.forms
-            .map((form) => {
-              const keys = form.invalidateQueryKeys
-                .map((queryKey) => {
-                  return queryKeyLabel(queryKey);
-                })
-                .join(", ");
-              return `${titleForId(form.id)}: ${keys || "no query keys"}`;
-            })
-            .join(" · ")}
-          status={getPhaseStatus(orchestrator.phase, "refreshing")}
-        />
-        <ProgressStep
-          label="Reconcile query cache"
-          detail={orchestrator.forms
-            .map((form) => {
-              return `${titleForId(form.id)}: ${form.cacheUpdateCount} cache update(s)`;
-            })
-            .join(" · ")}
-          status={getPhaseStatus(orchestrator.phase, "reconciling")}
-        />
-        <ProgressStep
-          label="Finish orchestration"
-          detail="Mark forms saved, clear drafts, and run success effects"
-          status={getPhaseStatus(orchestrator.phase, "effects")}
-        />
+        <li>
+          <ProgressStep
+            label="Refresh and invalidate queries"
+            detail={orchestrator.forms
+              .map((form) => {
+                const keys = form.invalidateQueryKeys
+                  .map((queryKey) => {
+                    return queryKeyLabel(queryKey);
+                  })
+                  .join(", ");
+                return `${titleForId(form.id)}: ${keys || "no query keys"}`;
+              })
+              .join(" · ")}
+            status={getPhaseStatus(orchestrator.phase, "refreshing")}
+            element="div"
+          />
+        </li>
+        <li>
+          <ProgressStep
+            label="Reconcile query cache"
+            detail={orchestrator.forms
+              .map((form) => {
+                return `${titleForId(form.id)}: ${form.cacheUpdateCount} cache update(s)`;
+              })
+              .join(" · ")}
+            status={getPhaseStatus(orchestrator.phase, "reconciling")}
+            element="div"
+          />
+        </li>
+        <li>
+          <ProgressStep
+            label="Finish orchestration"
+            detail="Mark forms saved, clear drafts, and run success effects"
+            status={getPhaseStatus(orchestrator.phase, "effects")}
+            element="div"
+          />
+        </li>
       </ol>
     </section>
   );
