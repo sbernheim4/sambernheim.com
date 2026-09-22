@@ -57,14 +57,27 @@ test("reuses one mapped payload across retry attempts", async () => {
 });
 
 test("timestamps every emitted progress snapshot", async () => {
-  const snapshots: { timestamp: number; phase: string }[] = [];
+  const snapshots: { correlationId: string; timestamp: number; phase: string }[] = [];
   const save = createOrchestrator(new QueryClient(), (state) => {
-    snapshots.push({ timestamp: state.timestamp, phase: state.phase });
+    snapshots.push({
+      correlationId: state.correlationId,
+      timestamp: state.timestamp,
+      phase: state.phase,
+    });
   });
 
   await save.submit({ forms: [form("timestamped")] });
 
   assert.ok(snapshots.length > 0);
+  assert.equal(
+    new Set(
+      snapshots.map((snapshot) => {
+        return snapshot.correlationId;
+      }),
+    ).size,
+    1,
+  );
+  assert.notEqual(snapshots[0].correlationId, "idle");
   assert.ok(
     snapshots.every(({ timestamp }) => {
       return Number.isFinite(timestamp);

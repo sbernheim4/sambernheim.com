@@ -30,6 +30,7 @@ export type FormStates = Readonly<Record<string, FormState>>;
 export type Responses = Readonly<Record<string, any>>;
 
 export type SaveState<P extends readonly AnyForm[]> = {
+  correlationId: string;
   timestamp: number;
   phase: Phase;
   isSaving: boolean;
@@ -108,6 +109,7 @@ export type PipelineOperations<P extends readonly AnyForm[]> = {
   waitForProgress: (delayMs: number) => Promise<void>;
   emitProgress: (
     onChange: (state: SaveState<P>) => void,
+    correlationId: string,
     phase: Phase,
     result: SaveResult<P>,
     states: FormStates,
@@ -155,8 +157,19 @@ export const createSavePipeline = <P extends readonly AnyForm[]>(
     { name: "complete", run: completeStage },
   ];
 
-  return async (config: SaveConfig<P>, plan: SavePlan): Promise<SaveResult<P>> => {
-    const context = createRunContext(config, plan, queryClient, onChange, operations);
+  return async (
+    config: SaveConfig<P>,
+    plan: SavePlan,
+    correlationId: string,
+  ): Promise<SaveResult<P>> => {
+    const context = createRunContext(
+      config,
+      plan,
+      queryClient,
+      onChange,
+      correlationId,
+      operations,
+    );
 
     try {
       for (const stage of stages) {
@@ -176,6 +189,7 @@ const createRunContext = <P extends readonly AnyForm[]>(
   plan: SavePlan,
   queryClient: QueryClient,
   onChange: (state: SaveState<P>) => void,
+  correlationId: string,
   operations: PipelineOperations<P>,
 ): RunContext<P> => {
   const context = {
@@ -209,6 +223,7 @@ const createRunContext = <P extends readonly AnyForm[]>(
   context.emit = (phase) => {
     operations.emitProgress(
       onChange,
+      correlationId,
       phase,
       context.result,
       context.runtime.forms,
