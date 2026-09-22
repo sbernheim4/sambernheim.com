@@ -210,3 +210,51 @@ test("FormEditor error and draft banner expose their actions", async () => {
   await user.click(screen.getByRole("button", { name: "Discard draft" }));
   assert.deepEqual([restored, discarded], [1, 1]);
 });
+
+test("FormEditor progress exposes correlation and failure diagnostics", () => {
+  const actions = {
+    onSubmit: () => {},
+    isSubmitting: true,
+    isPristine: false,
+    orchestrator: {
+      correlationId: "run-123",
+      timestamp: Date.parse("2026-09-22T12:00:00.000Z"),
+      phase: "saving",
+      isSubmitting: true,
+      isOpen: true,
+      progressDelayMs: 0,
+      setProgressDelayMs: () => {},
+      close: () => {},
+      forms: [
+        {
+          id: "profile",
+          invalidateQueryKeys: [],
+          refetchCount: 0,
+          cacheUpdateCount: 0,
+        },
+      ],
+      result: {
+        forms: {
+          profile: {
+            status: "failed",
+            attempts: 2,
+            failure: { phase: "save", error: new Error("request failed") },
+          },
+        },
+        followUpErrors: [
+          { phase: "refresh", formId: "profile", error: new Error("refresh failed") },
+        ],
+      },
+    },
+  } as any;
+
+  render(
+    <FormEditor.Provider mode="edit" defaultTab="profile" actions={actions}>
+      <FormEditor.OrchestratorProgress />
+    </FormEditor.Provider>,
+  );
+
+  expect(screen.getByTestId("orchestrator-diagnostics")).toHaveTextContent("run-123");
+  expect(screen.getAllByText("Attempts: 2 · save: request failed")).toHaveLength(2);
+  expect(screen.getByText("1 follow-up error(s)")).toBeInTheDocument();
+});

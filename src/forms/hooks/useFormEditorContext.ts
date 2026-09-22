@@ -14,6 +14,8 @@ export type FormEditorActionState = {
 };
 
 export type FormEditorOrchestrator = {
+  correlationId: string;
+  timestamp: number;
   phase: string;
   isSubmitting: boolean;
   forms: readonly {
@@ -23,7 +25,18 @@ export type FormEditorOrchestrator = {
     cacheUpdateCount: number;
   }[];
   result?: {
-    forms: Readonly<Record<string, { status: string }>>;
+    forms: Readonly<
+      Record<
+        string,
+        {
+          status: string;
+          attempts: number;
+          blockedBy?: readonly string[];
+          failure?: { phase: string; error: unknown };
+        }
+      >
+    >;
+    followUpErrors: readonly { phase: string; formId?: string; error: unknown }[];
   };
   progressDelayMs: number;
   isOpen: boolean;

@@ -56,6 +56,36 @@
   text-transform: uppercase;
 }
 
+.form-editor-orchestrator-diagnostics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  margin: 0 0 12px;
+  color: #687671;
+  font-size: 11px;
+}
+
+.form-editor-orchestrator-diagnostics code {
+  color: #216b5e;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+}
+
+.form-editor-orchestrator-diagnostics details {
+  flex-basis: 100%;
+}
+
+.form-editor-orchestrator-diagnostics summary {
+  color: #a13c3c;
+  cursor: pointer;
+  font-weight: 750;
+}
+
+.form-editor-orchestrator-diagnostics ul {
+  margin: 5px 0 0;
+  padding-left: 18px;
+}
+
 .form-editor-orchestrator-steps {
   display: grid;
   gap: 8px;
