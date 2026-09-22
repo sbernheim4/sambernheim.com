@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { expect, test } from "vitest";
 import { Form } from "../src/forms/components/FormComponents";
-import { FormEditor } from "../src/forms/components";
+import { CycleableDateTime, FormEditor } from "../src/forms/components";
 
 const baseForm = { handleSubmit: async () => {}, reset: () => {}, state: { isDirty: false } };
 const scope = (overrides: Record<string, unknown> = {}) => {
@@ -257,4 +257,17 @@ test("FormEditor progress exposes correlation and failure diagnostics", () => {
   expect(screen.getByTestId("orchestrator-diagnostics")).toHaveTextContent("run-123");
   expect(screen.getAllByText("Attempts: 2 · save: request failed")).toHaveLength(2);
   expect(screen.getByText("1 follow-up error(s)")).toBeInTheDocument();
+});
+
+test("CycleableDateTime titles each display mode", async () => {
+  const user = userEvent.setup();
+  render(<CycleableDateTime value="2026-09-22T12:00:00.000Z" />);
+  const control = screen.getByRole("button");
+  const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || "Local time";
+
+  expect(control).toHaveAttribute("title", "Display mode: UTC. Click to change.");
+  await user.click(control);
+  expect(control).toHaveAttribute("title", `Display mode: ${userTimeZone}. Click to change.`);
+  await user.click(control);
+  expect(control).toHaveAttribute("title", "Display mode: Relative time. Click to change.");
 });

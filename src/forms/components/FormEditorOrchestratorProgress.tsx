@@ -1,5 +1,6 @@
 import type { FormEditorOrchestrator } from "../hooks/useFormEditorContext";
 import { useFormEditorContext } from "../hooks/useFormEditorContext";
+import { CycleableDateTime } from "./CycleableDateTime";
 import "./FormEditorOrchestratorProgress.css";
 
 type ProgressStatus = "pending" | "active" | "complete" | "skipped" | "failed";
@@ -168,10 +169,6 @@ const errorLabel = (error: unknown) => {
   return error instanceof Error ? error.message : String(error);
 };
 
-const updatedAtLabel = (timestamp: number) => {
-  return new Date(timestamp).toLocaleTimeString();
-};
-
 const ProgressStep = ({
   label,
   detail,
@@ -284,7 +281,9 @@ export const FormEditorOrchestratorProgress = () => {
         <span title={orchestrator.correlationId}>
           Run: <code>{orchestrator.correlationId}</code>
         </span>
-        <span>Updated: {updatedAtLabel(orchestrator.timestamp)}</span>
+        <span>
+          Updated: <CycleableDateTime value={orchestrator.timestamp} />
+        </span>
         {orchestrator.result && orchestrator.result.followUpErrors.length > 0 && (
           <details>
             <summary>{orchestrator.result.followUpErrors.length} follow-up error(s)</summary>
