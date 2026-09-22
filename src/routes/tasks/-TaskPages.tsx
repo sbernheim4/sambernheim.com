@@ -21,7 +21,12 @@ export const TaskListPage = () => {
 
   return (
     <>
-      <h1>Tasks</h1>
+      <div className="heading">
+        <h1>Tasks</h1>
+        <Link className="primary-action" to="/form-demo/tasks/create">
+          Create task
+        </Link>
+      </div>
       {query.isPending ? (
         <p>Loading...</p>
       ) : (
