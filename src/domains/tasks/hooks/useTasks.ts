@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { getTask, listTasks, updateTask } from "../api";
+import { createTask, getTask, listTasks, updateTask } from "../api";
 export const taskKeys = {
   all: ["tasks"] as const,
   list: () => {
@@ -25,6 +25,14 @@ export const useUpdateTask = () => {
   return useMutation({
     mutationFn: ({ id, input }: { id: string; input: Parameters<typeof updateTask>[1] }) => {
       return updateTask(id, input);
+    },
+  });
+};
+
+export const useCreateTask = () => {
+  return useMutation({
+    mutationFn: (input: Parameters<typeof createTask>[0]) => {
+      return createTask(input);
     },
   });
 };

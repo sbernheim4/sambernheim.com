@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { getExecutionProfile, updateExecutionProfile } from "../api";
+import { createExecutionProfile, getExecutionProfile, updateExecutionProfile } from "../api";
 export const profileKeys = {
   all: ["execution-profiles"] as const,
   detail: (id: string) => {
@@ -25,6 +25,14 @@ export const useUpdateExecutionProfile = () => {
       input: Parameters<typeof updateExecutionProfile>[1];
     }) => {
       return updateExecutionProfile(id, input);
+    },
+  });
+};
+
+export const useCreateExecutionProfile = () => {
+  return useMutation({
+    mutationFn: (input: Parameters<typeof createExecutionProfile>[0]) => {
+      return createExecutionProfile(input);
     },
   });
 };

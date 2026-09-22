@@ -1,5 +1,9 @@
 import { store } from "../shared/store";
 
+export const createTask = (input: Parameters<typeof store.createTask>[0]) => {
+  return store.createTask(input);
+};
+
 export const listTasks = () => {
   return store.listTasks();
 };

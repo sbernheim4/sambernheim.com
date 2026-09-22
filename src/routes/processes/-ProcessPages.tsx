@@ -3,6 +3,7 @@ import { FormEditor } from "../../forms/components";
 import { ExecutionProfileFields } from "../../domains/execution-profiles/components/ExecutionProfileFields";
 import { useProcesses, useProcess } from "../../domains/processes/hooks/useProcesses";
 import { useProcessEditForms } from "../../domains/processes/hooks/useProcessEditForms";
+import { useProcessCreateForms } from "../../domains/processes/hooks/useProcessCreateForms";
 import { useThreads } from "../../domains/threads/hooks/useThreads";
 import { useTasks } from "../../domains/tasks/hooks/useTasks";
 import { useExecutionProfile } from "../../domains/execution-profiles/hooks/useExecutionProfile";
@@ -193,6 +194,53 @@ export const ProcessEditPage = ({
 
       <FormEditor.OrchestratorStatus />
 
+      <FormEditor.Actions />
+    </FormEditor.Provider>
+  );
+};
+
+export const ProcessCreatePage = ({
+  activeTab,
+  onActiveTabChange,
+}: {
+  activeTab: string;
+  onActiveTabChange: (tab: string) => void;
+}) => {
+  const navigate = useNavigate();
+  const { mode, updateMode } = useViewModePreference();
+  const { entityForm, profileForm, save } = useProcessCreateForms();
+
+  return (
+    <FormEditor.Provider
+      mode="create"
+      isEditing
+      defaultTab="entity"
+      viewMode={mode}
+      activeTab={activeTab}
+      onActiveTabChange={onActiveTabChange}
+      actions={save.actions}
+      onCancel={() => {
+        return navigate({ to: "/form-demo/processes", search: {} });
+      }}
+      saveLabel="Create process"
+      preventSaveWithoutChanges={false}
+    >
+      <div className="editor-heading">
+        <h1>Create Process</h1>
+        <ViewModePicker mode={mode} onChange={updateMode} />
+      </div>
+      <FormEditor.TabList>
+        <FormEditor.TabTrigger name="entity" label="Process" />
+        <FormEditor.TabTrigger name="profile" label="Execution Profile" />
+      </FormEditor.TabList>
+      <FormEditor.Tab name="entity">
+        <ProcessFields form={entityForm.form} />
+      </FormEditor.Tab>
+      <FormEditor.Tab name="profile">
+        <ExecutionProfileFields form={profileForm.form} />
+      </FormEditor.Tab>
+      <FormEditor.OrchestratorProgress />
+      <FormEditor.OrchestratorStatus />
       <FormEditor.Actions />
     </FormEditor.Provider>
   );

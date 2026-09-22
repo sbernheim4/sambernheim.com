@@ -123,6 +123,12 @@ const nextId = (prefix: string) => {
 };
 
 export const store = {
+  async createTask(input: Omit<Task, "id"> & Partial<Pick<Task, "id">>) {
+    await pause();
+    const task = { id: nextId("task"), ...input };
+    tasks.push(task);
+    return clone(task);
+  },
   async listTasks() {
     await pause();
     return clone(tasks);
@@ -138,6 +144,12 @@ export const store = {
   async updateTask(id: string, input: Omit<Task, "id">) {
     await pause();
     return update(tasks, id, input);
+  },
+  async createProcess(input: Omit<Process, "id"> & Partial<Pick<Process, "id">>) {
+    await pause();
+    const process = { id: nextId("process"), ...input };
+    processes.push(process);
+    return clone(process);
   },
   async listProcesses(taskId?: string) {
     await pause();
@@ -161,6 +173,12 @@ export const store = {
     await pause();
     return update(processes, id, input);
   },
+  async createThread(input: Omit<Thread, "id"> & Partial<Pick<Thread, "id">>) {
+    await pause();
+    const thread = { id: nextId("thread"), ...input };
+    threads.push(thread);
+    return clone(thread);
+  },
   async listThreads(processId?: string) {
     await pause();
     return clone(
@@ -182,6 +200,12 @@ export const store = {
   async updateThread(id: string, input: Omit<Thread, "id">) {
     await pause();
     return update(threads, id, input);
+  },
+  async createProfile(input: Omit<ExecutionProfile, "id"> & Partial<Pick<ExecutionProfile, "id">>) {
+    await pause();
+    const profile = { id: nextId("profile"), ...input };
+    profiles.push(profile);
+    return clone(profile);
   },
   async getProfile(id: string) {
     await pause();

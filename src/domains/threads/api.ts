@@ -1,5 +1,9 @@
 import { store } from "../shared/store";
 
+export const createThread = (input: Parameters<typeof store.createThread>[0]) => {
+  return store.createThread(input);
+};
+
 export const listThreads = (processId?: string) => {
   return store.listThreads(processId);
 };

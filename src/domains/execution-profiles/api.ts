@@ -1,5 +1,9 @@
 import { store } from "../shared/store";
 
+export const createExecutionProfile = (input: Parameters<typeof store.createProfile>[0]) => {
+  return store.createProfile(input);
+};
+
 export const getExecutionProfile = (id: string) => {
   return store.getProfile(id);
 };
