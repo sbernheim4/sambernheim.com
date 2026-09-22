@@ -22,20 +22,12 @@ import {
   reconcileCacheWithMutationResponses,
   refreshAndInvalidateCache,
 } from "./effects";
-import { emitProgress } from "./progress";
+import { emitProgress, type SaveState } from "./progress";
 import { waitForProgress } from "./mutation";
 
 export type FormState = Readonly<FormSaveState<any, any, any>>;
 export type FormStates = Readonly<Record<string, FormState>>;
 export type Responses = Readonly<Record<string, any>>;
-
-export type SaveState<P extends readonly AnyForm[]> = {
-  correlationId: string;
-  timestamp: number;
-  phase: Phase;
-  isSaving: boolean;
-  result?: SaveResult<P>;
-};
 
 type RunContext<P extends readonly AnyForm[]> = {
   forms: readonly FormInput[];
