@@ -11,9 +11,9 @@ import type {
   SaveResult,
 } from "./types";
 
-export type EffectContext = CacheContext<any, any, any> & {
+export type EffectContext = CacheContext<unknown, unknown, Readonly<Record<string, unknown>>> & {
   formId?: string;
-  formValues?: any;
+  formValues?: unknown;
   attempts?: number;
   followUpErrors?: FollowUpError[];
 };
@@ -108,7 +108,7 @@ export const refreshAndInvalidateCache = async <P extends readonly AnyForm[]>(
 
 export const updateCacheWithMutationResponse = (
   context: EffectContext,
-  cacheUpdates: readonly CacheUpdate<any, any, any>[] = [],
+  cacheUpdates: readonly CacheUpdate<unknown, unknown, Readonly<Record<string, unknown>>>[] = [],
   formId?: string,
 ): FollowUpError[] => {
   const errors: FollowUpError[] = [];
@@ -145,20 +145,24 @@ export const reconcileCacheWithMutationResponses = <P extends readonly AnyForm[]
     ...successful.flatMap((form) => {
       return updateCacheWithMutationResponse(
         context(form),
-        form.cacheUpdates as readonly CacheUpdate<any, any, any>[] | undefined,
+        form.cacheUpdates as
+          | readonly CacheUpdate<unknown, unknown, Readonly<Record<string, unknown>>>[]
+          | undefined,
         form.id,
       );
     }),
     ...updateCacheWithMutationResponse(
       { queryClient, response: result.responses, variables: undefined, results: result.responses },
-      config.cacheUpdates as readonly CacheUpdate<any, any, any>[] | undefined,
+      config.cacheUpdates as
+        | readonly CacheUpdate<unknown, unknown, Readonly<Record<string, unknown>>>[]
+        | undefined,
     ),
   ];
 };
 
 export const markFormsSaved = async (
   forms: readonly FormInput[],
-  states: Readonly<Record<string, FormSaveState<any, any, any>>>,
+  states: Readonly<Record<string, FormSaveState<unknown, unknown, unknown>>>,
 ) => {
   return executeOrderedEffects(
     forms.map((form) => {
@@ -175,7 +179,7 @@ export const markFormsSaved = async (
 
 export const invokeFormCallbacks = async (
   forms: readonly FormInput[],
-  states: Readonly<Record<string, FormSaveState<any, any, any>>>,
+  states: Readonly<Record<string, FormSaveState<unknown, unknown, unknown>>>,
   context: (form: FormInput) => EffectContext,
 ) => {
   return executeOrderedEffects(

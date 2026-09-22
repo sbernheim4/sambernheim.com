@@ -5,7 +5,7 @@ export type PersistedFormBinding = {
   form: {
     state: { values: Record<string, unknown>; isDirty: boolean };
     store: { subscribe: (listener: () => void) => { unsubscribe: () => void } };
-    reset: (...args: any[]) => void;
+    reset: (...args: never[]) => void;
     setFieldValue?: (field: any, value: any) => void;
   };
 };

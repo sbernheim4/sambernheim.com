@@ -76,7 +76,7 @@ export const captureUndoState = (forms: readonly FormInput[]) => {
 const getVariables = (
   form: FormInput,
   state: FormState,
-  responses: Readonly<Record<string, any>>,
+  responses: Readonly<Record<string, unknown>>,
 ) => {
   return structuredClone(
     form.toMutationPayload

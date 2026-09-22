@@ -1,23 +1,24 @@
 import { useStore } from "@tanstack/react-form";
+import type { AnyFormApi } from "@tanstack/form-core";
 
 import type { FormEditorActionState } from "./useFormEditorContext";
 
 export type FormEditorActionStatus = Omit<FormEditorActionState, "onSubmit">;
 
-export const useFormActionState = (form: any): FormEditorActionStatus => {
-  const canSubmit = useStore(form.store, (state: any) => {
+export const useFormActionState = (form: AnyFormApi): FormEditorActionStatus => {
+  const canSubmit = useStore(form.store, (state) => {
     return state.canSubmit || (state.isFieldsValid && state.isValid);
   });
-  const isSubmitting = useStore(form.store, (state: any) => {
+  const isSubmitting = useStore(form.store, (state) => {
     return state.isSubmitting;
   });
-  const isPristine = useStore(form.store, (state: any) => {
+  const isPristine = useStore(form.store, (state) => {
     return state.isDefaultValue;
   });
-  const validationError = useStore(form.store, (state: any) => {
+  const validationError = useStore(form.store, (state) => {
     return state.errorMap.onDynamic;
   });
-  const submitError = useStore(form.store, (state: any) => {
+  const submitError = useStore(form.store, (state) => {
     return state.errorMap.onSubmit;
   });
 

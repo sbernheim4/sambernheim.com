@@ -30,7 +30,7 @@ export const validateForms = async (
 const getVariables = (
   form: FormInput,
   state: FormStates[string],
-  responses: Readonly<Record<string, any>>,
+  responses: Readonly<Record<string, unknown>>,
 ) => {
   return structuredClone(
     form.toMutationPayload
@@ -44,7 +44,7 @@ const getVariables = (
 export const getVariablesWithOverrides = (
   form: FormInput,
   state: FormStates[string],
-  responses: Readonly<Record<string, any>>,
+  responses: Readonly<Record<string, unknown>>,
   payloadOverrides?: Readonly<Record<string, unknown>>,
 ) => {
   if (payloadOverrides && Object.hasOwn(payloadOverrides, form.id)) {

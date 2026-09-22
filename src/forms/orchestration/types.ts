@@ -85,9 +85,9 @@ export type PayloadMapping<V, I, Results> = [V] extends [I]
 export type AnyForm = {
   id: string;
   dependencies?: readonly { id: string }[];
-  snapshot: () => any;
-  undoSnapshot?: () => any;
-  undoResponse?: () => any;
+  snapshot: () => unknown;
+  undoSnapshot?: () => unknown;
+  undoResponse?: () => unknown;
   validate: (...args: any[]) => ValidationResult | Promise<ValidationResult>;
   toMutationPayload?: (...args: any[]) => any;
   markSaved?: (...args: any[]) => void | Promise<void>;
@@ -103,7 +103,7 @@ export type AnyForm = {
     retrySafe?: boolean;
   };
   form: {
-    reset: (...args: any[]) => void;
+    reset: (...args: never[]) => void;
   };
 };
 
