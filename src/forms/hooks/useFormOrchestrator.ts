@@ -65,6 +65,7 @@ export const useFormOrchestrator = <const T extends readonly SavableForm[]>(
   });
 
   const [state, setState] = useState<SaveState<T>>({
+    timestamp: Date.now(),
     phase: "idle",
     isSaving: false,
   });

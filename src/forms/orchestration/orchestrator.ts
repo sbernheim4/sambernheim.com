@@ -50,7 +50,7 @@ export const createOrchestrator = <P extends readonly AnyForm[]>(
       return false;
     }
 
-    onChange({ phase: "idle", isSaving: false });
+    onChange({ timestamp: Date.now(), phase: "idle", isSaving: false });
 
     for (const form of config.forms) {
       form.form.reset();

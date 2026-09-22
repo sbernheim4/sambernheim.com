@@ -30,6 +30,7 @@ export type FormStates = Readonly<Record<string, FormState>>;
 export type Responses = Readonly<Record<string, any>>;
 
 export type SaveState<P extends readonly AnyForm[]> = {
+  timestamp: number;
   phase: Phase;
   isSaving: boolean;
   result?: SaveResult<P>;
