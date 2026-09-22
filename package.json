@@ -30,6 +30,7 @@
     "@tanstack/react-query": "^5.102.8",
     "@tanstack/react-router": "^1.168.6",
     "@tanstack/react-start": "^1.168.6",
+    "date-fns": "^4.4.0",
     "lucide-react": "^1.41.0",
     "monaco-editor": "^0.56.0",
     "react": "^19.1.1",

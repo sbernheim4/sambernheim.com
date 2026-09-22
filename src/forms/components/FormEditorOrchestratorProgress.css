@@ -71,6 +71,17 @@
   font-size: 10px;
 }
 
+.cycleable-date-time {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  text-decoration: underline dotted;
+  text-underline-offset: 2px;
+}
+
 .form-editor-orchestrator-diagnostics details {
   flex-basis: 100%;
 }
