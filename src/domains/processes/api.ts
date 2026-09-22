@@ -1,5 +1,9 @@
 import { store } from "../shared/store";
 
+export const createProcess = (input: Parameters<typeof store.createProcess>[0]) => {
+  return store.createProcess(input);
+};
+
 export const listProcesses = (taskId?: string) => {
   return store.listProcesses(taskId);
 };

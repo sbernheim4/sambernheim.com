@@ -8,8 +8,11 @@ export const Shell = ({ children }: { children: ReactNode }) => {
     <main className="shell">
       <nav className="nav">
         <Link to="/form-demo/tasks">Tasks</Link>
+        <Link to="/form-demo/tasks/create">Create Task</Link>
         <Link to="/form-demo/processes">Processes</Link>
+        <Link to="/form-demo/processes/create">Create Process</Link>
         <Link to="/form-demo/threads">Threads</Link>
+        <Link to="/form-demo/threads/create">Create Thread</Link>
       </nav>
       <section className="main">{children}</section>
     </main>

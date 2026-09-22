@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { getProcess, listProcesses, updateProcess } from "../api";
+import { createProcess, getProcess, listProcesses, updateProcess } from "../api";
 export const processKeys = {
   all: ["processes"] as const,
   list: (taskId?: string) => {
@@ -30,6 +30,14 @@ export const useUpdateProcess = () => {
   return useMutation({
     mutationFn: ({ id, input }: { id: string; input: Parameters<typeof updateProcess>[1] }) => {
       return updateProcess(id, input);
+    },
+  });
+};
+
+export const useCreateProcess = () => {
+  return useMutation({
+    mutationFn: (input: Parameters<typeof createProcess>[0]) => {
+      return createProcess(input);
     },
   });
 };
