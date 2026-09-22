@@ -234,7 +234,7 @@ const hasValidationFailure = (context: RunContext<any>) => {
   });
 };
 
-const skipBlockedReadyForms = (context: RunContext<any>) => {
+const skipBlockedReadyForms = (context: RunContext<any>, phase: Phase) => {
   let changed = true;
   while (changed) {
     changed = false;
@@ -253,6 +253,7 @@ const skipBlockedReadyForms = (context: RunContext<any>) => {
           id: form.id,
           blockedBy,
         });
+        context.emit(phase);
         changed = true;
       }
     }
@@ -300,6 +301,7 @@ const validateStage = async <P extends readonly AnyForm[]>(
         ? { type: "validation.failed", id: form.id, error: next.failure.error }
         : { type: "validation.succeeded", id: form.id },
     );
+    context.emit("validating");
   }
 };
 
@@ -324,6 +326,7 @@ const preparePayloadStage = async <P extends readonly AnyForm[]>(
             phase: "mapping",
             error: next.failure.error,
           });
+          context.emit("validating");
         }
         continue;
       }
@@ -333,9 +336,10 @@ const preparePayloadStage = async <P extends readonly AnyForm[]>(
           id: form.id,
           variables: next.variables,
         });
+        context.emit("validating");
       }
     }
-    skipBlockedReadyForms(context);
+    skipBlockedReadyForms(context, "validating");
   }
 };
 
@@ -371,7 +375,7 @@ const finalizeStage = async <P extends readonly AnyForm[]>(
     .map(({ id }) => {
       return id;
     });
-  skipBlockedReadyForms(context);
+  skipBlockedReadyForms(context, "saving");
   for (const form of context.forms) {
     if (context.runtime.forms[form.id].status === "ready") {
       context.runtime = reduceRuntimeState(context.runtime, {
@@ -421,6 +425,7 @@ const refreshStage = async <P extends readonly AnyForm[]>(
       context.queryClient,
     ),
   );
+  context.emit("refreshing");
 };
 
 const reconcileStage = async <P extends readonly AnyForm[]>(
@@ -445,6 +450,7 @@ const reconcileStage = async <P extends readonly AnyForm[]>(
       context.config,
     ),
   );
+  context.emit("reconciling");
 };
 
 const markSavedStage = async <P extends readonly AnyForm[]>(
@@ -456,6 +462,7 @@ const markSavedStage = async <P extends readonly AnyForm[]>(
       context,
       await operations.markFormsSaved(context.successful, context.runtime.forms),
     );
+    context.emit("effects");
   }
 };
 
@@ -473,6 +480,7 @@ const effectsStage = async <P extends readonly AnyForm[]>(
     ...(await operations.invokeConfigCallbacks(context.allSaved, context.config, context.result)),
     ...(await context.finish()),
   ]);
+  context.emit("effects");
 
   if (context.allSaved && context.result.followUpErrors.length) {
     context.result.outcome = "saved-with-follow-up-errors";
