@@ -2,6 +2,7 @@ import type { QueryClient } from "@tanstack/react-query";
 import type { AnyForm, SaveConfig, SaveResult } from "./types";
 import { compileSavePlan } from "./plan";
 import { createSavePipeline, type SaveState } from "./pipeline";
+import { createCorrelationId } from "./progress";
 
 export type { SaveState } from "./progress";
 
@@ -39,7 +40,7 @@ export const createOrchestrator = <P extends readonly AnyForm[]>(
       return Promise.reject(new AggregateError(errors, "Unable to compile save plan."));
     }
 
-    active = executePipeline(config, plan).finally(() => {
+    active = executePipeline(config, plan, createCorrelationId()).finally(() => {
       active = undefined;
     });
     return active;
@@ -50,7 +51,12 @@ export const createOrchestrator = <P extends readonly AnyForm[]>(
       return false;
     }
 
-    onChange({ timestamp: Date.now(), phase: "idle", isSaving: false });
+    onChange({
+      correlationId: "idle",
+      timestamp: Date.now(),
+      phase: "idle",
+      isSaving: false,
+    });
 
     for (const form of config.forms) {
       form.form.reset();
