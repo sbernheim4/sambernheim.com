@@ -2,6 +2,8 @@ import type { AnyForm, Phase, SaveResult } from "./types";
 import type { FormStates, Responses } from "./state";
 
 export type SaveState<P extends readonly AnyForm[]> = {
+  /** Unix epoch milliseconds when this progress snapshot was emitted. */
+  timestamp: number;
   phase: Phase;
   isSaving: boolean;
   result?: SaveResult<P>;
@@ -15,6 +17,7 @@ export const emitProgress = <P extends readonly AnyForm[]>(
   responses: Responses,
 ) => {
   onChange({
+    timestamp: Date.now(),
     phase,
     isSaving: phase !== "complete",
     result: {

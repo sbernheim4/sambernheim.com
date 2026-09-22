@@ -56,6 +56,27 @@ test("reuses one mapped payload across retry attempts", async () => {
   assert.deepEqual(variables, [{ stable: true }, { stable: true }]);
 });
 
+test("timestamps every emitted progress snapshot", async () => {
+  const snapshots: { timestamp: number; phase: string }[] = [];
+  const save = createOrchestrator(new QueryClient(), (state) => {
+    snapshots.push({ timestamp: state.timestamp, phase: state.phase });
+  });
+
+  await save.submit({ forms: [form("timestamped")] });
+
+  assert.ok(snapshots.length > 0);
+  assert.ok(
+    snapshots.every(({ timestamp }) => {
+      return Number.isFinite(timestamp);
+    }),
+  );
+  assert.ok(
+    snapshots.every((snapshot, index) => {
+      return index === 0 || snapshot.timestamp >= snapshots[index - 1].timestamp;
+    }),
+  );
+});
+
 test("runs unrelated forms while skipping descendants of a failed mutation", async () => {
   const events: string[] = [];
   const parent = form("parent", {
