@@ -35,7 +35,9 @@ export const useProcessCreateForms = () => {
   const save = useFormOrchestrator({
     forms: [profile.form, entityForm] as const,
     onSuccess: () => {
-      if (progressDelayRef.current > 0) return;
+      if (progressDelayRef.current > 0) {
+        return;
+      }
       return navigate({ to: "/form-demo/processes/$processId", params: { processId }, search: {} });
     },
     onProgressClose: () => {

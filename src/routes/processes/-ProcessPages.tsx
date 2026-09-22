@@ -22,7 +22,12 @@ export const ProcessListPage = () => {
 
   return (
     <>
-      <h1>Processes</h1>
+      <div className="heading">
+        <h1>Processes</h1>
+        <Link className="primary-action" to="/form-demo/processes/create">
+          Create process
+        </Link>
+      </div>
       {query.isPending ? (
         <p>Loading...</p>
       ) : (

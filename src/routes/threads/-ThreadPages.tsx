@@ -17,7 +17,12 @@ export const ThreadListPage = () => {
 
   return (
     <>
-      <h1>Threads</h1>
+      <div className="heading">
+        <h1>Threads</h1>
+        <Link className="primary-action" to="/form-demo/threads/create">
+          Create thread
+        </Link>
+      </div>
       {query.isPending ? (
         <p>Loading...</p>
       ) : (

@@ -35,7 +35,9 @@ export const useTaskCreateForms = () => {
   const save = useFormOrchestrator({
     forms: [profile.form, entityForm] as const,
     onSuccess: () => {
-      if (progressDelayRef.current > 0) return;
+      if (progressDelayRef.current > 0) {
+        return;
+      }
       return navigate({ to: "/form-demo/tasks/$taskId", params: { taskId }, search: {} });
     },
     onProgressClose: () => {

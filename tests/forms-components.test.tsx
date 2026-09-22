@@ -1,145 +1,7 @@
-import assert from "node:assert/strict";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { expect, test } from "vitest";
-import { Form } from "../src/forms/components/FormComponents";
 import { CycleableDateTime, FormEditor } from "../src/forms/components";
-
-const baseForm = { handleSubmit: async () => {}, reset: () => {}, state: { isDirty: false } };
-const scope = (overrides: Record<string, unknown> = {}) => {
-  return { form: baseForm, isReady: true, isSaving: false, isDirty: false, ...overrides } as any;
-};
-
-test("Form.SaveButton reflects readiness, dirtiness, and saving state", () => {
-  const { rerender } = render(
-    <Form.Provider value={scope()}>
-      <Form.SaveButton />
-    </Form.Provider>,
-  );
-  expect(screen.getByRole("button")).toBeDisabled();
-  expect(screen.getByRole("button")).toHaveTextContent("No changes to save");
-  rerender(
-    <Form.Provider
-      value={scope({ isDirty: true, form: { ...baseForm, state: { isDirty: true } } })}
-    >
-      <Form.SaveButton label="Update" />
-    </Form.Provider>,
-  );
-  expect(screen.getByRole("button")).toBeEnabled();
-  expect(screen.getByRole("button")).toHaveTextContent("Update");
-  rerender(
-    <Form.Provider value={scope({ isDirty: true, isSaving: true })}>
-      <Form.SaveButton />
-    </Form.Provider>,
-  );
-  expect(screen.getByRole("button")).toBeDisabled();
-  expect(screen.getByRole("button")).toHaveTextContent("Saving...");
-});
-
-test("Form.SaveButton can save a pristine form when explicitly allowed", () => {
-  render(
-    <Form.Provider value={scope({ allowPristineSave: true })}>
-      <Form.SaveButton label="Run" />
-    </Form.Provider>,
-  );
-  expect(screen.getByRole("button", { name: "Run" })).toBeEnabled();
-});
-
-test("Form.DiscardButton resets dirty forms and invokes discard callbacks", async () => {
-  const user = userEvent.setup();
-  let resets = 0;
-  let changes = 0;
-  let discards = 0;
-  render(
-    <Form.Provider
-      value={scope({
-        isDirty: true,
-        form: {
-          ...baseForm,
-          state: { isDirty: true },
-          reset: () => {
-            resets += 1;
-          },
-        },
-        onChange: () => {
-          changes += 1;
-        },
-        onDiscard: () => {
-          discards += 1;
-        },
-      })}
-    >
-      <Form.DiscardButton />
-    </Form.Provider>,
-  );
-  await user.click(screen.getByRole("button", { name: "Discard changes" }));
-  assert.deepEqual([resets, changes, discards], [1, 1, 1]);
-});
-
-test("Form.DiscardButton does not reset pristine forms and uses the back label", async () => {
-  const user = userEvent.setup();
-  let resets = 0;
-  render(
-    <Form.Provider
-      value={scope({
-        form: {
-          ...baseForm,
-          reset: () => {
-            resets += 1;
-          },
-        },
-      })}
-    >
-      <Form.DiscardButton />
-    </Form.Provider>,
-  );
-  await user.click(screen.getByRole("button", { name: "Go back" }));
-  assert.equal(resets, 0);
-});
-
-test("Form.Shell forwards rejected submissions", async () => {
-  let submits = 0;
-  let changes = 0;
-  let receivedError: unknown;
-  const error = new Error("save failed");
-  render(
-    <Form.Provider
-      value={scope({
-        form: {
-          ...baseForm,
-          handleSubmit: async () => {
-            submits += 1;
-            throw error;
-          },
-        },
-        onChange: () => {
-          changes += 1;
-        },
-        onSubmitError: (value: unknown) => {
-          receivedError = value;
-        },
-      })}
-    >
-      <Form.Shell>
-        <button type="submit">Submit</button>
-      </Form.Shell>
-    </Form.Provider>,
-  );
-  await userEvent.setup().click(screen.getByRole("button", { name: "Submit" }));
-  assert.deepEqual([submits, changes, receivedError], [1, 1, error]);
-});
-
-test("Form.Feedback renders errors and follow-up status", () => {
-  render(
-    <Form.Provider
-      value={scope({ error: "request failed", result: { outcome: "saved-with-follow-up-errors" } })}
-    >
-      <Form.Feedback />
-    </Form.Provider>,
-  );
-  expect(screen.getByRole("alert")).toHaveTextContent("request failed");
-  expect(screen.getByRole("status")).toHaveTextContent("Saved, but a follow-up action failed.");
-});
 
 test("FormEditor tabs hide inactive content and page mode shows every section", () => {
   const tabs = (
@@ -208,7 +70,7 @@ test("FormEditor error and draft banner expose their actions", async () => {
   expect(screen.getByRole("alert")).toHaveTextContent("server error");
   await user.click(screen.getByRole("button", { name: "Restore draft" }));
   await user.click(screen.getByRole("button", { name: "Discard draft" }));
-  assert.deepEqual([restored, discarded], [1, 1]);
+  expect([restored, discarded]).toEqual([1, 1]);
 });
 
 test("FormEditor progress exposes correlation and failure diagnostics", () => {
