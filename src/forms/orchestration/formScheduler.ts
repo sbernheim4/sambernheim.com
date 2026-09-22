@@ -58,7 +58,7 @@ export const saveFormsInGraph = async <P extends readonly AnyForm[]>(
 
         const current = runtime.forms[id];
         const retry = resolveRetryPolicy(node.form, config.retry);
-        return saveFormWithRetry(
+        const result = await saveFormWithRetry(
           node.form,
           { ...current, variables },
           retry,
@@ -73,6 +73,10 @@ export const saveFormsInGraph = async <P extends readonly AnyForm[]>(
           },
           config.progressDelayMs ?? 0,
         );
+        if (result.status === "failed") {
+          throw result.failure?.error;
+        }
+        return result;
       },
     });
   }
