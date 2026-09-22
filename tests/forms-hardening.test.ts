@@ -26,6 +26,16 @@ const form = (id: string, overrides: Partial<AnyForm> = {}): AnyForm => {
   };
 };
 
+const deferred = <T>() => {
+  let resolve!: (value: T) => void;
+  let reject!: (error: unknown) => void;
+  const promise = new Promise<T>((promiseResolve, promiseReject) => {
+    resolve = promiseResolve;
+    reject = promiseReject;
+  });
+  return { promise, resolve, reject };
+};
+
 test("reuses one mapped payload across retry attempts", async () => {
   let mapCalls = 0;
   let attempts = 0;
@@ -88,6 +98,98 @@ test("timestamps every emitted progress snapshot", async () => {
       return index === 0 || snapshot.timestamp >= snapshots[index - 1].timestamp;
     }),
   );
+});
+
+test("shares a correlation ID for coalesced submits and creates a new one per run", async () => {
+  const mutation = deferred<{ ok: true }>();
+  const correlationIds: string[] = [];
+  let calls = 0;
+  const save = createOrchestrator(new QueryClient(), (state) => {
+    correlationIds.push(state.correlationId);
+  });
+  const blockingForm = form("blocking", {
+    endpoint: {
+      mutationFn: async () => {
+        calls += 1;
+        return mutation.promise;
+      },
+    },
+  });
+
+  const first = save.submit({ forms: [blockingForm] });
+  const second = save.submit({ forms: [blockingForm] });
+  assert.equal(first, second);
+  mutation.resolve({ ok: true });
+  await first;
+
+  const firstRunIds = new Set(correlationIds);
+  assert.equal(firstRunIds.size, 1);
+  assert.equal(calls, 1);
+
+  await save.submit({ forms: [blockingForm] });
+  const allIds = new Set(correlationIds);
+  assert.equal(allIds.size, 2);
+});
+
+test("isolates the captured snapshot from validator mutations", async () => {
+  const submitted = { name: "before" };
+  let received: unknown;
+  const isolated = form("isolated", {
+    snapshot: () => {
+      return submitted;
+    },
+    validate: async (values) => {
+      (values as { name: string }).name = "validator-mutated";
+      return { valid: true };
+    },
+    endpoint: {
+      mutationFn: async (variables) => {
+        received = variables;
+        return { ok: true };
+      },
+    },
+  });
+
+  await createOrchestrator(new QueryClient()).submit({ forms: [isolated] });
+
+  assert.deepEqual(submitted, { name: "before" });
+  assert.deepEqual(received, { name: "before" });
+});
+
+test("continues cache reconciliation after one cache updater fails", async () => {
+  const cacheError = new Error("first cache update failed");
+  const queryClient = new QueryClient();
+  const saved = form("cache", {
+    endpoint: {
+      mutationFn: async () => {
+        return { value: 42 };
+      },
+    },
+    cacheUpdates: [
+      {
+        queryKey: () => {
+          return ["first"];
+        },
+        update: () => {
+          throw cacheError;
+        },
+      },
+      {
+        queryKey: () => {
+          return ["second"];
+        },
+        getData: (response) => {
+          return response;
+        },
+      },
+    ],
+  });
+
+  const result = await createOrchestrator(queryClient).submit({ forms: [saved] });
+
+  assert.equal(result.outcome, "saved-with-follow-up-errors");
+  assert.deepEqual(queryClient.getQueryData(["second"]), { value: 42 });
+  assert.deepEqual(result.followUpErrors, [{ phase: "cache", formId: "cache", error: cacheError }]);
 });
 
 test("runs unrelated forms while skipping descendants of a failed mutation", async () => {
