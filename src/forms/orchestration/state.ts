@@ -1,8 +1,8 @@
 import type { FormSaveState, FollowUpError } from "./types";
 
-export type FormState = Readonly<FormSaveState<any, any, any>>;
+export type FormState = Readonly<FormSaveState<unknown, unknown, unknown>>;
 export type FormStates = Readonly<Record<string, FormState>>;
-export type Responses = Readonly<Record<string, any>>;
+export type Responses = Readonly<Record<string, unknown>>;
 export type RuntimeState = {
   forms: FormStates;
   responses: Responses;

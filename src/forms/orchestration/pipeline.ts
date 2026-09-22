@@ -25,9 +25,9 @@ import {
 import { emitProgress, type SaveState } from "./progress";
 import { waitForProgress } from "./mutation";
 
-export type FormState = Readonly<FormSaveState<any, any, any>>;
+export type FormState = Readonly<FormSaveState<unknown, unknown, unknown>>;
 export type FormStates = Readonly<Record<string, FormState>>;
-export type Responses = Readonly<Record<string, any>>;
+export type Responses = Readonly<Record<string, unknown>>;
 
 type RunContext<P extends readonly AnyForm[]> = {
   forms: readonly FormInput[];
@@ -43,9 +43,9 @@ type RunContext<P extends readonly AnyForm[]> = {
   emit: (phase: Phase) => void;
 };
 
-type FormContext = CacheContext<any, any, any> & {
+type FormContext = CacheContext<unknown, unknown, Readonly<Record<string, unknown>>> & {
   formId: string;
-  formValues: any;
+  formValues: unknown;
   attempts: number;
   followUpErrors: FollowUpError[];
 };
@@ -226,7 +226,10 @@ const createRunContext = <P extends readonly AnyForm[]>(
   return context;
 };
 
-const recordFollowUpErrors = (context: RunContext<any>, errors: readonly FollowUpError[]) => {
+const recordFollowUpErrors = <P extends readonly AnyForm[]>(
+  context: RunContext<P>,
+  errors: readonly FollowUpError[],
+) => {
   for (const error of errors) {
     context.runtime = reduceRuntimeState(context.runtime, {
       type: "follow-up.failed",
@@ -236,13 +239,16 @@ const recordFollowUpErrors = (context: RunContext<any>, errors: readonly FollowU
   context.result.followUpErrors = [...context.runtime.followUpErrors];
 };
 
-const hasValidationFailure = (context: RunContext<any>) => {
+const hasValidationFailure = <P extends readonly AnyForm[]>(context: RunContext<P>) => {
   return context.forms.some((form) => {
     return context.runtime.forms[form.id].failure?.phase === "validation";
   });
 };
 
-const skipBlockedReadyForms = (context: RunContext<any>, phase: Phase) => {
+const skipBlockedReadyForms = <P extends readonly AnyForm[]>(
+  context: RunContext<P>,
+  phase: Phase,
+) => {
   let changed = true;
   while (changed) {
     changed = false;
@@ -402,7 +408,10 @@ const finalizeStage = async <P extends readonly AnyForm[]>(
   context.result.outcome = operations.getOutcome(hasValidationFailure(context), context.allSaved);
 };
 
-const getFormContext = (context: RunContext<any>, form: FormInput): FormContext => {
+const getFormContext = <P extends AnyForm>(
+  context: RunContext<readonly P[]>,
+  form: FormInput,
+): FormContext => {
   return {
     queryClient: context.queryClient,
     response: context.runtime.forms[form.id].response,
