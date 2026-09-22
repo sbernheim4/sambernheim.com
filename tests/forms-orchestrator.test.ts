@@ -401,10 +401,16 @@ test("emits the lifecycle phases and coalesces concurrent submissions", async ()
   await first;
   assert.deepEqual(phases, [
     "validating",
+    "validating",
+    "validating",
     "saving",
     "saving",
     "refreshing",
+    "refreshing",
     "reconciling",
+    "reconciling",
+    "effects",
+    "effects",
     "effects",
     "complete",
   ]);
