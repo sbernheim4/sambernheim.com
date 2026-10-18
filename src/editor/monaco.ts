@@ -5,10 +5,7 @@ if (typeof self !== "undefined") {
   self.MonacoEnvironment = {
     getWorker: () => {
       return new Worker(
-        new URL(
-          "../../node_modules/monaco-editor/esm/vs/editor/editor.worker.js",
-          import.meta.url,
-        ),
+        new URL("../../node_modules/monaco-editor/esm/vs/editor/editor.worker.js", import.meta.url),
         { type: "module" },
       );
     },

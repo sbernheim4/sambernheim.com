@@ -1,0 +1,21 @@
+.fake-global-query-loader {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-primary);
+}
+
+.fake-global-query-loader-spinner {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: fake-global-query-loader-spin 250ms linear infinite;
+}
+
+@keyframes fake-global-query-loader-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

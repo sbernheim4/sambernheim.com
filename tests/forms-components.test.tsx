@@ -142,16 +142,12 @@ test("CycleableDateTime titles each display mode", async () => {
   await user.click(control);
   expect(control).toHaveAttribute(
     "aria-label",
-    expect.stringContaining(
-      "Format: Relative. Click to toggle between UTC, Local, and Relative.",
-    ),
+    expect.stringContaining("Format: Relative. Click to toggle between UTC, Local, and Relative."),
   );
   await user.click(control);
   expect(control).toHaveAttribute(
     "aria-label",
-    expect.stringContaining(
-      "Format: Local. Click to toggle between UTC, Local, and Relative.",
-    ),
+    expect.stringContaining("Format: Local. Click to toggle between UTC, Local, and Relative."),
   );
 });
 

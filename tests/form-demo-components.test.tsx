@@ -89,9 +89,7 @@ test("DetailView switches from tabs to full-page sections", async () => {
 test("full-page sections can be collapsed and expanded", async () => {
   const user = userEvent.setup();
   render(
-    <DetailView
-      tabs={[{ value: "one", label: "One", children: <span>First section</span> }]}
-    />,
+    <DetailView tabs={[{ value: "one", label: "One", children: <span>First section</span> }]} />,
   );
   await user.click(screen.getByRole("button", { name: "Full page" }));
   expect(screen.getByRole("button", { name: "Expand all" })).toBeInTheDocument();

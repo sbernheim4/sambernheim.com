@@ -1,0 +1,143 @@
+---
+meta:
+  title: UX Design Patterns
+  description: Some UX Design Patterns
+  slug: ux-design-patterns
+  publishedAt: 2026-10-18
+headers:
+  Cache-Control: max-age=60000
+---
+
+import { CycleableDateTime } from "../forms/components";
+import { EntityDetailDensityExample } from "./EntityDetailDensityExample";
+import { FakeLoader, FakeGlobalQueryLoader } from "./FakeLoader";
+
+# UX Design Patterns
+
+I recently watched this recording of a talk [about Desktop UX](https://www.youtube.com/watch?v=1fZTOjd_bOQ&pp=ygUCdXg%3D) by Scott Jenson.
+
+This got me thinking about some UX patterns I've found myself including in my
+work building mostly internal web apps.
+
+## CycleableDateTime
+
+We have a lot more freedom, I think, when building internal tools than consumer
+facing products. One UX pattern I've particularly loved is what I call:
+
+```tsx
+<CycleableDateTime />
+```
+
+Users often want to view timestamps in different formats depending on context. A
+single user may also want to view timestamps in different formats depending on
+the web page they are on. The options are:
+
+- UTC time zone
+- Local time zone
+- Relative time
+
+CycleableDateTime is a component I've started bringing with me in every internal
+web app. A global, app-wide configuration value controls the format used for all
+instances. Clicking any CycleableDateTime component causes them all to toggle
+and flip through these three modes.
+
+Try it below.
+
+```tsx
+<CycleableDateTime value={new Date("2025-01-18T05:22:23.000Z")} />
+<CycleableDateTime value={new Date("2022-08-10T19:23:54.000Z")} />
+<CycleableDateTime value={new Date("2020-04-19T13:17:32.000Z")} />
+```
+
+Which renders:
+
+<CycleableDateTime value={new Date("2025-01-18T05:22:23.000Z")} />
+<br />
+<br />
+<CycleableDateTime value={new Date("2022-08-10T19:23:54.000Z")} />
+<br />
+<br />
+<CycleableDateTime value={new Date("2020-04-19T13:17:32.000Z")} />
+
+Hovering over one provides the current format.
+
+## Global Loader
+
+All of our applications load data. That can be triggered automatically,
+programmatically, or by a user clicking a button. It's nice to see when data is
+loading across our app. And thus was born
+
+```tsx
+<GlobalQueryLoader />
+```
+
+<br />
+<FakeLoader />
+<br />
+<FakeGlobalQueryLoader />
+
+Click “Load something” to see the loader appear while the request is running.
+
+All the internal apps I use leverage TanStack Query which helpfully exports a
+hook `useIsFetching`. Whenever this hook's return value is greater than 0,
+something is being fetched and the spinner is rendered.
+
+Normally I place it in the navbar or some part of the page that is consistently
+available and visible across all routes. It's a small detail but always makes it
+easy to see when the page is loading new data.
+
+## Entity Detail Density
+
+Some people want entity detail pages such that all information is inline on the
+page, with each section expandable/collapsible. Some may prefer a tabbed
+interface so the page isn't overwhelming with all the information, others may
+prefer a mix between the two like a sidebar with links to each section via the
+`id` property.
+
+And some may prefer one style over another on different pages or different
+contexts e.g. an entity detail page vs a form page to create an entity or edit an
+entity.
+
+Nothing about these views is based on the actual components that we render; it's
+just how we lay out those views.
+
+We can very easily build a layout picker that lets users select their preferred
+viewing option that simply flips between how the underlying components are
+rendered. Nothing about how the actual component changes, just how we render
+them on the page.
+
+Use the picker above to try each layout.
+
+<EntityDetailDensityExample />
+
+## Command Palettes
+
+Engineers love command palettes. They are in all our tools and many engineer
+focused websites. But implementing them can be annoying if we have to manually
+register actions into the command palette for each of our pages. Keeping that up
+to date as we add new features, move features from one page to another or remove
+them is a hassle. We need this at a lower level: `<Button>`, `<Link>`, `<Tab>`,
+`<FormSubmit>` etc should automatically register their actions.
+
+Rendering a `<Button>` on the page automatically adds its action to the
+command palette. The command palette becomes contextually aware of the
+page and stays in sync as we make changes.
+
+Try CMD+k / Ctrl+k on this page. You'll have options to navigate to all the
+linked pages and toggle light and dark mode.
+
+You'll also see options to switch the entity detail layout and select
+the various sections.
+
+## Summary
+
+What's important about these UX patterns is their ease of access. Swapping
+the timestamp formatting doesn't require digging through some settings menu
+buried in a rarely used part of the application. It's right there in front of
+you. It is discoverable due to the underline and tooltip without being in your
+face. The ability to control the layout is right there on the screen. The
+loading indicator shows when anything is loading, and the command palette has a
+dedicated icon in the navbar.
+
+These are little ways to give users back more feedback and more control over the
+software they use. It makes our tools more flexible.

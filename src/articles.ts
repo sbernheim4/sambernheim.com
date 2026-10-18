@@ -18,6 +18,7 @@ import MonadsAreMonoids, {
 import EngineersSchrodingersCat, {
   meta as engineersSchrodingersCatMeta,
 } from "./articles/the-engineers-schrodingers-cat.mdx";
+import UxDesignPatterns, { meta as uxDesignPatternsMeta } from "./articles/ux-design-patterns.mdx";
 
 export type SitePost = {
   slug: string;
@@ -63,6 +64,10 @@ export const sitePosts: readonly SitePost[] = [
   {
     ...engineersSchrodingersCatMeta.meta,
     Component: EngineersSchrodingersCat,
+  },
+  {
+    ...uxDesignPatternsMeta.meta,
+    Component: UxDesignPatterns,
   },
 ];
 
