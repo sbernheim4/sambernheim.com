@@ -282,7 +282,7 @@ export const FormEditorOrchestratorProgress = () => {
           Run: <code>{orchestrator.correlationId}</code>
         </span>
         <span>
-          Updated: <CycleableDateTime value={orchestrator.timestamp} />
+          Updated: <CycleableDateTime value={new Date(orchestrator.timestamp)} />
         </span>
         {orchestrator.result && orchestrator.result.followUpErrors.length > 0 && (
           <details>

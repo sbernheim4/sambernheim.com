@@ -9,15 +9,12 @@ import { useProcesses } from "../../domains/processes/hooks/useProcesses";
 import { useExecutionProfile } from "../../domains/execution-profiles/hooks/useExecutionProfile";
 import { TaskFields } from "../../domains/tasks/components/TaskFields";
 import { DetailLayout, Loading, Missing, Status } from "../form-demo/components/Layout";
-import {
-  ChildList,
-  DetailProperties,
-  ProfileSummary,
-} from "../form-demo/components/DetailHelpers";
+import { ChildList, DetailProperties, ProfileSummary } from "../form-demo/components/DetailHelpers";
 import { DetailView } from "../form-demo/components/DetailView";
 import { ViewModePicker, useViewModePreference } from "../form-demo/components/ViewModePreference";
 import { Number as FormattedNumber } from "../../shared/components/Number";
 import { CycleableDateTime } from "../../forms/components";
+import { parseUtcDate } from "../../shared/date";
 export const TaskListPage = () => {
   const query = useTasks();
 
@@ -84,7 +81,7 @@ export const TaskDetailPage = ({ id }: { id: string }) => {
                     {
                       label: "Created",
                       value: task.data.createdAt ? (
-                        <CycleableDateTime value={task.data.createdAt} />
+                        <CycleableDateTime value={parseUtcDate(task.data.createdAt)} />
                       ) : (
                         "—"
                       ),
@@ -92,7 +89,7 @@ export const TaskDetailPage = ({ id }: { id: string }) => {
                     {
                       label: "Updated",
                       value: task.data.updatedAt ? (
-                        <CycleableDateTime value={task.data.updatedAt} />
+                        <CycleableDateTime value={parseUtcDate(task.data.updatedAt)} />
                       ) : (
                         "—"
                       ),

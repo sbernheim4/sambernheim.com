@@ -29,39 +29,39 @@ export type SitePost = {
 
 export const sitePosts: readonly SitePost[] = [
   {
-    ...howIEngineerSoftwareMeta,
+    ...howIEngineerSoftwareMeta.meta,
     Component: HowIEngineerSoftware,
   },
   {
-    ...reactPatternsMeta,
+    ...reactPatternsMeta.meta,
     Component: ReactPatterns,
   },
   {
-    ...reRenderWithRouteMeta,
+    ...reRenderWithRouteMeta.meta,
     Component: ReRenderWithRoute,
   },
   {
-    ...logAndContinueMeta,
+    ...logAndContinueMeta.meta,
     Component: LogAndContinue,
   },
   {
-    ...debugDrivenDevelopmentMeta,
+    ...debugDrivenDevelopmentMeta.meta,
     Component: DebugDrivenDevelopment,
   },
   {
-    ...partyMathTrickMeta,
+    ...partyMathTrickMeta.meta,
     Component: ThePartyMathTrick,
   },
   {
-    ...buildingAMonadMeta,
+    ...buildingAMonadMeta.meta,
     Component: BuildingAMonad,
   },
   {
-    ...monadsAreMonoidsMeta,
+    ...monadsAreMonoidsMeta.meta,
     Component: MonadsAreMonoids,
   },
   {
-    ...engineersSchrodingersCatMeta,
+    ...engineersSchrodingersCatMeta.meta,
     Component: EngineersSchrodingersCat,
   },
 ];

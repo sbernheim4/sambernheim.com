@@ -27,8 +27,11 @@ export const CycleableDate = ({
   const relative = mode === "relative";
   const date = parseDate(value);
   const valid = isValid(date);
-  const dateTime =
-    typeof value === "string" && dateOnlyPattern.test(value) ? value : date.toISOString();
+  const dateTime = valid
+    ? typeof value === "string" && dateOnlyPattern.test(value)
+      ? value
+      : date.toISOString()
+    : undefined;
   const years = valid ? differenceInYears(new Date(), date) : 0;
   const text = !valid
     ? "Invalid date"
@@ -47,7 +50,7 @@ export const CycleableDate = ({
           aria-label={`${text}. Format: ${formatLabel}. Click to toggle between Date and Relative.`}
           data-mode={relative ? "relative" : "date"}
         >
-          <time dateTime={valid ? dateTime : undefined}>{text}</time>
+          <time dateTime={dateTime}>{text}</time>
         </button>
       </TooltipTrigger>
       <TooltipContent>

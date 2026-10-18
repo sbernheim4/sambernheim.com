@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { CommandLink as Link } from "../../shared/components/CommandLink";
 import { sitePosts } from "../../articles";
 import { CycleableDate } from "../../forms/components";
+import { parseDateOnly } from "../../shared/date";
 import { useTheme } from "../../shared/theme/ThemeProvider";
 
 const BlogIndex = () => {
@@ -27,7 +28,7 @@ const BlogIndex = () => {
                   <h2>{post.title}</h2>
                   <p>{post.description}</p>
                 </Link>
-                <CycleableDate value={post.publishedAt} className="article-date" />
+                <CycleableDate value={parseDateOnly(post.publishedAt)} className="article-date" />
               </div>
             );
           })}
