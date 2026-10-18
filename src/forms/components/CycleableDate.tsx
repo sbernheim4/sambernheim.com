@@ -3,6 +3,19 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "../../shared/components
 import { useCycleableDateTimeMode } from "./CycleableDateTime";
 import "./CycleableDate.css";
 
+const dateOnlyPattern = /^(\d{4})-(\d{2})-(\d{2})$/;
+
+const parseDate = (value: Date | number | string) => {
+  if (typeof value === "string") {
+    const match = dateOnlyPattern.exec(value);
+    if (match) {
+      return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+    }
+  }
+
+  return value instanceof Date ? value : new Date(value);
+};
+
 export const CycleableDate = ({
   value,
   className,
@@ -12,8 +25,10 @@ export const CycleableDate = ({
 }) => {
   const { mode, setMode } = useCycleableDateTimeMode();
   const relative = mode === "relative";
-  const date = value instanceof Date ? value : new Date(value);
+  const date = parseDate(value);
   const valid = isValid(date);
+  const dateTime =
+    typeof value === "string" && dateOnlyPattern.test(value) ? value : date.toISOString();
   const years = valid ? differenceInYears(new Date(), date) : 0;
   const text = !valid
     ? "Invalid date"
@@ -32,12 +47,14 @@ export const CycleableDate = ({
           aria-label={`${text}. Format: ${formatLabel}. Click to toggle between Date and Relative.`}
           data-mode={relative ? "relative" : "date"}
         >
-          <time dateTime={valid ? date.toISOString() : undefined}>{text}</time>
+          <time dateTime={valid ? dateTime : undefined}>{text}</time>
         </button>
       </TooltipTrigger>
       <TooltipContent>
         <span className="cycleable-date-tooltip-line">Format: {formatLabel}</span>
-        <span className="cycleable-date-tooltip-line">Click to toggle between Date and Relative.</span>
+        <span className="cycleable-date-tooltip-line">
+          Click to toggle between Date and Relative.
+        </span>
       </TooltipContent>
     </Tooltip>
   );

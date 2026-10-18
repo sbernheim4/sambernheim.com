@@ -57,7 +57,7 @@ export const sitePosts: readonly SitePost[] = [
     slug: "the-party-math-trick",
     title: "The Party Math Trick",
     description: "A Math Trick with Some Interesting Properties",
-    publishedAt: "2020-09-12",
+    publishedAt: "2020-09-20",
     Component: ThePartyMathTrick,
   },
   {
