@@ -60,6 +60,10 @@ export const Route = createRootRoute({
       meta: [
         { charSet: "utf-8" },
         {
+          name: "theme-color",
+          content: "#111418",
+        },
+        {
           name: "viewport",
           content: "width=device-width, initial-scale=1",
         },
@@ -67,6 +71,7 @@ export const Route = createRootRoute({
           title: "Samuel Bernheim — Software Engineer",
         },
       ],
+      links: [{ rel: "icon", type: "image/svg+xml", href: "/favicon.svg" }],
     };
   },
   shellComponent: RootDocument,
