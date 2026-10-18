@@ -11,7 +11,6 @@ export const SiteNavbar = () => {
         <hr />
       </div>
       <Link to="/blog">Blog</Link>
-      <Link to="/form-demo/tasks">Form Demo</Link>
     </nav>
   );
 };
