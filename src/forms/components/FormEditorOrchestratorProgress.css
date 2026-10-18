@@ -82,6 +82,10 @@
   text-underline-offset: 2px;
 }
 
+.cycleable-date-time-tooltip-line {
+  display: block;
+}
+
 .form-editor-orchestrator-diagnostics details {
   flex-basis: 100%;
 }
