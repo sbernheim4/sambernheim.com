@@ -2,6 +2,7 @@ import "./styles/route.css";
 import { createFileRoute } from "@tanstack/react-router";
 import { CommandLink as Link } from "../../shared/components/CommandLink";
 import { findSitePost } from "../../articles";
+import { ArticleLayout } from "./components/ArticleLayout";
 import { useTheme } from "../../shared/theme/ThemeProvider";
 
 const BlogPost = () => {
@@ -22,7 +23,9 @@ const BlogPost = () => {
   return (
     <>
       <main className="article" data-theme={theme}>
-        <Article />
+        <ArticleLayout title={post.title} publishedAt={post.publishedAt}>
+          <Article />
+        </ArticleLayout>
       </main>
     </>
   );
