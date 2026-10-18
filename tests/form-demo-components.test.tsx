@@ -28,9 +28,11 @@ test("ViewModePicker reports the selected mode and changes mode", async () => {
   );
   expect(screen.getByRole("button", { name: "Tabs" })).not.toBePressed();
   expect(screen.getByRole("button", { name: "Full page" })).toBePressed();
+  expect(screen.getByRole("button", { name: "Sidebar" })).not.toBePressed();
   await user.click(screen.getByRole("button", { name: "Tabs" }));
+  await user.click(screen.getByRole("button", { name: "Sidebar" }));
   await user.click(screen.getByRole("button", { name: "Full page" }));
-  assert.deepEqual(changed, ["tabs", "page"]);
+  assert.deepEqual(changed, ["tabs", "sidebar", "page"]);
 });
 
 test("view mode preference reads persisted page mode and writes updates", async () => {
@@ -80,6 +82,54 @@ test("DetailView switches from tabs to full-page sections", async () => {
   expect(screen.getByRole("tablist")).toBeInTheDocument();
   await user.click(screen.getByRole("button", { name: "Full page" }));
   expect(screen.queryByRole("tablist")).not.toBeInTheDocument();
+  expect(screen.getByText("First section")).toBeVisible();
+  expect(screen.getByText("Second section")).toBeVisible();
+});
+
+test("full-page sections can be collapsed and expanded", async () => {
+  const user = userEvent.setup();
+  render(
+    <DetailView
+      tabs={[{ value: "one", label: "One", children: <span>First section</span> }]}
+    />,
+  );
+  await user.click(screen.getByRole("button", { name: "Full page" }));
+  expect(screen.getByRole("button", { name: "Expand all" })).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "Collapse all" })).toBeInTheDocument();
+
+  const section = screen.getByText("One").closest("details");
+  assert(section);
+  expect(section).toHaveAttribute("open");
+  await user.click(screen.getByText("One"));
+  expect(section).not.toHaveAttribute("open");
+  expect(screen.queryByText("First section")).not.toBeVisible();
+  await user.click(screen.getByText("One"));
+  expect(section).toHaveAttribute("open");
+  expect(screen.getByText("First section")).toBeVisible();
+  await user.click(screen.getByRole("button", { name: "Collapse all" }));
+  expect(section).not.toHaveAttribute("open");
+  await user.click(screen.getByRole("button", { name: "Expand all" }));
+  expect(section).toHaveAttribute("open");
+});
+
+test("DetailView renders sidebar navigation and all sections", async () => {
+  const user = userEvent.setup();
+  render(
+    <DetailView
+      tabs={[
+        { value: "one", label: "One", children: <span>First section</span> },
+        { value: "two", label: "Two", children: <span>Second section</span> },
+      ]}
+    />,
+  );
+  await user.click(screen.getByRole("button", { name: "Sidebar" }));
+  expect(screen.getByRole("navigation", { name: "Entity details" })).toBeInTheDocument();
+  expect(screen.getByRole("link", { name: "One" })).toHaveAttribute("href", "#one");
+  expect(screen.getByRole("link", { name: "Two" })).toHaveAttribute("href", "#two");
+  expect(screen.getByRole("link", { name: "One" })).toHaveAttribute("aria-current", "location");
+  await user.click(screen.getByRole("link", { name: "Two" }));
+  expect(screen.getByRole("link", { name: "Two" })).toHaveAttribute("aria-current", "location");
+  expect(screen.getByRole("link", { name: "One" })).not.toHaveAttribute("aria-current");
   expect(screen.getByText("First section")).toBeVisible();
   expect(screen.getByText("Second section")).toBeVisible();
 });

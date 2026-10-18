@@ -11,6 +11,8 @@ import { DetailLayout, Loading, Missing, Status } from "../form-demo/components/
 import { DetailProperties, ProfileSummary } from "../form-demo/components/-DetailHelpers";
 import { DetailView } from "../form-demo/components/-DetailView";
 import { ViewModePicker, useViewModePreference } from "../form-demo/components/-ViewModePreference";
+import { Number as FormattedNumber } from "../../shared/components/Number";
+import { CycleableDateTime } from "../../forms/components";
 
 export const ThreadListPage = () => {
   const query = useThreads();
@@ -77,9 +79,17 @@ export const ThreadDetailPage = ({ id }: { id: string }) => {
                     { label: "Name", value: thread.data.name },
                     { label: "Entry point", value: thread.data.entryPoint },
                     { label: "Status", value: <Status value={thread.data.status} /> },
-                    { label: "Priority", value: thread.data.priority },
+                    { label: "Priority", value: <FormattedNumber value={thread.data.priority} /> },
                     { label: "Process ID", value: thread.data.processId },
                     { label: "Execution profile ID", value: thread.data.executionProfileId },
+                    {
+                      label: "Created",
+                      value: thread.data.createdAt ? <CycleableDateTime value={thread.data.createdAt} /> : "—",
+                    },
+                    {
+                      label: "Updated",
+                      value: thread.data.updatedAt ? <CycleableDateTime value={thread.data.updatedAt} /> : "—",
+                    },
                   ]}
                 />
               </section>
@@ -154,16 +164,18 @@ export const ThreadEditPage = ({
     >
       <div className="editor-heading">
         <h1>Edit Thread</h1>
+      </div>
+      <div className="form-editor-view-mode-toolbar">
         <ViewModePicker mode={mode} onChange={updateMode} />
       </div>
       <FormEditor.TabList>
         <FormEditor.TabTrigger name="entity" label="Thread" />
         <FormEditor.TabTrigger name="profile" label="Execution Profile" />
       </FormEditor.TabList>
-      <FormEditor.Tab name="entity">
+      <FormEditor.Tab name="entity" label="Thread">
         <ThreadFields form={entityForm.form} />
       </FormEditor.Tab>
-      <FormEditor.Tab name="profile">
+      <FormEditor.Tab name="profile" label="Execution Profile">
         <ExecutionProfileFields form={profileForm.form} />
       </FormEditor.Tab>
       <FormEditor.OrchestratorProgress />
@@ -203,16 +215,18 @@ export const ThreadCreatePage = ({
     >
       <div className="editor-heading">
         <h1>Create Thread</h1>
+      </div>
+      <div className="form-editor-view-mode-toolbar">
         <ViewModePicker mode={mode} onChange={updateMode} />
       </div>
       <FormEditor.TabList>
         <FormEditor.TabTrigger name="entity" label="Thread" />
         <FormEditor.TabTrigger name="profile" label="Execution Profile" />
       </FormEditor.TabList>
-      <FormEditor.Tab name="entity">
+      <FormEditor.Tab name="entity" label="Thread">
         <ThreadFields form={entityForm.form} />
       </FormEditor.Tab>
-      <FormEditor.Tab name="profile">
+      <FormEditor.Tab name="profile" label="Execution Profile">
         <ExecutionProfileFields form={profileForm.form} />
       </FormEditor.Tab>
       <FormEditor.OrchestratorProgress />

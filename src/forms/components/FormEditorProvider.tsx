@@ -90,7 +90,11 @@ export const FormEditorProvider = ({
     <EditContext.Provider value={{ isEditing }}>
       <FormEditorContext.Provider value={controller}>
         <Tabs.Root value={activeTab} onValueChange={setActiveTab} asChild>
-          <form onSubmit={handleSubmit} aria-busy={actions.isSubmitting}>
+          <form
+            className={`form-editor-form form-editor-form-${viewMode}`}
+            onSubmit={handleSubmit}
+            aria-busy={actions.isSubmitting}
+          >
             {children}
           </form>
         </Tabs.Root>

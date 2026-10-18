@@ -16,6 +16,7 @@ import {
 } from "../form-demo/components/-DetailHelpers";
 import { DetailView } from "../form-demo/components/-DetailView";
 import { ViewModePicker, useViewModePreference } from "../form-demo/components/-ViewModePreference";
+import { CycleableDateTime } from "../../forms/components";
 
 export const ProcessListPage = () => {
   const query = useProcesses();
@@ -98,6 +99,14 @@ export const ProcessDetailPage = ({ id }: { id: string }) => {
                     { label: "Command", value: process.data.command },
                     { label: "Status", value: <Status value={process.data.status} /> },
                     { label: "Execution profile ID", value: process.data.executionProfileId },
+                    {
+                      label: "Created",
+                      value: process.data.createdAt ? <CycleableDateTime value={process.data.createdAt} /> : "—",
+                    },
+                    {
+                      label: "Updated",
+                      value: process.data.updatedAt ? <CycleableDateTime value={process.data.updatedAt} /> : "—",
+                    },
                   ]}
                 />
               </section>
@@ -179,19 +188,20 @@ export const ProcessEditPage = ({
     >
       <div className="editor-heading">
         <h1>Edit Process</h1>
+      </div>
+      <div className="form-editor-view-mode-toolbar">
         <ViewModePicker mode={mode} onChange={updateMode} />
       </div>
-
       <FormEditor.TabList>
         <FormEditor.TabTrigger name="entity" label="Process" />
         <FormEditor.TabTrigger name="profile" label="Execution Profile" />
       </FormEditor.TabList>
 
-      <FormEditor.Tab name="entity">
+      <FormEditor.Tab name="entity" label="Process">
         <ProcessFields form={entityForm.form} />
       </FormEditor.Tab>
 
-      <FormEditor.Tab name="profile">
+      <FormEditor.Tab name="profile" label="Execution Profile">
         <ExecutionProfileFields form={profileForm.form} />
       </FormEditor.Tab>
 
@@ -232,16 +242,18 @@ export const ProcessCreatePage = ({
     >
       <div className="editor-heading">
         <h1>Create Process</h1>
+      </div>
+      <div className="form-editor-view-mode-toolbar">
         <ViewModePicker mode={mode} onChange={updateMode} />
       </div>
       <FormEditor.TabList>
         <FormEditor.TabTrigger name="entity" label="Process" />
         <FormEditor.TabTrigger name="profile" label="Execution Profile" />
       </FormEditor.TabList>
-      <FormEditor.Tab name="entity">
+      <FormEditor.Tab name="entity" label="Process">
         <ProcessFields form={entityForm.form} />
       </FormEditor.Tab>
-      <FormEditor.Tab name="profile">
+      <FormEditor.Tab name="profile" label="Execution Profile">
         <ExecutionProfileFields form={profileForm.form} />
       </FormEditor.Tab>
       <FormEditor.OrchestratorProgress />

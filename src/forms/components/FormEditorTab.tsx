@@ -1,23 +1,28 @@
 import type { ReactNode } from "react";
 import { useFormEditorContext } from "../hooks/useFormEditorContext";
 import { SegmentedTabContent } from "../../shared/components/SegmentedTabs";
+import { FullPageSection } from "../../routes/form-demo/components/FullPageSection";
 import "./FormEditorTab.css";
 
-export type FormEditorTabProps = { name: string; children: ReactNode };
+export type FormEditorTabProps = { name: string; label?: string; children: ReactNode };
 
-export const FormEditorTab = ({ name, children }: FormEditorTabProps) => {
+export const FormEditorTab = ({ name, label = name, children }: FormEditorTabProps) => {
   const { activeTab, viewMode } = useFormEditorContext();
   const active = activeTab === name;
 
-  if (viewMode === "tabs" && !active) {
+  if ((viewMode === "tabs" || viewMode === "sidebar") && !active) {
     return null;
   }
 
   if (viewMode === "page") {
     return (
-      <section className="form-editor-tab form-editor-page-section" data-state="active">
+      <FullPageSection
+        className="form-editor-tab form-editor-page-section"
+        dataState="active"
+        label={label}
+      >
         {children}
-      </section>
+      </FullPageSection>
     );
   }
 

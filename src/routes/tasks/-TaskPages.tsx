@@ -15,6 +15,8 @@ import {
 } from "../form-demo/components/-DetailHelpers";
 import { DetailView } from "../form-demo/components/-DetailView";
 import { ViewModePicker, useViewModePreference } from "../form-demo/components/-ViewModePreference";
+import { Number as FormattedNumber } from "../../shared/components/Number";
+import { CycleableDateTime } from "../../forms/components";
 
 export const TaskListPage = () => {
   const query = useTasks();
@@ -77,8 +79,16 @@ export const TaskDetailPage = ({ id }: { id: string }) => {
                     { label: "Name", value: task.data.name },
                     { label: "Description", value: task.data.description },
                     { label: "Status", value: <Status value={task.data.status} /> },
-                    { label: "Priority", value: task.data.priority },
+                    { label: "Priority", value: <FormattedNumber value={task.data.priority} /> },
                     { label: "Execution profile ID", value: task.data.executionProfileId },
+                    {
+                      label: "Created",
+                      value: task.data.createdAt ? <CycleableDateTime value={task.data.createdAt} /> : "—",
+                    },
+                    {
+                      label: "Updated",
+                      value: task.data.updatedAt ? <CycleableDateTime value={task.data.updatedAt} /> : "—",
+                    },
                   ]}
                 />
               </section>
@@ -156,16 +166,18 @@ export const TaskEditPage = ({
     >
       <div className="editor-heading">
         <h1>Edit Task</h1>
+      </div>
+      <div className="form-editor-view-mode-toolbar">
         <ViewModePicker mode={mode} onChange={updateMode} />
       </div>
       <FormEditor.TabList>
         <FormEditor.TabTrigger name="entity" label="Task" />
         <FormEditor.TabTrigger name="profile" label="Execution Profile" />
       </FormEditor.TabList>
-      <FormEditor.Tab name="entity">
+      <FormEditor.Tab name="entity" label="Task">
         <TaskFields form={entityForm.form} />
       </FormEditor.Tab>
-      <FormEditor.Tab name="profile">
+      <FormEditor.Tab name="profile" label="Execution Profile">
         <ExecutionProfileFields form={profileForm.form} />
       </FormEditor.Tab>
       <FormEditor.OrchestratorProgress />
@@ -205,16 +217,18 @@ export const TaskCreatePage = ({
     >
       <div className="editor-heading">
         <h1>Create Task</h1>
+      </div>
+      <div className="form-editor-view-mode-toolbar">
         <ViewModePicker mode={mode} onChange={updateMode} />
       </div>
       <FormEditor.TabList>
         <FormEditor.TabTrigger name="entity" label="Task" />
         <FormEditor.TabTrigger name="profile" label="Execution Profile" />
       </FormEditor.TabList>
-      <FormEditor.Tab name="entity">
+      <FormEditor.Tab name="entity" label="Task">
         <TaskFields form={entityForm.form} />
       </FormEditor.Tab>
-      <FormEditor.Tab name="profile">
+      <FormEditor.Tab name="profile" label="Execution Profile">
         <ExecutionProfileFields form={profileForm.form} />
       </FormEditor.Tab>
       <FormEditor.OrchestratorProgress />
