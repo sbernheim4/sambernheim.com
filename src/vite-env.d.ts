@@ -9,6 +9,7 @@ declare module "*.mdx" {
     slug: string;
     title: string;
     description: string;
+    publishedAt: string;
   };
 }
 
