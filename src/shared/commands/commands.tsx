@@ -68,14 +68,38 @@ class CommandRegistry {
 }
 
 const CommandRegistryContext = createContext<CommandRegistry | null>(null);
+type CommandPaletteContextValue = {
+  open: boolean;
+  toggle: () => void;
+  close: () => void;
+};
+
+const CommandPaletteContext = createContext<CommandPaletteContextValue | null>(null);
 const EMPTY_ACTIONS: readonly CommandAction[] = [];
 const EMPTY_SUBSCRIBE = () => () => {};
 
 export const CommandPaletteProvider = ({ children }: { children: ReactNode }) => {
   const registry = useMemo(() => new CommandRegistry(), []);
-  return (
-    <CommandRegistryContext.Provider value={registry}>{children}</CommandRegistryContext.Provider>
+  const [open, setOpen] = useState(false);
+  const palette = useMemo(
+    () => ({
+      open,
+      toggle: () => setOpen((value) => !value),
+      close: () => setOpen(false),
+    }),
+    [open],
   );
+  return (
+    <CommandRegistryContext.Provider value={registry}>
+      <CommandPaletteContext.Provider value={palette}>{children}</CommandPaletteContext.Provider>
+    </CommandRegistryContext.Provider>
+  );
+};
+
+export const useCommandPalette = () => {
+  const context = useContext(CommandPaletteContext);
+  if (!context) throw new Error("useCommandPalette must be used inside CommandPaletteProvider");
+  return context;
 };
 
 export const useCommandActions = () => {
@@ -167,23 +191,24 @@ const scoreAction = (action: CommandAction, query: string) => {
 
 export const CommandPalette = () => {
   const theme = useOptionalTheme()?.theme ?? "light";
+  const { open, toggle, close } = useCommandPalette();
   const actions = useCommandActions();
-  const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState(0);
   const [running, setRunning] = useState(false);
+  const selectedOptionRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
         event.preventDefault();
-        setOpen((value) => !value);
+        toggle();
       }
-      if (event.key === "Escape") setOpen(false);
+      if (event.key === "Escape") close();
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, []);
+  }, [close, toggle]);
 
   const results = actions
     .filter((action) => !action.hidden)
@@ -210,6 +235,10 @@ export const CommandPalette = () => {
 
   useEffect(() => setSelected(0), [query]);
 
+  useEffect(() => {
+    selectedOptionRef.current?.scrollIntoView?.({ block: "nearest" });
+  }, [selected]);
+
   if (!open) return null;
 
   const run = async (action: CommandAction | undefined) => {
@@ -217,7 +246,7 @@ export const CommandPalette = () => {
     setRunning(true);
     try {
       await action.execute();
-      setOpen(false);
+      close();
       setQuery("");
     } finally {
       setRunning(false);
@@ -229,7 +258,7 @@ export const CommandPalette = () => {
       className="command-palette-backdrop"
       data-theme={theme}
       role="presentation"
-      onMouseDown={() => setOpen(false)}
+      onMouseDown={close}
     >
       <section
         className="command-palette"
@@ -269,6 +298,7 @@ export const CommandPalette = () => {
                   return (
                     <button
                       key={action.id}
+                      ref={selected === index ? selectedOptionRef : undefined}
                       type="button"
                       role="option"
                       aria-selected={selected === index}

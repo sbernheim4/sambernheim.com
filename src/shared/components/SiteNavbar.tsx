@@ -1,12 +1,19 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "@tanstack/react-router";
+import { Search } from "lucide-react";
+import { useCommandPalette } from "../commands/commands";
 import { CommandExternalLink } from "./CommandExternalLink";
 import { CommandLink } from "./CommandLink";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import resumeUrl from "../../Sam Bernheim Resume.pdf";
 import "./styles/navbar.css";
 
 export const SiteNavbar = () => {
   const { pathname } = useLocation();
+  const { toggle } = useCommandPalette();
+  const isApplePlatform =
+    typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(navigator.platform);
+  const commandShortcut = isApplePlatform ? "⌘ K" : "Ctrl K";
   const isArticle = pathname.startsWith("/blog/");
   const [progress, setProgress] = useState(0);
 
@@ -45,16 +52,31 @@ export const SiteNavbar = () => {
           <hr />
         )}
       </div>
-      <CommandLink to="/blog">Blog</CommandLink>
-      <CommandExternalLink
-        href={resumeUrl}
-        target="_blank"
-        rel="noreferrer"
-        aria-label="Resume"
-        command={{ group: "Navigation" }}
-      >
-        Resume
-      </CommandExternalLink>
+      <div className="navbar__actions">
+        <CommandLink to="/blog">Blog</CommandLink>
+        <CommandExternalLink
+          href={resumeUrl}
+          target="_blank"
+          rel="noreferrer"
+          aria-label="Resume"
+          command={{ group: "Navigation" }}
+        >
+          Resume
+        </CommandExternalLink>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              className="navbar__command-button"
+              type="button"
+              aria-label="Open command palette"
+              onClick={toggle}
+            >
+              <Search size={17} strokeWidth={2} aria-hidden="true" />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>Open command palette ({commandShortcut})</TooltipContent>
+        </Tooltip>
+      </div>
     </nav>
   );
 };

@@ -36,8 +36,8 @@
   background-color: var(--background-color);
   border-bottom: 1px solid var(--border-color);
   display: flex;
-  justify-content: space-around;
   align-items: center;
+  justify-content: space-around;
   animation: fade-in-right ease 0.6s forwards;
   z-index: 2;
 }
@@ -85,8 +85,42 @@
   text-decoration: none;
 }
 .navbar #main:hover {
-  color: #c4cfb4;
+  color: var(--line-color);
 }
 .navbar a:hover {
-  color: #c4cfb4;
+  color: var(--line-color);
+}
+
+.navbar__command-button {
+  display: inline-grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  margin: 0;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--foreground-color);
+  cursor: pointer;
+}
+
+.navbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+.navbar__actions a {
+  margin: 0;
+}
+
+.navbar__command-button:hover {
+  border-color: var(--border-color);
+  color: var(--line-color);
+}
+
+.navbar__command-button:focus-visible {
+  outline: 2px solid var(--line-color);
+  outline-offset: 2px;
 }
