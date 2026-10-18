@@ -6,7 +6,7 @@ export const LandingPage = () => {
           <p className="landing__eyebrow">Software engineer · New York</p>
           <h1>Engineering thoughtful software systems.</h1>
           <p className="landing__intro">
-            I work on products, tools, and ideas to make complex things feel a little simpler.
+            I work on products, tools, and ideas to make complex systems feel simpler.
           </p>
           <div className="landing__links">
             <a href="/blog">
