@@ -1,6 +1,9 @@
 import type { ReactNode } from "react";
 import { createRootRoute, HeadContent, Outlet, Scripts } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { CycleableDateTimeProvider } from "../forms/components";
+import { GlobalQueryLoader } from "../shared/components/GlobalQueryLoader";
+import { TooltipProvider } from "../shared/components/ui/tooltip";
 
 import "../styles.css";
 
@@ -14,7 +17,12 @@ const validateSearch = (search: Record<string, unknown>): RootSearch => {
 const RootComponent = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
+      <CycleableDateTimeProvider>
+        <TooltipProvider>
+          <GlobalQueryLoader />
+          <Outlet />
+        </TooltipProvider>
+      </CycleableDateTimeProvider>
     </QueryClientProvider>
   );
 };

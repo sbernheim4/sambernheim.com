@@ -1,0 +1,32 @@
+.global-query-loader {
+  position: fixed;
+  z-index: 100;
+  top: 16px;
+  right: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 11px;
+  border: 1px solid #ccd5d0;
+  border-radius: 999px;
+  background: #fffdf8;
+  color: #53615d;
+  font-size: 12px;
+  font-weight: 750;
+  box-shadow: 0 4px 14px rgb(30 36 39 / 12%);
+}
+
+.global-query-loader-spinner {
+  width: 13px;
+  height: 13px;
+  border: 2px solid #c8d1cc;
+  border-top-color: #216b5e;
+  border-radius: 50%;
+  animation: global-query-loader-spin 700ms linear infinite;
+}
+
+@keyframes global-query-loader-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
