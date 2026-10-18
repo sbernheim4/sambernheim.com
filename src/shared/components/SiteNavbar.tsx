@@ -1,16 +1,16 @@
-import { Link } from "@tanstack/react-router";
+import { CommandLink } from "./CommandLink";
 import "./styles/navbar.css";
 
 export const SiteNavbar = () => {
   return (
     <nav className="navbar">
-      <Link to="/" id="main">
+      <CommandLink to="/" id="main">
         Home
-      </Link>
+      </CommandLink>
       <div className="navbar__line-container">
         <hr />
       </div>
-      <Link to="/blog">Blog</Link>
+      <CommandLink to="/blog">Blog</CommandLink>
     </nav>
   );
 };

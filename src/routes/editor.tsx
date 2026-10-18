@@ -1,4 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { CommandLink as Link } from "../shared/components/CommandLink";
 
 import { PythonEditor } from "../editor/components/PythonEditor";
 

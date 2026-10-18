@@ -1,4 +1,5 @@
-import { Link, useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
+import { CommandLink as Link } from "../../shared/components/CommandLink";
 import { FormEditor } from "../../forms/components";
 import { ExecutionProfileFields } from "../../domains/execution-profiles/components/ExecutionProfileFields";
 import { useProcesses, useProcess } from "../../domains/processes/hooks/useProcesses";
@@ -17,7 +18,6 @@ import {
 import { DetailView } from "../form-demo/components/-DetailView";
 import { ViewModePicker, useViewModePreference } from "../form-demo/components/-ViewModePreference";
 import { CycleableDateTime } from "../../forms/components";
-
 export const ProcessListPage = () => {
   const query = useProcesses();
 
@@ -101,11 +101,19 @@ export const ProcessDetailPage = ({ id }: { id: string }) => {
                     { label: "Execution profile ID", value: process.data.executionProfileId },
                     {
                       label: "Created",
-                      value: process.data.createdAt ? <CycleableDateTime value={process.data.createdAt} /> : "—",
+                      value: process.data.createdAt ? (
+                        <CycleableDateTime value={process.data.createdAt} />
+                      ) : (
+                        "—"
+                      ),
                     },
                     {
                       label: "Updated",
-                      value: process.data.updatedAt ? <CycleableDateTime value={process.data.updatedAt} /> : "—",
+                      value: process.data.updatedAt ? (
+                        <CycleableDateTime value={process.data.updatedAt} />
+                      ) : (
+                        "—"
+                      ),
                     },
                   ]}
                 />
