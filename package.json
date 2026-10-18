@@ -3,15 +3,13 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "npm run ensure:ty-wasm && vite dev",
-    "build": "npm run ensure:ty-wasm && vite build && tsc --noEmit",
+    "dev": "vite dev",
+    "build": "vite build && tsc --noEmit",
     "typecheck": "tsc --noEmit",
     "start": "vite preview",
     "preview": "vite preview",
     "deploy": "npm run build && wrangler deploy",
     "cf-typegen": "wrangler types",
-    "build:ty-wasm": "bash scripts/build-ty-wasm.sh",
-    "ensure:ty-wasm": "bash scripts/ensure-ty-wasm.sh",
     "typecheck:tests": "tsc -p tsconfig.tests.json",
     "tsserver": "node scripts/tsserver-tools.ts",
     "typecheck:scripts": "tsc -p tsconfig.scripts.json",
@@ -34,7 +32,8 @@
     "lucide-react": "^1.41.0",
     "monaco-editor": "^0.56.0",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1"
+    "react-dom": "^19.1.1",
+    "ty_wasm": "^0.0.0"
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "^1.54.5",
@@ -61,6 +60,6 @@
     "wrangler": "^4.129.1"
   },
   "engines": {
-    "node": ">=22.18.0"
+    "node": ">=24.0.0"
   }
 }

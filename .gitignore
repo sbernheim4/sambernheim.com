@@ -3,8 +3,8 @@ dist
 .output
 .nitro
 .tanstack
-src/routeTree.gen.ts
 src/wasm/ty/pkg
+src/routeTree.gen.ts
 .vendor
 .DS_Store
 
