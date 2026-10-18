@@ -1,9 +1,30 @@
 import { format, formatDistanceToNow, isValid } from "date-fns";
-import { useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "../../shared/components/ui/tooltip";
 
-type DisplayMode = "utc" | "local" | "relative";
+export type CycleableDateTimeMode = "utc" | "relative" | "local";
 
-const modes: readonly DisplayMode[] = ["utc", "local", "relative"];
+const modes: readonly CycleableDateTimeMode[] = ["utc", "relative", "local"];
+const CycleableDateTimeContext = createContext<CycleableDateTimeMode>("utc");
+const CycleableDateTimeModeContext = createContext<
+  ((mode: CycleableDateTimeMode) => void) | null
+>(null);
+
+export const CycleableDateTimeProvider = ({ children }: { children: ReactNode }) => {
+  const [mode, setMode] = useState<CycleableDateTimeMode>("utc");
+
+  return (
+    <CycleableDateTimeContext.Provider value={mode}>
+      <CycleableDateTimeModeContext.Provider value={setMode}>
+        {children}
+      </CycleableDateTimeModeContext.Provider>
+    </CycleableDateTimeContext.Provider>
+  );
+};
 
 const toDate = (value: Date | number | string) => {
   return value instanceof Date ? value : new Date(value);
@@ -24,10 +45,10 @@ export const CycleableDateTime = ({
   value: Date | number | string;
   className?: string;
 }) => {
-  const [mode, setMode] = useState<DisplayMode>("utc");
+  const mode = useContext(CycleableDateTimeContext);
+  const setMode = useContext(CycleableDateTimeModeContext);
   const [, refresh] = useState(0);
   const date = toDate(value);
-  const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || "Local time";
 
   useEffect(() => {
     if (mode !== "relative") {
@@ -45,30 +66,37 @@ export const CycleableDateTime = ({
   }, [mode]);
 
   const nextMode = () => {
-    setMode((current) => {
-      return modes[(modes.indexOf(current) + 1) % modes.length];
-    });
+    setMode?.(modes[(modes.indexOf(mode) + 1) % modes.length]);
   };
 
   const text = !isValid(date)
     ? "Invalid date"
     : mode === "utc"
       ? formatUtc(date)
-      : mode === "local"
-        ? format(date, "PPpp")
-        : formatDistanceToNow(date, { addSuffix: true });
-  const modeLabel = mode === "utc" ? "UTC" : mode === "local" ? userTimeZone : "Relative time";
+      : mode === "relative"
+        ? formatDistanceToNow(date, { addSuffix: true })
+        : format(date, "PPpp");
+  const formatLabel = mode === "utc" ? "UTC" : mode === "relative" ? "Relative" : "Local";
+  const toggleHint = "Click to toggle between UTC, Local, and Relative.";
+  const tooltip = `Format: ${formatLabel}. ${toggleHint}`;
 
   return (
-    <button
-      type="button"
-      className={className ?? "cycleable-date-time"}
-      onClick={nextMode}
-      title={`Display mode: ${modeLabel}. Click to change.`}
-      aria-label={`${text}. Display mode: ${modeLabel}. Click to change.`}
-      data-mode={mode}
-    >
-      <time dateTime={isValid(date) ? date.toISOString() : undefined}>{text}</time>
-    </button>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <button
+          type="button"
+          className={className ?? "cycleable-date-time"}
+          onClick={nextMode}
+          aria-label={`${text}. ${tooltip}`}
+          data-mode={mode}
+        >
+          <time dateTime={isValid(date) ? date.toISOString() : undefined}>{text}</time>
+        </button>
+      </TooltipTrigger>
+      <TooltipContent>
+        <span className="cycleable-date-time-tooltip-line">Format: {formatLabel}</span>
+        <span className="cycleable-date-time-tooltip-line">{toggleHint}</span>
+      </TooltipContent>
+    </Tooltip>
   );
 };

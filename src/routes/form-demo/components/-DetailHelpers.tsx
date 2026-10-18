@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 import { useExecutionProfile } from "../../../domains/execution-profiles/hooks/useExecutionProfile";
+import { CycleableDateTime } from "../../../forms/components";
+import { Number as FormattedNumber } from "../../../shared/components/Number";
 import "./DetailHelpers.css";
 
 export const ProfileSummary = ({ id }: { id: string }) => {
@@ -20,8 +22,30 @@ export const ProfileSummary = ({ id }: { id: string }) => {
         { label: "Name", value: profile.data.name },
         { label: "Runtime", value: profile.data.runtime },
         { label: "Region", value: profile.data.region },
-        { label: "Timeout", value: `${profile.data.timeoutMs} ms` },
-        { label: "Memory limit", value: `${profile.data.memoryLimitMb} MB` },
+        {
+          label: "Created",
+          value: profile.data.createdAt ? <CycleableDateTime value={profile.data.createdAt} /> : "—",
+        },
+        {
+          label: "Updated",
+          value: profile.data.updatedAt ? <CycleableDateTime value={profile.data.updatedAt} /> : "—",
+        },
+        {
+          label: "Timeout",
+          value: (
+            <>
+              <FormattedNumber value={profile.data.timeoutMs} /> ms
+            </>
+          ),
+        },
+        {
+          label: "Memory limit",
+          value: (
+            <>
+              <FormattedNumber value={profile.data.memoryLimitMb} /> MB
+            </>
+          ),
+        },
       ]}
     />
   );

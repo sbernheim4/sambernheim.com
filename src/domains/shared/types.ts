@@ -4,6 +4,8 @@ export type ThreadStatus = "new" | "running" | "blocked" | "finished";
 
 export type ExecutionProfile = {
   id: string;
+  createdAt?: string;
+  updatedAt?: string;
   name: string;
   runtime: string;
   region: string;
@@ -18,6 +20,8 @@ export type ExecutionProfileFormValues = Omit<ExecutionProfile, "timeoutMs" | "m
 
 export type Task = {
   id: string;
+  createdAt?: string;
+  updatedAt?: string;
   name: string;
   description: string;
   status: TaskStatus;
@@ -31,6 +35,8 @@ export type TaskFormValues = Omit<Task, "priority"> & {
 
 export type Process = {
   id: string;
+  createdAt?: string;
+  updatedAt?: string;
   name: string;
   taskId: string;
   command: string;
@@ -40,6 +46,8 @@ export type Process = {
 
 export type Thread = {
   id: string;
+  createdAt?: string;
+  updatedAt?: string;
   name: string;
   processId: string;
   entryPoint: string;

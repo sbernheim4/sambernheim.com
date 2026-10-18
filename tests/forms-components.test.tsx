@@ -1,7 +1,9 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { expect, test } from "vitest";
-import { CycleableDateTime, FormEditor } from "../src/forms/components";
+import { CycleableDateTime, CycleableDateTimeProvider, FormEditor } from "../src/forms/components";
+import { Number as FormattedNumber } from "../src/shared/components/Number";
+import { TooltipProvider } from "../src/shared/components/ui/tooltip";
 
 test("FormEditor tabs hide inactive content and page mode shows every section", () => {
   const tabs = (
@@ -111,9 +113,11 @@ test("FormEditor progress exposes correlation and failure diagnostics", () => {
   } as any;
 
   render(
-    <FormEditor.Provider mode="edit" defaultTab="profile" actions={actions}>
-      <FormEditor.OrchestratorProgress />
-    </FormEditor.Provider>,
+    <TooltipProvider>
+      <FormEditor.Provider mode="edit" defaultTab="profile" actions={actions}>
+        <FormEditor.OrchestratorProgress />
+      </FormEditor.Provider>
+    </TooltipProvider>,
   );
 
   expect(screen.getByTestId("orchestrator-diagnostics")).toHaveTextContent("run-123");
@@ -123,13 +127,44 @@ test("FormEditor progress exposes correlation and failure diagnostics", () => {
 
 test("CycleableDateTime titles each display mode", async () => {
   const user = userEvent.setup();
-  render(<CycleableDateTime value="2026-09-22T12:00:00.000Z" />);
+  render(
+    <TooltipProvider>
+      <CycleableDateTimeProvider>
+        <CycleableDateTime value="2026-09-22T12:00:00.000Z" />
+      </CycleableDateTimeProvider>
+    </TooltipProvider>,
+  );
   const control = screen.getByRole("button");
-  const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || "Local time";
+  expect(control).toHaveAttribute(
+    "aria-label",
+    expect.stringContaining("Format: UTC. Click to toggle between UTC, Local, and Relative."),
+  );
+  await user.click(control);
+  expect(control).toHaveAttribute(
+    "aria-label",
+    expect.stringContaining(
+      "Format: Relative. Click to toggle between UTC, Local, and Relative.",
+    ),
+  );
+  await user.click(control);
+  expect(control).toHaveAttribute(
+    "aria-label",
+    expect.stringContaining(
+      "Format: Local. Click to toggle between UTC, Local, and Relative.",
+    ),
+  );
+});
 
-  expect(control).toHaveAttribute("title", "Display mode: UTC. Click to change.");
-  await user.click(control);
-  expect(control).toHaveAttribute("title", `Display mode: ${userTimeZone}. Click to change.`);
-  await user.click(control);
-  expect(control).toHaveAttribute("title", "Display mode: Relative time. Click to change.");
+test("Number formats values using the requested locale", () => {
+  render(
+    <>
+      <FormattedNumber value={30000} locale="en-US" data-testid="us-number" />
+      <FormattedNumber value={30000} locale="fr-FR" data-testid="fr-number" />
+    </>,
+  );
+
+  expect(screen.getByTestId("us-number")).toHaveTextContent("30,000");
+  expect(screen.getByTestId("fr-number").textContent).toBe(
+    new Intl.NumberFormat("fr-FR").format(30000),
+  );
 });
