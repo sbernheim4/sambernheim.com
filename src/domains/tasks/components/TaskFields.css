@@ -1,4 +1,4 @@
-.task-fields:has(.app-field:nth-child(4))::before {
+.task-fields::before {
   content: "Task configuration";
   grid-column: 1 / -1;
   color: #53615d;
