@@ -29,10 +29,6 @@ export const CycleableDateTimeProvider = ({ children }: { children: ReactNode })
   );
 };
 
-const toDate = (value: Date | number | string) => {
-  return value instanceof Date ? value : new Date(value);
-};
-
 const formatUtc = (date: Date) => {
   return new Intl.DateTimeFormat(undefined, {
     dateStyle: "medium",
@@ -46,13 +42,13 @@ export const CycleableDateTime = ({
   className,
   modes: availableModes = modes,
 }: {
-  value: Date | number | string;
+  value: Date;
   className?: string;
   modes?: readonly CycleableDateTimeMode[];
 }) => {
   const { mode: contextMode, setMode } = useCycleableDateTimeMode();
   const [, refresh] = useState(0);
-  const date = toDate(value);
+  const date = value;
   const mode = availableModes.includes(contextMode) ? contextMode : (availableModes[0] ?? "utc");
 
   useEffect(() => {

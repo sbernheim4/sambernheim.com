@@ -6,10 +6,13 @@ declare module "*.mdx" {
   const Component: ComponentType;
   export default Component;
   export const meta: {
-    slug: string;
-    title: string;
-    description: string;
-    publishedAt: string;
+    meta: {
+      slug: string;
+      title: string;
+      description: string;
+      publishedAt: string;
+    };
+    headers: Record<string, string>;
   };
 }
 

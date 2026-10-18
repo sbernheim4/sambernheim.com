@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { useExecutionProfile } from "../../../domains/execution-profiles/hooks/useExecutionProfile";
 import { CycleableDateTime } from "../../../forms/components";
+import { parseUtcDate } from "../../../shared/date";
 import { Number as FormattedNumber } from "../../../shared/components/Number";
 import "./DetailHelpers.css";
 
@@ -25,7 +26,7 @@ export const ProfileSummary = ({ id }: { id: string }) => {
         {
           label: "Created",
           value: profile.data.createdAt ? (
-            <CycleableDateTime value={profile.data.createdAt} />
+            <CycleableDateTime value={parseUtcDate(profile.data.createdAt)} />
           ) : (
             "—"
           ),
@@ -33,7 +34,7 @@ export const ProfileSummary = ({ id }: { id: string }) => {
         {
           label: "Updated",
           value: profile.data.updatedAt ? (
-            <CycleableDateTime value={profile.data.updatedAt} />
+            <CycleableDateTime value={parseUtcDate(profile.data.updatedAt)} />
           ) : (
             "—"
           ),

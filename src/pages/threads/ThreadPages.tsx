@@ -14,6 +14,7 @@ import { DetailView } from "../form-demo/components/DetailView";
 import { ViewModePicker, useViewModePreference } from "../form-demo/components/ViewModePreference";
 import { Number as FormattedNumber } from "../../shared/components/Number";
 import { CycleableDateTime } from "../../forms/components";
+import { parseUtcDate } from "../../shared/date";
 export const ThreadListPage = () => {
   const query = useThreads();
 
@@ -85,7 +86,7 @@ export const ThreadDetailPage = ({ id }: { id: string }) => {
                     {
                       label: "Created",
                       value: thread.data.createdAt ? (
-                        <CycleableDateTime value={thread.data.createdAt} />
+                        <CycleableDateTime value={parseUtcDate(thread.data.createdAt)} />
                       ) : (
                         "—"
                       ),
@@ -93,7 +94,7 @@ export const ThreadDetailPage = ({ id }: { id: string }) => {
                     {
                       label: "Updated",
                       value: thread.data.updatedAt ? (
-                        <CycleableDateTime value={thread.data.updatedAt} />
+                        <CycleableDateTime value={parseUtcDate(thread.data.updatedAt)} />
                       ) : (
                         "—"
                       ),
