@@ -1,0 +1,54 @@
+.entity-detail-density-example {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.entity-detail-density-example__content {
+  display: grid;
+  gap: 0.75rem;
+  padding: 0.25rem;
+}
+
+.entity-detail-density-example__title {
+  color: var(--color-text);
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.entity-detail-density-example__metadata {
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+}
+
+.entity-detail-density-example__properties {
+  display: grid;
+  gap: 0.65rem;
+  margin: 0;
+}
+
+.entity-detail-density-example__properties div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.65rem;
+  border-bottom: 1px solid var(--color-border-muted);
+}
+
+.entity-detail-density-example__properties div:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.entity-detail-density-example__properties dt {
+  color: var(--color-text-secondary);
+}
+
+.entity-detail-density-example__properties dd {
+  margin: 0;
+  color: var(--color-text);
+  font-weight: 600;
+}

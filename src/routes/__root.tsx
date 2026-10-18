@@ -29,7 +29,7 @@ const RootComponent = () => {
         <ThemeProvider>
           <CycleableDateTimeProvider>
             <TooltipProvider>
-              <GlobalQueryLoader />
+              <GlobalQueryLoading />
               <CommandPalette />
               <ThemeCommandAction />
               <SiteNavigation />
@@ -40,6 +40,12 @@ const RootComponent = () => {
       </CommandPaletteProvider>
     </QueryClientProvider>
   );
+};
+
+const GlobalQueryLoading = () => {
+  const { pathname } = useLocation();
+
+  return pathname.startsWith("/blog") ? null : <GlobalQueryLoader />;
 };
 
 const ThemeCommandAction = () => {
