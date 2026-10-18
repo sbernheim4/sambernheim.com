@@ -11,11 +11,6 @@ export default defineConfig({
   server: {
     port: 3000,
   },
-  resolve: {
-    alias: {
-      ty_wasm: "/src/wasm/ty/pkg/ty_wasm",
-    },
-  },
   plugins: [
     cloudflare({ viteEnvironment: { name: "ssr" } }),
     mdx({

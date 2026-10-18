@@ -12,8 +12,7 @@
     "allowImportingTsExtensions": true,
     "baseUrl": ".",
     "paths": {
-      "~/*": ["src/*"],
-      "ty_wasm": ["src/wasm/ty/pkg/ty_wasm"]
+      "~/*": ["src/*"]
     }
   },
   "include": ["src", "vite.config.ts"]
