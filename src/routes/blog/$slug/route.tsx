@@ -1,6 +1,7 @@
 import "../styles/route.css";
 import "highlight.js/styles/atom-one-dark.css";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { CommandLink as Link } from "../../../shared/components/CommandLink";
 import { SiteNavbar } from "../../../shared/components/SiteNavbar";
 import { findSitePost } from "../../../articles";
 

@@ -4,6 +4,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { CycleableDateTimeProvider } from "../forms/components";
 import { GlobalQueryLoader } from "../shared/components/GlobalQueryLoader";
 import { TooltipProvider } from "../shared/components/ui/tooltip";
+import { CommandPalette, CommandPaletteProvider } from "../shared/commands/commands";
+import "../shared/commands/commands.css";
 
 import "../styles.css";
 
@@ -17,12 +19,15 @@ const validateSearch = (search: Record<string, unknown>): RootSearch => {
 const RootComponent = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <CycleableDateTimeProvider>
-        <TooltipProvider>
-          <GlobalQueryLoader />
-          <Outlet />
-        </TooltipProvider>
-      </CycleableDateTimeProvider>
+      <CommandPaletteProvider>
+        <CycleableDateTimeProvider>
+          <TooltipProvider>
+            <GlobalQueryLoader />
+            <CommandPalette />
+            <Outlet />
+          </TooltipProvider>
+        </CycleableDateTimeProvider>
+      </CommandPaletteProvider>
     </QueryClientProvider>
   );
 };

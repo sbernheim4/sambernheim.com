@@ -1,4 +1,6 @@
 import { useFormEditorContext } from "../hooks/useFormEditorContext";
+import { CommandButton } from "../../shared/components/CommandButton";
+import type { CommandOverride } from "../../shared/commands/commands";
 import "./FormEditorActions.css";
 
 type FormActionControlsProps = {
@@ -9,6 +11,13 @@ type FormActionControlsProps = {
   cancelEditing: () => void;
   cancelText: string;
   saveText: string;
+  saveCommand?: CommandOverride;
+  cancelCommand?: CommandOverride;
+};
+
+export type FormEditorActionsProps = {
+  saveCommand?: CommandOverride;
+  cancelCommand?: CommandOverride;
 };
 
 const FormActionControls = ({
@@ -19,6 +28,8 @@ const FormActionControls = ({
   cancelEditing,
   cancelText,
   saveText,
+  saveCommand,
+  cancelCommand,
 }: FormActionControlsProps) => {
   return (
     <>
@@ -38,23 +49,29 @@ const FormActionControls = ({
         </label>
       )}
       {showCancel && (
-        <button
+        <CommandButton
           type="button"
           className="workspace-button"
           onClick={cancelEditing}
           disabled={isSubmitting}
+          command={cancelCommand}
         >
           {cancelText}
-        </button>
+        </CommandButton>
       )}
-      <button type="submit" className="primary-action" disabled={disabled}>
+      <CommandButton
+        type="submit"
+        className="primary-action"
+        disabled={disabled}
+        command={saveCommand}
+      >
         {isSubmitting ? "Saving…" : saveText}
-      </button>
+      </CommandButton>
     </>
   );
 };
 
-export const FormEditorActions = () => {
+export const FormEditorActions = ({ saveCommand, cancelCommand }: FormEditorActionsProps) => {
   const {
     actions,
     isEditing,
@@ -75,16 +92,6 @@ export const FormEditorActions = () => {
   );
   const saveText = saveLabel ?? (saveButtonVariant === "next" ? "Next" : "Save changes");
   const cancelText = cancelLabel ?? (cancelButtonVariant === "previous" ? "Previous" : "Cancel");
-  const controls = {
-    orchestrator,
-    isSubmitting,
-    disabled,
-    showCancel,
-    cancelEditing,
-    cancelText,
-    saveText,
-  };
-
   return (
     <div className="form-editor-actions">
       <FormActionControls
@@ -95,6 +102,8 @@ export const FormEditorActions = () => {
         cancelEditing={cancelEditing}
         cancelText={cancelText}
         saveText={saveText}
+        saveCommand={saveCommand}
+        cancelCommand={cancelCommand}
       />
     </div>
   );

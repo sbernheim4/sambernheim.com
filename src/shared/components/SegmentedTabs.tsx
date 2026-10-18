@@ -1,6 +1,11 @@
-import type { ComponentType, ReactNode } from "react";
+import { useRef, useState, type ComponentType, type ReactNode } from "react";
 import * as Tabs from "@radix-ui/react-tabs";
 import "./SegmentedTabs.css";
+import {
+  getCommandLabel,
+  useAutomaticCommandAction,
+  type CommandOverride,
+} from "../commands/commands";
 
 export type SegmentedTab = {
   value: string;
@@ -8,6 +13,7 @@ export type SegmentedTab = {
   children: ReactNode;
   icon?: ComponentType<{ className?: string }>;
   disabled?: boolean;
+  command?: CommandOverride;
 };
 
 export const SegmentedTabList = ({
@@ -33,6 +39,8 @@ export const SegmentedTabTrigger = ({
   disabled,
   className,
   onClick,
+  command,
+  onCommand,
 }: {
   value: string;
   children: ReactNode;
@@ -40,9 +48,27 @@ export const SegmentedTabTrigger = ({
   disabled?: boolean;
   className?: string;
   onClick?: () => void;
+  command?: CommandOverride;
+  onCommand?: () => void;
 }) => {
+  const label = getCommandLabel(children);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  useAutomaticCommandAction({
+    kind: "tab",
+    label,
+    command: command === false ? false : { ...command, enabled: command?.enabled ?? !disabled },
+    execute: () => {
+      if (onCommand) {
+        onCommand();
+      } else {
+        triggerRef.current?.click();
+      }
+    },
+  });
+
   return (
     <Tabs.Trigger
+      ref={triggerRef}
       value={value}
       className={className ?? "segmented-tab-trigger"}
       disabled={disabled}
@@ -82,8 +108,14 @@ export const SegmentedTabs = ({
   ariaLabel?: string;
   className?: string;
 }) => {
+  const [activeTab, setActiveTab] = useState(tabs[0]?.value);
+
   return (
-    <Tabs.Root className={className ?? "segmented-tabs"} defaultValue={tabs[0]?.value}>
+    <Tabs.Root
+      className={className ?? "segmented-tabs"}
+      value={activeTab}
+      onValueChange={setActiveTab}
+    >
       <SegmentedTabList ariaLabel={ariaLabel}>
         {tabs.map((tab) => {
           return (
@@ -92,6 +124,10 @@ export const SegmentedTabs = ({
               value={tab.value}
               icon={tab.icon}
               disabled={tab.disabled}
+              command={tab.command}
+              onCommand={() => {
+                setActiveTab(tab.value);
+              }}
             >
               {tab.label}
             </SegmentedTabTrigger>

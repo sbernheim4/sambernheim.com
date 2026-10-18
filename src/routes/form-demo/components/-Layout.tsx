@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Link } from "@tanstack/react-router";
+import { CommandLink as Link } from "../../../shared/components/CommandLink";
 import { FormEditor } from "../../../forms/components";
 import "./Layout.css";
 

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { CommandButton } from "../../../shared/components/CommandButton";
 import "./ViewModePreference.css";
 
 export type ViewMode = "tabs" | "page" | "sidebar";
@@ -38,7 +39,7 @@ export const ViewModePicker = ({
 }) => {
   return (
     <div className="view-mode-picker" role="group" aria-label="View preference">
-      <button
+      <CommandButton
         className="view-mode-option"
         type="button"
         aria-pressed={mode === "tabs"}
@@ -48,8 +49,8 @@ export const ViewModePicker = ({
         }}
       >
         Tabs
-      </button>
-      <button
+      </CommandButton>
+      <CommandButton
         className="view-mode-option"
         type="button"
         aria-pressed={mode === "page"}
@@ -59,8 +60,8 @@ export const ViewModePicker = ({
         }}
       >
         Full page
-      </button>
-      <button
+      </CommandButton>
+      <CommandButton
         className="view-mode-option"
         type="button"
         aria-pressed={mode === "sidebar"}
@@ -70,7 +71,7 @@ export const ViewModePicker = ({
         }}
       >
         Sidebar
-      </button>
+      </CommandButton>
     </div>
   );
 };

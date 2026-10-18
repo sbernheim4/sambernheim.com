@@ -1,4 +1,5 @@
-import { Link, useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
+import { CommandLink as Link } from "../../shared/components/CommandLink";
 import { FormEditor } from "../../forms/components";
 import { ExecutionProfileFields } from "../../domains/execution-profiles/components/ExecutionProfileFields";
 import { useTasks, useTask } from "../../domains/tasks/hooks/useTasks";
@@ -17,7 +18,6 @@ import { DetailView } from "../form-demo/components/-DetailView";
 import { ViewModePicker, useViewModePreference } from "../form-demo/components/-ViewModePreference";
 import { Number as FormattedNumber } from "../../shared/components/Number";
 import { CycleableDateTime } from "../../forms/components";
-
 export const TaskListPage = () => {
   const query = useTasks();
 
