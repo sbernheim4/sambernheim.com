@@ -4,7 +4,7 @@ import type { FormEditorActionState, FormEditorController } from "../hooks/useFo
 export type FormEditorProviderProps = {
   mode: FormEditorController["mode"];
   defaultTab: string;
-  viewMode?: "tabs" | "page";
+  viewMode?: "tabs" | "page" | "sidebar";
   children: ReactNode;
   activeTab?: string;
   onActiveTabChange?: (tab: string) => void;

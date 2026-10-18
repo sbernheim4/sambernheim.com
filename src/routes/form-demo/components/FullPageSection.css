@@ -1,0 +1,43 @@
+.full-page-section {
+  display: grid;
+  gap: 10px;
+  box-sizing: border-box;
+  min-width: 0;
+  padding-top: 20px;
+  border-top: 1px solid #d9dee6;
+}
+
+.full-page-section:first-of-type {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.full-page-section > :not(summary) {
+  margin-left: 24px;
+}
+
+.full-page-section-heading {
+  margin: 0;
+  padding: 0 2px;
+  cursor: pointer;
+  color: #7a8580;
+  font-weight: 750;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  list-style: none;
+}
+
+.full-page-section-heading::-webkit-details-marker {
+  display: none;
+}
+
+.full-page-section-heading::before {
+  display: inline-block;
+  width: 1em;
+  color: #6b7772;
+  content: "▸";
+}
+
+.full-page-section[open] > .full-page-section-heading::before {
+  content: "▾";
+}

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "./ViewModePreference.css";
 
-export type ViewMode = "tabs" | "page";
+export type ViewMode = "tabs" | "page" | "sidebar";
 
 const viewModePreferenceKey = "form-demo:view-mode";
 
@@ -10,11 +10,8 @@ const readViewMode = (): ViewMode => {
     return "tabs";
   }
 
-  if (window.localStorage.getItem(viewModePreferenceKey) === "page") {
-    return "page";
-  }
-
-  return "tabs";
+  const storedMode = window.localStorage.getItem(viewModePreferenceKey);
+  return storedMode === "page" || storedMode === "sidebar" ? storedMode : "tabs";
 };
 
 export const useViewModePreference = () => {
@@ -62,6 +59,17 @@ export const ViewModePicker = ({
         }}
       >
         Full page
+      </button>
+      <button
+        className="view-mode-option"
+        type="button"
+        aria-pressed={mode === "sidebar"}
+        data-selected={mode === "sidebar"}
+        onClick={() => {
+          onChange("sidebar");
+        }}
+      >
+        Sidebar
       </button>
     </div>
   );

@@ -46,7 +46,7 @@ export type FormEditorOrchestrator = {
 
 export type FormEditorController = {
   mode: FormEditorMode;
-  viewMode: "tabs" | "page";
+  viewMode: "tabs" | "page" | "sidebar";
   activeTab: string;
   isEditing: boolean;
   readOnly?: boolean;

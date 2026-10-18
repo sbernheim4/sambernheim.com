@@ -1,28 +1,27 @@
 import { useFormEditorContext } from "../hooks/useFormEditorContext";
 import "./FormEditorActions.css";
 
-export const FormEditorActions = () => {
-  const {
-    actions,
-    isEditing,
-    readOnly,
-    preventSaveWithoutChanges,
-    saveLabel,
-    saveButtonVariant,
-    cancelEditing,
-    cancelLabel,
-    cancelButtonVariant,
-    showCancel,
-  } = useFormEditorContext();
+type FormActionControlsProps = {
+  orchestrator?: ReturnType<typeof useFormEditorContext>["actions"]["orchestrator"];
+  isSubmitting: boolean;
+  disabled: boolean;
+  showCancel?: boolean;
+  cancelEditing: () => void;
+  cancelText: string;
+  saveText: string;
+};
 
-  const orchestrator = actions.orchestrator;
-  const isSubmitting = Boolean(orchestrator?.isSubmitting || actions.isSubmitting);
-  const disabled =
-    readOnly || !isEditing || isSubmitting || (preventSaveWithoutChanges && actions.isPristine);
-  const saveText = saveLabel ?? (saveButtonVariant === "next" ? "Next" : "Save changes");
-  const cancelText = cancelLabel ?? (cancelButtonVariant === "previous" ? "Previous" : "Cancel");
+const FormActionControls = ({
+  orchestrator,
+  isSubmitting,
+  disabled,
+  showCancel,
+  cancelEditing,
+  cancelText,
+  saveText,
+}: FormActionControlsProps) => {
   return (
-    <div className="form-editor-actions">
+    <>
       {orchestrator && (
         <label className="form-editor-delay-control">
           <span>Step delay</span>
@@ -51,6 +50,52 @@ export const FormEditorActions = () => {
       <button type="submit" className="primary-action" disabled={disabled}>
         {isSubmitting ? "Saving…" : saveText}
       </button>
+    </>
+  );
+};
+
+export const FormEditorActions = () => {
+  const {
+    actions,
+    isEditing,
+    readOnly,
+    preventSaveWithoutChanges,
+    saveLabel,
+    saveButtonVariant,
+    cancelEditing,
+    cancelLabel,
+    cancelButtonVariant,
+    showCancel,
+  } = useFormEditorContext();
+
+  const orchestrator = actions.orchestrator;
+  const isSubmitting = Boolean(orchestrator?.isSubmitting || actions.isSubmitting);
+  const disabled = Boolean(
+    readOnly || !isEditing || isSubmitting || (preventSaveWithoutChanges && actions.isPristine),
+  );
+  const saveText = saveLabel ?? (saveButtonVariant === "next" ? "Next" : "Save changes");
+  const cancelText = cancelLabel ?? (cancelButtonVariant === "previous" ? "Previous" : "Cancel");
+  const controls = {
+    orchestrator,
+    isSubmitting,
+    disabled,
+    showCancel,
+    cancelEditing,
+    cancelText,
+    saveText,
+  };
+
+  return (
+    <div className="form-editor-actions">
+      <FormActionControls
+        orchestrator={orchestrator}
+        isSubmitting={isSubmitting}
+        disabled={disabled}
+        showCancel={showCancel}
+        cancelEditing={cancelEditing}
+        cancelText={cancelText}
+        saveText={saveText}
+      />
     </div>
   );
 };

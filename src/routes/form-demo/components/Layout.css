@@ -48,6 +48,13 @@
   margin-bottom: 28px;
 }
 
+.form-editor-view-mode-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 14px;
+}
+
 .heading h1,
 .editor-heading h1 {
   margin: 0;
