@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { useFormEditorContext } from "../hooks/useFormEditorContext";
 import { SegmentedTabContent } from "../../shared/components/SegmentedTabs";
-import { FullPageSection } from "../../routes/form-demo/components/FullPageSection";
+import { FullPageSection } from "../../pages/form-demo/components/FullPageSection";
 import "./FormEditorTab.css";
 
 export type FormEditorTabProps = { name: string; label?: string; children: ReactNode };
