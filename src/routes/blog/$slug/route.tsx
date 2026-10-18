@@ -30,4 +30,14 @@ const BlogPost = () => {
   );
 };
 
-export const Route = createFileRoute("/blog/$slug")({ component: BlogPost });
+export const Route = createFileRoute("/blog/$slug")({
+  head: ({ params }) => {
+    const post = findSitePost(params.slug);
+    return {
+      meta: [
+        { title: post ? `${post.title} | Samuel Bernheim` : "Article not found | Samuel Bernheim" },
+      ],
+    };
+  },
+  component: BlogPost,
+});

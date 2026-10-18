@@ -5,6 +5,7 @@ import { CycleableDateTimeProvider } from "../forms/components";
 import { GlobalQueryLoader } from "../shared/components/GlobalQueryLoader";
 import { TooltipProvider } from "../shared/components/ui/tooltip";
 import { CommandPalette, CommandPaletteProvider } from "../shared/commands/commands";
+import { ThemeProvider } from "../shared/theme/ThemeProvider";
 import "../shared/commands/commands.css";
 
 import "../styles.css";
@@ -20,13 +21,15 @@ const RootComponent = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <CommandPaletteProvider>
-        <CycleableDateTimeProvider>
-          <TooltipProvider>
-            <GlobalQueryLoader />
-            <CommandPalette />
-            <Outlet />
-          </TooltipProvider>
-        </CycleableDateTimeProvider>
+        <ThemeProvider>
+          <CycleableDateTimeProvider>
+            <TooltipProvider>
+              <GlobalQueryLoader />
+              <CommandPalette />
+              <Outlet />
+            </TooltipProvider>
+          </CycleableDateTimeProvider>
+        </ThemeProvider>
       </CommandPaletteProvider>
     </QueryClientProvider>
   );
@@ -61,7 +64,7 @@ export const Route = createRootRoute({
           content: "width=device-width, initial-scale=1",
         },
         {
-          title: "Monaco ty WASM Editor",
+          title: "Samuel Bernheim — Software Engineer",
         },
       ],
     };

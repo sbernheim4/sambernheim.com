@@ -15,6 +15,7 @@ const BlogIndex = () => {
               <Link
                 className="article-item"
                 key={post.slug}
+                aria-label={post.title}
                 to="/blog/$slug"
                 params={{ slug: post.slug }}
               >
@@ -29,4 +30,11 @@ const BlogIndex = () => {
   );
 };
 
-export const Route = createFileRoute("/blog/")({ component: BlogIndex });
+export const Route = createFileRoute("/blog/")({
+  head: () => {
+    return {
+      meta: [{ title: "Blog | Samuel Bernheim" }],
+    };
+  },
+  component: BlogIndex,
+});

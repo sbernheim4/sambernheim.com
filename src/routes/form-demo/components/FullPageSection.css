@@ -4,7 +4,7 @@
   box-sizing: border-box;
   min-width: 0;
   padding-top: 20px;
-  border-top: 1px solid #d9dee6;
+  border-top: 1px solid var(--color-border-muted);
 }
 
 .full-page-section:first-of-type {
@@ -20,7 +20,7 @@
   margin: 0;
   padding: 0 2px;
   cursor: pointer;
-  color: #7a8580;
+  color: var(--color-text-muted);
   font-weight: 750;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -34,7 +34,7 @@
 .full-page-section-heading::before {
   display: inline-block;
   width: 1em;
-  color: #6b7772;
+  color: var(--color-text-muted);
   content: "▸";
 }
 

@@ -1,15 +1,27 @@
 import type { ReactNode } from "react";
 import { CommandLink as Link } from "../../../shared/components/CommandLink";
 import { FormEditor } from "../../../forms/components";
+import { CommandButton } from "../../../shared/components/CommandButton";
+import { useTheme } from "../../../shared/theme/ThemeProvider";
 import "./Layout.css";
 
 export const Shell = ({ children }: { children: ReactNode }) => {
+  const { theme, toggleTheme } = useTheme();
+
   return (
-    <main className="shell">
+    <main className="shell" data-theme={theme}>
       <nav className="nav">
         <Link to="/form-demo/tasks">Tasks</Link>
         <Link to="/form-demo/processes">Processes</Link>
         <Link to="/form-demo/threads">Threads</Link>
+        <CommandButton
+          className="theme-switcher"
+          aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
+          aria-pressed={theme === "dark"}
+          onClick={toggleTheme}
+        >
+          {theme === "light" ? "Dark mode" : "Light mode"}
+        </CommandButton>
       </nav>
       <section className="main">{children}</section>
     </main>
