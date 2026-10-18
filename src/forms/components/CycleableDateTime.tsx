@@ -10,6 +10,13 @@ const CycleableDateTimeModeContext = createContext<((mode: CycleableDateTimeMode
   null,
 );
 
+export const useCycleableDateTimeMode = () => {
+  return {
+    mode: useContext(CycleableDateTimeContext),
+    setMode: useContext(CycleableDateTimeModeContext),
+  };
+};
+
 export const CycleableDateTimeProvider = ({ children }: { children: ReactNode }) => {
   const [mode, setMode] = useState<CycleableDateTimeMode>("utc");
 
@@ -37,14 +44,16 @@ const formatUtc = (date: Date) => {
 export const CycleableDateTime = ({
   value,
   className,
+  modes: availableModes = modes,
 }: {
   value: Date | number | string;
   className?: string;
+  modes?: readonly CycleableDateTimeMode[];
 }) => {
-  const mode = useContext(CycleableDateTimeContext);
-  const setMode = useContext(CycleableDateTimeModeContext);
+  const { mode: contextMode, setMode } = useCycleableDateTimeMode();
   const [, refresh] = useState(0);
   const date = toDate(value);
+  const mode = availableModes.includes(contextMode) ? contextMode : (availableModes[0] ?? "utc");
 
   useEffect(() => {
     if (mode !== "relative") {
@@ -62,7 +71,7 @@ export const CycleableDateTime = ({
   }, [mode]);
 
   const nextMode = () => {
-    setMode?.(modes[(modes.indexOf(mode) + 1) % modes.length]);
+    setMode?.(availableModes[(availableModes.indexOf(mode) + 1) % availableModes.length] ?? "utc");
   };
 
   const text = !isValid(date)
@@ -73,7 +82,16 @@ export const CycleableDateTime = ({
         ? formatDistanceToNow(date, { addSuffix: true })
         : format(date, "PPpp");
   const formatLabel = mode === "utc" ? "UTC" : mode === "relative" ? "Relative" : "Local";
-  const toggleHint = "Click to toggle between UTC, Local, and Relative.";
+  const toggleHint =
+    availableModes.length === 3
+      ? "Click to toggle between UTC, Local, and Relative."
+      : `Click to toggle between ${availableModes
+          .map((availableMode) =>
+            availableMode === "utc"
+              ? "Absolute"
+              : availableMode[0].toUpperCase() + availableMode.slice(1),
+          )
+          .join(", ")}.`;
   const tooltip = `Format: ${formatLabel}. ${toggleHint}`;
 
   return (
@@ -81,7 +99,7 @@ export const CycleableDateTime = ({
       <TooltipTrigger asChild>
         <button
           type="button"
-          className={className ?? "cycleable-date-time"}
+          className={`cycleable-date-time${className ? ` ${className}` : ""}`}
           onClick={nextMode}
           aria-label={`${text}. ${tooltip}`}
           data-mode={mode}

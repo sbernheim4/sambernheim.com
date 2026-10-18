@@ -1,14 +1,100 @@
-body {
-  background: #1e2427;
-}
-
 .article {
   padding: 10px;
   padding-top: 80px;
   margin: 0 auto;
   max-width: 680px;
-  color: #bcbfc9;
-  --main-bg-color: rgb(59 77 86);
+  color: var(--blog-foreground);
+  background: var(--blog-background);
+  --main-bg-color: var(--blog-surface);
+
+  --code-background: #fafafa;
+  --code-text: #383a42;
+  --code-comment: #a0a1a7;
+  --code-keyword: #a626a4;
+  --code-tag: #e45649;
+  --code-literal: #0184bb;
+  --code-string: #50a14f;
+  --code-number: #986801;
+  --code-function: #4078f2;
+  --code-type: #c18401;
+  --code-operator: #383a42;
+}
+
+.article[data-theme="dark"] {
+  --code-background: #282c34;
+  --code-text: #abb2bf;
+  --code-comment: #5c6370;
+  --code-keyword: #c678dd;
+  --code-tag: #e06c75;
+  --code-literal: #56b6c2;
+  --code-string: #98c379;
+  --code-number: #d19a66;
+  --code-function: #61aeee;
+  --code-type: #e6c07b;
+  --code-operator: #abb2bf;
+}
+
+.article pre.th-code {
+  display: block;
+  overflow-x: auto;
+  padding: 1em;
+  color: var(--code-text);
+  background: var(--code-background);
+}
+
+.article pre.th-code code {
+  color: inherit;
+}
+
+.article .th-comment {
+  color: var(--code-comment);
+  font-style: italic;
+}
+
+.article .th-keyword,
+.article .th-command {
+  color: var(--code-keyword);
+}
+
+.article .th-tag,
+.article .th-selector,
+.article .th-deleted {
+  color: var(--code-tag);
+}
+
+.article .th-literal {
+  color: var(--code-literal);
+}
+
+.article .th-string,
+.article .th-inserted,
+.article .th-attr {
+  color: var(--code-string);
+}
+
+.article .th-number,
+.article .th-variable {
+  color: var(--code-number);
+}
+
+.article .th-function,
+.article .th-link,
+.article .th-heading {
+  color: var(--code-function);
+}
+
+.article .th-type,
+.article .th-property {
+  color: var(--code-type);
+}
+
+.article .th-operator,
+.article .th-meta {
+  color: var(--code-operator);
+}
+
+.article .th-link {
+  text-decoration: underline;
 }
 
 .article > blockquote {
@@ -59,12 +145,12 @@ code:after {
 }
 
 .article > p > a {
-  color: #bcbfc9;
+  color: var(--blog-accent);
   text-decoration: underline;
 }
 
 .article > p > a:hover {
-  color: #bcbfc9;
+  color: var(--blog-accent);
   filter: brightness(85%);
   text-decoration: underline;
 }

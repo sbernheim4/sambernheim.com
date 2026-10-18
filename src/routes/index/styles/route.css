@@ -2,5 +2,5 @@
 @import "./about.css";
 
 main {
-  color: #29483b;
+  color: var(--home-foreground);
 }

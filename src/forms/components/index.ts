@@ -16,7 +16,12 @@ import { FormEditorTabTrigger } from "./FormEditorTabTrigger";
 import { FormEditorTools } from "./FormEditorTools";
 
 export { type FormEditorProviderProps, type FormEditorRegionProps } from "./formTypes";
-export { CycleableDateTime, CycleableDateTimeProvider } from "./CycleableDateTime";
+export {
+  CycleableDateTime,
+  CycleableDateTimeProvider,
+  useCycleableDateTimeMode,
+} from "./CycleableDateTime";
+export { CycleableDate } from "./CycleableDate";
 
 export const FormEditor = {
   Actions: FormEditorActions,

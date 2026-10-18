@@ -2,8 +2,8 @@
 @import "./article.css";
 
 body:has(.blog, .article) .navbar {
-  --foreground-color: #bcbfc9;
-  --background-color: #1e2427;
-  --border-color: #526071;
-  --line-color: #526071;
+  --foreground-color: var(--blog-foreground);
+  --background-color: var(--blog-background);
+  --border-color: var(--blog-border);
+  --line-color: var(--blog-accent);
 }

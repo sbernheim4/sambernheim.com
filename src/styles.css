@@ -1,6 +1,5 @@
 @import "./styles/tokens.css";
-
-@import url("https://fonts.googleapis.com/css2?family=Lato&display=swap");
+@import "./styles/globals.css";
 
 * {
   box-sizing: border-box;
