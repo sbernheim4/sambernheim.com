@@ -6,7 +6,7 @@ if (typeof self !== "undefined") {
     getWorker: () => {
       return new Worker(
         new URL(
-          "../../../node_modules/monaco-editor/esm/vs/editor/editor.worker.js",
+          "../../node_modules/monaco-editor/esm/vs/editor/editor.worker.js",
           import.meta.url,
         ),
         { type: "module" },
