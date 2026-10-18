@@ -4,17 +4,6 @@ body {
   background-color: var(--main-bg-color);
 }
 
-.navbar {
-  background-color: var(--main-bg-color);
-}
-.navbar a,
-.navbar #main {
-  color: white;
-}
-.navbar hr {
-  background-color: white;
-}
-
 .blog {
   display: block;
   margin: 0 auto;

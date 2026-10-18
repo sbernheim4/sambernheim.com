@@ -1,18 +1,14 @@
 import { format, formatDistanceToNow, isValid } from "date-fns";
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "../../shared/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../../shared/components/ui/tooltip";
 
 export type CycleableDateTimeMode = "utc" | "relative" | "local";
 
 const modes: readonly CycleableDateTimeMode[] = ["utc", "relative", "local"];
 const CycleableDateTimeContext = createContext<CycleableDateTimeMode>("utc");
-const CycleableDateTimeModeContext = createContext<
-  ((mode: CycleableDateTimeMode) => void) | null
->(null);
+const CycleableDateTimeModeContext = createContext<((mode: CycleableDateTimeMode) => void) | null>(
+  null,
+);
 
 export const CycleableDateTimeProvider = ({ children }: { children: ReactNode }) => {
   const [mode, setMode] = useState<CycleableDateTimeMode>("utc");

@@ -39,9 +39,9 @@
   align-self: start;
   gap: 4px;
   padding: 6px;
-  border: 1px solid #d8dfd9;
+  border: 1px solid var(--color-border);
   border-radius: 10px;
-  background: #f4f5ef;
+  background: var(--color-surface-muted);
 }
 
 .form-editor-form-sidebar > .form-editor-tab {

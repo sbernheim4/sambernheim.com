@@ -1,54 +1,55 @@
-:root {
-  --main-bg-color: #f2e65a;
+.about {
+  color: #f3efe6;
+  background: #29483b;
 }
 
-.about {
-  position: relative;
-  max-width: 100vw;
-  width: 100vw;
-  fill: var(--main-bg-color);
-  background: var(--main-bg-color);
-  overflow: initial;
-}
-.about svg {
-  position: absolute;
-  top: 0;
-  transform: translateY(calc(-100% + 1px));
-}
-.about svg text {
-  font-family: "verlag", "Lato", sans-serif;
-  font-weight: 300;
-}
-@media all and (max-width: 800px) {
-  .about svg text {
-    display: none;
-  }
-}
-.about div {
+.about__inner {
+  max-width: 1240px;
   margin: 0 auto;
-  max-width: 1200px;
-  min-height: 300px;
-  padding: 20px 60px 60px 60px;
+  padding: 5rem 7vw 6rem;
 }
-.about div h1 {
-  display: none;
+
+.about__label {
+  color: #c9a66b;
 }
-@media all and (max-width: 800px) {
-  .about div h1 {
-    display: block;
-    margin-top: 20px;
-    font-family: "verlag", "Lato", sans-serif;
-    font-size: 50px;
-    text-align: center;
+
+.about__content {
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) minmax(260px, 0.8fr);
+  gap: 4rem;
+  align-items: start;
+}
+
+.about h2 {
+  margin: 0;
+  font-family: "verlag", "Lato", sans-serif;
+  font-size: clamp(2.7rem, 6vw, 5rem);
+  font-weight: 300;
+  line-height: 0.95;
+}
+
+.about__content div {
+  max-width: 420px;
+  color: #dce3d5;
+  font-family: "Lato", sans-serif;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.about__content p + p {
+  margin-top: 1.5rem;
+}
+
+@media all and (max-width: 700px) {
+  .about__inner {
+    padding: 4rem 1.5rem 5rem;
   }
-}
-.about div h2 {
-  margin: 30px 0;
-  font-size: 30px;
-  font-family: "Lato", "sans-serif";
-}
-.about div p {
-  margin: 40px 0;
-  font-size: 18px;
-  font-family: "Lato", "sans-serif";
+
+  .about__content {
+    display: block;
+  }
+
+  .about__content div {
+    margin-top: 2rem;
+  }
 }

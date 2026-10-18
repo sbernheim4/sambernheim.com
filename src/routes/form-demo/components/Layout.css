@@ -2,8 +2,8 @@
   display: grid;
   grid-template-columns: 220px minmax(0, 1fr);
   min-height: 100vh;
-  background: #f5f1e8;
-  color: #1e2427;
+  background: var(--color-background);
+  color: var(--color-text);
   font-family: Lato, sans-serif;
 }
 
@@ -12,19 +12,35 @@
   flex-direction: column;
   gap: 6px;
   padding: 32px 20px;
-  background: #1e2427;
+  background: var(--color-surface);
+  border-right: 1px solid var(--color-border);
 }
 
 .nav a {
   padding: 11px 13px;
   border-radius: 6px;
-  color: #f4f1e8;
+  color: var(--color-text);
   text-decoration: none;
 }
 
 .nav a:hover,
 .nav a[aria-current="page"] {
-  background: #354842;
+  background: var(--color-surface-muted);
+}
+
+.theme-switcher {
+  padding: 11px 13px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+
+.theme-switcher:hover {
+  background: var(--color-surface-muted);
 }
 
 .main {
@@ -34,7 +50,7 @@
 
 .main > h1 {
   margin: 0;
-  color: #14201f;
+  color: var(--color-text);
   font-size: clamp(30px, 4vw, 46px);
   letter-spacing: -0.04em;
 }
@@ -80,28 +96,32 @@
   grid-template-columns: 1fr auto;
   gap: 8px 16px;
   padding: 18px 20px;
-  border: 1px solid #ccd5d0;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
-  background: #fffdf8;
-  color: inherit;
+  background: var(--color-surface);
+  color: var(--color-text);
   text-decoration: none;
 }
 
 .card:hover {
-  border-color: #216b5e;
-  box-shadow: 0 5px 18px rgb(30 36 39 / 8%);
+  border-color: var(--color-primary);
+  box-shadow: 0 5px 18px var(--color-shadow-subtle);
 }
 
 .card > span:last-child {
   grid-column: 1 / -1;
-  color: #53615d;
+  color: var(--color-text-secondary);
+}
+
+.card > strong {
+  color: var(--color-primary);
 }
 
 .details {
   padding: clamp(22px, 3vw, 34px);
-  border: 1px solid #ccd5d0;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
-  background: #fffdf8;
+  background: var(--color-surface);
 }
 
 .summary-grid {
@@ -124,13 +144,13 @@
 .summary-grid p,
 .summary-grid strong {
   margin: 0;
-  color: #1e2427;
+  color: var(--color-text);
   font-size: 16px;
   line-height: 1.5;
 }
 
 .eyebrow {
-  color: #687671;
+  color: var(--color-text-muted);
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.1em;
@@ -147,7 +167,7 @@
   display: grid;
   gap: 4px;
   padding-bottom: 12px;
-  border-bottom: 1px solid #e1e5df;
+  border-bottom: 1px solid var(--color-border-muted);
 }
 
 .detail-property:last-child {
@@ -161,7 +181,7 @@
 }
 
 .detail-property dd {
-  color: #1e2427;
+  color: var(--color-text);
   line-height: 1.5;
 }
 
@@ -176,21 +196,21 @@
   justify-content: space-between;
   gap: 16px;
   padding: 14px 16px;
-  border: 1px solid #d8ded9;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
-  background: #f8faf6;
-  color: #216b5e;
+  background: var(--color-surface-muted);
+  color: var(--color-primary);
   text-decoration: none;
 }
 
 .relationship-list a:hover {
-  border-color: #216b5e;
-  background: #f1f7f1;
+  border-color: var(--color-primary);
+  background: var(--color-surface-muted);
 }
 
 .relationship-meta {
   overflow: hidden;
-  color: #687671;
+  color: var(--color-text-muted);
   font-size: 13px;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -202,16 +222,16 @@
 }
 
 .child-list a {
-  color: #216b5e;
+  color: var(--color-primary);
 }
 
 .status-pill {
   width: fit-content;
   padding: 4px 9px;
-  border: 1px solid #b7c8be;
+  border: 1px solid var(--color-border);
   border-radius: 999px;
-  background: #edf5ef;
-  color: #216b5e;
+  background: var(--color-surface-muted);
+  color: var(--color-primary);
   font-size: 12px;
   text-transform: capitalize;
 }
@@ -236,6 +256,8 @@
   .nav {
     flex-direction: row;
     overflow-x: auto;
+    border-right: 0;
+    border-bottom: 1px solid var(--color-border);
   }
 
   .main {

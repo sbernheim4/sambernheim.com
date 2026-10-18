@@ -7,20 +7,20 @@
   align-items: center;
   gap: 8px;
   padding: 8px 11px;
-  border: 1px solid #ccd5d0;
+  border: 1px solid var(--color-border);
   border-radius: 999px;
-  background: #fffdf8;
-  color: #53615d;
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
   font-size: 12px;
   font-weight: 750;
-  box-shadow: 0 4px 14px rgb(30 36 39 / 12%);
+  box-shadow: 0 4px 14px var(--color-overlay);
 }
 
 .global-query-loader-spinner {
   width: 13px;
   height: 13px;
-  border: 2px solid #c8d1cc;
-  border-top-color: #216b5e;
+  border: 2px solid var(--color-border);
+  border-top-color: var(--color-primary);
   border-radius: 50%;
   animation: global-query-loader-spin 700ms linear infinite;
 }

@@ -4,20 +4,20 @@
   justify-content: space-between;
   gap: 12px;
   padding: 10px 14px;
-  border: 1px solid #b7c8be;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
-  background: #e8f1eb;
-  color: #216b5e;
+  background: var(--color-surface-muted);
+  color: var(--color-primary);
   font-size: 13px;
   font-weight: 700;
 }
 
 .form-editor-undo button {
   padding: 6px 10px;
-  border: 1px solid #8eb1a4;
+  border: 1px solid var(--color-border);
   border-radius: 6px;
-  background: #ffffff;
-  color: #216b5e;
+  background: var(--color-surface);
+  color: var(--color-primary);
   cursor: pointer;
   font: inherit;
 }

@@ -24,11 +24,19 @@ export const ProfileSummary = ({ id }: { id: string }) => {
         { label: "Region", value: profile.data.region },
         {
           label: "Created",
-          value: profile.data.createdAt ? <CycleableDateTime value={profile.data.createdAt} /> : "—",
+          value: profile.data.createdAt ? (
+            <CycleableDateTime value={profile.data.createdAt} />
+          ) : (
+            "—"
+          ),
         },
         {
           label: "Updated",
-          value: profile.data.updatedAt ? <CycleableDateTime value={profile.data.updatedAt} /> : "—",
+          value: profile.data.updatedAt ? (
+            <CycleableDateTime value={profile.data.updatedAt} />
+          ) : (
+            "—"
+          ),
         },
         {
           label: "Timeout",

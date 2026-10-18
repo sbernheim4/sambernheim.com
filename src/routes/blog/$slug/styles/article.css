@@ -1,23 +1,10 @@
-.navbar #main {
-  color: #bcbfc9;
-}
-
-.navbar a {
-  color: #bcbfc9;
-}
-
-.navbar__line-container > hr {
-  background-color: #bcbfc9;
-  border-radius: 5px;
-}
-
-body,
-.navbar {
+body {
   background: #1e2427;
 }
 
 .article {
   padding: 10px;
+  padding-top: 80px;
   margin: 0 auto;
   max-width: 680px;
   color: #bcbfc9;

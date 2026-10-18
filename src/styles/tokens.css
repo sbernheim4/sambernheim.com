@@ -1,0 +1,84 @@
+/* Compact semantic theme tokens. Each theme defines the complete contract. */
+
+:root,
+[data-theme="light"] {
+  --color-primary: #216b5e;
+  --color-primary-hover: #195448;
+  --color-on-primary: #ffffff;
+  --color-border: #ccd5d0;
+  --color-border-muted: #d9dee6;
+  --color-focus: #216b5e;
+  --color-danger: #a13c3c;
+  --color-danger-surface: #f9e8e5;
+  --color-info: #245c98;
+  --color-info-surface: #eef5fc;
+  --color-success: #2c6e55;
+  --color-success-surface: #e8f1eb;
+  --color-warning: #d97706;
+  --color-warning-surface: #fff8e8;
+  --color-background: #f5f1e8;
+  --color-surface: #fffdf8;
+  --color-surface-muted: #e8e9df;
+  --color-text: #1e2427;
+  --color-text-secondary: #53615d;
+  --color-text-muted: #687671;
+  --color-on-inverse: #f4f1e8;
+  --color-link: #216b5e;
+  --color-placeholder: #9aa4b2;
+  --color-surface-inverse: #111418;
+  --color-surface-inverse-raised: #151a20;
+  --color-surface-inverse-selected: #354842;
+  --color-border-inverse: #34404d;
+  --color-text-inverse: #e6e8eb;
+  --color-text-inverse-muted: #8f9aa7;
+  --color-selection: rgba(54, 120, 199, 0.16);
+  --color-highlight: rgba(90, 100, 112, 0.26);
+  --color-secondary: rgb(80, 152, 196);
+  --color-accent-secondary: #f2e65a;
+  --color-on-accent-secondary: #1e2427;
+  --color-shadow-subtle: rgb(30 36 39 / 8%);
+  --color-shadow-medium: rgba(15, 23, 42, 0.14);
+  --color-shadow-heavy: rgba(16, 24, 40, 0.08);
+  --color-overlay: rgb(0 0 0 / 45%);
+}
+
+[data-theme="dark"] {
+  --color-primary: #8eb1a4;
+  --color-primary-hover: #a7e0c6;
+  --color-on-primary: #111418;
+  --color-border: #465366;
+  --color-border-muted: #252b33;
+  --color-focus: #8fc7ed;
+  --color-danger: #f19a9a;
+  --color-danger-surface: #2a1e22;
+  --color-info: #8fc7ed;
+  --color-info-surface: #243044;
+  --color-success: #a7e0c6;
+  --color-success-surface: #14201f;
+  --color-warning: #e4c27d;
+  --color-warning-surface: #2a2418;
+  --color-background: #111418;
+  --color-surface: #151a20;
+  --color-surface-muted: #252b33;
+  --color-text: #e6e8eb;
+  --color-text-secondary: #c8d1dc;
+  --color-text-muted: #9da8b5;
+  --color-on-inverse: #f4f1e8;
+  --color-link: #a7e0c6;
+  --color-placeholder: #8792a1;
+  --color-surface-inverse: #111418;
+  --color-surface-inverse-raised: #151a20;
+  --color-surface-inverse-selected: #2c6e55;
+  --color-border-inverse: #34404d;
+  --color-text-inverse: #e6e8eb;
+  --color-text-inverse-muted: #8f9aa7;
+  --color-selection: rgba(54, 120, 199, 0.16);
+  --color-highlight: rgba(90, 100, 112, 0.26);
+  --color-secondary: #8fc7ed;
+  --color-accent-secondary: #d6b86a;
+  --color-on-accent-secondary: #111418;
+  --color-shadow-subtle: rgb(0 0 0 / 28%);
+  --color-shadow-medium: rgb(0 0 0 / 45%);
+  --color-shadow-heavy: rgb(0 0 0 / 55%);
+  --color-overlay: rgb(0 0 0 / 65%);
+}

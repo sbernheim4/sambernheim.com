@@ -3,16 +3,16 @@
   max-width: 280px;
   padding: 7px 10px;
   border-radius: 6px;
-  background: #1e2427;
-  color: #fffdf8;
+  background: var(--color-surface-inverse);
+  color: var(--color-on-inverse);
   font-size: 12px;
   line-height: 1.4;
-  box-shadow: 0 4px 14px rgb(30 36 39 / 20%);
+  box-shadow: 0 4px 14px var(--color-shadow-medium);
   animation: tooltip-in 120ms ease-out;
 }
 
 .tooltip-arrow {
-  fill: #1e2427;
+  fill: var(--color-text);
 }
 
 @keyframes tooltip-in {

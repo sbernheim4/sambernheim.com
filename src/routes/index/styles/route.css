@@ -1,2 +1,6 @@
 @import "./landingPage.css";
 @import "./about.css";
+
+main {
+  color: #29483b;
+}
