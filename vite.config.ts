@@ -25,7 +25,7 @@ export default defineConfig({
   plugins: [
     cloudflare({ viteEnvironment: { name: "ssr" } }),
     mdx({
-      remarkPlugins: [remarkFrontmatter, remarkMdxFrontmatter],
+      remarkPlugins: [remarkFrontmatter, [remarkMdxFrontmatter, { name: "meta" }]],
       rehypePlugins: [[rehypeHighlightCodeBlocks, { highlighter }]],
     }),
     tanstackStart({
