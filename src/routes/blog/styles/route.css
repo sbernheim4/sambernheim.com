@@ -1,5 +1,5 @@
 @import "./blog.css";
-@import "../$slug/styles/article.css";
+@import "./article.css";
 
 body:has(.blog, .article) .navbar {
   --foreground-color: #bcbfc9;
