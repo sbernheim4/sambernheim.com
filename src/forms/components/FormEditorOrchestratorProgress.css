@@ -80,6 +80,8 @@
   font: inherit;
   text-decoration: underline dotted;
   text-underline-offset: 2px;
+  outline: 0;
+  box-shadow: none;
 }
 
 .cycleable-date-time-tooltip-line {

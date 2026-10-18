@@ -2,13 +2,14 @@ import "./index/styles/route.css";
 import { createFileRoute } from "@tanstack/react-router";
 import { About } from "./../pages/home/About";
 import { LandingPage } from "./../pages/home/LandingPage";
-import { SiteNavbar } from "../shared/components/SiteNavbar";
+import { useTheme } from "../shared/theme/ThemeProvider";
 
 const Home = () => {
+  const { theme } = useTheme();
+
   return (
     <>
-      <SiteNavbar />
-      <main>
+      <main data-theme={theme}>
         <LandingPage />
         <About />
       </main>

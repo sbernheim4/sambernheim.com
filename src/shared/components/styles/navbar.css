@@ -24,10 +24,10 @@
 }
 
 .navbar {
-  --foreground-color: #29483b;
-  --background-color: #f3efe6;
-  --border-color: #d8d7ca;
-  --line-color: #a2793d;
+  --foreground-color: var(--home-foreground);
+  --background-color: var(--home-background);
+  --border-color: var(--color-border);
+  --line-color: color-mix(in srgb, var(--home-panel), var(--home-foreground) 60%);
   font-family: "Lato";
   position: sticky;
   opacity: 0;
@@ -49,6 +49,7 @@
 }
 .navbar__line-container {
   width: 60%;
+  margin-inline: 12px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -56,8 +57,10 @@
 .navbar__line-container hr {
   border: none;
   width: 100%;
-  height: 2px;
-  background-color: var(--line-color);
+  height: 3px;
+  margin: 0;
+  border-radius: 999px;
+  background-color: color-mix(in srgb, var(--line-color), transparent 8%);
   transform: scaleX(0);
   transform-origin: left;
   animation: slide ease-in-out 0.5s forwards;
@@ -67,7 +70,8 @@
 .navbar__progress-track {
   position: relative;
   width: 100%;
-  height: 2px;
+  height: 3px;
+  border-radius: 999px;
   overflow: hidden;
   background: color-mix(in srgb, var(--line-color), transparent 70%);
 }
@@ -108,11 +112,16 @@
 .navbar__actions {
   display: flex;
   align-items: center;
-  gap: 30px;
+  gap: 12px;
+  margin-right: 15px;
 }
 
 .navbar__actions a {
   margin: 0;
+}
+
+.navbar__actions > a + a {
+  margin-left: 4px;
 }
 
 .navbar__command-button:hover {
@@ -123,4 +132,34 @@
 .navbar__command-button:focus-visible {
   outline: 2px solid var(--line-color);
   outline-offset: 2px;
+}
+
+.navbar__theme-button {
+  display: inline-grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  margin: 0;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--foreground-color);
+  cursor: pointer;
+}
+
+.navbar__theme-button:hover {
+  border-color: var(--border-color);
+  color: var(--line-color);
+}
+
+.navbar__theme-button:focus-visible {
+  outline: 2px solid var(--line-color);
+  outline-offset: 2px;
+}
+
+@media (min-width: 1000px) {
+  .navbar__actions {
+    gap: 22px;
+  }
 }

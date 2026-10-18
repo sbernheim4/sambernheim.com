@@ -1,3 +1,5 @@
+import { CycleableDate } from "../../forms/components";
+
 export const LandingPage = () => {
   return (
     <section className="landing">
@@ -17,11 +19,15 @@ export const LandingPage = () => {
             </a>
           </div>
         </div>
-        <div className="landing__mark" aria-hidden="true">
+        <div className="landing__mark">
           <span>
             Samuel
             <br />
             Bernheim
+          </span>
+          <span className="landing__established">
+            Working since{" "}
+            <CycleableDate className="landing__established-date" value="2018-06-04T00:00:00.000Z" />
           </span>
           <span className="landing__mark-line" />
         </div>

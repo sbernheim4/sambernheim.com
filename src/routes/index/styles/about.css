@@ -1,6 +1,6 @@
 .about {
-  color: #f3efe6;
-  background: #29483b;
+  color: var(--home-panel-text);
+  background: var(--home-panel);
 }
 
 .about__inner {
@@ -10,7 +10,7 @@
 }
 
 .about__label {
-  color: #c9a66b;
+  color: var(--home-accent);
 }
 
 .about__content {
@@ -30,7 +30,7 @@
 
 .about__content div {
   max-width: 420px;
-  color: #dce3d5;
+  color: var(--home-panel-muted);
   font-family: "Lato", sans-serif;
   font-size: 1.1rem;
   line-height: 1.6;

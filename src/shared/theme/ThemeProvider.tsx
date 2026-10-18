@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { useLocation } from "@tanstack/react-router";
 
 export type Theme = "light" | "dark";
 
@@ -11,32 +12,60 @@ type ThemeContextValue = {
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 const THEME_STORAGE_KEY = "sambernheim-theme";
 
-const getInitialTheme = (): Theme => {
+const getRouteDefault = (pathname: string): Theme => {
+  return pathname === "/" ? "dark" : pathname.startsWith("/blog") ? "light" : "dark";
+};
+
+const getInitialTheme = (pathname: string): Theme => {
   if (typeof window === "undefined") {
-    return "light";
+    return getRouteDefault(pathname);
   }
   const saved = window.localStorage.getItem(THEME_STORAGE_KEY);
-  return saved === "dark" ? "dark" : "light";
+  if (saved === "dark" || saved === "light") {
+    return saved;
+  }
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 };
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
-  const [theme, setTheme] = useState<Theme>(getInitialTheme);
+  const { pathname } = useLocation();
+  const [theme, setTheme] = useState<Theme>(() => getInitialTheme(pathname));
+  const [hasSavedTheme, setHasSavedTheme] = useState(() => {
+    if (typeof window === "undefined") return false;
+    const saved = window.localStorage.getItem(THEME_STORAGE_KEY);
+    return saved === "dark" || saved === "light";
+  });
+
+  const updateTheme = (nextTheme: Theme) => {
+    setHasSavedTheme(true);
+    setTheme(nextTheme);
+    window.localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+  };
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem(THEME_STORAGE_KEY, theme);
-    }
+    document.documentElement.dataset.theme = theme;
+    document.documentElement.style.colorScheme = theme;
   }, [theme]);
+
+  useEffect(() => {
+    if (hasSavedTheme) return;
+
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const updateFromSystem = (event: MediaQueryListEvent) => {
+      setTheme(event.matches ? "dark" : "light");
+    };
+
+    mediaQuery.addEventListener("change", updateFromSystem);
+    return () => mediaQuery.removeEventListener("change", updateFromSystem);
+  }, [hasSavedTheme]);
 
   return (
     <ThemeContext.Provider
       value={{
         theme,
-        setTheme,
+        setTheme: updateTheme,
         toggleTheme: () => {
-          setTheme((current) => {
-            return current === "light" ? "dark" : "light";
-          });
+          updateTheme(theme === "light" ? "dark" : "light");
         },
       }}
     >

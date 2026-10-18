@@ -1,11 +1,16 @@
 import type { ReactNode } from "react";
-import { createRootRoute, HeadContent, Outlet, Scripts } from "@tanstack/react-router";
+import { createRootRoute, HeadContent, Outlet, Scripts, useLocation } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { CycleableDateTimeProvider } from "../forms/components";
 import { GlobalQueryLoader } from "../shared/components/GlobalQueryLoader";
 import { TooltipProvider } from "../shared/components/ui/tooltip";
-import { CommandPalette, CommandPaletteProvider } from "../shared/commands/commands";
-import { ThemeProvider } from "../shared/theme/ThemeProvider";
+import {
+  CommandPalette,
+  CommandPaletteProvider,
+  useCommandAction,
+} from "../shared/commands/commands";
+import { ThemeProvider, useTheme } from "../shared/theme/ThemeProvider";
+import { SiteNavbar } from "../shared/components/SiteNavbar";
 import "../shared/commands/commands.css";
 
 import "../styles.css";
@@ -26,6 +31,8 @@ const RootComponent = () => {
             <TooltipProvider>
               <GlobalQueryLoader />
               <CommandPalette />
+              <ThemeCommandAction />
+              <SiteNavigation />
               <Outlet />
             </TooltipProvider>
           </CycleableDateTimeProvider>
@@ -33,6 +40,28 @@ const RootComponent = () => {
       </CommandPaletteProvider>
     </QueryClientProvider>
   );
+};
+
+const ThemeCommandAction = () => {
+  const { theme, toggleTheme } = useTheme();
+  const nextTheme = theme === "light" ? "dark" : "light";
+
+  useCommandAction({
+    id: "theme:toggle",
+    label: `Switch to ${nextTheme} mode`,
+    keywords: ["theme", "appearance", nextTheme],
+    group: "Actions",
+    execute: toggleTheme,
+  });
+
+  return null;
+};
+
+const SiteNavigation = () => {
+  const { pathname } = useLocation();
+  const showNavbar = pathname === "/" || pathname.startsWith("/blog");
+
+  return showNavbar ? <SiteNavbar /> : null;
 };
 
 const RootDocument = ({

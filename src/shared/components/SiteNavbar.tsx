@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "@tanstack/react-router";
-import { Search } from "lucide-react";
+import { Moon, Search, Sun } from "lucide-react";
 import { useCommandPalette } from "../commands/commands";
+import { useTheme } from "../theme/ThemeProvider";
 import { CommandExternalLink } from "./CommandExternalLink";
 import { CommandLink } from "./CommandLink";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
@@ -11,11 +12,13 @@ import "./styles/navbar.css";
 export const SiteNavbar = () => {
   const { pathname } = useLocation();
   const { toggle } = useCommandPalette();
+  const { theme, toggleTheme } = useTheme();
   const isApplePlatform =
     typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(navigator.platform);
   const commandShortcut = isApplePlatform ? "⌘ K" : "Ctrl K";
   const isArticle = pathname.startsWith("/blog/");
   const [progress, setProgress] = useState(0);
+  const nextTheme = theme === "light" ? "dark" : "light";
 
   useEffect(() => {
     if (!isArticle) {
@@ -39,6 +42,7 @@ export const SiteNavbar = () => {
   return (
     <nav
       className={`navbar${isArticle ? " navbar--article" : ""}${pathname === "/" ? " navbar--home" : ""}`}
+      data-theme={theme}
     >
       <CommandLink to="/" id="main">
         Home
@@ -75,6 +79,24 @@ export const SiteNavbar = () => {
             </button>
           </TooltipTrigger>
           <TooltipContent>Open command palette ({commandShortcut})</TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              className="navbar__theme-button"
+              type="button"
+              aria-label={`Switch to ${nextTheme} mode`}
+              aria-pressed={theme === "dark"}
+              onClick={toggleTheme}
+            >
+              {theme === "light" ? (
+                <Moon size={17} strokeWidth={2} aria-hidden="true" />
+              ) : (
+                <Sun size={17} strokeWidth={2} aria-hidden="true" />
+              )}
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>Switch to {nextTheme} mode</TooltipContent>
         </Tooltip>
       </div>
     </nav>
