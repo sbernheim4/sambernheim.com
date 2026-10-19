@@ -9,7 +9,7 @@ export const Shell = ({ children }: { children: ReactNode }) => {
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <main className="shell" data-theme={theme}>
+    <main className="shell">
       <nav className="nav">
         <Link to="/form-demo/tasks">Tasks</Link>
         <Link to="/form-demo/processes">Processes</Link>

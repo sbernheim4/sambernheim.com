@@ -2,17 +2,15 @@ import "./styles/route.css";
 import { createFileRoute } from "@tanstack/react-router";
 import { CommandLink as Link } from "../../shared/components/CommandLink";
 import { findSitePost } from "../../articles";
-import { ArticleLayout } from "./components/ArticleLayout";
-import { useTheme } from "../../shared/theme/ThemeProvider";
+import { ArticleLayout } from "../../pages/blog/components/ArticleLayout";
 
 const BlogPost = () => {
-  const { theme } = useTheme();
   const { slug } = Route.useParams();
   const post = findSitePost(slug);
   if (!post) {
     return (
       <>
-        <main className="article" data-theme={theme}>
+        <main className="article">
           <h1>404 - Article not found</h1>
           <Link to="/blog">Back to Blog</Link>
         </main>
@@ -22,7 +20,7 @@ const BlogPost = () => {
   const Article = post.Component;
   return (
     <>
-      <main className="article" data-theme={theme}>
+      <main className="article">
         <ArticleLayout title={post.title} publishedAt={post.publishedAt}>
           <Article />
         </ArticleLayout>

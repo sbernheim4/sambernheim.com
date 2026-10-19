@@ -4,17 +4,15 @@ import { CommandLink as Link } from "../../shared/components/CommandLink";
 import { sitePosts } from "../../articles";
 import { CycleableDate } from "../../forms/components";
 import { parseDateOnly } from "../../shared/date";
-import { useTheme } from "../../shared/theme/ThemeProvider";
 
 const BlogIndex = () => {
-  const { theme } = useTheme();
   const postsByDate = [...sitePosts].sort((a, b) => {
     return Date.parse(b.publishedAt) - Date.parse(a.publishedAt);
   });
 
   return (
     <>
-      <main className="blog" data-theme={theme}>
+      <main className="blog">
         <div className="article-container">
           {postsByDate.map((post) => {
             return (
