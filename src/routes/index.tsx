@@ -18,7 +18,6 @@ const Home = () => {
 };
 
 export const Route = createFileRoute("/")({
-  ssr: false,
   head: () => {
     return {
       meta: [{ title: "Samuel Bernheim" }],
