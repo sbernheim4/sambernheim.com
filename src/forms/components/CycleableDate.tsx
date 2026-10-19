@@ -1,9 +1,45 @@
-import { differenceInYears, format, isValid } from "date-fns";
+import {
+  differenceInCalendarDays,
+  differenceInMonths,
+  differenceInYears,
+  format,
+  isValid,
+} from "date-fns";
+import { useEffect, useState } from "react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../../shared/components/ui/tooltip";
 import { useCycleableDateTimeMode } from "./CycleableDateTime";
 import "./CycleableDate.css";
 
 const dateOnlyPattern = /^(\d{4})-(\d{2})-(\d{2})$/;
+
+const formatRelativeDate = (date: Date) => {
+  const now = new Date();
+  const days = differenceInCalendarDays(now, date);
+
+  if (days === 0) return "Today";
+  if (days === 1) return "Yesterday";
+  if (days === -1) return "Tomorrow";
+  if (days > 1 && days < 30) return `${days} days ago`;
+  if (days < -1 && days > -30) return `in ${Math.abs(days)} days`;
+
+  const months = differenceInMonths(now, date);
+  if (months >= 1 && months < 12) {
+    return `${months} ${months === 1 ? "month" : "months"} ago`;
+  }
+  if (months <= -1 && months > -12) {
+    const absoluteMonths = Math.abs(months);
+    return `in ${absoluteMonths} ${absoluteMonths === 1 ? "month" : "months"}`;
+  }
+
+  const years = differenceInYears(now, date);
+  if (years >= 1) return `${years} ${years === 1 ? "year" : "years"} ago`;
+  if (years <= -1) {
+    const absoluteYears = Math.abs(years);
+    return `in ${absoluteYears} ${absoluteYears === 1 ? "year" : "years"}`;
+  }
+
+  return `${days} days ago`;
+};
 
 const parseDate = (value: Date | number | string) => {
   if (typeof value === "string") {
@@ -24,6 +60,7 @@ export const CycleableDate = ({
   className?: string;
 }) => {
   const { mode, setMode } = useCycleableDateTimeMode();
+  const [, refresh] = useState(0);
   const relative = mode === "relative";
   const date = parseDate(value);
   const valid = isValid(date);
@@ -32,12 +69,17 @@ export const CycleableDate = ({
       ? value
       : date.toISOString()
     : undefined;
-  const years = valid ? differenceInYears(new Date(), date) : 0;
-  const text = !valid
-    ? "Invalid date"
-    : relative
-      ? `${years} ${years === 1 ? "year" : "years"} ago`
-      : format(date, "PP");
+
+  useEffect(() => {
+    if (!relative) return;
+
+    const timer = setInterval(() => {
+      refresh((current) => current + 1);
+    }, 60_000);
+    return () => clearInterval(timer);
+  }, [relative]);
+
+  const text = !valid ? "Invalid date" : relative ? formatRelativeDate(date) : format(date, "PP");
   const formatLabel = relative ? "Relative" : "Date";
 
   return (
