@@ -20,7 +20,7 @@
   --code-operator: #383a42;
 }
 
-.article[data-theme="dark"] {
+[data-theme="dark"] .article {
   --code-background: #282c34;
   --code-text: #abb2bf;
   --code-comment: #5c6370;

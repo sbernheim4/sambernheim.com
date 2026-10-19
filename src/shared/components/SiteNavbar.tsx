@@ -42,7 +42,6 @@ export const SiteNavbar = () => {
   return (
     <nav
       className={`navbar${isArticle ? " navbar--article" : ""}${pathname === "/" ? " navbar--home" : ""}`}
-      data-theme={theme}
     >
       <CommandLink to="/" id="main">
         Home

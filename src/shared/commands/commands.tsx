@@ -11,7 +11,6 @@ import {
   useSyncExternalStore,
   type ReactNode,
 } from "react";
-import { useOptionalTheme } from "../theme/ThemeProvider";
 
 export type CommandAction = {
   id: string;
@@ -190,7 +189,6 @@ const scoreAction = (action: CommandAction, query: string) => {
 };
 
 export const CommandPalette = () => {
-  const theme = useOptionalTheme()?.theme ?? "light";
   const { open, toggle, close } = useCommandPalette();
   const actions = useCommandActions();
   const [query, setQuery] = useState("");
@@ -254,12 +252,7 @@ export const CommandPalette = () => {
   };
 
   return (
-    <div
-      className="command-palette-backdrop"
-      data-theme={theme}
-      role="presentation"
-      onMouseDown={close}
-    >
+    <div className="command-palette-backdrop" role="presentation" onMouseDown={close}>
       <section
         className="command-palette"
         role="dialog"

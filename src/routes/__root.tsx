@@ -79,12 +79,36 @@ const RootDocument = ({
     <html lang="en">
       <head>
         <HeadContent />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(() => {
+              try {
+                const saved = localStorage.getItem("sambernheim-theme");
+                const theme = saved === "dark" || saved === "light"
+                  ? saved
+                  : matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+                document.documentElement.dataset.theme = theme;
+                document.documentElement.style.colorScheme = theme;
+              } catch {}
+            })();`,
+          }}
+        />
       </head>
       <body>
         {children}
         <Scripts />
       </body>
     </html>
+  );
+};
+
+const NotFound = () => {
+  return (
+    <main>
+      <h1>Page not found</h1>
+      <p>The page you requested doesn’t exist.</p>
+      <a href="/">Return home</a>
+    </main>
   );
 };
 
@@ -111,4 +135,5 @@ export const Route = createRootRoute({
   },
   shellComponent: RootDocument,
   component: RootComponent,
+  notFoundComponent: NotFound,
 });
