@@ -42,6 +42,17 @@ export const ViewModePicker = ({
       <CommandButton
         className="view-mode-option"
         type="button"
+        aria-pressed={mode === "sidebar"}
+        data-selected={mode === "sidebar"}
+        onClick={() => {
+          onChange("sidebar");
+        }}
+      >
+        Sidebar
+      </CommandButton>
+      <CommandButton
+        className="view-mode-option"
+        type="button"
         aria-pressed={mode === "tabs"}
         data-selected={mode === "tabs"}
         onClick={() => {
@@ -60,17 +71,6 @@ export const ViewModePicker = ({
         }}
       >
         Full page
-      </CommandButton>
-      <CommandButton
-        className="view-mode-option"
-        type="button"
-        aria-pressed={mode === "sidebar"}
-        data-selected={mode === "sidebar"}
-        onClick={() => {
-          onChange("sidebar");
-        }}
-      >
-        Sidebar
       </CommandButton>
     </div>
   );
