@@ -26,7 +26,9 @@ My professional workflow involves Jira, Asana, GitHub, and a few other enterpris
 
 Some higher-level primitives I've found are CLIs. They allow me, and more importantly AI, to interact with each of these systems. But I've found most CLIs to be both, paradoxically, too powerful and too complex.
 
-I use the open-source Jira CLI tool. This tool does everything I need, and I can toss it to Claude or Codex to manage my tickets. But sometimes I want to do what needs to be done quickly and easily. I may need to assign a bunch of tickets to myself, add a label, move them from `'To Do'` to `'In Progress'`, and throw in a comment or two. Remembering all the commands, flags, ticket numbers, and everything else is a feat I have no interest in mastering. I don't have it in me, nor do I want to.
+Just as an API can have hundreds of endpoints, so too can a CLI have hundreds of commands... 👀 `kubectl` in particular comes to mind.
+
+I use the open-source [Jira CLI](https://github.com/ankitpokhrel/jira-cli). This tool does everything I need, and I can toss it to Claude or Codex to manage my tickets. But sometimes I want to do what needs to be done quickly and easily. I may need to assign a bunch of tickets to myself, add a label, move them from `'To Do'` to `'In Progress'`, and throw in a comment or two. Remembering all the commands, flags, ticket numbers, and everything else is a feat I have no interest in mastering. I don't have it in me, nor do I want to.
 
 I need a higher level primitive.
 
@@ -34,11 +36,7 @@ The higher-level primitive I want is not simply a CLI or a TUI, or a web app. It
 
 A CLI is a great start because it provides a programmatic interface into the system. An API does the same. Both get us the data we need to process and render how we want.
 
-Just as an API can have hundreds of endpoints, so too can a CLI have hundreds of commands... 👀 `kubectl` in particular comes to mind.
-
 What I want instead is some sort of UI with the speed and precision of a CLI, but with enough visual support to understand the actions I can take and the entities against which I can take them.
-
-What I want is a TUI!
 
 ## TUIs
 
@@ -46,13 +44,13 @@ My background is as a frontend developer. Frontend is fascinating. We interact w
 
 Frontend is more than web apps. It's more than mobile apps. Frontend is also the CLI and the TUI. On the web, a frontend engineer's best friend is React. At its core, React is a rendering system with scheduling capabilities: when state changes, React determines what parts of the UI have changed and schedules them to re-render.
 
-React is great for a number of reasons. It provides a phenomenal developer experience. React and its toolchain provide hot module reloading, great developer tools for introspection, testing tools, an ecosystem of exceptional dependencies, and everything else that comes with a great language and runtime. And all for, if not free, an extremely low cost.
+React is great. It, and the web platform, provide a phenomenal developer experience: hot module reloading, great developer tools for introspection, testing frameworks, an ecosystem of exceptional dependencies, and everything else that comes with a great language and runtime. And all for, if not free, an extremely low cost.
 
-Wouldn't it be cool to update a TUI's codebase and see the live instance display the change immediately and automatically? It would feel surreal until it became expected.
+Wouldn't it be cool to update a TUI's codebase and see the running instance display the change immediately and automatically? It would feel surreal until it became expected.
 
-React is not just for the web, these capabilities are generic.
+React, and generally TypeScript is not just for browser, these capabilities are generic. TypeScript can run everywhere.
 
-TUIs are also frontend. If we wanted to use React and a 'web' stack to build them we would need a good component library to compose rich and performant user interfaces... enter [Ink](https://github.com/vadimdemedes/ink)! Ink is a React component library for terminal environments. It's a TUI component library!
+TUIs are also frontend. If we wanted to use React to build them we would need a good component library to compose rich and performant user interfaces... enter [Ink](https://github.com/vadimdemedes/ink)! Ink is a React component library for terminal environments. It's a TUI component library!
 
 Another lesson learned from web apps is the importance of storing server state separately from client state. We also want metadata about our server state and a way to track the progress of actions against it. Luckily, the frontend ecosystem gave us [TanStack Query](https://tanstack.com/query/latest), and all our work became easier.
 
