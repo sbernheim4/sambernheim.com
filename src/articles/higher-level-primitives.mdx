@@ -1,0 +1,70 @@
+# Higher Level Primitives
+
+Primitives are an interesting concept.
+
+In our software languages we have char, int, float, boolean. Perhaps some others I'm forgetting but this misses the point.
+
+We take these primitives and we compose them together into structs. We take those structs and compose them again with each other. We take statements and compose them into functions and we take functions and compose them into systems.
+
+Each of these layer is itself a primitive. And I need higher level ones.
+
+Primitives are more than just the lowest level representation of data. Each layer of software we build itself becomes a primitive.
+
+My workflow professionally involves JIRA, Aasana, github, and a few other enterprise tools with which we are all too familiar.
+
+## CLIs
+
+I've found great CLIs that allow me, and more importantly AI, to interact with each of these systems but I've found most both, paradoxically, too powerful and too complex.
+
+I use the open source JIRA CLI tool. This tool can do everything I need to and I can feed it to claude or codex to manage my tickets but sometimes I want to be able to just do what needs to be done quickly and easily. I need to assign a bunch of tickets to myself or add a label, move them from To Do to In Progress or toss in a comment. Remembering all the commands, flags, arguments, and everything else is a feat. I don't have it in me. I don't want to memorize this.
+
+I need a higher level primitive:
+
+A CLI is a great start because it provides a programmatic interface into the system. An API does the same. Both serve the same purpose but for different interfaces though they could on the system's backend of course both leverage the same underlying functions and implementations.
+
+Just as an API can have hundreds of endpoints, so too can a CLI have hundreds of commands... 👀 kubectl.
+
+What I want instead is some sort of UI with the speed and precision of a CLI but with a bit more visual support to understand the actions I can take and the entities against them I can take.
+
+I want a TUI!
+
+## TUIs
+
+My background is as a front end developer. Frontend is fascinating. We interact with the same sort of problems as other software domains but on a smaller scale. Principly though the problems are the same: Race conditions, managing concurrency, coordinating state updates, cache invalidation, performance etc.
+
+Front end though is more than web apps. It's more than mobile apps. Frontend is also the CLI. It is the TUI. But for web, a frontend engineer's best friend is React. And really at its core React is a rendering scheduler for a state management system: state changes, React determines what parts of the UI have changed, and updates those parts them to reflect the new state.
+
+React is not just for the web, it is for any user interface. TUI's are a user interface too. We just need a good component library to build rich and performant user interfaces. Something like [ ink ]( https://github.com/vadimdemedes/ink ). Ink is a component library for React applications rendered in the terminal. Its a TUI component library.
+
+With JIRA we have some actions we want to support. We want to be able to view our boards, list issues in an epic, see the tickets assigned to us this sprint and their status, add a label to a set of tickets that `'Need refinement'` and move another batch of tickets from `'In Progress'` to `'Complete'`
+
+To do this all we need some tools to retreive and store the data we want to display and to make updates and keep track of the status of those operations. Luckily the frontend ecosystem received [TanstackQuery](https://tanstack.com/query/latest) and all our work became easier.
+
+These are a nice set of primitives to build with. We've got React, Ink, TanstackQuery, and JIRA.
+
+What is even more wonderful about these primitives is the developer experience built in. I can have HMR, developer tools, a test framework, a library ecosystem and everything else that comes with a language and runtime. And all for if not free, extremely low cost. Changing the code and seeing the TUI update immediately and automatically just as a web app would is slightly surreal, until it becomes expected.
+
+JIRA can be our API: it retrieves all the data we need asyncrhonously and lets us take actions against our entities. That data can be cached in TanstackQuery and made globally available across our application. We have React to handle rendering our UI and Ink to provide components to build the UI of our TUI.
+
+These are great primitives but they are still not the primitives I want.
+
+## JIRA TUI
+
+I want a JIRA TUI. So we can take the JIRA cli tool, create some typescript functions to progrmattically invoke it, capture the reponse, which is kindly made available as JSON, chuck the JSON into our TanstackQuery cache, compose Ink components for our UI, manage state with React, and build a fully fledged TUI with almost the exact same techonologies as a web app.
+
+We can also leverage the environment and delegate functions to other CLI tools IE FZF for fuzzy finding and selecting an option or set of options from a menu.
+
+Selecting the JIRA board, filtering the tickets to those assigned to me, selecting a few and moving them from `'To Do'` to `'In Progress'` is now an extremely easy action for me to take. I don't have to remember any complex CLI commands, nor do I have to remember a bunch of ticket numbers. I can print both on the screen.
+
+Finally I have the primitive I want. A UI that makes it easy and efficient to execute some action against an arbitrary batch of entities. It is the efficency of the tool that is critical to making this faster for me to do than it would take to ask AI. It feels good.
+
+Of course, I can have AI help me build this tool, and I did.
+
+## Wrapping Up
+I think this gets at what most users want from most of their tools: the ability to execute an action against one or more entities at a time quickly and easily in a system that makes this process repeatable and predictable.
+
+I don't want to have to delete every email individually. I want to select a bunch, and then hit delete! The interfaces we build for the web, for our phones, for our CLIs and for our TUIs are more flexible and more powerful when they incorporate these princples.
+
+So finally we have arrived at the primitive I want. Its a very high level one, built on many smaller primitives where each is composed with another at the same level. Because, really, what is an int but a composition of a handful of bits.
+
+My advice is not to turn everything into a TUI. Not every application is at its best in a TUI. Sometimes we want a mix of a CLI, TUI, web app for different purposes. Each is useful in varying situations. What I extract from this is the important on performance, efficency, and repeatabilty of the tools we help create. We can build phenomenal, powerful, primitives, more easily than ever. Lets make sure we make them for us Humans to use too, even if we build them with AI.
