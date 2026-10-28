@@ -19,6 +19,9 @@ import EngineersSchrodingersCat, {
   meta as engineersSchrodingersCatMeta,
 } from "./articles/the-engineers-schrodingers-cat.mdx";
 import UxDesignPatterns, { meta as uxDesignPatternsMeta } from "./articles/ux-design-patterns.mdx";
+import HigherLevelPrimitives, {
+  meta as higherLevelPrimitivesMeta,
+} from "./articles/higher-level-primitives.mdx";
 
 export type SitePost = {
   slug: string;
@@ -68,6 +71,10 @@ export const sitePosts: readonly SitePost[] = [
   {
     ...uxDesignPatternsMeta.meta,
     Component: UxDesignPatterns,
+  },
+  {
+    ...higherLevelPrimitivesMeta.meta,
+    Component: HigherLevelPrimitives,
   },
 ];
 
