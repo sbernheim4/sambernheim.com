@@ -1,13 +1,13 @@
 import { useState } from "react";
 import type { DetailTab } from "./DetailTabs";
 import { DetailTabs } from "./DetailTabs";
-import { FullPageSection } from "./FullPageSection";
+import { DetailSection } from "./DetailSection";
 import { ViewModePicker, useViewModePreference } from "./ViewModePreference";
 import "./DetailView.css";
 
 const setSectionsOpen = (event: React.MouseEvent<HTMLButtonElement>, open: boolean) => {
   const container = event.currentTarget.closest(".detail-view");
-  container?.querySelectorAll<HTMLDetailsElement>(".detail-page-section").forEach((section) => {
+  container?.querySelectorAll<HTMLDetailsElement>(".detail-section--collapsible").forEach((section) => {
     section.open = open;
   });
 };
@@ -35,9 +35,9 @@ export const DetailView = ({ tabs }: { tabs: readonly DetailTab[] }) => {
             </button>
           </div>
           {tabs.map((tab) => (
-            <FullPageSection className="detail-page-section" key={tab.value} label={tab.label}>
+            <DetailSection key={tab.value} label={tab.label} collapsible>
               {tab.children}
-            </FullPageSection>
+            </DetailSection>
           ))}
         </div>
       ) : (
@@ -62,12 +62,9 @@ export const DetailView = ({ tabs }: { tabs: readonly DetailTab[] }) => {
           <div className="detail-sidebar-content">
             {tabs.map((tab) => {
               return (
-                <section className="detail-page-section" id={tab.value} key={tab.value}>
-                  <div className="detail-page-section-heading">
-                    <span className="eyebrow">{tab.label}</span>
-                  </div>
-                  {tab.children}
-                </section>
+                <div id={tab.value} key={tab.value}>
+                  <DetailSection label={tab.label}>{tab.children}</DetailSection>
+                </div>
               );
             })}
           </div>
