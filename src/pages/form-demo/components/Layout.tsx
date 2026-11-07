@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Moon, Sun } from "lucide-react";
 import { CommandLink as Link } from "@/features";
 import { FormEditor } from "@/features";
 import { CommandButton } from "@/features";
@@ -11,17 +12,26 @@ export const Shell = ({ children }: { children: ReactNode }) => {
   return (
     <main className="shell">
       <nav className="nav">
-        <Link to="/form-demo/tasks">Tasks</Link>
-        <Link to="/form-demo/processes">Processes</Link>
-        <Link to="/form-demo/threads">Threads</Link>
-        <CommandButton
-          className="theme-switcher"
-          aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
-          aria-pressed={theme === "dark"}
-          onClick={toggleTheme}
-        >
-          {theme === "light" ? "Dark mode" : "Light mode"}
-        </CommandButton>
+        <div className="nav-links">
+          <Link to="/form-demo/tasks">Tasks</Link>
+          <Link to="/form-demo/processes">Processes</Link>
+          <Link to="/form-demo/threads">Threads</Link>
+        </div>
+        <div className="nav-footer">
+          <CommandButton
+            className="theme-switcher"
+            aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
+            aria-pressed={theme === "dark"}
+            onClick={toggleTheme}
+          >
+            {theme === "light" ? (
+              <Moon size={16} strokeWidth={2} aria-hidden="true" />
+            ) : (
+              <Sun size={16} strokeWidth={2} aria-hidden="true" />
+            )}
+            <span>{theme === "light" ? "Dark mode" : "Light mode"}</span>
+          </CommandButton>
+        </div>
       </nav>
       <section className="main">{children}</section>
     </main>
