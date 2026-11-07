@@ -41,6 +41,10 @@
 
 .detail-page-section {
   min-width: 0;
+  padding: 24px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-surface);
 }
 
 .detail-sidebar-view {
@@ -79,7 +83,7 @@
 
 .detail-sidebar-content {
   display: grid;
-  gap: 28px;
+  gap: 16px;
 }
 
 @media (max-width: 520px) {
@@ -90,6 +94,10 @@
 
   .detail-sidebar-view {
     grid-template-columns: 1fr;
+  }
+
+  .detail-page-section {
+    padding: 18px;
   }
 
   .detail-sidebar-nav {

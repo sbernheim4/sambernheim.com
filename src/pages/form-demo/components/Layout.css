@@ -91,6 +91,15 @@
   font-size: clamp(28px, 4vw, 42px);
 }
 
+.heading-copy {
+  display: grid;
+  gap: 6px;
+}
+
+.detail-heading {
+  margin-bottom: 24px;
+}
+
 .heading .primary-action {
   width: auto;
   min-width: 84px;
@@ -173,6 +182,7 @@
 
 .detail-properties {
   display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
   margin: 0;
 }
@@ -250,6 +260,26 @@
   text-transform: capitalize;
 }
 
+.status-pill[data-status="running"] {
+  border-color: color-mix(in srgb, var(--color-success) 35%, var(--color-border));
+  background: var(--color-success-surface);
+  color: var(--color-success);
+}
+
+.status-pill[data-status="failed"],
+.status-pill[data-status="blocked"] {
+  border-color: color-mix(in srgb, var(--color-danger) 35%, var(--color-border));
+  background: var(--color-danger-surface);
+  color: var(--color-danger);
+}
+
+.status-pill[data-status="completed"],
+.status-pill[data-status="finished"] {
+  border-color: color-mix(in srgb, var(--color-primary) 35%, var(--color-border));
+  background: var(--color-surface-muted);
+  color: var(--color-primary);
+}
+
 .fields {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -299,6 +329,10 @@
   }
 
   .summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-properties {
     grid-template-columns: 1fr;
   }
 

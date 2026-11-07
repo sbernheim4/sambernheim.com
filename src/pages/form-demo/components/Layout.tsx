@@ -49,8 +49,11 @@ export const DetailLayout = ({
 }) => {
   return (
     <>
-      <div className="heading">
-        <h1>{title}</h1>
+      <div className="heading detail-heading">
+        <div className="heading-copy">
+          <span className="eyebrow">Workspace record</span>
+          <h1>{title}</h1>
+        </div>
         <Link className="primary-action" to={editTo}>
           Edit
         </Link>
@@ -62,7 +65,7 @@ export const DetailLayout = ({
 };
 
 export const Status = ({ value }: { value: string }) => {
-  return <span className="status-pill">{value}</span>;
+  return <span className="status-pill" data-status={value}>{value}</span>;
 };
 
 export const Loading = () => {
