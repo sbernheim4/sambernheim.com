@@ -1,8 +1,7 @@
-import "./styles/route.css";
 import { createFileRoute } from "@tanstack/react-router";
 import { CommandLink as Link } from "@/features";
 import { findSitePost } from "../../articles";
-import { ArticleLayout } from "@features/Site/components/web/blog/ArticleLayout";
+import { ArticleLayout } from "@features/Site/components/web/ArticleLayout/ArticleLayout";
 
 const BlogPost = () => {
   const { slug } = Route.useParams();

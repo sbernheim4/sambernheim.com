@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ProcessCreatePage } from "@features/Processes/components/web/ProcessPages";
+import { ProcessCreatePage } from "@features/Processes/components/ProcessForms.web";
 
 const ProcessCreateRoute = () => {
   const { tab } = Route.useSearch();

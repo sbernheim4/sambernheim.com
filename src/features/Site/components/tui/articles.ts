@@ -133,7 +133,9 @@ function formatMarkdown(markdown: string, title: string, columns: number) {
       .flatMap((line) => {
         return wrapAnsi(line, width, { hard: true, trim: false })
           .split("\n")
-          .map((part) => `${left}${part}${" ".repeat(Math.max(0, width - visible(part)))}`);
+          .map((part) => {
+            return `${left}${part}${" ".repeat(Math.max(0, width - visible(part)))}`;
+          });
       })
       .join("\n") + "\n"
   );

@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ThreadCreatePage } from "@features/Threads/components/web/ThreadPages";
+import { ThreadCreatePage } from "@features/Threads/components/ThreadForms.web";
 
 const ThreadCreateRoute = () => {
   const { tab } = Route.useSearch();

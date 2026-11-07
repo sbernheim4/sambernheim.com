@@ -12,18 +12,20 @@ export function EntityTable({ data }: { data: EntityTableRecord[] }) {
           {table.getHeaderGroups().map((group) => {
             return (
               <tr key={group.id}>
-                {group.headers.map((header) => (
-                  <th key={header.id}>
-                    {header.isPlaceholder ? null : (
-                      <button
-                        className="entity-table-sort"
-                        onClick={header.column.getToggleSortingHandler()}
-                      >
-                        {flexRender(header.column.columnDef.header, header.getContext())}
-                      </button>
-                    )}
-                  </th>
-                ))}
+                {group.headers.map((header) => {
+                  return (
+                    <th key={header.id}>
+                      {header.isPlaceholder ? null : (
+                        <button
+                          className="entity-table-sort"
+                          onClick={header.column.getToggleSortingHandler()}
+                        >
+                          {flexRender(header.column.columnDef.header, header.getContext())}
+                        </button>
+                      )}
+                    </th>
+                  );
+                })}
               </tr>
             );
           })}

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ProcessListPage } from "@features/Processes/components/web/ProcessPages";
+import { ProcessList } from "@features/Processes/components/ProcessList";
 
 export const Route = createFileRoute("/form-demo/processes/")({
-  component: ProcessListPage,
+  component: ProcessList,
 });

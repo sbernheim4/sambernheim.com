@@ -1,0 +1,54 @@
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
+import { Text, useInput } from "ink";
+import { useTuiWorkspaceNavigation } from "./Navigation";
+
+type Registry = {
+  register: (href: string) => void;
+  unregister: (href: string) => void;
+  selected?: string;
+};
+const RegistryContext = createContext<Registry | null>(null);
+export const LinkNavigation = ({ children }: { children: ReactNode }) => {
+  const navigate = useTuiWorkspaceNavigation();
+  const [paths, setPaths] = useState<string[]>([]);
+  const [selected, setSelected] = useState(0);
+  const register = useCallback((href: string) => {
+    setPaths((current) => (current.includes(href) ? current : [...current, href]));
+  }, []);
+  const unregister = useCallback((href: string) => {
+    setPaths((current) => current.filter((path) => path !== href));
+  }, []);
+  const registry = useMemo(
+    () => ({ register, unregister, selected: paths[selected] }),
+    [register, unregister, paths, selected],
+  );
+  useInput((input, key) => {
+    if (key.upArrow || input === "k") setSelected((value) => Math.max(0, value - 1));
+    else if (key.downArrow || input === "j")
+      setSelected((value) => Math.min(paths.length - 1, value + 1));
+    else if (key.return && paths[selected]) navigate(paths[selected]);
+  });
+  return <RegistryContext.Provider value={registry}>{children}</RegistryContext.Provider>;
+};
+export const Link = ({ href, children }: { href: string; children: ReactNode }) => {
+  const registry = useContext(RegistryContext);
+  useEffect(() => {
+    registry?.register(href);
+    return () => {
+      registry?.unregister(href);
+    };
+  }, [href, registry?.register, registry?.unregister]);
+  return (
+    <Text color="cyan" inverse={registry?.selected === href}>
+      {children}
+    </Text>
+  );
+};

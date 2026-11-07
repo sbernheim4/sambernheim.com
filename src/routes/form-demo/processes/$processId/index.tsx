@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ProcessDetailPage } from "@features/Processes/components/web/ProcessPages";
+import { ProcessDetail } from "@features/Processes/components/ProcessDetail";
 
 export const Route = createFileRoute("/form-demo/processes/$processId/")({
   component: () => {
-    return <ProcessDetailPage id={Route.useParams().processId} />;
+    return <ProcessDetail id={Route.useParams().processId} />;
   },
 });

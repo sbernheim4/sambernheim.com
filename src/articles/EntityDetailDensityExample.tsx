@@ -1,5 +1,5 @@
 import { CycleableDate, CycleableDateTime } from "@/features";
-import { DetailView } from "../features/Workspace/components/web/DetailView";
+import { DetailView } from "../features/Workspace/components/web/DetailView/DetailView";
 import "./EntityDetailDensityExample.css";
 
 export const EntityDetailDensityExample = () => {

@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { TaskEditPage } from "@features/Tasks/components/web/TaskPages";
+import { TaskEditPage } from "@features/Tasks/components/TaskForms.web";
 
 const TaskEditRoute = () => {
   const { taskId } = Route.useParams();

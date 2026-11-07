@@ -15,7 +15,7 @@ export * from "./Processes/components/ProcessFields";
 export * from "./Processes/hooks/useProcessCreateForms";
 export * from "./Processes/hooks/useProcessEditForms";
 export * from "./Processes/hooks/useProcesses";
-export * from "./Site/components/SiteNavbar";
+export * from "./Site/components/web/SiteNavbar/SiteNavbar";
 export * from "./Tasks/api";
 export * from "./Tasks/model";
 export * from "./Tasks/components/TaskFields";

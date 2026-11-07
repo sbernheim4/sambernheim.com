@@ -1,46 +1,26 @@
-import "./styles/route.css";
 import { createFileRoute } from "@tanstack/react-router";
-import { CommandLink as Link } from "@/features";
 import { sitePosts } from "../../articles";
-import { CycleableDate } from "@/features";
-import { parseDateOnly } from "@/utils";
+import { BlogList, BlogListViewContext } from "@features/Site/components/BlogList";
+import { WebBlogList } from "@features/Site/components/web/BlogList/BlogList";
 
 const BlogIndex = () => {
-  const postsByDate = [...sitePosts].sort((a, b) => {
-    return Date.parse(b.publishedAt) - Date.parse(a.publishedAt);
-  });
-
+  const articles = [...sitePosts]
+    .sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt))
+    .map((post) => ({
+      id: post.slug,
+      title: post.title,
+      description: post.description,
+      href: `/blog/${post.slug}`,
+      publishedAt: post.publishedAt,
+    }));
   return (
-    <>
-      <main className="blog">
-        <div className="article-container">
-          {postsByDate.map((post) => {
-            return (
-              <div className="article-item" key={post.slug}>
-                <Link
-                  className="article-item-content"
-                  aria-label={post.title}
-                  to="/blog/$slug"
-                  params={{ slug: post.slug }}
-                >
-                  <h2>{post.title}</h2>
-                  <p>{post.description}</p>
-                </Link>
-                <CycleableDate value={parseDateOnly(post.publishedAt)} className="article-date" />
-              </div>
-            );
-          })}
-        </div>
-      </main>
-    </>
+    <BlogListViewContext.Provider value={WebBlogList}>
+      <BlogList articles={articles} />
+    </BlogListViewContext.Provider>
   );
 };
 
 export const Route = createFileRoute("/blog/")({
-  head: () => {
-    return {
-      meta: [{ title: "Blog | Samuel Bernheim" }],
-    };
-  },
+  head: () => ({ meta: [{ title: "Blog | Samuel Bernheim" }] }),
   component: BlogIndex,
 });

@@ -1,11 +1,15 @@
 import { Outlet, createFileRoute } from "@tanstack/react-router";
-import { Shell } from "../../pages/form-demo/components/Layout";
+import { Shell } from "@features/Workspace/components/web/Layout/Layout";
+import { WorkspaceRendererContext } from "@features/Workspace/components/renderer";
+import { webWorkspaceRenderer } from "@features/Workspace/components/web/renderer";
 
 const FormDemoLayout = () => {
   return (
-    <Shell>
-      <Outlet />
-    </Shell>
+    <WorkspaceRendererContext.Provider value={webWorkspaceRenderer}>
+      <Shell>
+        <Outlet />
+      </Shell>
+    </WorkspaceRendererContext.Provider>
   );
 };
 
