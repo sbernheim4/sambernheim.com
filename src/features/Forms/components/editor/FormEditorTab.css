@@ -1,5 +1,14 @@
 .form-editor-page-section {
   min-width: 0;
+  margin-block: 0;
+}
+
+.form-editor-page-section:first-of-type {
+  margin-top: 12px;
+}
+
+.form-editor-page-section:last-of-type {
+  margin-bottom: 12px;
 }
 
 .form-editor-page-controls {
