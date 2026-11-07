@@ -15,6 +15,7 @@ import { DetailView } from "../form-demo/components/DetailView";
 import { ViewModePicker, useViewModePreference } from "../form-demo/components/ViewModePreference";
 import { CycleableDateTime } from "@/features";
 import { parseUtcDate } from "@/utils";
+import { EntityTable } from "../form-demo/components/EntityTable";
 export const ProcessListPage = () => {
   const query = useProcesses();
 
@@ -29,22 +30,7 @@ export const ProcessListPage = () => {
       {query.isPending ? (
         <p>Loading...</p>
       ) : (
-        <div className="list">
-          {query.data?.map((process) => {
-            return (
-              <Link
-                key={process.id}
-                className="card"
-                to="/form-demo/processes/$processId"
-                params={{ processId: process.id }}
-              >
-                <strong>{process.name}</strong>
-                <Status value={process.status} />
-                <span>{process.command}</span>
-              </Link>
-            );
-          })}
-        </div>
+        <EntityTable data={(query.data ?? []).map((process) => ({ id: process.id, name: process.name, status: process.status, summary: process.command, href: `/form-demo/processes/${process.id}` }))} />
       )}
     </>
   );

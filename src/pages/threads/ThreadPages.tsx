@@ -15,6 +15,7 @@ import { ViewModePicker, useViewModePreference } from "../form-demo/components/V
 import { Number as FormattedNumber } from "@/features";
 import { CycleableDateTime } from "@/features";
 import { parseUtcDate } from "@/utils";
+import { EntityTable } from "../form-demo/components/EntityTable";
 export const ThreadListPage = () => {
   const query = useThreads();
 
@@ -29,22 +30,7 @@ export const ThreadListPage = () => {
       {query.isPending ? (
         <p>Loading...</p>
       ) : (
-        <div className="list">
-          {query.data?.map((thread) => {
-            return (
-              <Link
-                key={thread.id}
-                className="card"
-                to="/form-demo/threads/$threadId"
-                params={{ threadId: thread.id }}
-              >
-                <strong>{thread.name}</strong>
-                <Status value={thread.status} />
-                <span>{thread.entryPoint}</span>
-              </Link>
-            );
-          })}
-        </div>
+        <EntityTable data={(query.data ?? []).map((thread) => ({ id: thread.id, name: thread.name, status: thread.status, summary: thread.entryPoint, href: `/form-demo/threads/${thread.id}` }))} />
       )}
     </>
   );

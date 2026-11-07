@@ -15,6 +15,7 @@ import { ViewModePicker, useViewModePreference } from "../form-demo/components/V
 import { Number as FormattedNumber } from "@/features";
 import { CycleableDateTime } from "@/features";
 import { parseUtcDate } from "@/utils";
+import { EntityTable } from "../form-demo/components/EntityTable";
 export const TaskListPage = () => {
   const query = useTasks();
 
@@ -29,22 +30,7 @@ export const TaskListPage = () => {
       {query.isPending ? (
         <p>Loading...</p>
       ) : (
-        <div className="list">
-          {query.data?.map((task) => {
-            return (
-              <Link
-                key={task.id}
-                className="card"
-                to="/form-demo/tasks/$taskId"
-                params={{ taskId: task.id }}
-              >
-                <strong>{task.name}</strong>
-                <Status value={task.status} />
-                <span>{task.description}</span>
-              </Link>
-            );
-          })}
-        </div>
+        <EntityTable data={(query.data ?? []).map((task) => ({ id: task.id, name: task.name, status: task.status, summary: task.description, href: `/form-demo/tasks/${task.id}` }))} />
       )}
     </>
   );
