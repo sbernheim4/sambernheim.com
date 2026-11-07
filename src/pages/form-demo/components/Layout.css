@@ -1,7 +1,9 @@
 .shell {
   display: grid;
   grid-template-columns: 184px minmax(0, 1fr);
+  height: 100vh;
   min-height: 100vh;
+  overflow: hidden;
   background: var(--color-background);
   color: var(--color-text);
   font-family: Lato, sans-serif;
@@ -58,6 +60,10 @@
 }
 
 .main {
+  min-width: 0;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
   width: min(1100px, 100%);
   padding: 48px clamp(24px, 6vw, 80px);
 }
@@ -119,7 +125,7 @@
   grid-template-columns: 1fr auto;
   gap: 8px 16px;
   padding: 18px 20px;
-  border: 1px solid var(--color-border);
+  border: 0;
   border-radius: 8px;
   background: var(--color-surface);
   color: var(--color-text);
@@ -142,9 +148,10 @@
 
 .details {
   padding: clamp(22px, 3vw, 34px);
-  border: 1px solid var(--color-border);
+  border: 0;
   border-radius: 8px;
   background: var(--color-surface);
+  box-shadow: 0 1px 3px var(--color-shadow-subtle);
 }
 
 .summary-grid {
@@ -295,6 +302,9 @@
 @media (max-width: 720px) {
   .shell {
     display: block;
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
   }
 
   .nav {
@@ -321,6 +331,8 @@
   }
 
   .main {
+    min-height: auto;
+    overflow: visible;
     padding: 32px 20px;
   }
 
@@ -345,3 +357,5 @@
     grid-column: auto;
   }
 }
+  min-height: 0;
+  overflow-y: auto;
