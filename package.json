@@ -3,7 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite dev",
+    "dev": "node --import tsx scripts/dev.ts",
+    "tui": "node --import tsx src/tui.tsx",
     "build": "vite build && tsc --noEmit",
     "typecheck": "tsc --noEmit",
     "start": "vite preview",
@@ -32,10 +33,11 @@
     "@tanstack/react-start": "^1.168.6",
     "@tanstack/react-table": "^9.3.1",
     "date-fns": "^4.4.0",
+    "ink": "^6.8.0",
     "lucide-react": "^1.41.0",
     "monaco-editor": "^0.56.0",
-    "react": "^19.1.1",
-    "react-dom": "^19.1.1",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
     "ty_wasm": "^0.0.0"
   },
   "devDependencies": {
@@ -55,6 +57,7 @@
     "remark-frontmatter": "^5.0.0",
     "remark-gfm": "^4.0.1",
     "remark-mdx-frontmatter": "^5.2.0",
+    "tsx": "^4.23.15",
     "typescript": "^5.9.2",
     "vite": "^7.1.4",
     "vitest": "^5.0.1",

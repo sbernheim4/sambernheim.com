@@ -16,11 +16,21 @@ const formatRelativeDate = (date: Date) => {
   const now = new Date();
   const days = differenceInCalendarDays(now, date);
 
-  if (days === 0) return "Today";
-  if (days === 1) return "Yesterday";
-  if (days === -1) return "Tomorrow";
-  if (days > 1 && days < 30) return `${days} days ago`;
-  if (days < -1 && days > -30) return `in ${Math.abs(days)} days`;
+  if (days === 0) {
+    return "Today";
+  }
+  if (days === 1) {
+    return "Yesterday";
+  }
+  if (days === -1) {
+    return "Tomorrow";
+  }
+  if (days > 1 && days < 30) {
+    return `${days} days ago`;
+  }
+  if (days < -1 && days > -30) {
+    return `in ${Math.abs(days)} days`;
+  }
 
   const months = differenceInMonths(now, date);
   if (months >= 1 && months < 12) {
@@ -32,7 +42,9 @@ const formatRelativeDate = (date: Date) => {
   }
 
   const years = differenceInYears(now, date);
-  if (years >= 1) return `${years} ${years === 1 ? "year" : "years"} ago`;
+  if (years >= 1) {
+    return `${years} ${years === 1 ? "year" : "years"} ago`;
+  }
   if (years <= -1) {
     const absoluteYears = Math.abs(years);
     return `in ${absoluteYears} ${absoluteYears === 1 ? "year" : "years"}`;
@@ -71,12 +83,18 @@ export const CycleableDate = ({
     : undefined;
 
   useEffect(() => {
-    if (!relative) return;
+    if (!relative) {
+      return;
+    }
 
     const timer = setInterval(() => {
-      refresh((current) => current + 1);
+      refresh((current) => {
+        return current + 1;
+      });
     }, 60_000);
-    return () => clearInterval(timer);
+    return () => {
+      return clearInterval(timer);
+    };
   }, [relative]);
 
   const text = !valid ? "Invalid date" : relative ? formatRelativeDate(date) : format(date, "PP");
@@ -88,7 +106,9 @@ export const CycleableDate = ({
         <button
           type="button"
           className={`cycleable-date${className ? ` ${className}` : ""}`}
-          onClick={() => setMode?.(relative ? "utc" : "relative")}
+          onClick={() => {
+            return setMode?.(relative ? "utc" : "relative");
+          }}
           aria-label={`${text}. Format: ${formatLabel}. Click to toggle between Date and Relative.`}
           data-mode={relative ? "relative" : "date"}
         >

@@ -16,7 +16,13 @@ export const FakeLoader = () => {
   });
 
   return (
-    <button type="button" disabled={fakeQuery.isFetching} onClick={() => void fakeQuery.refetch()}>
+    <button
+      type="button"
+      disabled={fakeQuery.isFetching}
+      onClick={() => {
+        return void fakeQuery.refetch();
+      }}
+    >
       {fakeQuery.isFetching ? "Loading..." : "Click me to fire a refetch"}
     </button>
   );

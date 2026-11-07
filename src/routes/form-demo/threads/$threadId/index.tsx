@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ThreadDetailPage } from "../../../../pages/threads/ThreadPages";
+import { ThreadDetailPage } from "@features/Threads/components/web/ThreadPages";
 
 export const Route = createFileRoute("/form-demo/threads/$threadId/")({
   component: () => {

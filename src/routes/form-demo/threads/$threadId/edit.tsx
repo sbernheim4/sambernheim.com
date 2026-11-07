@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ThreadEditPage } from "../../../../pages/threads/ThreadPages";
+import { ThreadEditPage } from "@features/Threads/components/web/ThreadPages";
 
 const ThreadEditRoute = () => {
   const { threadId } = Route.useParams();

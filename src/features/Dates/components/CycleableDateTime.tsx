@@ -61,11 +61,11 @@ export const CycleableDateTime = ({
     availableModes.length === 3
       ? "Click to toggle between UTC, Local, and Relative."
       : `Click to toggle between ${availableModes
-          .map((availableMode) =>
-            availableMode === "utc"
+          .map((availableMode) => {
+            return availableMode === "utc"
               ? "Absolute"
-              : availableMode[0].toUpperCase() + availableMode.slice(1),
-          )
+              : availableMode[0].toUpperCase() + availableMode.slice(1);
+          })
           .join(", ")}.`;
   const tooltip = `Format: ${formatLabel}. ${toggleHint}`;
 

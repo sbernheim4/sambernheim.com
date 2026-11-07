@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ProcessEditPage } from "../../../../pages/processes/ProcessPages";
+import { ProcessEditPage } from "@features/Processes/components/web/ProcessPages";
 
 const ProcessEditRoute = () => {
   const { processId } = Route.useParams();

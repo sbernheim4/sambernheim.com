@@ -15,10 +15,20 @@ export const FormEditorTabList = ({ children, className }: FormEditorRegionProps
 
     return (
       <div className="form-editor-page-controls" role="group" aria-label="Page sections">
-        <button type="button" onClick={(event) => setSectionsOpen(event, true)}>
+        <button
+          type="button"
+          onClick={(event) => {
+            return setSectionsOpen(event, true);
+          }}
+        >
           Expand all
         </button>
-        <button type="button" onClick={(event) => setSectionsOpen(event, false)}>
+        <button
+          type="button"
+          onClick={(event) => {
+            return setSectionsOpen(event, false);
+          }}
+        >
           Collapse all
         </button>
       </div>

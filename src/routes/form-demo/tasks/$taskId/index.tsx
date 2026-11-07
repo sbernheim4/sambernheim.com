@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { TaskDetailPage } from "../../../../pages/tasks/TaskPages";
+import { TaskDetailPage } from "@features/Tasks/components/web/TaskPages";
 
 export const Route = createFileRoute("/form-demo/tasks/$taskId/")({
   component: () => {

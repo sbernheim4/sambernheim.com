@@ -19,22 +19,24 @@ const highlighter = createHighlighter({
   languages: [json, plaintext, shell, ts, tsx],
 });
 
-export default defineConfig({
-  server: {
-    port: 3000,
-  },
-  resolve: {
-    alias: aliases,
-  },
-  plugins: [
-    cloudflare({ viteEnvironment: { name: "ssr" } }),
-    mdx({
-      remarkPlugins: [remarkFrontmatter, [remarkMdxFrontmatter, { name: "meta" }]],
-      rehypePlugins: [[rehypeHighlightCodeBlocks, { highlighter }]],
-    }),
-    tanstackStart({
-      srcDirectory: "src",
-    }),
-    viteReact(),
-  ],
+export default defineConfig(({ mode }) => {
+  return {
+    server: {
+      port: 3000,
+    },
+    resolve: {
+      alias: aliases,
+    },
+    plugins: [
+      ...(mode === "tui" ? [] : [cloudflare({ viteEnvironment: { name: "ssr" } })]),
+      mdx({
+        remarkPlugins: [remarkFrontmatter, [remarkMdxFrontmatter, { name: "meta" }]],
+        rehypePlugins: [[rehypeHighlightCodeBlocks, { highlighter }]],
+      }),
+      tanstackStart({
+        srcDirectory: "src",
+      }),
+      viteReact(),
+    ],
+  };
 });

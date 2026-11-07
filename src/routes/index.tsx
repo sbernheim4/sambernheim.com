@@ -1,7 +1,7 @@
 import "./index/styles/route.css";
 import { createFileRoute } from "@tanstack/react-router";
-import { About } from "./../pages/home/About";
-import { LandingPage } from "./../pages/home/LandingPage";
+import { About } from "@features/Site/components/web/home/About";
+import { LandingPage } from "@features/Site/components/web/home/LandingPage";
 
 const Home = () => {
   return (

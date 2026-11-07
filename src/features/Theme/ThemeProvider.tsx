@@ -29,9 +29,13 @@ const getInitialTheme = (pathname: string): Theme => {
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const { pathname } = useLocation();
-  const [theme, setTheme] = useState<Theme>(() => getInitialTheme(pathname));
+  const [theme, setTheme] = useState<Theme>(() => {
+    return getInitialTheme(pathname);
+  });
   const [hasSavedTheme, setHasSavedTheme] = useState(() => {
-    if (typeof window === "undefined") return false;
+    if (typeof window === "undefined") {
+      return false;
+    }
     const saved = window.localStorage.getItem(THEME_STORAGE_KEY);
     return saved === "dark" || saved === "light";
   });
@@ -48,7 +52,9 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   }, [theme]);
 
   useEffect(() => {
-    if (hasSavedTheme) return;
+    if (hasSavedTheme) {
+      return;
+    }
 
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
     const updateFromSystem = (event: MediaQueryListEvent) => {
@@ -56,7 +62,9 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     };
 
     mediaQuery.addEventListener("change", updateFromSystem);
-    return () => mediaQuery.removeEventListener("change", updateFromSystem);
+    return () => {
+      return mediaQuery.removeEventListener("change", updateFromSystem);
+    };
   }, [hasSavedTheme]);
 
   return (

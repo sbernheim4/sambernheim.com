@@ -29,18 +29,30 @@ export const DetailView = ({ tabs }: { tabs: readonly DetailTab[] }) => {
       ) : mode === "page" ? (
         <div className="detail-page-view">
           <div className="detail-page-controls" role="group" aria-label="Page sections">
-            <button type="button" onClick={(event) => setSectionsOpen(event, true)}>
+            <button
+              type="button"
+              onClick={(event) => {
+                return setSectionsOpen(event, true);
+              }}
+            >
               Expand all
             </button>
-            <button type="button" onClick={(event) => setSectionsOpen(event, false)}>
+            <button
+              type="button"
+              onClick={(event) => {
+                return setSectionsOpen(event, false);
+              }}
+            >
               Collapse all
             </button>
           </div>
-          {tabs.map((tab) => (
-            <DetailSection key={tab.value} label={tab.label} collapsible>
-              {tab.children}
-            </DetailSection>
-          ))}
+          {tabs.map((tab) => {
+            return (
+              <DetailSection key={tab.value} label={tab.label} collapsible>
+                {tab.children}
+              </DetailSection>
+            );
+          })}
         </div>
       ) : (
         <div className="detail-sidebar-view">
