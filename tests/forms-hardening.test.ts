@@ -2,9 +2,9 @@ import assert from "node:assert/strict";
 import { QueryClient } from "@tanstack/react-query";
 import { test } from "vitest";
 
-import { createOrchestrator } from "../src/forms/orchestration/orchestrator";
-import { executeGraph } from "../src/forms/orchestration/scheduler";
-import type { AnyForm } from "../src/forms/orchestration/types";
+import { createOrchestrator } from "../src/features/Forms/orchestration/orchestrator";
+import { executeGraph } from "../src/features/Forms/orchestration/scheduler";
+import type { AnyForm } from "../src/features/Forms/orchestration/types";
 
 const form = (id: string, overrides: Partial<AnyForm> = {}): AnyForm => {
   return {

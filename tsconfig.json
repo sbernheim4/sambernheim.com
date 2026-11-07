@@ -12,7 +12,11 @@
     "allowImportingTsExtensions": true,
     "baseUrl": ".",
     "paths": {
-      "~/*": ["src/*"]
+      "~/*": ["src/*"],
+      "@/*": ["src/*"],
+      "@features": ["src/features/index.ts"],
+      "@features/*": ["src/features/*"],
+      "@utils/*": ["src/utils/*"]
     }
   },
   "include": ["src", "vite.config.ts"]

@@ -1,9 +1,11 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { expect, test } from "vitest";
-import { CycleableDateTime, CycleableDateTimeProvider, FormEditor } from "../src/forms/components";
-import { Number as FormattedNumber } from "../src/shared/components/Number";
-import { TooltipProvider } from "../src/shared/components/ui/tooltip";
+import { FormEditor } from "../src/features/Forms/components";
+import { CycleableDateTime } from "../src/features/Dates/components";
+import { CycleableDateTimeProvider } from "../src/features/Dates";
+import { Number as FormattedNumber } from "../src/features/UI/components/Number";
+import { TooltipProvider } from "../src/features/UI/components/ui/tooltip";
 
 test("FormEditor tabs hide inactive content and page mode shows every section", () => {
   const tabs = (

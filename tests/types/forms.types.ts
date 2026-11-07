@@ -3,7 +3,7 @@ import type {
   FormConfig,
   FormSaveState,
   SaveResult,
-} from "../../src/forms/orchestration/types";
+} from "../../src/features/Forms/orchestration/types";
 
 type Equal<Actual, Expected> =
   (<T>() => T extends Actual ? 1 : 2) extends <T>() => T extends Expected ? 1 : 2 ? true : false;

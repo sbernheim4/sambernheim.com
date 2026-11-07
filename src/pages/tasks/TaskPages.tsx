@@ -1,20 +1,20 @@
 import { useNavigate } from "@tanstack/react-router";
-import { CommandLink as Link } from "../../shared/components/CommandLink";
-import { FormEditor } from "../../forms/components";
-import { ExecutionProfileFields } from "../../domains/execution-profiles/components/ExecutionProfileFields";
-import { useTasks, useTask } from "../../domains/tasks/hooks/useTasks";
-import { useTaskEditForms } from "../../domains/tasks/hooks/useTaskEditForms";
-import { useTaskCreateForms } from "../../domains/tasks/hooks/useTaskCreateForms";
-import { useProcesses } from "../../domains/processes/hooks/useProcesses";
-import { useExecutionProfile } from "../../domains/execution-profiles/hooks/useExecutionProfile";
-import { TaskFields } from "../../domains/tasks/components/TaskFields";
+import { CommandLink as Link } from "@/features";
+import { FormEditor } from "@/features";
+import { ExecutionProfileFields } from "@/features";
+import { useTasks, useTask } from "@/features";
+import { useTaskEditForms } from "@/features";
+import { useTaskCreateForms } from "@/features";
+import { useProcesses } from "@/features";
+import { useExecutionProfile } from "@/features";
+import { TaskFields } from "@/features";
 import { DetailLayout, Loading, Missing, Status } from "../form-demo/components/Layout";
 import { ChildList, DetailProperties, ProfileSummary } from "../form-demo/components/DetailHelpers";
 import { DetailView } from "../form-demo/components/DetailView";
 import { ViewModePicker, useViewModePreference } from "../form-demo/components/ViewModePreference";
-import { Number as FormattedNumber } from "../../shared/components/Number";
-import { CycleableDateTime } from "../../forms/components";
-import { parseUtcDate } from "../../shared/date";
+import { Number as FormattedNumber } from "@/features";
+import { CycleableDateTime } from "@/features";
+import { parseUtcDate } from "@/utils";
 export const TaskListPage = () => {
   const query = useTasks();
 

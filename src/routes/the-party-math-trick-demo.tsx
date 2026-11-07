@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { SiteNavbar } from "../shared/components/SiteNavbar";
+import { SiteNavbar } from "@/features";
 
 const MathTrickDemo = () => {
   const [initial, setInitial] = useState(0);

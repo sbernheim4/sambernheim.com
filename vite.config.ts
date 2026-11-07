@@ -12,6 +12,7 @@ import { ts } from "@tanstack/highlight/languages/ts";
 import { tsx } from "@tanstack/highlight/languages/tsx";
 import { cloudflare } from "@cloudflare/vite-plugin";
 import { defineConfig } from "vite";
+import { aliases } from "./config/aliases";
 
 const highlighter = createHighlighter({
   fallbackLanguage: "plaintext",
@@ -21,6 +22,9 @@ const highlighter = createHighlighter({
 export default defineConfig({
   server: {
     port: 3000,
+  },
+  resolve: {
+    alias: aliases,
   },
   plugins: [
     cloudflare({ viteEnvironment: { name: "ssr" } }),

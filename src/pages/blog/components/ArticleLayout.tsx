@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
-import { CycleableDate } from "../../../forms/components";
-import { parseDateOnly } from "../../../shared/date";
+import { CycleableDate } from "@/features";
+import { parseDateOnly } from "@/utils";
 import "./ArticleLayout.css";
 
 export const ArticleLayout = ({

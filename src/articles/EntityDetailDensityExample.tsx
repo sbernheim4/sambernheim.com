@@ -1,4 +1,4 @@
-import { CycleableDate, CycleableDateTime } from "../forms/components";
+import { CycleableDate, CycleableDateTime } from "@/features";
 import { DetailView } from "../pages/form-demo/components/DetailView";
 import "./EntityDetailDensityExample.css";
 

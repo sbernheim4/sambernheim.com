@@ -1,6 +1,6 @@
 import "./styles/route.css";
 import { createFileRoute } from "@tanstack/react-router";
-import { CommandLink as Link } from "../../shared/components/CommandLink";
+import { CommandLink as Link } from "@/features";
 import { findSitePost } from "../../articles";
 import { ArticleLayout } from "../../pages/blog/components/ArticleLayout";
 

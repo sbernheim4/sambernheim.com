@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { CommandLink as Link } from "../shared/components/CommandLink";
+import { CommandLink as Link } from "@/features";
 
-import { PythonEditor } from "../editor/components/PythonEditor";
+import { PythonEditor } from "@features/PythonEditor";
 
 const EditorRoute = () => {
   return (

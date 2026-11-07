@@ -6,9 +6,9 @@ import {
   CommandPalette,
   CommandPaletteProvider,
   useCommandAction,
-} from "../src/shared/commands/commands";
-import { SegmentedTabs } from "../src/shared/components/SegmentedTabs";
-import { CommandButton } from "../src/shared/components/CommandButton";
+} from "../src/features/Commands/commands";
+import { SegmentedTabs } from "../src/features/UI/components/SegmentedTabs";
+import { CommandButton } from "../src/features/Commands/components/CommandButton";
 
 const renderWithCommands = (children: ReactNode) => {
   return render(

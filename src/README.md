@@ -1,40 +1,44 @@
 # Source organization
 
 Group application code by feature, with hooks and components inside their owning
-feature. Shared form infrastructure stays independent of domain features.
+feature. Routes remain thin adapters around feature screens.
 
 ```text
 src/
 ├── features/
-│   ├── editor/
-│   │   ├── components/PythonEditor.tsx
+│   ├── PythonEditor/
+│   │   ├── components/web/PythonEditor.tsx
 │   │   ├── hooks/useTyMonacoSession.ts
 │   │   ├── lsp/                 # Python runtime and Monaco language providers
-│   │   └── monaco.ts           # Monaco loader and worker setup
-│   ├── workspace/
-│   │   ├── organizations/      # Includes Profile and Operations
-│   │   │   ├── components/
-│   │   │   ├── hooks/
-│   │   │   └── fieldOptions.ts
-│   │   ├── projects/           # Same entity structure
-│   │   ├── tasks/              # Same entity structure
-│   │   ├── components/         # Shared pages, layout, and controls
-│   │   ├── hooks/              # Cross-entity reads, launch flow, and reset
-│   │   └── *.ts                # Shared API, contracts, query keys, and cache logic
-│   └── form-demos/             # Demo activity display
-├── forms/
-│   ├── components/            # Compound form controls and field primitives
-│   ├── hooks/                 # Shared form bindings and React integration
-│   ├── orchestration/         # UI-independent saving and its types
-│   └── context.ts             # TanStack form and field contexts
+│   │   ├── wasm/ty/             # Generated Python analyzer package and build notes
+│   │   └── monaco.ts            # Monaco loader and worker setup
+│   ├── Dates/
+│   │   ├── components/          # Cycleable date and date-time displays
+│   │   └── hooks/               # Date display mode context
+│   ├── Commands/                # Command palette and command-aware controls
+│   ├── ExecutionProfiles/
+│   ├── Processes/
+│   ├── Tasks/
+│   ├── Threads/
+│   ├── Theme/                   # Theme context and persistence
+│   ├── Site/                    # Site navigation and chrome
+│   └── UI/                      # Generic visual primitives
+│   ├── forms/
+│   │   ├── components/
+│   │   │   ├── editor/          # FormEditor compound components
+│   │   │   └── fields/          # TanStack Form field primitives
+│   │   ├── hooks/
+│   │   └── orchestration/       # UI-independent saving and its types
+│   ├── shared/                   # Shared domain contracts and in-memory API
+│   │   ├── store.ts
+│   │   └── types.ts
+│   └── utils/date.ts            # Low-level date parsing helpers
 ├── routes/                    # Route declarations and page wiring
-└── wasm/ty/                   # Generated Python analyzer package and build notes
 ```
 
-Use direct imports from the owning module. Keep cross-entity composition at the
-workspace level and entity-specific queries, mutations, forms, and fields with
-the entity. The workspace API and cache reconciliation remain shared because
-they handle related records and aggregate views across entities.
+Use direct imports from the owning feature. Keep cross-feature composition in
+screens and routes, while entity-specific queries, mutations, forms, fields,
+and models stay with their entity feature.
 
 ## Local commands
 

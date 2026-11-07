@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
-import { useExecutionProfile } from "../../../domains/execution-profiles/hooks/useExecutionProfile";
-import { CycleableDateTime } from "../../../forms/components";
-import { parseUtcDate } from "../../../shared/date";
-import { Number as FormattedNumber } from "../../../shared/components/Number";
+import { useExecutionProfile } from "@/features";
+import { CycleableDateTime } from "@/features";
+import { parseUtcDate } from "@/utils";
+import { Number as FormattedNumber } from "@/features";
 import "./DetailHelpers.css";
 
 export const ProfileSummary = ({ id }: { id: string }) => {

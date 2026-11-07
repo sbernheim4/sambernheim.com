@@ -1,4 +1,4 @@
-import { CycleableDate } from "../../forms/components";
+import { CycleableDate } from "@/features";
 
 export const LandingPage = () => {
   return (

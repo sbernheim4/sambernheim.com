@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { CommandButton } from "../../../shared/components/CommandButton";
+import { CommandButton } from "@/features";
 import "./ViewModePreference.css";
 
 export type ViewMode = "tabs" | "page" | "sidebar";
