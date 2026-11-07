@@ -1,17 +1,13 @@
 import type { ReactNode } from "react";
 import { createRootRoute, HeadContent, Outlet, Scripts, useLocation } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { CycleableDateTimeProvider } from "../forms/components";
-import { GlobalQueryLoader } from "../shared/components/GlobalQueryLoader";
-import { TooltipProvider } from "../shared/components/ui/tooltip";
-import {
-  CommandPalette,
-  CommandPaletteProvider,
-  useCommandAction,
-} from "../shared/commands/commands";
-import { ThemeProvider, useTheme } from "../shared/theme/ThemeProvider";
-import { SiteNavbar } from "../shared/components/SiteNavbar";
-import "../shared/commands/commands.css";
+import { CycleableDateTimeProvider } from "@/features";
+import { GlobalQueryLoader } from "@/features";
+import { TooltipProvider } from "@/features";
+import { CommandPalette, CommandPaletteProvider, useCommandAction } from "@/features";
+import { ThemeProvider, useTheme } from "@/features";
+import { SiteNavbar } from "@/features";
+import "@/features/Commands/commands.css";
 
 import "../styles.css";
 

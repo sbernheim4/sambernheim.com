@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import { test } from "vitest";
 import { QueryClient } from "@tanstack/react-query";
-import { createOrchestrator } from "../src/forms/orchestration/orchestrator";
-import type { AnyForm, FormInput } from "../src/forms/orchestration/types";
+import { createOrchestrator } from "../src/features/Forms/orchestration/orchestrator";
+import type { AnyForm, FormInput } from "../src/features/Forms/orchestration/types";
 
 const makeForm = ({
   id,

@@ -1,4 +1,4 @@
-import { SegmentedTabs, type SegmentedTab } from "../../../shared/components/SegmentedTabs";
+import { SegmentedTabs, type SegmentedTab } from "@/features";
 
 export type DetailTab = SegmentedTab;
 

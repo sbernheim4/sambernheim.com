@@ -1,20 +1,20 @@
 import { useNavigate } from "@tanstack/react-router";
-import { CommandLink as Link } from "../../shared/components/CommandLink";
-import { FormEditor } from "../../forms/components";
-import { ExecutionProfileFields } from "../../domains/execution-profiles/components/ExecutionProfileFields";
-import { useThreads, useThread } from "../../domains/threads/hooks/useThreads";
-import { useThreadEditForms } from "../../domains/threads/hooks/useThreadEditForms";
-import { useThreadCreateForms } from "../../domains/threads/hooks/useThreadCreateForms";
-import { useProcesses } from "../../domains/processes/hooks/useProcesses";
-import { useExecutionProfile } from "../../domains/execution-profiles/hooks/useExecutionProfile";
-import { ThreadFields } from "../../domains/threads/components/ThreadFields";
+import { CommandLink as Link } from "@/features";
+import { FormEditor } from "@/features";
+import { ExecutionProfileFields } from "@/features";
+import { useThreads, useThread } from "@/features";
+import { useThreadEditForms } from "@/features";
+import { useThreadCreateForms } from "@/features";
+import { useProcesses } from "@/features";
+import { useExecutionProfile } from "@/features";
+import { ThreadFields } from "@/features";
 import { DetailLayout, Loading, Missing, Status } from "../form-demo/components/Layout";
 import { DetailProperties, ProfileSummary } from "../form-demo/components/DetailHelpers";
 import { DetailView } from "../form-demo/components/DetailView";
 import { ViewModePicker, useViewModePreference } from "../form-demo/components/ViewModePreference";
-import { Number as FormattedNumber } from "../../shared/components/Number";
-import { CycleableDateTime } from "../../forms/components";
-import { parseUtcDate } from "../../shared/date";
+import { Number as FormattedNumber } from "@/features";
+import { CycleableDateTime } from "@/features";
+import { parseUtcDate } from "@/utils";
 export const ThreadListPage = () => {
   const query = useThreads();
 

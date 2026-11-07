@@ -78,7 +78,7 @@ try {
     command === "diagnostics"
       ? args
       : command === "navto"
-        ? ["src/forms/orchestration/types.ts"]
+        ? ["src/features/Forms/orchestration/types.ts"]
         : [args[0]];
   for (const file of files) {
     await request("open", {

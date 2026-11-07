@@ -10,10 +10,10 @@ import {
   ViewModePicker,
   useViewModePreference,
 } from "../src/routes/form-demo/components/-ViewModePreference";
-import { profileToForm } from "../src/domains/execution-profiles/components/ExecutionProfileFields";
-import { processToForm } from "../src/domains/processes/components/ProcessFields";
-import { taskToForm } from "../src/domains/tasks/components/TaskFields";
-import { threadToForm } from "../src/domains/threads/components/ThreadFields";
+import { profileToForm } from "../src/features/ExecutionProfiles/components/ExecutionProfileFields";
+import { processToForm } from "../src/features/Processes/components/ProcessFields";
+import { taskToForm } from "../src/features/Tasks/components/TaskFields";
+import { threadToForm } from "../src/features/Threads/components/ThreadFields";
 
 test("ViewModePicker reports the selected mode and changes mode", async () => {
   const user = userEvent.setup();

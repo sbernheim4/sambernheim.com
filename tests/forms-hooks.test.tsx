@@ -3,13 +3,13 @@ import { act, render, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { test } from "vitest";
 import type { ReactNode } from "react";
-import { useComposableForm } from "../src/forms/hooks/useComposableForm";
-import { useFormOrchestrator } from "../src/forms/hooks/useFormOrchestrator";
+import { useComposableForm } from "../src/features/Forms/hooks/useComposableForm";
+import { useFormOrchestrator } from "../src/features/Forms/hooks/useFormOrchestrator";
 import {
   usePersistedFormData,
   type PersistedFormBinding,
   type PersistedDraftController,
-} from "../src/forms/hooks/usePersistedFormData";
+} from "../src/features/Forms/hooks/usePersistedFormData";
 
 test("query updates received while dirty are applied after discard", async () => {
   let currentForm: any;

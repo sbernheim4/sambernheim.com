@@ -4,7 +4,7 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 VENDOR_DIR="$ROOT_DIR/.vendor"
 RUFF_DIR="$VENDOR_DIR/ruff"
-OUT_DIR="$ROOT_DIR/src/wasm/ty/pkg"
+OUT_DIR="$ROOT_DIR/src/features/PythonEditor/wasm/ty/pkg"
 RUFF_COMMIT="53a94487e7f35600cd2a554099f2dd7518d18798"
 
 mkdir -p "$VENDOR_DIR"

@@ -1,9 +1,9 @@
 import "./styles/route.css";
 import { createFileRoute } from "@tanstack/react-router";
-import { CommandLink as Link } from "../../shared/components/CommandLink";
+import { CommandLink as Link } from "@/features";
 import { sitePosts } from "../../articles";
-import { CycleableDate } from "../../forms/components";
-import { parseDateOnly } from "../../shared/date";
+import { CycleableDate } from "@/features";
+import { parseDateOnly } from "@/utils";
 
 const BlogIndex = () => {
   const postsByDate = [...sitePosts].sort((a, b) => {

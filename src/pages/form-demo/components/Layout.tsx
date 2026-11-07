@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
-import { CommandLink as Link } from "../../../shared/components/CommandLink";
-import { FormEditor } from "../../../forms/components";
-import { CommandButton } from "../../../shared/components/CommandButton";
-import { useTheme } from "../../../shared/theme/ThemeProvider";
+import { CommandLink as Link } from "@/features";
+import { FormEditor } from "@/features";
+import { CommandButton } from "@/features";
+import { useTheme } from "@/features";
 import "./Layout.css";
 
 export const Shell = ({ children }: { children: ReactNode }) => {
