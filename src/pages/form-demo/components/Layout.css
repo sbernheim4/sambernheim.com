@@ -60,11 +60,12 @@
 }
 
 .main {
+  box-sizing: border-box;
   min-width: 0;
   min-height: 0;
   overflow-x: hidden;
   overflow-y: auto;
-  width: min(1100px, 100%);
+  width: 100%;
   padding: 48px clamp(24px, 6vw, 80px);
 }
 
