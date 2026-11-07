@@ -1,0 +1,10 @@
+.entity-table-scroll { width: 100%; margin-top: 24px; overflow-x: auto; border-radius: 10px; background: var(--color-surface); }
+.entity-table { width: 100%; border-collapse: collapse; text-align: left; }
+.entity-table th,.entity-table td { padding: 14px 18px; border-bottom: 1px solid var(--color-border-muted); white-space: nowrap; }
+.entity-table th { color: var(--color-text-muted); font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.entity-table tbody tr:last-child td { border-bottom: 0; }
+.entity-table tbody tr:hover { background: var(--color-surface-muted); }
+.entity-table-sort { padding: 0; border: 0; background: none; color: inherit; cursor: pointer; font: inherit; letter-spacing: inherit; text-transform: inherit; }
+.entity-table-name { color: var(--color-primary); font-weight: 700; text-decoration: none; }
+.entity-table-summary { max-width: 460px; overflow: hidden; color: var(--color-text-secondary); text-overflow: ellipsis; }
+.entity-table-empty { padding: 28px; color: var(--color-text-muted); text-align: center; }

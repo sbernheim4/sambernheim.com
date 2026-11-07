@@ -15,7 +15,7 @@ import { DetailView } from "../form-demo/components/DetailView";
 import { ViewModePicker, useViewModePreference } from "../form-demo/components/ViewModePreference";
 import { CycleableDateTime } from "@/features";
 import { parseUtcDate } from "@/utils";
-import { EntityTable } from "../form-demo/components/EntityTable";
+import { EntityTable } from "../../features/EntityTable/components/web/EntityTable";
 export const ProcessListPage = () => {
   const query = useProcesses();
 

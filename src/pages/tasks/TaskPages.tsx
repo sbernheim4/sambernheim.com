@@ -15,7 +15,7 @@ import { ViewModePicker, useViewModePreference } from "../form-demo/components/V
 import { Number as FormattedNumber } from "@/features";
 import { CycleableDateTime } from "@/features";
 import { parseUtcDate } from "@/utils";
-import { EntityTable } from "../form-demo/components/EntityTable";
+import { EntityTable } from "../../features/EntityTable/components/web/EntityTable";
 export const TaskListPage = () => {
   const query = useTasks();
 
