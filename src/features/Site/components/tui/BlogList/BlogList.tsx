@@ -11,12 +11,14 @@ export const TuiBlogList: BlogListView = ({ articles }) => {
       status: "Article",
       summary: article.description,
       href: article.href,
+      publishedAt: article.publishedAt,
     };
   });
   return (
     <Box flexDirection="column" marginTop={1}>
       <Text bold>BLOG ARTICLES</Text>
       <EntityTable
+        variant="articles"
         data={data}
         onSelect={(article) => {
           return navigate(article.href);

@@ -1,4 +1,5 @@
-import { Box, Text, useInput } from "ink";
+import { useTuiInput } from "@features/Workspace/components/tui/Primitives/InputMode";
+import { Box, Text } from "ink";
 import type { ReactNode } from "react";
 import type { FormEditorRegionProps } from "../formTypes";
 import type { PersistedDraftController } from "../../../hooks/usePersistedFormData";
@@ -32,7 +33,7 @@ export const FormEditorError = () => {
   ) : null;
 };
 export const FormEditorDraftBanner = ({ draft }: { draft: PersistedDraftController }) => {
-  useInput((input) => {
+  useTuiInput((input) => {
     if (!draft.hasDraft) {
       return;
     }
@@ -50,7 +51,7 @@ export const FormEditorDraftBanner = ({ draft }: { draft: PersistedDraftControll
 export const FormEditorUndo = () => {
   const transaction = useFormUndoTransaction();
   const [error, setError] = useState<string>();
-  useInput((input) => {
+  useTuiInput((input) => {
     if (!transaction || input !== "u") {
       return;
     }

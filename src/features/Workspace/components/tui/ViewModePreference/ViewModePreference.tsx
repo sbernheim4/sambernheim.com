@@ -1,4 +1,5 @@
-import { Text, useInput } from "ink";
+import { useTuiInput } from "@features/Workspace/components/tui/Primitives/InputMode";
+import { Text } from "ink";
 import { useState } from "react";
 export type ViewMode = "tabs" | "page";
 export const useViewModePreference = () => {
@@ -12,7 +13,7 @@ export const ViewModePicker = ({
   mode: ViewMode;
   onChange: (mode: ViewMode) => void;
 }) => {
-  useInput((input) => {
+  useTuiInput((input) => {
     if (input === "1") {
       onChange("tabs");
     } else if (input === "2") {

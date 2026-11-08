@@ -3,11 +3,18 @@ import { spawnSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
 import wrapAnsi from "wrap-ansi";
+import { createHighlighter } from "@tanstack/highlight/core";
+import { json } from "@tanstack/highlight/languages/json";
+import { plaintext } from "@tanstack/highlight/languages/plaintext";
+import { shell } from "@tanstack/highlight/languages/shell";
+import { ts } from "@tanstack/highlight/languages/ts";
+import { tsx } from "@tanstack/highlight/languages/tsx";
 
 export type TuiArticle = {
   id: string;
   title: string;
   description: string;
+  publishedAt?: string;
   href: string;
   content: string;
 };
@@ -30,12 +37,35 @@ const extractText = (source: string) => {
       }
       return [
         line
+          .replace(/<([A-Z][A-Za-z0-9]*)\b([^>]*)\/>/g, (_tag, name, attrs) => {
+            return renderMdxComponent(name, attrs);
+          })
+          .replace(/<([A-Z][A-Za-z0-9]*)\b[^>]*>(.*?)<\/\1>/gs, (_tag, name, children) => {
+            return `${renderMdxComponent(name, "")} ${children}`;
+          })
           .replace(/<\/?[A-Za-z][A-Za-z0-9.-]*(?:\s[^<>]*?)?\s*\/?>/g, "")
           .replace(/\{[^{}]*\}/g, ""),
       ];
     })
     .join("\n")
     .trim();
+};
+
+const renderMdxComponent = (name: string, attributes: string) => {
+  if (name === "CycleableDateTime") {
+    const value = attributes.match(/value=\{new Date\(["']([^"']+)["']\)\}/)?.[1];
+    if (value) {
+      const date = new Date(value);
+      return `⟦${date.toLocaleString()} · Enter to cycle⟧`;
+    }
+  }
+  if (name === "CycleableDate") {
+    const value = attributes.match(/value=\{new Date\(["']([^"']+)["']\)\}/)?.[1];
+    if (value) {
+      return `⟦${new Date(value).toLocaleDateString()} · Enter to cycle⟧`;
+    }
+  }
+  return `⟦${name} component⟧`;
 };
 
 export const loadTuiArticles = (): TuiArticle[] => {
@@ -46,14 +76,22 @@ export const loadTuiArticles = (): TuiArticle[] => {
     })
     .map((file) => {
       const source = readFileSync(resolve(directory, file), "utf8");
-      const title =
-        source.match(/^title:\s*["']?(.*?)['"]?\s*$/m)?.[1] ??
+      const rawTitle =
+        source.match(/^\s*title:\s*["']?(.*?)['"]?\s*$/m)?.[1] ??
         file.replace(/\.mdx$/, "").replaceAll("-", " ");
+      const title = rawTitle.replace(/\b\w[\w']*/g, (word, offset) => {
+        const lower = word.toLowerCase();
+        return offset > 0 &&
+          ["a", "an", "and", "as", "at", "for", "in", "of", "the", "to"].includes(lower)
+          ? lower
+          : `${lower[0].toUpperCase()}${lower.slice(1)}`;
+      });
       const description = source.match(/^description:\s*["']?(.*?)\s*["']?$/m)?.[1] ?? "Article";
       return {
         id: file,
         title,
         description,
+        publishedAt: source.match(/^\s*publishedAt:\s*["']?([^"'\n]+)["']?\s*$/m)?.[1],
         href: `/blog/${file.replace(/\.mdx$/, "")}`,
         content: extractText(source),
       };
@@ -70,6 +108,27 @@ const ansi = {
   blue: "\u001b[34m",
   gray: "\u001b[90m",
   magenta: "\u001b[35m",
+  red: "\u001b[31m",
+};
+const highlighter = createHighlighter({
+  fallbackLanguage: "plaintext",
+  languages: [json, plaintext, shell, ts, tsx],
+});
+const tokenColor: Record<string, string> = {
+  attr: ansi.cyan,
+  command: ansi.cyan,
+  comment: ansi.gray,
+  function: ansi.blue,
+  keyword: ansi.magenta,
+  literal: ansi.yellow,
+  meta: ansi.gray,
+  number: ansi.yellow,
+  operator: ansi.gray,
+  property: ansi.cyan,
+  string: ansi.green,
+  tag: ansi.red,
+  type: ansi.cyan,
+  variable: ansi.blue,
 };
 const inline = (text: string) => {
   return text
@@ -90,21 +149,40 @@ const formatMarkdown = (markdown: string, title: string, columns: number) => {
     `${ansi.gray}${"─".repeat(title.length)}${ansi.reset}`,
     "",
   ];
-  let code = false;
-  for (const line of markdown.split(/\r?\n/)) {
-    const fence = line.match(/^\s*```(\w*)/);
+  const sourceLines = markdown.split(/\r?\n/);
+  for (let index = 0; index < sourceLines.length; index += 1) {
+    const line = sourceLines[index];
+    const fence = line.match(/^\s*```([\w+-]*)/);
     if (fence) {
-      code = !code;
+      const codeLines: string[] = [];
+      index += 1;
+      while (index < sourceLines.length && !/^\s*```/.test(sourceLines[index])) {
+        codeLines.push(sourceLines[index]);
+        index += 1;
+      }
+      lines.push(`${ansi.gray}┌─ ${fence[1] || "code"} ${"─".repeat(24)}${ansi.reset}`);
+      const code = codeLines.join("\n");
+      const tokens = highlighter.tokenize(code, { lang: fence[1] }).tokens;
+      const highlightedLines = [""];
+      for (const token of tokens) {
+        const parts = token.value.split("\n");
+        parts.forEach((part, partIndex) => {
+          if (part) {
+            const color = tokenColor[token.className ?? ""];
+            highlightedLines[highlightedLines.length - 1] +=
+              `${color ?? ""}${part}${color ? ansi.reset : ""}`;
+          }
+          if (partIndex < parts.length - 1) {
+            highlightedLines.push("");
+          }
+        });
+      }
       lines.push(
-        code
-          ? `${ansi.gray}┌─ ${fence[1] || "code"} ${"─".repeat(24)}${ansi.reset}`
-          : `${ansi.gray}└${"─".repeat(32)}${ansi.reset}`,
-        ...(code ? [] : [""]),
+        ...highlightedLines.map((codeLine) => {
+          return `${ansi.gray}│${ansi.reset} ${codeLine}`;
+        }),
       );
-      continue;
-    }
-    if (code) {
-      lines.push(`${ansi.gray}│${ansi.reset} ${ansi.green}${line}${ansi.reset}`);
+      lines.push(`${ansi.gray}└${"─".repeat(32)}${ansi.reset}`, "");
       continue;
     }
     const heading = line.match(/^(#{1,6})\s+(.+)$/);

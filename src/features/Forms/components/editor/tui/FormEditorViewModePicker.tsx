@@ -1,4 +1,5 @@
-import { Box, Text, useInput } from "ink";
+import { useTuiInput } from "@features/Workspace/components/tui/Primitives/InputMode";
+import { Box, Text } from "ink";
 import { useFieldFocus } from "../../fields/tui/FieldFocus";
 import type { ViewMode } from "../../../../Workspace/hooks/useViewModePreference";
 
@@ -11,7 +12,7 @@ export const FormEditorViewModePicker = ({
 }) => {
   const { focused } = useFieldFocus();
   const modes: ViewMode[] = ["tabs", "page"];
-  useInput((input, key) => {
+  useTuiInput((input, key) => {
     if (!focused || (!key.leftArrow && !key.rightArrow && input !== "h" && input !== "l")) {
       return;
     }

@@ -1,4 +1,5 @@
-import { Box, Text, useInput } from "ink";
+import { useTuiInput } from "@features/Workspace/components/tui/Primitives/InputMode";
+import { Box, Text } from "ink";
 import { useFormEditorContext } from "../../../hooks/useFormEditorContext";
 
 export const FormEditorOrchestratorProgress = () => {
@@ -35,7 +36,7 @@ export const FormEditorOrchestratorProgress = () => {
 export const FormEditorOrchestratorStatus = () => {
   const { actions } = useFormEditorContext();
   const run = actions.orchestrator;
-  useInput((input) => {
+  useTuiInput((input) => {
     if (run?.isOpen && run.phase === "complete" && input === "x") {
       void run.close();
     }

@@ -1,3 +1,4 @@
+import { useTuiInput } from "@features/Workspace/components/tui/Primitives/InputMode";
 import {
   createContext,
   useCallback,
@@ -7,8 +8,9 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { Text, useInput } from "ink";
+import { Text } from "ink";
 import { useTuiWorkspaceNavigation } from "./Navigation";
+import { getCommandLabel, useAutomaticCommandAction, type CommandOverride } from "@features/Commands/commands";
 
 type Registry = {
   register: (href: string) => void;
@@ -35,7 +37,7 @@ export const LinkNavigation = ({ children }: { children: ReactNode }) => {
   const registry = useMemo(() => {
     return { register, unregister, selected: paths[selected] };
   }, [register, unregister, paths, selected]);
-  useInput((input, key) => {
+  useTuiInput((input, key) => {
     if (key.upArrow || input === "k") {
       setSelected((value) => {
         return Math.max(0, value - 1);
@@ -50,8 +52,15 @@ export const LinkNavigation = ({ children }: { children: ReactNode }) => {
   });
   return <RegistryContext.Provider value={registry}>{children}</RegistryContext.Provider>;
 };
-export const Link = ({ href, children }: { href: string; children: ReactNode }) => {
+export const Link = ({ href, children, command }: { href: string; children: ReactNode; command?: CommandOverride }) => {
   const registry = useContext(RegistryContext);
+  const navigate = useTuiWorkspaceNavigation();
+  useAutomaticCommandAction({
+    kind: "link",
+    label: getCommandLabel(children),
+    command,
+    execute: () => {navigate(href);},
+  });
   useEffect(() => {
     registry?.register(href);
     return () => {

@@ -176,7 +176,7 @@ export const useAutomaticCommandAction = ({
   useCommandAction(action);
 };
 
-const scoreAction = (action: CommandAction, query: string) => {
+export const scoreCommandAction = (action: CommandAction, query: string) => {
   const normalized = query.trim().toLowerCase();
   if (!normalized) return action.priority ?? 0;
   const label = action.label.toLowerCase();
@@ -210,7 +210,7 @@ export const CommandPalette = () => {
 
   const results = actions
     .filter((action) => !action.hidden)
-    .map((action) => ({ action, score: scoreAction(action, query) }))
+    .map((action) => ({ action, score: scoreCommandAction(action, query) }))
     .filter(({ score }) => score >= 0)
     .sort((a, b) => b.score - a.score || a.action.label.localeCompare(b.action.label))
     .map(({ action }) => action);

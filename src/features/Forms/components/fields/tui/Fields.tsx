@@ -1,4 +1,5 @@
-import { Box, Text, useInput } from "ink";
+import { useTuiInput } from "@features/Workspace/components/tui/Primitives/InputMode";
+import { Box, Text } from "ink";
 import { useEffect } from "react";
 import { useFieldContext, useFormContext } from "../../../context";
 import { useFieldFocus } from "./FieldFocus";
@@ -29,7 +30,7 @@ const useTextInput = (
   update: (value: string) => void,
   next: () => void,
 ) => {
-  useInput((input, key) => {
+  useTuiInput((input, key) => {
     if (!focused || key.tab) {
       return;
     }
@@ -90,7 +91,7 @@ export const SelectField = <TValue extends string>({
   const selected = options.findIndex((option) => {
     return option.value === field.state.value;
   });
-  useInput((input, key) => {
+  useTuiInput((input, key) => {
     if (!focused || key.tab) {
       return;
     }
@@ -137,7 +138,7 @@ export const AutocompleteField = <TValue extends string>({
     },
     next,
   );
-  useInput((_, key) => {
+  useTuiInput((_, key) => {
     if (!focused || options.length === 0 || (!key.upArrow && !key.downArrow)) {
       return;
     }
@@ -187,7 +188,7 @@ export const RadioGroupField = <TValue extends string>({
   const selected = options.findIndex((option) => {
     return option.value === field.state.value;
   });
-  useInput((input, key) => {
+  useTuiInput((input, key) => {
     if (!focused || key.tab) {
       return;
     }
@@ -219,7 +220,7 @@ export const RadioGroupField = <TValue extends string>({
 export const SubmitButton = ({ label, isSaving }: SubmitButtonProps) => {
   const form = useFormContext();
   const { focused } = useFieldFocus();
-  useInput((_, key) => {
+  useTuiInput((_, key) => {
     if (focused && key.return && !isSaving) {
       void form.handleSubmit();
     }

@@ -1,8 +1,9 @@
-import { useMemo, useState } from "react";
-import { Box, Text, render, useApp, useInput } from "ink";
+import { useState } from "react";
+import { Box, Text, render, useInput } from "ink";
 import { fileURLToPath } from "node:url";
 import { resolve } from "node:path";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { CycleableDateTimeProvider } from "./features/Dates/hooks/useCycleableDateTimeMode";
 import { SiteLayout } from "./features/Site/components/tui/SiteLayout/SiteLayout";
 import {
   TuiRouterProvider,
@@ -18,7 +19,12 @@ import { tuiFieldPrimitives } from "./features/Forms/components/fields/tui";
 import { FieldFocusProvider } from "./features/Forms/components/fields/tui/FieldFocus";
 import { FormEditorRendererContext } from "./features/Forms/components/editor/renderer";
 import { tuiFormEditorRenderer } from "./features/Forms/components/editor/tui";
+import { CommandPaletteProvider } from "./features/Commands/commands";
+import { TuiCommandPalette } from "./features/Commands/components/tui/CommandPalette";
+import { TuiNavigationCommands } from "./features/Commands/components/tui/NavigationCommands";
 import { loadTuiArticles, openTuiArticle } from "./features/Site/components/tui/articles";
+import { Home } from "./features/Site/components/tui/Home";
+import { FormDemoHome } from "./features/Workspace/components/tui/FormDemoHome";
 import { ProcessList } from "./features/Processes/components/ProcessList";
 import { TaskList } from "./features/Tasks/components/TaskList";
 import { ThreadList } from "./features/Threads/components/ThreadList";
@@ -33,54 +39,35 @@ import {
   tuiWorkspaceRenderer,
   TuiWorkspaceNavigation,
 } from "./features/Workspace/components/tui/renderer";
+import {
+  TuiInputModeProvider,
+  type TuiInputMode,
+} from "./features/Workspace/components/tui/Primitives/InputMode";
 
 const articles = loadTuiArticles();
-const pages = [
-  { title: "Home", path: "/", description: "Personal site and about" },
-  { title: "Blog", path: "/blog", description: "All articles" },
-  ...articles.map((article) => {
-    return { title: article.title, path: article.href, description: article.description };
-  }),
-  { title: "Python editor", path: "/editor", description: "Interactive Python editor demo" },
-  {
-    title: "Party math trick",
-    path: "/the-party-math-trick-demo",
-    description: "Interactive math demo",
-  },
-  ...(["tasks", "processes", "threads"] as const).flatMap((entity) => {
-    return [
-      {
-        title: `${entity[0].toUpperCase()}${entity.slice(1)}`,
-        path: `/form-demo/${entity}`,
-        description: "List records",
-      },
-      {
-        title: `Create ${entity === "processes" ? "process" : entity.slice(0, -1)}`,
-        path: `/form-demo/${entity}/create`,
-        description: "Create a record",
-      },
-    ];
-  }),
-];
 const queryClient = new QueryClient();
 
 export const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <FieldPrimitivesContext.Provider value={tuiFieldPrimitives}>
-        <FormEditorRendererContext.Provider value={tuiFormEditorRenderer}>
-          <FieldFocusProvider>
-            <WorkspaceRendererContext.Provider value={tuiWorkspaceRenderer}>
-              <BlogListViewContext.Provider value={TuiBlogList}>
-                <TuiRouterProvider
-                  renderRoute={(route) => {
-                    return <TuiScreen route={route} />;
-                  }}
-                />
-              </BlogListViewContext.Provider>
-            </WorkspaceRendererContext.Provider>
-          </FieldFocusProvider>
-        </FormEditorRendererContext.Provider>
+        <CycleableDateTimeProvider>
+          <FormEditorRendererContext.Provider value={tuiFormEditorRenderer}>
+            <CommandPaletteProvider>
+              <FieldFocusProvider>
+                <WorkspaceRendererContext.Provider value={tuiWorkspaceRenderer}>
+                  <BlogListViewContext.Provider value={TuiBlogList}>
+                    <TuiRouterProvider
+                      renderRoute={(route) => {
+                        return <TuiScreen key={JSON.stringify(route)} route={route} />;
+                      }}
+                    />
+                  </BlogListViewContext.Provider>
+                </WorkspaceRendererContext.Provider>
+              </FieldFocusProvider>
+            </CommandPaletteProvider>
+          </FormEditorRendererContext.Provider>
+        </CycleableDateTimeProvider>
       </FieldPrimitivesContext.Provider>
     </QueryClientProvider>
   );
@@ -114,15 +101,9 @@ const FormScreen = ({
 const TuiScreen = ({ route }: { route: TuiRoute }) => {
   const pathname = useTuiPathname();
   const navigate = useTuiNavigate();
-  const [selected, setSelected] = useState(0);
-  const [filter, setFilter] = useState("");
   const [lastKey, setLastKey] = useState("");
-  const { exit } = useApp();
-  const matches = useMemo(() => {
-    return pages.filter((item) => {
-      return `${item.title} ${item.path}`.toLowerCase().includes(filter.toLowerCase());
-    });
-  }, [filter]);
+  const [inputMode, setInputMode] = useState<TuiInputMode>("normal");
+  const [paletteOpen, setPaletteOpen] = useState(false);
   const navigateTo = (path: string) => {
     const article = articles.find((item) => {
       return item.href === path;
@@ -133,6 +114,26 @@ const TuiScreen = ({ route }: { route: TuiRoute }) => {
     void navigate({ to: path as "/" });
   };
   useInput((input, key) => {
+    if (paletteOpen) {
+      return;
+    }
+    const isForm = route.page === "entity-create" || route.page === "entity-edit";
+    if (
+      (key.ctrl && input === "k") ||
+      (!isForm && inputMode === "normal" && input === "f" && lastKey === "f")
+    ) {
+      setPaletteOpen(true);
+      setInputMode("insert");
+      setLastKey("");
+      return;
+    }
+    if (!isForm && inputMode === "normal" && input === "f") {
+      setLastKey("f");
+      return;
+    }
+    if (lastKey === "f") {
+      setLastKey("");
+    }
     if (key.ctrl && input === "o") {
       tuiRouter.history.back();
       return;
@@ -141,101 +142,66 @@ const TuiScreen = ({ route }: { route: TuiRoute }) => {
       tuiRouter.history.forward();
       return;
     }
-    if (route.page !== "home") {
-      if (key.escape) {
-        navigateTo("/");
+    if (key.escape) {
+      if (route.page === "blog" || route.page === "entity-list") {
+        return;
       }
-      return;
-    }
-    if (key.upArrow || input === "k") {
-      setSelected((index) => {
-        return Math.max(0, index - 1);
-      });
-    } else if (key.downArrow || input === "j") {
-      setSelected((index) => {
-        return Math.min(matches.length - 1, index + 1);
-      });
-    } else if (input === "G") {
-      setSelected(Math.max(0, matches.length - 1));
-    } else if (input === "g" && lastKey === "g") {
-      setSelected(0);
-      setLastKey("");
-    } else if (input === "g") {
-      setLastKey("g");
-    } else if (key.backspace || key.delete) {
-      setFilter((value) => {
-        return value.slice(0, -1);
-      });
-    } else if (key.return && matches[selected]) {
-      navigateTo(matches[selected].path);
-    } else if (input === "q") {
-      exit();
-    } else if (input && !key.ctrl && !key.meta) {
-      setFilter((value) => {
-        return value + input;
-      });
-      setSelected(0);
+      if (inputMode === "insert" && (route.page === "home" || route.page === "form-demo")) {
+        setInputMode("normal");
+      } else {
+        tuiRouter.history.back();
+      }
     }
   });
-  const current = matches[selected];
   return (
-    <TuiWorkspaceNavigation onNavigate={navigateTo}>
-      <SiteLayout pathname={pathname} maxWidth={route.page === "article" ? 88 : undefined}>
-        {route.page === "home" ? (
-          <>
-            <Text dimColor>↑/↓ or j/k navigate · type to filter · Enter open · q quit</Text>
-            <Text>
-              Route filter: <Text color="yellow">{filter || "(all routes)"}</Text>
-            </Text>
-            <Box marginTop={1}>
-              <Box flexDirection="column" width="50%">
-                {matches.map((item, index) => {
-                  return (
-                    <Text key={item.path} color={index === selected ? "green" : undefined}>
-                      {index === selected ? "› " : "  "}
-                      {item.title}
-                    </Text>
-                  );
-                })}
-              </Box>
-              {current && (
-                <Box flexDirection="column" paddingLeft={2}>
-                  <Text bold>{current.title}</Text>
-                  <Text color="cyan">{current.path}</Text>
-                  <Text>{current.description}</Text>
-                </Box>
-              )}
-            </Box>
-          </>
-        ) : route.page === "blog" ? (
-          <BlogList articles={articles} />
-        ) : route.page === "entity-list" ? (
-          route.entity === "tasks" ? (
-            <TaskList />
-          ) : route.entity === "processes" ? (
-            <ProcessList />
-          ) : (
-            <ThreadList />
-          )
-        ) : route.page === "entity-detail" ? (
-          route.entity === "tasks" ? (
-            <TaskDetail id={route.id} />
-          ) : route.entity === "processes" ? (
-            <ProcessDetail id={route.id} />
-          ) : (
-            <ThreadDetail id={route.id} />
-          )
-        ) : route.page === "entity-create" || route.page === "entity-edit" ? (
-          <FormScreen route={route} />
-        ) : route.page === "article" ? (
-          <Text dimColor>Article opened in less. Ctrl+O returns to the previous route.</Text>
-        ) : (
-          <Text dimColor>
-            This route is registered. Its feature screen is not implemented in the TUI yet.
-          </Text>
-        )}
-      </SiteLayout>
-    </TuiWorkspaceNavigation>
+    <TuiInputModeProvider mode={inputMode} setMode={setInputMode} paletteOpen={paletteOpen}>
+      <TuiWorkspaceNavigation onNavigate={navigateTo}>
+        <TuiNavigationCommands route={route} />
+        <SiteLayout pathname={pathname} maxWidth={route.page === "article" ? 88 : undefined}>
+          <Box flexDirection="column" display={paletteOpen ? "none" : "flex"}>
+            {route.page === "home" ? (
+              <Home />
+            ) : route.page === "form-demo" ? (
+              <FormDemoHome />
+            ) : route.page === "blog" ? (
+              <BlogList articles={articles} />
+            ) : route.page === "entity-list" ? (
+              route.entity === "tasks" ? (
+                <TaskList />
+              ) : route.entity === "processes" ? (
+                <ProcessList />
+              ) : (
+                <ThreadList />
+              )
+            ) : route.page === "entity-detail" ? (
+              route.entity === "tasks" ? (
+                <TaskDetail id={route.id} />
+              ) : route.entity === "processes" ? (
+                <ProcessDetail id={route.id} />
+              ) : (
+                <ThreadDetail id={route.id} />
+              )
+            ) : route.page === "entity-create" || route.page === "entity-edit" ? (
+              <FormScreen route={route} />
+            ) : route.page === "article" ? (
+              <Text dimColor>Article opened in less. Ctrl+O returns to the previous route.</Text>
+            ) : (
+              <Text dimColor>
+                This route is registered. Its feature screen is not implemented in the TUI yet.
+              </Text>
+            )}
+          </Box>
+          {paletteOpen && (
+            <TuiCommandPalette
+              onClose={() => {
+                setPaletteOpen(false);
+                setInputMode("normal");
+              }}
+            />
+          )}
+        </SiteLayout>
+      </TuiWorkspaceNavigation>
+    </TuiInputModeProvider>
   );
 };
 

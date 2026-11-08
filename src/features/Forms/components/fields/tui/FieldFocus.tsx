@@ -50,17 +50,20 @@ export const FieldFocusProvider = ({ children }: { children: ReactNode }) => {
     </FocusContext.Provider>
   );
 };
-export const useFieldFocus = () => {
+export const useFieldFocus = (enabled = true) => {
   const focus = useContext(FocusContext);
   if (!focus) {
     throw new Error("FieldFocusProvider is missing");
   }
   const id = useId();
   useEffect(() => {
+    if (!enabled) {
+      return;
+    }
     focus.register(id);
     return () => {
       focus.unregister(id);
     };
-  }, [id, focus.register, focus.unregister]);
+  }, [enabled, id, focus.register, focus.unregister]);
   return { focused: focus.active === id, next: focus.next };
 };

@@ -1,6 +1,9 @@
-import { Box, Text, useInput } from "ink";
+import { useTuiInput } from "@features/Workspace/components/tui/Primitives/InputMode";
+import { useAutomaticCommandAction } from "@features/Commands/commands";
+import { Box, Text } from "ink";
 import { EntityTable } from "@features/EntityTable/components/tui/EntityTable";
 import { useTuiWorkspaceNavigation } from "../Primitives/Navigation";
+import { useTuiInputMode } from "../Primitives/InputMode";
 import type { WorkspaceRenderer } from "../../renderer";
 export const EntityList: WorkspaceRenderer["EntityList"] = ({
   title,
@@ -10,8 +13,10 @@ export const EntityList: WorkspaceRenderer["EntityList"] = ({
   loading,
 }) => {
   const navigate = useTuiWorkspaceNavigation();
-  useInput((input) => {
-    if (input === "c") {
+  const { mode } = useTuiInputMode();
+  useAutomaticCommandAction({kind: "button", label: createLabel, command: {group: "Actions"}, execute: () => {navigate(createHref);}});
+  useTuiInput((input) => {
+    if (mode === "normal" && input === "c") {
       navigate(createHref);
     }
   });

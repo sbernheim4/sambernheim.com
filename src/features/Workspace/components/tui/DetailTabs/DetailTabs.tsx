@@ -1,10 +1,11 @@
-import { Box, Text, useInput } from "ink";
+import { useTuiInput } from "@features/Workspace/components/tui/Primitives/InputMode";
+import { Box, Text } from "ink";
 import { useState } from "react";
 import type { DetailTab } from "../../renderer";
 import { DetailSection } from "../DetailSection/DetailSection";
 export const DetailTabs = ({ tabs }: { tabs: readonly DetailTab[] }) => {
   const [selected, setSelected] = useState(0);
-  useInput((input, key) => {
+  useTuiInput((input, key) => {
     if (key.leftArrow || input === "h") {
       setSelected((value) => {
         return Math.max(0, value - 1);

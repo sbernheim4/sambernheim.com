@@ -15,6 +15,18 @@ if (mode !== "tui") {
     return process.exit(code ?? 0);
   });
 } else {
+  const alternateScreen = Boolean(process.stdout.isTTY);
+  if (alternateScreen) {
+    process.stdout.write("\u001b[?1049h\u001b[H");
+  }
+  let screenRestored = false;
+  const restoreScreen = () => {
+    if (alternateScreen && !screenRestored) {
+      screenRestored = true;
+      process.stdout.write("\u001b[?1049l");
+    }
+  };
+  process.once("exit", restoreScreen);
   const server = await createServer({
     configFile: "vite.config.ts",
     mode: "tui",
@@ -58,6 +70,7 @@ if (mode !== "tui") {
   const shutdown = async () => {
     terminal?.unmount();
     await server.close();
+    restoreScreen();
     process.exit(0);
   };
   process.on("SIGINT", shutdown);

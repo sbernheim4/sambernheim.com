@@ -1,4 +1,6 @@
-import { Box, Text, useInput } from "ink";
+import { useTuiInput } from "@features/Workspace/components/tui/Primitives/InputMode";
+import { useAutomaticCommandAction } from "@features/Commands/commands";
+import { Box, Text } from "ink";
 import { useFormEditorContext } from "../../../hooks/useFormEditorContext";
 import { useFieldFocus } from "../../fields/tui/FieldFocus";
 import type { FormEditorActionsProps } from "../FormEditorActions";
@@ -24,7 +26,19 @@ export const FormEditorActions = (_props: FormEditorActionsProps) => {
     submitting ||
     (preventSaveWithoutChanges && actions.isPristine) ||
     !actions.canSubmit;
-  useInput((input, key) => {
+  useAutomaticCommandAction({
+    kind: "button",
+    label: saveLabel ?? "Save changes",
+    command: {group: "Actions", enabled: !disabled},
+    execute: async () => {await actions.onSubmit();},
+  });
+  useAutomaticCommandAction({
+    kind: "button",
+    label: cancelLabel ?? "Cancel",
+    command: showCancel ? { id: "form:cancel", group: "Actions" } : false,
+    execute: cancelEditing,
+  });
+  useTuiInput((input, key) => {
     if (!focused) {
       return;
     }

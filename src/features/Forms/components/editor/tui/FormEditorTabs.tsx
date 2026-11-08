@@ -1,4 +1,5 @@
-import { Box, Text, useInput } from "ink";
+import { useTuiInput } from "@features/Workspace/components/tui/Primitives/InputMode";
+import { Box, Text } from "ink";
 import type { FormEditorRegionProps } from "../formTypes";
 import type { FormEditorTabProps } from "../FormEditorTab";
 import type { FormEditorTabTriggerProps } from "../FormEditorTabTrigger";
@@ -16,7 +17,7 @@ export const FormEditorTabList = ({ children }: FormEditorRegionProps) => {
 export const FormEditorTabTrigger = ({ name, label, disabled }: FormEditorTabTriggerProps) => {
   const { activeTab, setActiveTab } = useFormEditorContext();
   const { focused } = useFieldFocus();
-  useInput((_, key) => {
+  useTuiInput((_, key) => {
     if (focused && key.return && !disabled) {
       setActiveTab(name);
     }
