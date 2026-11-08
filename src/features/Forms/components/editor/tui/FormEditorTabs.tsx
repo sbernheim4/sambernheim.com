@@ -28,8 +28,8 @@ export const FormEditorTabTrigger = ({ name, label, disabled }: FormEditorTabTri
   });
   return (
     <Box ref={ref}>
-      <Text bold={activeTab === name} inverse={focused} dimColor={disabled}>
-        {label}
+      <Text color="yellow" bold={activeTab === name} inverse={focused} dimColor={disabled}>
+        {activeTab === name ? `[ ${label} ]` : label}
       </Text>
     </Box>
   );
@@ -42,7 +42,11 @@ export const FormEditorTab = ({ name, label = name, children }: FormEditorTabPro
   }
   return (
     <Box flexDirection="column" marginBottom={1}>
-      {viewMode === "page" && <Text bold>{label}</Text>}
+      {viewMode === "page" && (
+        <Text bold color="yellow">
+          {label}
+        </Text>
+      )}
       {children}
     </Box>
   );
