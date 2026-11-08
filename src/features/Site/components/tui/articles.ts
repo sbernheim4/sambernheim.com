@@ -12,7 +12,7 @@ export type TuiArticle = {
   content: string;
 };
 
-function extractText(source: string) {
+const extractText = (source: string) => {
   const body = source.replace(/^---[\s\S]*?---\s*/m, "");
   let inCode = false;
   return body
@@ -36,9 +36,9 @@ function extractText(source: string) {
     })
     .join("\n")
     .trim();
-}
+};
 
-export function loadTuiArticles(): TuiArticle[] {
+export const loadTuiArticles = (): TuiArticle[] => {
   const directory = resolve(process.cwd(), "src/articles");
   return readdirSync(directory)
     .filter((file) => {
@@ -58,7 +58,7 @@ export function loadTuiArticles(): TuiArticle[] {
         content: extractText(source),
       };
     });
-}
+};
 
 const ansi = {
   reset: "\u001b[0m",
@@ -71,7 +71,7 @@ const ansi = {
   gray: "\u001b[90m",
   magenta: "\u001b[35m",
 };
-function inline(text: string) {
+const inline = (text: string) => {
   return text
     .replace(
       /\[([^\]]+)\]\(([^)]+)\)/g,
@@ -81,8 +81,8 @@ function inline(text: string) {
     .replace(/\*\*([^*]+)\*\*/g, `${ansi.bold}$1${ansi.reset}`)
     .replace(/(^|[^*])\*([^*]+)\*/g, `$1${ansi.italic}$2${ansi.reset}`)
     .replace(/~~([^~]+)~~/g, `${ansi.gray}$1${ansi.reset}`);
-}
-function formatMarkdown(markdown: string, title: string, columns: number) {
+};
+const formatMarkdown = (markdown: string, title: string, columns: number) => {
   const width = Math.min(88, Math.max(40, Math.floor(columns * 0.68)));
   const left = " ".repeat(Math.max(0, Math.floor((columns - width) / 2)));
   const lines = [
@@ -126,7 +126,7 @@ function formatMarkdown(markdown: string, title: string, columns: number) {
     );
   }
   const visible = (line: string) => {
-    return line.replace(/\u001b\[[0-9;]*m/g, "").length;
+    return line.replace(new RegExp(String.fromCharCode(27) + "\\[[0-9;]*m", "g"), "").length;
   };
   return (
     lines
@@ -139,9 +139,9 @@ function formatMarkdown(markdown: string, title: string, columns: number) {
       })
       .join("\n") + "\n"
   );
-}
+};
 
-export function openTuiArticle(article: TuiArticle) {
+export const openTuiArticle = (article: TuiArticle) => {
   if (!process.stdin.isTTY) {
     return;
   }
@@ -166,4 +166,4 @@ export function openTuiArticle(article: TuiArticle) {
     rmSync(folder, { recursive: true, force: true });
     process.stdout.write("\u001b[2J\u001b[H");
   }
-}
+};

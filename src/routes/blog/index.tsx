@@ -5,14 +5,18 @@ import { WebBlogList } from "@features/Site/components/web/BlogList/BlogList";
 
 const BlogIndex = () => {
   const articles = [...sitePosts]
-    .sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt))
-    .map((post) => ({
-      id: post.slug,
-      title: post.title,
-      description: post.description,
-      href: `/blog/${post.slug}`,
-      publishedAt: post.publishedAt,
-    }));
+    .sort((a, b) => {
+      return Date.parse(b.publishedAt) - Date.parse(a.publishedAt);
+    })
+    .map((post) => {
+      return {
+        id: post.slug,
+        title: post.title,
+        description: post.description,
+        href: `/blog/${post.slug}`,
+        publishedAt: post.publishedAt,
+      };
+    });
   return (
     <BlogListViewContext.Provider value={WebBlogList}>
       <BlogList articles={articles} />
@@ -21,6 +25,8 @@ const BlogIndex = () => {
 };
 
 export const Route = createFileRoute("/blog/")({
-  head: () => ({ meta: [{ title: "Blog | Samuel Bernheim" }] }),
+  head: () => {
+    return { meta: [{ title: "Blog | Samuel Bernheim" }] };
+  },
   component: BlogIndex,
 });

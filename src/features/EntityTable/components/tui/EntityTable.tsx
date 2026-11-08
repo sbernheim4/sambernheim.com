@@ -3,13 +3,13 @@ import { useState } from "react";
 import type { EntityTableRecord } from "../../model";
 import { useEntityTable } from "../../model";
 
-export function EntityTable({
+export const EntityTable = ({
   data,
   onSelect,
 }: {
   data: EntityTableRecord[];
   onSelect?: (record: EntityTableRecord) => void;
-}) {
+}) => {
   const [selected, setSelected] = useState(0);
   const [lastKey, setLastKey] = useState("");
   const { stdout } = useStdout();
@@ -82,4 +82,4 @@ export function EntityTable({
       )}
     </Box>
   );
-}
+};

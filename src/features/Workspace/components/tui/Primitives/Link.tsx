@@ -21,20 +21,32 @@ export const LinkNavigation = ({ children }: { children: ReactNode }) => {
   const [paths, setPaths] = useState<string[]>([]);
   const [selected, setSelected] = useState(0);
   const register = useCallback((href: string) => {
-    setPaths((current) => (current.includes(href) ? current : [...current, href]));
+    setPaths((current) => {
+      return current.includes(href) ? current : [...current, href];
+    });
   }, []);
   const unregister = useCallback((href: string) => {
-    setPaths((current) => current.filter((path) => path !== href));
+    setPaths((current) => {
+      return current.filter((path) => {
+        return path !== href;
+      });
+    });
   }, []);
-  const registry = useMemo(
-    () => ({ register, unregister, selected: paths[selected] }),
-    [register, unregister, paths, selected],
-  );
+  const registry = useMemo(() => {
+    return { register, unregister, selected: paths[selected] };
+  }, [register, unregister, paths, selected]);
   useInput((input, key) => {
-    if (key.upArrow || input === "k") setSelected((value) => Math.max(0, value - 1));
-    else if (key.downArrow || input === "j")
-      setSelected((value) => Math.min(paths.length - 1, value + 1));
-    else if (key.return && paths[selected]) navigate(paths[selected]);
+    if (key.upArrow || input === "k") {
+      setSelected((value) => {
+        return Math.max(0, value - 1);
+      });
+    } else if (key.downArrow || input === "j") {
+      setSelected((value) => {
+        return Math.min(paths.length - 1, value + 1);
+      });
+    } else if (key.return && paths[selected]) {
+      navigate(paths[selected]);
+    }
   });
   return <RegistryContext.Provider value={registry}>{children}</RegistryContext.Provider>;
 };

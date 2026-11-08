@@ -72,7 +72,7 @@ const pages: Page[] = [
   }),
 ];
 
-function resolvePage(path: string): Page | undefined {
+const resolvePage = (path: string): Page | undefined => {
   const exact = pages.find((page) => {
     return page.path === path;
   });
@@ -91,23 +91,23 @@ function resolvePage(path: string): Page | undefined {
     entity,
     entityId: match[2],
   };
-}
+};
 
 const queryClient = new QueryClient();
 
-export function App() {
+export const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <TuiApp />
     </QueryClientProvider>
   );
-}
+};
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
   render(<App />);
 }
 
-function TuiApp() {
+const TuiApp = () => {
   const [selected, setSelected] = useState(0);
   const [filter, setFilter] = useState("");
   const [page, setPage] = useState<Page | null>(null);
@@ -255,4 +255,4 @@ function TuiApp() {
       </TuiWorkspaceNavigation>
     </WorkspaceRendererContext.Provider>
   );
-}
+};

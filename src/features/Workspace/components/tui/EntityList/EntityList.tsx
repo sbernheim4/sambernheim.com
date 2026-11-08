@@ -10,7 +10,12 @@ export const EntityList: WorkspaceRenderer["EntityList"] = ({ title, data, loadi
       {loading ? (
         <Text dimColor>Loading…</Text>
       ) : (
-        <EntityTable data={data} onSelect={(row) => navigate(row.href)} />
+        <EntityTable
+          data={data}
+          onSelect={(row) => {
+            return navigate(row.href);
+          }}
+        />
       )}
     </Box>
   );

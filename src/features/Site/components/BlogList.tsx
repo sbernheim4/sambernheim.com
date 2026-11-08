@@ -11,6 +11,8 @@ export type BlogListView = ComponentType<{ articles: readonly BlogArticle[] }>;
 export const BlogListViewContext = createContext<BlogListView | null>(null);
 export const BlogList = ({ articles }: { articles: readonly BlogArticle[] }) => {
   const View = useContext(BlogListViewContext);
-  if (!View) throw new Error("BlogListView provider is missing");
+  if (!View) {
+    throw new Error("BlogListView provider is missing");
+  }
   return <View articles={articles} />;
 };

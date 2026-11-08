@@ -9,13 +9,15 @@ export const DetailSection = ({
   children: ReactNode;
   collapsible?: boolean;
   showLabel?: boolean;
-}) => (
-  <Box flexDirection="column" marginTop={1}>
-    {showLabel && (
-      <Text bold color="yellow">
-        {label.toUpperCase()}
-      </Text>
-    )}
-    {children}
-  </Box>
-);
+}) => {
+  return (
+    <Box flexDirection="column" marginTop={1}>
+      {showLabel && (
+        <Text bold color="yellow">
+          {label.toUpperCase()}
+        </Text>
+      )}
+      {children}
+    </Box>
+  );
+};

@@ -7,14 +7,16 @@ export const EntityList: WorkspaceRenderer["EntityList"] = ({
   createLabel,
   data,
   loading,
-}) => (
-  <>
-    <div className="heading">
-      <h1>{title}</h1>
-      <CommandLink className="primary-action" to={createHref}>
-        {createLabel}
-      </CommandLink>
-    </div>
-    {loading ? <p>Loading...</p> : <EntityTable data={data} />}
-  </>
-);
+}) => {
+  return (
+    <>
+      <div className="heading">
+        <h1>{title}</h1>
+        <CommandLink className="primary-action" to={createHref}>
+          {createLabel}
+        </CommandLink>
+      </div>
+      {loading ? <p>Loading...</p> : <EntityTable data={data} />}
+    </>
+  );
+};

@@ -23,7 +23,7 @@ const columns: ColumnDef<typeof features, EntityTableRecord, any>[] = [
   column.accessor("summary", { header: "Details" }),
 ];
 
-export function useEntityTable(data: EntityTableRecord[]) {
+export const useEntityTable = (data: EntityTableRecord[]) => {
   const [sorting, setSorting] = useState<SortingState>([]);
   return useTable({
     features,
@@ -35,4 +35,4 @@ export function useEntityTable(data: EntityTableRecord[]) {
     state: { sorting },
     onSortingChange: setSorting,
   });
-}
+};

@@ -7,5 +7,9 @@ export const TuiWorkspaceNavigation = ({
 }: {
   onNavigate: (path: string) => void;
   children: ReactNode;
-}) => <NavigationContext.Provider value={onNavigate}>{children}</NavigationContext.Provider>;
-export const useTuiWorkspaceNavigation = () => useContext(NavigationContext);
+}) => {
+  return <NavigationContext.Provider value={onNavigate}>{children}</NavigationContext.Provider>;
+};
+export const useTuiWorkspaceNavigation = () => {
+  return useContext(NavigationContext);
+};

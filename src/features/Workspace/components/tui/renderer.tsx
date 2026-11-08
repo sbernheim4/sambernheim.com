@@ -21,7 +21,11 @@ export const tuiWorkspaceRenderer: WorkspaceRenderer = {
   Status,
   Loading,
   Missing,
-  DateTime: ({ value }) => <Text>{value.toLocaleString()}</Text>,
-  Number: ({ value }) => <Text>{value.toLocaleString()}</Text>,
+  DateTime: ({ value }) => {
+    return <Text>{value.toLocaleString()}</Text>;
+  },
+  Number: ({ value }) => {
+    return <Text>{value.toLocaleString()}</Text>;
+  },
   EntityList,
 };

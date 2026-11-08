@@ -3,7 +3,7 @@ import type { EntityTableRecord } from "../../model";
 import { useEntityTable } from "../../model";
 import "./EntityTable.css";
 
-export function EntityTable({ data }: { data: EntityTableRecord[] }) {
+export const EntityTable = ({ data }: { data: EntityTableRecord[] }) => {
   const table = useEntityTable(data);
   return (
     <div className="entity-table-scroll">
@@ -60,4 +60,4 @@ export function EntityTable({ data }: { data: EntityTableRecord[] }) {
       </table>
     </div>
   );
-}
+};

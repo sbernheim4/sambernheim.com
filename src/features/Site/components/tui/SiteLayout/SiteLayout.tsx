@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { Box, Text, useStdout } from "ink";
 
-export function SiteLayout({
+export const SiteLayout = ({
   pathname,
   children,
   maxWidth,
@@ -9,7 +9,7 @@ export function SiteLayout({
   pathname: string;
   children: ReactNode;
   maxWidth?: number;
-}) {
+}) => {
   const { stdout } = useStdout();
   const width = maxWidth
     ? Math.min(maxWidth, Math.max(40, (stdout.columns ?? 100) - 4))
@@ -34,4 +34,4 @@ export function SiteLayout({
       </Box>
     </Box>
   );
-}
+};

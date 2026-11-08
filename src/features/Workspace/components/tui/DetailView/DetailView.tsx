@@ -9,11 +9,13 @@ export const DetailView = ({ tabs }: { tabs: readonly DetailTab[] }) => {
     <Box flexDirection="column">
       <ViewModePicker mode={mode} onChange={updateMode} />
       {mode === "page" ? (
-        tabs.map((tab) => (
-          <DetailSection key={tab.value} label={tab.label}>
-            {tab.children}
-          </DetailSection>
-        ))
+        tabs.map((tab) => {
+          return (
+            <DetailSection key={tab.value} label={tab.label}>
+              {tab.children}
+            </DetailSection>
+          );
+        })
       ) : (
         <DetailTabs tabs={tabs} />
       )}
