@@ -73,11 +73,7 @@ export const TuiMenu = ({ items }: { items: readonly TuiMenuItem[] }) => {
 
   return (
     <Box flexDirection="column" marginTop={1}>
-      <Text dimColor>
-        {mode === "insert"
-          ? "INSERT · type to search · Esc normal"
-          : "NORMAL · j/k move · i or / search · Enter open · ff commands"}
-      </Text>
+      <Text dimColor>{mode === "insert" ? "Search:" : ""}</Text>
       {(mode === "insert" || query) && (
         <Text>
           Search:{" "}

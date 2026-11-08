@@ -141,7 +141,7 @@ export const EntityTable = ({
   return (
     <Box flexDirection="column" width="100%">
       <Text dimColor>
-        {mode === "insert" ? "INSERT · search: " : "NORMAL · i or / search · j/k move · Enter open"}
+        {mode === "insert" ? "Search: " : ""}
         {search && <Text color="yellow">{search}</Text>}
         {mode === "insert" && <Text color="yellow">▏</Text>}
       </Text>
@@ -157,16 +157,21 @@ export const EntityTable = ({
         rows.slice(start, start + pageSize).map((row, offset) => {
           const isSelected = start + offset === activeIndex;
           return (
-            <Box key={row.id} flexDirection="row" width={width}>
-              <Text color="green" inverse={isSelected}>
+            <Box
+              key={row.id}
+              flexDirection="row"
+              width={width}
+              backgroundColor={isSelected ? "cyan" : undefined}
+            >
+              <Text color={isSelected ? "black" : "green"}>
                 {row.original.name.slice(0, nameWidth - 2).padEnd(nameWidth)}
               </Text>
               {variant === "entities" && (
-                <Text color="yellow" inverse={isSelected}>
+                <Text color={isSelected ? "black" : "yellow"}>
                   {row.original.status.slice(0, statusWidth - 2).padEnd(statusWidth)}
                 </Text>
               )}
-              <Text inverse={isSelected && !dateFocused}>
+              <Text color={isSelected ? "black" : undefined}>
                 {row.original.summary.slice(0, summaryWidth - 2).padEnd(summaryWidth)}
               </Text>
               {row.original.publishedAt && (
@@ -176,7 +181,7 @@ export const EntityTable = ({
                     showHint={false}
                     managedFocus
                     focused={isSelected && dateFocused}
-                    highlighted={isSelected && !dateFocused}
+                    highlighted={false}
                   />
                 </Box>
               )}
@@ -188,8 +193,7 @@ export const EntityTable = ({
       )}
       {rows.length > pageSize && (
         <Text dimColor>
-          {start + 1}–{Math.min(start + pageSize, rows.length)} of {rows.length} · j/k scroll · gg/G
-          first/last · Enter open · Alt/Option+number sorts columns
+          {start + 1}–{Math.min(start + pageSize, rows.length)} of {rows.length}
         </Text>
       )}
     </Box>

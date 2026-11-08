@@ -26,9 +26,6 @@ export const SiteLayout = ({
         <Text bold color="cyan">
           Samuel Bernheim · Site TUI
         </Text>
-        <Text dimColor>
-          j/k move · i or / search · ff commands · Enter open · Esc or Ctrl+O back · Ctrl+I forward
-        </Text>
         <Box borderStyle="round" borderColor="gray" paddingX={1} marginTop={1}>
           <Text dimColor>⌕ </Text>
           <Text color="cyan">sambernheim.com{pathname}</Text>

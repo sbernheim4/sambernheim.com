@@ -5,6 +5,87 @@ import { useFormEditorContext } from "../../../hooks/useFormEditorContext";
 import { useFieldFocus } from "../../fields/tui/FieldFocus";
 import type { FormEditorActionsProps } from "../FormEditorActions";
 
+const StepDelayControl = ({
+  run,
+}: {
+  run: ReturnType<typeof useFormEditorContext>["actions"]["orchestrator"];
+}) => {
+  const { focused, ref } = useFieldFocus(Boolean(run), true);
+  useTuiInput((input, key) => {
+    if (!focused || !run) {
+      return;
+    }
+    if (key.leftArrow || key.downArrow || input === "h" || input === "k") {
+      run.setProgressDelayMs(Math.max(0, run.progressDelayMs - 100));
+    } else if (key.rightArrow || key.upArrow || input === "l" || input === "j") {
+      run.setProgressDelayMs(run.progressDelayMs + 100);
+    }
+  });
+  return run ? (
+    <Box ref={ref}>
+      <Text inverse={focused} dimColor>
+        Step delay: {run.progressDelayMs} ms
+      </Text>
+    </Box>
+  ) : null;
+};
+
+const SaveAction = ({
+  actions,
+  disabled,
+  submitting,
+  label,
+}: {
+  actions: ReturnType<typeof useFormEditorContext>["actions"];
+  disabled: boolean;
+  submitting: boolean;
+  label: string;
+}) => {
+  const { focused, ref } = useFieldFocus();
+  useTuiInput((_, key) => {
+    if (focused && key.return && !disabled) {
+      void actions.onSubmit();
+    }
+  });
+  return (
+    <Box ref={ref}>
+      <Text inverse={focused} color={disabled ? "gray" : "green"}>
+        {submitting ? "Saving…" : label}
+        {focused ? " · Enter" : ""}
+      </Text>
+    </Box>
+  );
+};
+
+const CancelAction = ({
+  enabled,
+  submitting,
+  label,
+  onCancel,
+}: {
+  enabled: boolean;
+  submitting: boolean;
+  label: string;
+  onCancel: () => void;
+}) => {
+  const { focused, ref } = useFieldFocus(enabled);
+  useTuiInput((input, key) => {
+    if (focused && key.return && enabled && !submitting) {
+      onCancel();
+    } else if (focused && input === "c" && enabled && !submitting) {
+      onCancel();
+    }
+  });
+  return enabled ? (
+    <Box ref={ref}>
+      <Text inverse={focused} dimColor>
+        {label}
+        {focused ? " · Enter" : ""}
+      </Text>
+    </Box>
+  ) : null;
+};
+
 export const FormEditorActions = (_props: FormEditorActionsProps) => {
   const {
     actions,
@@ -18,7 +99,6 @@ export const FormEditorActions = (_props: FormEditorActionsProps) => {
     showCancel,
     cancelEditing,
   } = useFormEditorContext();
-  const { focused } = useFieldFocus();
   const submitting = actions.isSubmitting || Boolean(actions.orchestrator?.isSubmitting);
   const disabled =
     readOnly ||
@@ -40,34 +120,21 @@ export const FormEditorActions = (_props: FormEditorActionsProps) => {
     command: showCancel ? { id: "form:cancel", group: "Actions" } : false,
     execute: cancelEditing,
   });
-  useTuiInput((input, key) => {
-    if (!focused) {
-      return;
-    }
-    if (key.return && !disabled) {
-      void actions.onSubmit();
-    }
-    if (input === "c" && showCancel && !submitting) {
-      cancelEditing();
-    }
-  });
   return (
     <Box flexDirection="column" marginTop={1}>
-      {actions.orchestrator && (
-        <Text dimColor>Step delay: {actions.orchestrator.progressDelayMs} ms</Text>
-      )}
-      <Text inverse={focused} color={disabled ? "gray" : "green"}>
-        {submitting
-          ? "Saving…"
-          : (saveLabel ?? (saveButtonVariant === "next" ? "Next" : "Save changes"))}
-        {focused ? " · Enter" : ""}
-      </Text>
-      {showCancel && (
-        <Text dimColor>
-          {cancelLabel ?? (cancelButtonVariant === "previous" ? "Previous" : "Cancel")}
-          {focused ? " · c" : ""}
-        </Text>
-      )}
+      <StepDelayControl run={actions.orchestrator} />
+      <SaveAction
+        actions={actions}
+        disabled={disabled}
+        submitting={submitting}
+        label={saveLabel ?? (saveButtonVariant === "next" ? "Next" : "Save changes")}
+      />
+      <CancelAction
+        enabled={Boolean(showCancel)}
+        submitting={submitting}
+        label={cancelLabel ?? (cancelButtonVariant === "previous" ? "Previous" : "Cancel")}
+        onCancel={cancelEditing}
+      />
     </Box>
   );
 };

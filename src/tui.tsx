@@ -105,11 +105,23 @@ const TuiScreen = ({ route }: { route: TuiRoute }) => {
   const [lastKey, setLastKey] = useState("");
   const [inputMode, setInputMode] = useState<TuiInputMode>("normal");
   const [paletteOpen, setPaletteOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
   const navigateTo = (path: string) => {
     void navigate({ to: path as "/" });
   };
   useInput((input, key) => {
+    if (helpOpen) {
+      if (key.escape || input === "?") {
+        setHelpOpen(false);
+      }
+      return;
+    }
     if (paletteOpen) {
+      return;
+    }
+    if (input === "?" && inputMode === "normal") {
+      setHelpOpen(true);
+      setLastKey("");
       return;
     }
     const isForm = route.page === "entity-create" || route.page === "entity-edit";
@@ -149,7 +161,12 @@ const TuiScreen = ({ route }: { route: TuiRoute }) => {
     }
   });
   return (
-    <TuiInputModeProvider mode={inputMode} setMode={setInputMode} paletteOpen={paletteOpen}>
+    <TuiInputModeProvider
+      mode={inputMode}
+      setMode={setInputMode}
+      paletteOpen={paletteOpen}
+      helpOpen={helpOpen}
+    >
       <TuiWorkspaceNavigation onNavigate={navigateTo}>
         <TuiNavigationCommands route={route} />
         <SiteLayout pathname={pathname} maxWidth={route.page === "article" ? 88 : undefined}>
@@ -197,6 +214,35 @@ const TuiScreen = ({ route }: { route: TuiRoute }) => {
                 setInputMode("normal");
               }}
             />
+          )}
+          {helpOpen && (
+            <Box
+              position="absolute"
+              flexDirection="column"
+              alignSelf="center"
+              borderStyle="round"
+              borderColor="cyan"
+              backgroundColor="black"
+              width={58}
+              paddingX={3}
+              paddingY={2}
+              rowGap={1}
+              marginTop={2}
+            >
+              <Text bold color="cyan">
+                Keyboard shortcuts
+              </Text>
+              <Text>j / k Move or scroll</Text>
+              <Text>gg / G First / last item</Text>
+              <Text>zz Center selection</Text>
+              <Text>i or / Search in a list</Text>
+              <Text>Enter Open or activate</Text>
+              <Text>Tab Focus next control</Text>
+              <Text>Esc Back or clear focus</Text>
+              <Text>Ctrl+O / Ctrl+I Back / forward</Text>
+              <Text>ff Open command palette</Text>
+              <Text>? Close this help</Text>
+            </Box>
           )}
         </SiteLayout>
       </TuiWorkspaceNavigation>

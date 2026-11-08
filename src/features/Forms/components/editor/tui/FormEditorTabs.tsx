@@ -7,6 +7,10 @@ import { useFormEditorContext } from "../../../hooks/useFormEditorContext";
 import { useFieldFocus } from "../../fields/tui/FieldFocus";
 
 export const FormEditorTabList = ({ children }: FormEditorRegionProps) => {
+  const { viewMode } = useFormEditorContext();
+  if (viewMode === "page") {
+    return <></>;
+  }
   return (
     <Box flexDirection="row" gap={2} marginBottom={1}>
       {children}
@@ -16,16 +20,18 @@ export const FormEditorTabList = ({ children }: FormEditorRegionProps) => {
 
 export const FormEditorTabTrigger = ({ name, label, disabled }: FormEditorTabTriggerProps) => {
   const { activeTab, setActiveTab } = useFormEditorContext();
-  const { focused } = useFieldFocus();
+  const { focused, ref } = useFieldFocus();
   useTuiInput((_, key) => {
     if (focused && key.return && !disabled) {
       setActiveTab(name);
     }
   });
   return (
-    <Text bold={activeTab === name} inverse={focused} dimColor={disabled}>
-      {label}
-    </Text>
+    <Box ref={ref}>
+      <Text bold={activeTab === name} inverse={focused} dimColor={disabled}>
+        {label}
+      </Text>
+    </Box>
   );
 };
 

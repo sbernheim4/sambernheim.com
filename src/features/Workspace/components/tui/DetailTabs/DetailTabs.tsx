@@ -5,12 +5,12 @@ import type { DetailTab } from "../../renderer";
 import { DetailSection } from "../DetailSection/DetailSection";
 export const DetailTabs = ({ tabs }: { tabs: readonly DetailTab[] }) => {
   const [selected, setSelected] = useState(0);
-  useTuiInput((input, key) => {
-    if (key.leftArrow || input === "h") {
+  useTuiInput((input) => {
+    if (input === "h") {
       setSelected((value) => {
         return Math.max(0, value - 1);
       });
-    } else if (key.rightArrow || input === "l") {
+    } else if (input === "l") {
       setSelected((value) => {
         return Math.min(tabs.length - 1, value + 1);
       });

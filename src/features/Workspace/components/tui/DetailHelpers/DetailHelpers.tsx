@@ -1,6 +1,23 @@
+import { Children, Fragment, isValidElement, type ReactNode } from "react";
 import { Box, Text } from "ink";
-import type { ReactNode } from "react";
 import { useExecutionProfile } from "@features/ExecutionProfiles/hooks/useExecutionProfile";
+
+const DetailValue = ({ value }: { value: ReactNode }) => {
+  if (typeof value === "string" || typeof value === "number") {
+    return <Text>{value}</Text>;
+  }
+  if (Array.isArray(value)) {
+    return value.map((child, index) => {
+      return <DetailValue key={index} value={child} />;
+    });
+  }
+  if (isValidElement<{ children?: ReactNode }>(value) && value.type === Fragment) {
+    return Children.map(value.props.children, (child) => {
+      return <DetailValue value={child} />;
+    });
+  }
+  return value;
+};
 export const DetailProperties = ({
   properties,
 }: {
@@ -10,10 +27,10 @@ export const DetailProperties = ({
     <Box flexDirection="column">
       {properties.map((property) => {
         return (
-          <Text key={property.label}>
+          <Box key={property.label} flexDirection="row">
             <Text color="gray">{property.label}: </Text>
-            {property.value}
-          </Text>
+            <DetailValue value={property.value} />
+          </Box>
         );
       })}
     </Box>

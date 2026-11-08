@@ -106,10 +106,6 @@ export const ArticleViewer = ({ article }: { article?: TuiArticle }) => {
             <ArticleMarkdown source={article.content} />
           </Box>
         </Box>
-        <Text dimColor wrap="truncate">
-          j/k scroll · gg/G top/end · Tab focus · Enter activate · Esc{" "}
-          {focusedId ? "unfocus" : "back"} · zz center
-        </Text>
       </Box>
     </ArticleFocusProvider>
   );

@@ -89,11 +89,6 @@ export const TuiCommandPalette = ({ onClose }: { onClose: () => void }) => {
       <Text bold color="cyan">
         COMMAND PALETTE
       </Text>
-      <Text dimColor>
-        {mode === "insert"
-          ? "INSERT · type to search · Esc normal · Enter run"
-          : "NORMAL · j/k move · i or / search · Esc close"}
-      </Text>
       <Text>
         ⌕{" "}
         <Text color="yellow">

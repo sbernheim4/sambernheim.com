@@ -19,7 +19,6 @@ export const DetailLayout = ({
         <Text bold color="cyan">
           {title}
         </Text>
-        <Text dimColor>j/k select link · Enter open</Text>
         <Link href={editTo}>Edit</Link>
         {children}
       </Box>

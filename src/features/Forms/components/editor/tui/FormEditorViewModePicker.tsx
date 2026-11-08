@@ -3,30 +3,49 @@ import { Box, Text } from "ink";
 import { useFieldFocus } from "../../fields/tui/FieldFocus";
 import type { ViewMode } from "../../../../Workspace/hooks/useViewModePreference";
 
-export const FormEditorViewModePicker = ({
+const ViewModeOption = ({
   mode,
+  selected,
+  onChange,
+}: {
+  mode: ViewMode;
+  selected: boolean;
+  onChange: (mode: ViewMode) => void;
+}) => {
+  const { focused, ref } = useFieldFocus();
+  useTuiInput((_, key) => {
+    if (focused && key.return) {
+      onChange(mode);
+    }
+  });
+  return (
+    <Box ref={ref}>
+      <Text bold={selected} inverse={focused} color={selected ? "cyan" : undefined}>
+        {mode === "page" ? "Full page" : "Tabs"}
+      </Text>
+    </Box>
+  );
+};
+
+export const FormEditorViewModePicker = ({
+  mode: selectedMode,
   onChange,
 }: {
   mode: ViewMode;
   onChange: (mode: ViewMode) => void;
 }) => {
-  const { focused } = useFieldFocus();
   const modes: ViewMode[] = ["tabs", "page"];
-  useTuiInput((input, key) => {
-    if (!focused || (!key.leftArrow && !key.rightArrow && input !== "h" && input !== "l")) {
-      return;
-    }
-    const offset = key.leftArrow || input === "h" ? -1 : 1;
-    onChange(modes[(modes.indexOf(mode) + offset + modes.length) % modes.length]);
-  });
   return (
     <Box gap={2}>
       <Text dimColor>View:</Text>
-      {modes.map((item) => {
+      {modes.map((mode) => {
         return (
-          <Text key={item} bold={mode === item} inverse={focused && mode === item}>
-            {item === "page" ? "Full page" : item}
-          </Text>
+          <ViewModeOption
+            key={mode}
+            mode={mode}
+            selected={selectedMode === mode}
+            onChange={onChange}
+          />
         );
       })}
     </Box>

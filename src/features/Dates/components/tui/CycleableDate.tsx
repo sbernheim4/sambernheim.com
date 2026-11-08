@@ -1,5 +1,5 @@
 import { format, formatDistanceToNow, isValid } from "date-fns";
-import { Text } from "ink";
+import { Box, Text } from "ink";
 import { useEffect } from "react";
 import { useCycleableDateTimeMode } from "../../hooks/useCycleableDateTimeMode";
 import { useFieldFocus } from "@features/Forms/components/fields/tui/FieldFocus";
@@ -22,7 +22,7 @@ export const TuiCycleableDate = ({
 }) => {
   const date = value instanceof Date ? value : new Date(value);
   const { mode, setMode } = useCycleableDateTimeMode();
-  const { focused: fieldFocused } = useFieldFocus(!managedFocus);
+  const { focused: fieldFocused, ref } = useFieldFocus(!managedFocus);
   const focused = controlledFocused ?? fieldFocused;
   useEffect(() => {
     onFocusChange?.(focused);
@@ -38,16 +38,18 @@ export const TuiCycleableDate = ({
       ? formatDistanceToNow(date, { addSuffix: true })
       : format(date, "PP");
   return (
-    <Text inverse={focused || highlighted}>
-      {label}
-      {focused && showHint ? " · Enter to cycle" : ""}
-    </Text>
+    <Box ref={ref}>
+      <Text inverse={focused || highlighted}>
+        {label}
+        {focused && showHint ? " · Enter to cycle" : ""}
+      </Text>
+    </Box>
   );
 };
 
 export const TuiCycleableDateTime = ({ value }: { value: Date }) => {
   const { mode, setMode } = useCycleableDateTimeMode();
-  const { focused } = useFieldFocus();
+  const { focused, ref } = useFieldFocus();
   useTuiInput((_, key) => {
     if (focused && key.return) {
       const modes = ["utc", "relative", "local"] as const;
@@ -66,9 +68,11 @@ export const TuiCycleableDateTime = ({ value }: { value: Date }) => {
             timeZone: "UTC",
           }).format(value);
   return (
-    <Text inverse={focused}>
-      {label}
-      {focused ? " · Enter to cycle" : ""}
-    </Text>
+    <Box ref={ref}>
+      <Text inverse={focused}>
+        {label}
+        {focused ? " · Enter to cycle" : ""}
+      </Text>
+    </Box>
   );
 };

@@ -57,7 +57,7 @@ const useTextInput = (
 };
 export const TextField = ({ label, placeholder, required, onChange }: TextFieldProps) => {
   const field = useFieldContext<string>();
-  const { focused, next } = useFieldFocus();
+  const { focused, next, ref } = useFieldFocus(true, true);
   const value = String(field.state.value ?? "");
   useBlurOnExit(focused, field.handleBlur);
   useTextInput(
@@ -70,7 +70,7 @@ export const TextField = ({ label, placeholder, required, onChange }: TextFieldP
     next,
   );
   return (
-    <Box flexDirection="column">
+    <Box ref={ref} flexDirection="column">
       <Text inverse={focused}>
         {label}
         {required ? " *" : ""}: {value || <Text dimColor>{placeholder || "—"}</Text>}
@@ -86,7 +86,7 @@ export const SelectField = <TValue extends string>({
   onChange,
 }: SelectFieldProps<TValue>) => {
   const field = useFieldContext<TValue | "">();
-  const { focused, next } = useFieldFocus();
+  const { focused, next, ref } = useFieldFocus(true, true);
   useBlurOnExit(focused, field.handleBlur);
   const selected = options.findIndex((option) => {
     return option.value === field.state.value;
@@ -112,7 +112,7 @@ export const SelectField = <TValue extends string>({
   });
   const selectedLabel = options[selected]?.label ?? placeholder ?? "Select option";
   return (
-    <Box flexDirection="column">
+    <Box ref={ref} flexDirection="column">
       <Text inverse={focused}>
         {label}: {selectedLabel}
         {focused ? " · ↑/↓ choose" : ""}
@@ -127,7 +127,7 @@ export const AutocompleteField = <TValue extends string>({
   placeholder,
 }: AutocompleteFieldProps<TValue>) => {
   const field = useFieldContext<TValue>();
-  const { focused, next } = useFieldFocus();
+  const { focused, next, ref } = useFieldFocus(true, true);
   const value = String(field.state.value ?? "");
   useBlurOnExit(focused, field.handleBlur);
   useTextInput(
@@ -160,7 +160,7 @@ export const AutocompleteField = <TValue extends string>({
     })
     .slice(0, 3);
   return (
-    <Box flexDirection="column">
+    <Box ref={ref} flexDirection="column">
       <Text inverse={focused}>
         {label}: {value || <Text dimColor>{placeholder || "—"}</Text>}
       </Text>
@@ -183,7 +183,7 @@ export const RadioGroupField = <TValue extends string>({
   onChange,
 }: RadioGroupFieldProps<TValue>) => {
   const field = useFieldContext<TValue>();
-  const { focused, next } = useFieldFocus();
+  const { focused, next, ref } = useFieldFocus(true, true);
   useBlurOnExit(focused, field.handleBlur);
   const selected = options.findIndex((option) => {
     return option.value === field.state.value;
@@ -208,7 +208,7 @@ export const RadioGroupField = <TValue extends string>({
     }
   });
   return (
-    <Box flexDirection="column">
+    <Box ref={ref} flexDirection="column">
       <Text inverse={focused}>
         {label}: {options[selected]?.label ?? "—"}
         {focused ? " · ←/→ choose" : ""}
@@ -219,15 +219,17 @@ export const RadioGroupField = <TValue extends string>({
 };
 export const SubmitButton = ({ label, isSaving }: SubmitButtonProps) => {
   const form = useFormContext();
-  const { focused } = useFieldFocus();
+  const { focused, ref } = useFieldFocus();
   useTuiInput((_, key) => {
     if (focused && key.return && !isSaving) {
       void form.handleSubmit();
     }
   });
   return (
-    <Text color={isSaving ? "gray" : "green"} inverse={focused}>
-      {isSaving ? "Saving..." : label}
-    </Text>
+    <Box ref={ref}>
+      <Text color={isSaving ? "gray" : "green"} inverse={focused}>
+        {isSaving ? "Saving..." : label}
+      </Text>
+    </Box>
   );
 };

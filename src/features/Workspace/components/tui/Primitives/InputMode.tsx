@@ -13,21 +13,24 @@ const InputModeContext = createContext<{
   mode: TuiInputMode;
   setMode: Dispatch<SetStateAction<TuiInputMode>>;
   paletteOpen: boolean;
+  helpOpen: boolean;
 } | null>(null);
 
 export const TuiInputModeProvider = ({
   mode,
   setMode,
   paletteOpen,
+  helpOpen = false,
   children,
 }: {
   mode: TuiInputMode;
   setMode: Dispatch<SetStateAction<TuiInputMode>>;
   paletteOpen: boolean;
+  helpOpen?: boolean;
   children: ReactNode;
 }) => {
   return (
-    <InputModeContext.Provider value={{ mode, setMode, paletteOpen }}>
+    <InputModeContext.Provider value={{ mode, setMode, paletteOpen, helpOpen }}>
       {children}
     </InputModeContext.Provider>
   );
@@ -46,11 +49,11 @@ export const useOptionalTuiInputMode = () => {
 };
 
 export const useTuiInput = (handler: (input: string, key: Key) => void) => {
-  const { paletteOpen } = useTuiInputMode();
-  useInput(handler, { isActive: !paletteOpen });
+  const { paletteOpen, helpOpen } = useTuiInputMode();
+  useInput(handler, { isActive: !paletteOpen && !helpOpen });
 };
 
 export const useTuiInputIfAvailable = (handler: (input: string, key: Key) => void) => {
   const context = useOptionalTuiInputMode();
-  useInput(handler, { isActive: !context?.paletteOpen });
+  useInput(handler, { isActive: !context?.paletteOpen && !context?.helpOpen });
 };
