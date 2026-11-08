@@ -29,8 +29,10 @@ export const FormEditorActions = (_props: FormEditorActionsProps) => {
   useAutomaticCommandAction({
     kind: "button",
     label: saveLabel ?? "Save changes",
-    command: {group: "Actions", enabled: !disabled},
-    execute: async () => {await actions.onSubmit();},
+    command: { group: "Actions", enabled: !disabled },
+    execute: async () => {
+      await actions.onSubmit();
+    },
   });
   useAutomaticCommandAction({
     kind: "button",

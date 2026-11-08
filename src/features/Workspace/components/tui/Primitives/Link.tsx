@@ -10,7 +10,11 @@ import {
 } from "react";
 import { Text } from "ink";
 import { useTuiWorkspaceNavigation } from "./Navigation";
-import { getCommandLabel, useAutomaticCommandAction, type CommandOverride } from "@features/Commands/commands";
+import {
+  getCommandLabel,
+  useAutomaticCommandAction,
+  type CommandOverride,
+} from "@features/Commands/commands";
 
 type Registry = {
   register: (href: string) => void;
@@ -52,14 +56,24 @@ export const LinkNavigation = ({ children }: { children: ReactNode }) => {
   });
   return <RegistryContext.Provider value={registry}>{children}</RegistryContext.Provider>;
 };
-export const Link = ({ href, children, command }: { href: string; children: ReactNode; command?: CommandOverride }) => {
+export const Link = ({
+  href,
+  children,
+  command,
+}: {
+  href: string;
+  children: ReactNode;
+  command?: CommandOverride;
+}) => {
   const registry = useContext(RegistryContext);
   const navigate = useTuiWorkspaceNavigation();
   useAutomaticCommandAction({
     kind: "link",
     label: getCommandLabel(children),
     command,
-    execute: () => {navigate(href);},
+    execute: () => {
+      navigate(href);
+    },
   });
   useEffect(() => {
     registry?.register(href);

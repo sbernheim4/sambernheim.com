@@ -15,13 +15,19 @@ export const SiteLayout = ({
     ? Math.min(maxWidth, Math.max(40, (stdout.columns ?? 100) - 4))
     : Math.max(40, (stdout.columns ?? 100) - 4);
   return (
-      <Box flexDirection="column" paddingY={1} width="100%" height={stdout.rows ?? 24} overflow="hidden">
+    <Box
+      flexDirection="column"
+      paddingY={1}
+      width="100%"
+      height={stdout.rows ?? 24}
+      overflow="hidden"
+    >
       <Box flexDirection="column" width={width} alignSelf="center">
         <Text bold color="cyan">
           Samuel Bernheim · Site TUI
         </Text>
         <Text dimColor>
-            j/k move · i or / search · ff commands · Enter open · Esc or Ctrl+O back · Ctrl+I forward
+          j/k move · i or / search · ff commands · Enter open · Esc or Ctrl+O back · Ctrl+I forward
         </Text>
         <Box borderStyle="round" borderColor="gray" paddingX={1} marginTop={1}>
           <Text dimColor>⌕ </Text>

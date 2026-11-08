@@ -1,3 +1,4 @@
+import { ArticleViewer } from "./features/Site/components/tui/Article/ArticleViewer";
 import { useState } from "react";
 import { Box, Text, render, useInput } from "ink";
 import { fileURLToPath } from "node:url";
@@ -22,7 +23,7 @@ import { tuiFormEditorRenderer } from "./features/Forms/components/editor/tui";
 import { CommandPaletteProvider } from "./features/Commands/commands";
 import { TuiCommandPalette } from "./features/Commands/components/tui/CommandPalette";
 import { TuiNavigationCommands } from "./features/Commands/components/tui/NavigationCommands";
-import { loadTuiArticles, openTuiArticle } from "./features/Site/components/tui/articles";
+import { loadTuiArticles } from "./features/Site/components/tui/articles";
 import { Home } from "./features/Site/components/tui/Home";
 import { FormDemoHome } from "./features/Workspace/components/tui/FormDemoHome";
 import { ProcessList } from "./features/Processes/components/ProcessList";
@@ -105,12 +106,6 @@ const TuiScreen = ({ route }: { route: TuiRoute }) => {
   const [inputMode, setInputMode] = useState<TuiInputMode>("normal");
   const [paletteOpen, setPaletteOpen] = useState(false);
   const navigateTo = (path: string) => {
-    const article = articles.find((item) => {
-      return item.href === path;
-    });
-    if (article) {
-      openTuiArticle(article);
-    }
     void navigate({ to: path as "/" });
   };
   useInput((input, key) => {
@@ -143,7 +138,7 @@ const TuiScreen = ({ route }: { route: TuiRoute }) => {
       return;
     }
     if (key.escape) {
-      if (route.page === "blog" || route.page === "entity-list") {
+      if (route.page === "blog" || route.page === "entity-list" || route.page === "article") {
         return;
       }
       if (inputMode === "insert" && (route.page === "home" || route.page === "form-demo")) {
@@ -184,7 +179,11 @@ const TuiScreen = ({ route }: { route: TuiRoute }) => {
             ) : route.page === "entity-create" || route.page === "entity-edit" ? (
               <FormScreen route={route} />
             ) : route.page === "article" ? (
-              <Text dimColor>Article opened in less. Ctrl+O returns to the previous route.</Text>
+              <ArticleViewer
+                article={articles.find((article) => {
+                  return article.href === `/blog/${route.slug}`;
+                })}
+              />
             ) : (
               <Text dimColor>
                 This route is registered. Its feature screen is not implemented in the TUI yet.

@@ -14,7 +14,14 @@ export const EntityList: WorkspaceRenderer["EntityList"] = ({
 }) => {
   const navigate = useTuiWorkspaceNavigation();
   const { mode } = useTuiInputMode();
-  useAutomaticCommandAction({kind: "button", label: createLabel, command: {group: "Actions"}, execute: () => {navigate(createHref);}});
+  useAutomaticCommandAction({
+    kind: "button",
+    label: createLabel,
+    command: { group: "Actions" },
+    execute: () => {
+      navigate(createHref);
+    },
+  });
   useTuiInput((input) => {
     if (mode === "normal" && input === "c") {
       navigate(createHref);
