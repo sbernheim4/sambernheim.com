@@ -1,3 +1,4 @@
+import { publishedArticleFiles } from "./features/Site/articleCatalog";
 import type { ComponentType } from "react";
 import HowIEngineerSoftware, {
   meta as howIEngineerSoftwareMeta,
@@ -31,52 +32,56 @@ export type SitePost = {
   Component: ComponentType;
 };
 
-export const sitePosts: readonly SitePost[] = [
-  {
+const postsByFile = {
+  "how-i-engineer-software": {
     ...howIEngineerSoftwareMeta.meta,
     Component: HowIEngineerSoftware,
   },
-  {
+  "react-patterns": {
     ...reactPatternsMeta.meta,
     Component: ReactPatterns,
   },
-  {
+  "rerender-with-route": {
     ...reRenderWithRouteMeta.meta,
     Component: ReRenderWithRoute,
   },
-  {
+  "log-and-continue": {
     ...logAndContinueMeta.meta,
     Component: LogAndContinue,
   },
-  {
+  "debug-driven-development": {
     ...debugDrivenDevelopmentMeta.meta,
     Component: DebugDrivenDevelopment,
   },
-  {
+  "the-party-math-trick": {
     ...partyMathTrickMeta.meta,
     Component: ThePartyMathTrick,
   },
-  {
+  "building-a-monad": {
     ...buildingAMonadMeta.meta,
     Component: BuildingAMonad,
   },
-  {
+  "monads-are-monoids-in-the-category-of-endofunctors": {
     ...monadsAreMonoidsMeta.meta,
     Component: MonadsAreMonoids,
   },
-  {
+  "the-engineers-schrodingers-cat": {
     ...engineersSchrodingersCatMeta.meta,
     Component: EngineersSchrodingersCat,
   },
-  {
+  "ux-design-patterns": {
     ...uxDesignPatternsMeta.meta,
     Component: UxDesignPatterns,
   },
-  {
+  "higher-level-primitives": {
     ...higherLevelPrimitivesMeta.meta,
     Component: HigherLevelPrimitives,
   },
-];
+} satisfies Record<string, SitePost>;
+
+export const sitePosts = publishedArticleFiles.map((file) => {
+  return postsByFile[file];
+});
 
 export const findSitePost = (slug: string) => {
   return sitePosts.find((post) => {
