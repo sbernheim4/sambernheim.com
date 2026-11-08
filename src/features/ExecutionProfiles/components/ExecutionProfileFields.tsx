@@ -1,9 +1,11 @@
+import { useWorkspaceRenderer } from "@features/Workspace/components/renderer";
 import type { ExecutionProfile } from "../model";
 import "./ExecutionProfileFields.css";
 
 export const ExecutionProfileFields = ({ form }: { form: any }) => {
+  const { Section } = useWorkspaceRenderer();
   return (
-    <div className="execution-profile-fields fields">
+    <Section className="execution-profile-fields fields">
       <form.AppField name="name">
         {(field: any) => {
           return <field.TextField label="Profile name" required />;
@@ -59,7 +61,7 @@ export const ExecutionProfileFields = ({ form }: { form: any }) => {
           );
         }}
       </form.AppField>
-    </div>
+    </Section>
   );
 };
 

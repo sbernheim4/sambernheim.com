@@ -1,9 +1,11 @@
+import { useWorkspaceRenderer } from "@features/Workspace/components/renderer";
 import type { Thread } from "../model";
 import "./ThreadFields.css";
 
 export const ThreadFields = ({ form }: { form: any }) => {
+  const { Section } = useWorkspaceRenderer();
   return (
-    <div className="thread-fields fields">
+    <Section className="thread-fields fields">
       <form.AppField name="name">
         {(field: any) => {
           return <field.TextField label="Thread name" required />;
@@ -34,7 +36,7 @@ export const ThreadFields = ({ form }: { form: any }) => {
           return <field.TextField label="Priority" />;
         }}
       </form.AppField>
-    </div>
+    </Section>
   );
 };
 

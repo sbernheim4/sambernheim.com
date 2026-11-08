@@ -2,19 +2,16 @@ import { useNavigate } from "@tanstack/react-router";
 import {
   FormEditor,
   ExecutionProfileFields,
-  useProcess,
-  useProcessEditForms,
-  useProcessCreateForms,
+  useTask,
+  useTaskEditForms,
+  useTaskCreateForms,
   useExecutionProfile,
-  ProcessFields,
+  TaskFields,
 } from "@/features";
-import { Loading } from "@features/Workspace/components/web/Layout/Layout";
-import {
-  ViewModePicker,
-  useViewModePreference,
-} from "@features/Workspace/components/web/ViewModePreference/ViewModePreference";
+import { useWorkspaceRenderer } from "@features/Workspace/components/renderer";
+import { useViewModePreference } from "@features/Workspace/hooks/useViewModePreference";
 
-export const ProcessEditPage = ({
+export const TaskEditPage = ({
   id,
   activeTab,
   onActiveTabChange,
@@ -24,11 +21,12 @@ export const ProcessEditPage = ({
   onActiveTabChange: (tab: string) => void;
 }) => {
   const navigate = useNavigate();
-  const query = useProcess(id);
+  const { Loading } = useWorkspaceRenderer();
+  const query = useTask(id);
   const profile = useExecutionProfile(query.data?.executionProfileId ?? "");
   const { mode, updateMode } = useViewModePreference();
 
-  const { entityForm, profileForm, save } = useProcessEditForms(id);
+  const { entityForm, profileForm, save } = useTaskEditForms(id);
 
   if (query.isPending || profile.isPending) {
     return <Loading />;
@@ -44,32 +42,21 @@ export const ProcessEditPage = ({
       onActiveTabChange={onActiveTabChange}
       actions={save.actions}
       onCancel={() => {
-        return navigate({
-          to: "/form-demo/processes/$processId",
-          params: { processId: id },
-          search: {},
-        });
+        return navigate({ to: "/form-demo/tasks/$taskId", params: { taskId: id }, search: {} });
       }}
     >
-      <div className="editor-heading">
-        <h1>Edit Process</h1>
-      </div>
-      <div className="form-editor-view-mode-toolbar">
-        <ViewModePicker mode={mode} onChange={updateMode} />
-      </div>
+      <FormEditor.Title>Edit Task</FormEditor.Title>
+      <FormEditor.ViewModePicker mode={mode} onChange={updateMode} />
       <FormEditor.TabList>
-        <FormEditor.TabTrigger name="entity" label="Process" />
+        <FormEditor.TabTrigger name="entity" label="Task" />
         <FormEditor.TabTrigger name="profile" label="Execution Profile" />
       </FormEditor.TabList>
-
-      <FormEditor.Tab name="entity" label="Process">
-        <ProcessFields form={entityForm.form} />
+      <FormEditor.Tab name="entity" label="Task">
+        <TaskFields form={entityForm.form} />
       </FormEditor.Tab>
-
       <FormEditor.Tab name="profile" label="Execution Profile">
         <ExecutionProfileFields form={profileForm.form} />
       </FormEditor.Tab>
-
       <FormEditor.OrchestratorProgress />
 
       <FormEditor.OrchestratorStatus />
@@ -79,7 +66,7 @@ export const ProcessEditPage = ({
   );
 };
 
-export const ProcessCreatePage = ({
+export const TaskCreatePage = ({
   activeTab,
   onActiveTabChange,
 }: {
@@ -88,7 +75,7 @@ export const ProcessCreatePage = ({
 }) => {
   const navigate = useNavigate();
   const { mode, updateMode } = useViewModePreference();
-  const { entityForm, profileForm, save } = useProcessCreateForms();
+  const { entityForm, profileForm, save } = useTaskCreateForms();
 
   return (
     <FormEditor.Provider
@@ -100,23 +87,19 @@ export const ProcessCreatePage = ({
       onActiveTabChange={onActiveTabChange}
       actions={save.actions}
       onCancel={() => {
-        return navigate({ to: "/form-demo/processes", search: {} });
+        return navigate({ to: "/form-demo/tasks", search: {} });
       }}
-      saveLabel="Create process"
+      saveLabel="Create task"
       preventSaveWithoutChanges={false}
     >
-      <div className="editor-heading">
-        <h1>Create Process</h1>
-      </div>
-      <div className="form-editor-view-mode-toolbar">
-        <ViewModePicker mode={mode} onChange={updateMode} />
-      </div>
+      <FormEditor.Title>Create Task</FormEditor.Title>
+      <FormEditor.ViewModePicker mode={mode} onChange={updateMode} />
       <FormEditor.TabList>
-        <FormEditor.TabTrigger name="entity" label="Process" />
+        <FormEditor.TabTrigger name="entity" label="Task" />
         <FormEditor.TabTrigger name="profile" label="Execution Profile" />
       </FormEditor.TabList>
-      <FormEditor.Tab name="entity" label="Process">
-        <ProcessFields form={entityForm.form} />
+      <FormEditor.Tab name="entity" label="Task">
+        <TaskFields form={entityForm.form} />
       </FormEditor.Tab>
       <FormEditor.Tab name="profile" label="Execution Profile">
         <ExecutionProfileFields form={profileForm.form} />

@@ -1,9 +1,11 @@
+import { useWorkspaceRenderer } from "@features/Workspace/components/renderer";
 import type { Task } from "../model";
 import "./TaskFields.css";
 
 export const TaskFields = ({ form }: { form: any }) => {
+  const { Section } = useWorkspaceRenderer();
   return (
-    <div className="task-fields fields">
+    <Section className="task-fields fields">
       <form.AppField name="name">
         {(field: any) => {
           return <field.TextField label="Task name" required />;
@@ -34,7 +36,7 @@ export const TaskFields = ({ form }: { form: any }) => {
           return <field.TextField label="Priority" />;
         }}
       </form.AppField>
-    </div>
+    </Section>
   );
 };
 

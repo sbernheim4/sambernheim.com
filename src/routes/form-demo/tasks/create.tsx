@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { TaskCreatePage } from "@features/Tasks/components/TaskForms.web";
+import { TaskCreatePage } from "@features/Tasks/components/TaskForms";
 
 const TaskCreateRoute = () => {
   const { tab } = Route.useSearch();

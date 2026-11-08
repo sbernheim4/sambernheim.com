@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "node --import tsx scripts/dev.ts",
-    "tui": "node --import tsx src/tui.tsx",
+    "tui": "node --import tsx scripts/dev.ts tui",
     "build": "vite build && tsc --noEmit",
     "typecheck": "tsc --noEmit",
     "start": "vite preview",

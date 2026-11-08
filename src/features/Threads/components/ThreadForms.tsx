@@ -8,11 +8,8 @@ import {
   useExecutionProfile,
   ThreadFields,
 } from "@/features";
-import { Loading } from "@features/Workspace/components/web/Layout/Layout";
-import {
-  ViewModePicker,
-  useViewModePreference,
-} from "@features/Workspace/components/web/ViewModePreference/ViewModePreference";
+import { useWorkspaceRenderer } from "@features/Workspace/components/renderer";
+import { useViewModePreference } from "@features/Workspace/hooks/useViewModePreference";
 
 export const ThreadEditPage = ({
   id,
@@ -24,6 +21,7 @@ export const ThreadEditPage = ({
   onActiveTabChange: (tab: string) => void;
 }) => {
   const navigate = useNavigate();
+  const { Loading } = useWorkspaceRenderer();
   const query = useThread(id);
   const profile = useExecutionProfile(query.data?.executionProfileId ?? "");
   const { mode, updateMode } = useViewModePreference();
@@ -51,12 +49,8 @@ export const ThreadEditPage = ({
         });
       }}
     >
-      <div className="editor-heading">
-        <h1>Edit Thread</h1>
-      </div>
-      <div className="form-editor-view-mode-toolbar">
-        <ViewModePicker mode={mode} onChange={updateMode} />
-      </div>
+      <FormEditor.Title>Edit Thread</FormEditor.Title>
+      <FormEditor.ViewModePicker mode={mode} onChange={updateMode} />
       <FormEditor.TabList>
         <FormEditor.TabTrigger name="entity" label="Thread" />
         <FormEditor.TabTrigger name="profile" label="Execution Profile" />
@@ -102,12 +96,8 @@ export const ThreadCreatePage = ({
       saveLabel="Create thread"
       preventSaveWithoutChanges={false}
     >
-      <div className="editor-heading">
-        <h1>Create Thread</h1>
-      </div>
-      <div className="form-editor-view-mode-toolbar">
-        <ViewModePicker mode={mode} onChange={updateMode} />
-      </div>
+      <FormEditor.Title>Create Thread</FormEditor.Title>
+      <FormEditor.ViewModePicker mode={mode} onChange={updateMode} />
       <FormEditor.TabList>
         <FormEditor.TabTrigger name="entity" label="Thread" />
         <FormEditor.TabTrigger name="profile" label="Execution Profile" />

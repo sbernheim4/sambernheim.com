@@ -1,34 +1,7 @@
-import { useEffect, useState } from "react";
 import { CommandButton } from "@/features";
+import type { ViewMode } from "../../../hooks/useViewModePreference";
+export { useViewModePreference } from "../../../hooks/useViewModePreference";
 import "./ViewModePreference.css";
-
-export type ViewMode = "tabs" | "page" | "sidebar";
-
-const viewModePreferenceKey = "form-demo:view-mode";
-
-const readViewMode = (): ViewMode => {
-  if (typeof window === "undefined") {
-    return "tabs";
-  }
-
-  const storedMode = window.localStorage.getItem(viewModePreferenceKey);
-  return storedMode === "page" || storedMode === "sidebar" ? storedMode : "tabs";
-};
-
-export const useViewModePreference = () => {
-  const [mode, setMode] = useState<ViewMode>("tabs");
-
-  useEffect(() => {
-    setMode(readViewMode());
-  }, []);
-
-  const updateMode = (nextMode: ViewMode) => {
-    setMode(nextMode);
-    window.localStorage.setItem(viewModePreferenceKey, nextMode);
-  };
-
-  return { mode, updateMode };
-};
 
 export const ViewModePicker = ({
   mode,

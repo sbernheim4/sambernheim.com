@@ -1,9 +1,11 @@
+import { useWorkspaceRenderer } from "@features/Workspace/components/renderer";
 import type { Process } from "../model";
 import "./ProcessFields.css";
 
 export const ProcessFields = ({ form }: { form: any }) => {
+  const { Section } = useWorkspaceRenderer();
   return (
-    <div className="process-fields fields">
+    <Section className="process-fields fields">
       <form.AppField name="name">
         {(field: any) => {
           return <field.TextField label="Process name" required />;
@@ -29,7 +31,7 @@ export const ProcessFields = ({ form }: { form: any }) => {
           );
         }}
       </form.AppField>
-    </div>
+    </Section>
   );
 };
 

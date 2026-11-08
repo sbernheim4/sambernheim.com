@@ -1,6 +1,6 @@
 import { Box, Text } from "ink";
 import type { ReactNode } from "react";
-import { LinkNavigation } from "../Primitives/Link";
+import { Link, LinkNavigation } from "../Primitives/Link";
 export const Shell = ({ children }: { children: ReactNode }) => {
   return <Box flexDirection="column">{children}</Box>;
 };
@@ -19,7 +19,8 @@ export const DetailLayout = ({
         <Text bold color="cyan">
           {title}
         </Text>
-        <Text dimColor>j/k select link · Enter open · edit: {editTo}</Text>
+        <Text dimColor>j/k select link · Enter open</Text>
+        <Link href={editTo}>Edit</Link>
         {children}
       </Box>
     </LinkNavigation>
