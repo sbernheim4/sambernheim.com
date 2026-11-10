@@ -5,6 +5,7 @@ import type { TuiRoute } from "@features/Site/tuiRouter";
 const destinations = [
   { id: "home", label: "Home", path: "/" },
   { id: "blog", label: "Blog", path: "/blog" },
+  { id: "experiments", label: "Experiments", path: "/experiments" },
   { id: "workspace", label: "Workspace", path: "/experiments/workspace" },
   { id: "tasks", label: "Tasks", path: "/experiments/workspace/tasks" },
   { id: "processes", label: "Processes", path: "/experiments/workspace/processes" },

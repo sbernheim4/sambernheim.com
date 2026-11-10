@@ -10,7 +10,8 @@ import {
 
 export type TuiEntity = "tasks" | "processes" | "threads";
 export type TuiRoute =
-  | { page: "home" | "blog" | "workspace" | "editor" | "party-math" }
+  | { page: "home" | "blog" | "experiments" | "workspace" | "editor" | "party-math" }
+  | { page: "experiment"; slug: string }
   | { page: "article"; slug: string }
   | { page: "entity-list"; entity: TuiEntity }
   | { page: "entity-create"; entity: TuiEntity }
@@ -30,6 +31,8 @@ const routes = [
   route("/"),
   route("/blog"),
   route("/blog/$slug"),
+  route("/experiments"),
+  route("/experiments/$experiment"),
   route("/experiments/workspace"),
   route("/editor"),
   route("/the-party-math-trick-demo"),
@@ -68,8 +71,15 @@ const resolveRoute = (pathname: string): TuiRoute => {
   if (pathname === "/blog") {
     return { page: "blog" };
   }
+  if (pathname === "/experiments") {
+    return { page: "experiments" };
+  }
   if (pathname === "/experiments/workspace") {
     return { page: "workspace" };
+  }
+  const experiment = pathname.match(/^\/experiments\/([^/]+)$/);
+  if (experiment) {
+    return { page: "experiment", slug: experiment[1] };
   }
   if (pathname === "/editor") {
     return { page: "editor" };

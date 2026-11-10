@@ -4,6 +4,11 @@ import { TuiMenu, type TuiMenuItem } from "./TuiMenu";
 const destinations: TuiMenuItem[] = [
   { label: "Blog", path: "/blog", description: "Articles on software and engineering" },
   {
+    label: "Experiments",
+    path: "/experiments",
+    description: "Tools and ideas I’ve been working on",
+  },
+  {
     label: "Workspace",
     path: "/experiments/workspace",
     description: "Tasks, processes, and threads",

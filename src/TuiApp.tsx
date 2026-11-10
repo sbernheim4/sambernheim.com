@@ -23,6 +23,7 @@ import { TuiCommandPalette } from "./features/Commands/components/tui/CommandPal
 import { TuiNavigationCommands } from "./features/Commands/components/tui/NavigationCommands";
 import type { TuiArticle } from "./features/Site/components/tui/articleData";
 import { Home } from "./features/Site/components/tui/Home";
+import { ExperimentDetail, Experiments } from "./features/Site/components/tui/Experiments";
 import { WorkspaceHome } from "./features/Workspace/components/tui/FormDemoHome";
 import { ProcessList } from "./features/Processes/components/ProcessList";
 import { TaskList } from "./features/Tasks/components/TaskList";
@@ -30,6 +31,7 @@ import { ThreadList } from "./features/Threads/components/ThreadList";
 import { ProcessDetail } from "./features/Processes/components/ProcessDetail";
 import { TaskDetail } from "./features/Tasks/components/TaskDetail";
 import { ThreadDetail } from "./features/Threads/components/ThreadDetail";
+import { TuiGlobalQueryLoader } from "./features/UI/components/tui/GlobalQueryLoader";
 import { ProcessCreatePage, ProcessEditPage } from "./features/Processes/components/ProcessForms";
 import { TaskCreatePage, TaskEditPage } from "./features/Tasks/components/TaskForms";
 import { ThreadCreatePage, ThreadEditPage } from "./features/Threads/components/ThreadForms";
@@ -157,7 +159,10 @@ const TuiScreen = ({ route, articles }: { route: TuiRoute; articles: TuiArticle[
       if (route.page === "blog" || route.page === "entity-list" || route.page === "article") {
         return;
       }
-      if (inputMode === "insert" && (route.page === "home" || route.page === "workspace")) {
+      if (
+        inputMode === "insert" &&
+        (route.page === "home" || route.page === "experiments" || route.page === "workspace")
+      ) {
         setInputMode("normal");
       } else {
         tuiRouter.history.back();
@@ -174,9 +179,14 @@ const TuiScreen = ({ route, articles }: { route: TuiRoute; articles: TuiArticle[
       <TuiWorkspaceNavigation onNavigate={navigateTo}>
         <TuiNavigationCommands route={route} />
         <SiteLayout pathname={pathname} maxWidth={route.page === "article" ? 88 : undefined}>
+          <TuiGlobalQueryLoader />
           <Box flexDirection="column" display={paletteOpen ? "none" : "flex"}>
             {route.page === "home" ? (
               <Home />
+            ) : route.page === "experiments" ? (
+              <Experiments />
+            ) : route.page === "experiment" ? (
+              <ExperimentDetail slug={route.slug} />
             ) : route.page === "workspace" ? (
               <WorkspaceHome />
             ) : route.page === "blog" ? (
