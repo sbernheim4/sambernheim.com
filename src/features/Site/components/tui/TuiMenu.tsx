@@ -65,7 +65,11 @@ export const TuiMenu = ({ items }: { items: readonly TuiMenuItem[] }) => {
     } else if (key.return && matches[active]) {
       navigate(matches[active].path);
     } else if (input === "q") {
-      process.kill(process.pid, "SIGINT");
+      if (typeof window === "undefined") {
+        process.kill(process.pid, "SIGINT");
+      } else {
+        navigate("/");
+      }
     } else {
       setLastKey("");
     }

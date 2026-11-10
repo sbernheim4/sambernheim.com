@@ -5,13 +5,17 @@ import type { TuiRoute } from "@features/Site/tuiRouter";
 const destinations = [
   { id: "home", label: "Home", path: "/" },
   { id: "blog", label: "Blog", path: "/blog" },
-  { id: "form-demo", label: "Form Demo", path: "/form-demo" },
-  { id: "tasks", label: "Tasks", path: "/form-demo/tasks" },
-  { id: "processes", label: "Processes", path: "/form-demo/processes" },
-  { id: "threads", label: "Threads", path: "/form-demo/threads" },
-  { id: "create-task", label: "Create task", path: "/form-demo/tasks/create" },
-  { id: "create-process", label: "Create process", path: "/form-demo/processes/create" },
-  { id: "create-thread", label: "Create thread", path: "/form-demo/threads/create" },
+  { id: "workspace", label: "Workspace", path: "/experiments/workspace" },
+  { id: "tasks", label: "Tasks", path: "/experiments/workspace/tasks" },
+  { id: "processes", label: "Processes", path: "/experiments/workspace/processes" },
+  { id: "threads", label: "Threads", path: "/experiments/workspace/threads" },
+  { id: "create-task", label: "Create task", path: "/experiments/workspace/tasks/create" },
+  {
+    id: "create-process",
+    label: "Create process",
+    path: "/experiments/workspace/processes/create",
+  },
+  { id: "create-thread", label: "Create thread", path: "/experiments/workspace/threads/create" },
 ] as const;
 
 const DestinationCommand = ({ label, path, id }: (typeof destinations)[number]) => {
@@ -37,7 +41,7 @@ const EditCommand = ({ route }: { route: TuiRoute }) => {
           label: `Edit ${route.entity.slice(0, -1)}`,
           group: "Actions",
           execute: () => {
-            navigate(`/form-demo/${route.entity}/${route.id}/edit`);
+            navigate(`/experiments/workspace/${route.entity}/${route.id}/edit`);
           },
         }
       : null,

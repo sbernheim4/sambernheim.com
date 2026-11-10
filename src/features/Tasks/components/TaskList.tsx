@@ -10,13 +10,13 @@ export const TaskList = () => {
       name: item.name,
       status: item.status,
       summary: item.description,
-      href: `/form-demo/tasks/${item.id}`,
+      href: `/experiments/workspace/tasks/${item.id}`,
     };
   });
   return (
     <EntityList
       title="Tasks"
-      createHref="/form-demo/tasks/create"
+      createHref="/experiments/workspace/tasks/create"
       createLabel="Create task"
       data={data}
       loading={query.isPending}

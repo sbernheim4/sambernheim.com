@@ -69,6 +69,10 @@ class CommandRegistry {
 const CommandRegistryContext = createContext<CommandRegistry | null>(null);
 type CommandPaletteContextValue = {
   open: boolean;
+  query: string;
+  setQuery: (query: string) => void;
+  selected: number;
+  setSelected: (selected: number | ((previous: number) => number)) => void;
   toggle: () => void;
   close: () => void;
 };
@@ -80,13 +84,19 @@ const EMPTY_SUBSCRIBE = () => () => {};
 export const CommandPaletteProvider = ({ children }: { children: ReactNode }) => {
   const registry = useMemo(() => new CommandRegistry(), []);
   const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const [selected, setSelected] = useState(0);
   const palette = useMemo(
     () => ({
       open,
+      query,
+      setQuery,
+      selected,
+      setSelected,
       toggle: () => setOpen((value) => !value),
       close: () => setOpen(false),
     }),
-    [open],
+    [open, query, selected],
   );
   return (
     <CommandRegistryContext.Provider value={registry}>
@@ -188,11 +198,9 @@ export const scoreCommandAction = (action: CommandAction, query: string) => {
   return -1;
 };
 
-export const CommandPalette = () => {
-  const { open, toggle, close } = useCommandPalette();
+export const CommandPalette = ({ mode = "modal" }: { mode?: "modal" | "inline" }) => {
+  const { open, toggle, close, query, setQuery, selected, setSelected } = useCommandPalette();
   const actions = useCommandActions();
-  const [query, setQuery] = useState("");
-  const [selected, setSelected] = useState(0);
   const [running, setRunning] = useState(false);
   const selectedOptionRef = useRef<HTMLButtonElement | null>(null);
 
@@ -237,77 +245,81 @@ export const CommandPalette = () => {
     selectedOptionRef.current?.scrollIntoView?.({ block: "nearest" });
   }, [selected]);
 
-  if (!open) return null;
+  if (mode === "modal" && !open) return null;
 
   const run = async (action: CommandAction | undefined) => {
     if (!action || action.enabled === false || running) return;
     setRunning(true);
     try {
       await action.execute();
-      close();
+      if (mode === "modal") close();
       setQuery("");
     } finally {
       setRunning(false);
     }
   };
 
-  return (
+  const palette = (
+    <section
+      className={`command-palette${mode === "inline" ? " command-palette-inline" : ""}`}
+      role={mode === "modal" ? "dialog" : undefined}
+      aria-modal={mode === "modal" ? true : undefined}
+      aria-label="Command palette"
+      onMouseDown={mode === "modal" ? (event) => event.stopPropagation() : undefined}
+    >
+      <input
+        autoFocus
+        value={query}
+        placeholder="Search commands…"
+        aria-label="Search commands"
+        onChange={(event) => setQuery(event.target.value)}
+        onKeyDown={(event) => {
+          if (event.key === "ArrowDown") {
+            event.preventDefault();
+            setSelected((value) => Math.min(value + 1, Math.max(displayResults.length - 1, 0)));
+          } else if (event.key === "ArrowUp") {
+            event.preventDefault();
+            setSelected((value) => Math.max(value - 1, 0));
+          } else if (event.key === "Enter") {
+            void run(displayResults[selected]);
+          }
+        }}
+      />
+      <div className="command-palette-results" role="listbox" aria-label="Commands">
+        {results.length === 0 ? <p className="command-palette-empty">No commands found.</p> : null}
+        {orderedGroups.map(([group, groupActions]) => {
+          return (
+            <div className="command-palette-group" role="group" aria-label={group} key={group}>
+              <h3>{group}</h3>
+              {groupActions.map((action) => {
+                const index = displayResults.indexOf(action);
+                return (
+                  <button
+                    key={action.id}
+                    ref={selected === index ? selectedOptionRef : undefined}
+                    type="button"
+                    role="option"
+                    aria-selected={selected === index}
+                    disabled={action.enabled === false || running}
+                    onMouseEnter={() => setSelected(index)}
+                    onClick={() => void run(action)}
+                  >
+                    <span>{action.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+
+  return mode === "inline" ? (
+    palette
+  ) : (
     <div className="command-palette-backdrop" role="presentation" onMouseDown={close}>
-      <section
-        className="command-palette"
-        role="dialog"
-        aria-modal="true"
-        aria-label="Command palette"
-        onMouseDown={(event) => event.stopPropagation()}
-      >
-        <input
-          autoFocus
-          value={query}
-          placeholder="Search commands…"
-          aria-label="Search commands"
-          onChange={(event) => setQuery(event.target.value)}
-          onKeyDown={(event) => {
-            if (event.key === "ArrowDown") {
-              event.preventDefault();
-              setSelected((value) => Math.min(value + 1, Math.max(displayResults.length - 1, 0)));
-            } else if (event.key === "ArrowUp") {
-              event.preventDefault();
-              setSelected((value) => Math.max(value - 1, 0));
-            } else if (event.key === "Enter") {
-              void run(displayResults[selected]);
-            }
-          }}
-        />
-        <div className="command-palette-results" role="listbox" aria-label="Commands">
-          {results.length === 0 ? (
-            <p className="command-palette-empty">No commands found.</p>
-          ) : null}
-          {orderedGroups.map(([group, groupActions]) => {
-            return (
-              <div className="command-palette-group" role="group" aria-label={group} key={group}>
-                <h3>{group}</h3>
-                {groupActions.map((action) => {
-                  const index = displayResults.indexOf(action);
-                  return (
-                    <button
-                      key={action.id}
-                      ref={selected === index ? selectedOptionRef : undefined}
-                      type="button"
-                      role="option"
-                      aria-selected={selected === index}
-                      disabled={action.enabled === false || running}
-                      onMouseEnter={() => setSelected(index)}
-                      onClick={() => void run(action)}
-                    >
-                      <span>{action.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            );
-          })}
-        </div>
-      </section>
+      {palette}
     </div>
   );
 };

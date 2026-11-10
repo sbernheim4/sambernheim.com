@@ -1,4 +1,5 @@
 import { CycleableDate } from "@/features";
+import { ArrowDown, ArrowUp, ArrowUpRight } from "lucide-react";
 
 export const LandingPage = () => {
   return (
@@ -12,10 +13,13 @@ export const LandingPage = () => {
           </p>
           <div className="landing__links">
             <a href="/blog">
-              Read my blog <span>↗</span>
+              Read my blog <ArrowUp aria-hidden="true" size={17} />
             </a>
             <a href="#about">
-              About me <span>↓</span>
+              About me <ArrowDown aria-hidden="true" size={17} />
+            </a>
+            <a href="/experiments">
+              Explore experiments <ArrowUpRight aria-hidden="true" size={17} />
             </a>
           </div>
         </div>

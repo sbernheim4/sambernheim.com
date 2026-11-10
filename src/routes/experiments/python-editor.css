@@ -1,0 +1,56 @@
+.python-playground-hint {
+  margin-bottom: 24px;
+  padding: 16px 20px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface-muted);
+  line-height: 1.7;
+  font-size: 14px;
+}
+
+.python-playground .editor-shell {
+  height: min(680px, 80vh);
+  min-height: 480px;
+  overflow: visible;
+  border: 1px solid var(--color-border-inverse);
+  border-radius: 10px;
+  background: var(--color-surface-inverse);
+  color: var(--color-text-inverse);
+}
+
+.python-playground .topbar h2 {
+  margin: 0;
+  font-family: Menlo, Monaco, Consolas, monospace;
+  font-size: 15px;
+  letter-spacing: 0;
+}
+
+.python-playground .reset-button,
+.python-playground .status-pill {
+  background: var(--color-surface-inverse);
+}
+
+.python-playground .diagnostic-button {
+  flex-wrap: wrap;
+  overflow-wrap: anywhere;
+}
+
+.python-playground .diagnostics-list code {
+  margin-left: 0;
+}
+.python-example-picker {
+  display: grid;
+  gap: 6px;
+  width: min(100%, 360px);
+  margin: 0 0 16px;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  font-weight: 600;
+}
+.python-example-picker select {
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-surface);
+  color: var(--color-text);
+}

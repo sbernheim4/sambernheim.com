@@ -10,7 +10,7 @@ import {
 
 export type TuiEntity = "tasks" | "processes" | "threads";
 export type TuiRoute =
-  | { page: "home" | "blog" | "form-demo" | "editor" | "party-math" }
+  | { page: "home" | "blog" | "workspace" | "editor" | "party-math" }
   | { page: "article"; slug: string }
   | { page: "entity-list"; entity: TuiEntity }
   | { page: "entity-create"; entity: TuiEntity }
@@ -30,16 +30,16 @@ const routes = [
   route("/"),
   route("/blog"),
   route("/blog/$slug"),
-  route("/form-demo"),
+  route("/experiments/workspace"),
   route("/editor"),
   route("/the-party-math-trick-demo"),
   ...(["tasks", "processes", "threads"] as const).flatMap((entity) => {
     const id = entity === "tasks" ? "$taskId" : entity === "processes" ? "$processId" : "$threadId";
     return [
-      route(`/form-demo/${entity}`),
-      route(`/form-demo/${entity}/create`),
-      route(`/form-demo/${entity}/${id}`),
-      route(`/form-demo/${entity}/${id}/edit`),
+      route(`/experiments/workspace/${entity}`),
+      route(`/experiments/workspace/${entity}/create`),
+      route(`/experiments/workspace/${entity}/${id}`),
+      route(`/experiments/workspace/${entity}/${id}/edit`),
     ];
   }),
 ];
@@ -68,8 +68,8 @@ const resolveRoute = (pathname: string): TuiRoute => {
   if (pathname === "/blog") {
     return { page: "blog" };
   }
-  if (pathname === "/form-demo") {
-    return { page: "form-demo" };
+  if (pathname === "/experiments/workspace") {
+    return { page: "workspace" };
   }
   if (pathname === "/editor") {
     return { page: "editor" };
@@ -82,7 +82,7 @@ const resolveRoute = (pathname: string): TuiRoute => {
     return { page: "article", slug: article[1] };
   }
   const entity = pathname.match(
-    /^\/form-demo\/(tasks|processes|threads)(?:\/([^/]+))?(?:\/(edit))?$/,
+    /^\/experiments\/workspace\/(tasks|processes|threads)(?:\/([^/]+))?(?:\/(edit))?$/,
   );
   if (entity) {
     const name = entity[1] as TuiEntity;

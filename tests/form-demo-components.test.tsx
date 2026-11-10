@@ -2,14 +2,17 @@ import assert from "node:assert/strict";
 import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { expect, test } from "vitest";
-import { DetailTabs } from "../src/routes/form-demo/components/-DetailTabs";
-import { DetailView } from "../src/routes/form-demo/components/-DetailView";
-import { ChildList, DetailProperties } from "../src/routes/form-demo/components/-DetailHelpers";
-import { Loading, Missing, Status } from "../src/routes/form-demo/components/-Layout";
+import { DetailTabs } from "../src/routes/experiments/workspace/components/-DetailTabs";
+import { DetailView } from "../src/routes/experiments/workspace/components/-DetailView";
+import {
+  ChildList,
+  DetailProperties,
+} from "../src/routes/experiments/workspace/components/-DetailHelpers";
+import { Loading, Missing, Status } from "../src/routes/experiments/workspace/components/-Layout";
 import {
   ViewModePicker,
   useViewModePreference,
-} from "../src/routes/form-demo/components/-ViewModePreference";
+} from "../src/routes/experiments/workspace/components/-ViewModePreference";
 import { profileToForm } from "../src/features/ExecutionProfiles/components/ExecutionProfileFields";
 import { processToForm } from "../src/features/Processes/components/ProcessFields";
 import { taskToForm } from "../src/features/Tasks/components/TaskFields";
@@ -36,7 +39,7 @@ test("ViewModePicker reports the selected mode and changes mode", async () => {
 });
 
 test("view mode preference reads persisted page mode and writes updates", async () => {
-  window.localStorage.setItem("form-demo:view-mode", "page");
+  window.localStorage.setItem("workspace:view-mode", "page");
   let current: ReturnType<typeof useViewModePreference> | undefined;
   const Harness = () => {
     current = useViewModePreference();
@@ -50,7 +53,7 @@ test("view mode preference reads persisted page mode and writes updates", async 
     current!.updateMode("tabs");
   });
   expect(screen.getByText("tabs")).toBeInTheDocument();
-  assert.equal(window.localStorage.getItem("form-demo:view-mode"), "tabs");
+  assert.equal(window.localStorage.getItem("workspace:view-mode"), "tabs");
 });
 
 test("DetailTabs shows the first panel and exposes the other tab", () => {
@@ -132,7 +135,7 @@ test("DetailView renders sidebar navigation and all sections", async () => {
   expect(screen.getByText("Second section")).toBeVisible();
 });
 
-test("form-demo layout primitives render state labels", () => {
+test("workspace layout primitives render state labels", () => {
   render(
     <>
       <Status value="running" />

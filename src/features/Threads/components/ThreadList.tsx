@@ -10,13 +10,13 @@ export const ThreadList = () => {
       name: item.name,
       status: item.status,
       summary: item.entryPoint,
-      href: `/form-demo/threads/${item.id}`,
+      href: `/experiments/workspace/threads/${item.id}`,
     };
   });
   return (
     <EntityList
       title="Threads"
-      createHref="/form-demo/threads/create"
+      createHref="/experiments/workspace/threads/create"
       createLabel="Create thread"
       data={data}
       loading={query.isPending}

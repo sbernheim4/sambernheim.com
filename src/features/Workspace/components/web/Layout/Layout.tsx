@@ -13,9 +13,9 @@ export const Shell = ({ children }: { children: ReactNode }) => {
     <main className="shell">
       <nav className="nav">
         <div className="nav-links">
-          <Link to="/form-demo/tasks">Tasks</Link>
-          <Link to="/form-demo/processes">Processes</Link>
-          <Link to="/form-demo/threads">Threads</Link>
+          <Link to="/experiments/workspace/tasks">Tasks</Link>
+          <Link to="/experiments/workspace/processes">Processes</Link>
+          <Link to="/experiments/workspace/threads">Threads</Link>
         </div>
         <div className="nav-footer">
           <CommandButton

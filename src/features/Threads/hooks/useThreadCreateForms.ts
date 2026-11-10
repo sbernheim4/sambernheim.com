@@ -42,10 +42,18 @@ export const useThreadCreateForms = () => {
       if (progressDelayRef.current > 0) {
         return;
       }
-      return navigate({ to: "/form-demo/threads/$threadId", params: { threadId }, search: {} });
+      return navigate({
+        to: "/experiments/workspace/threads/$threadId",
+        params: { threadId },
+        search: {},
+      });
     },
     onProgressClose: () => {
-      return navigate({ to: "/form-demo/threads/$threadId", params: { threadId }, search: {} });
+      return navigate({
+        to: "/experiments/workspace/threads/$threadId",
+        params: { threadId },
+        search: {},
+      });
     },
   });
   progressDelayRef.current = save.orchestratorProgress.progressDelayMs;

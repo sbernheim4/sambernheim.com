@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "@tanstack/react-router";
-import { Moon, Search, Sun } from "lucide-react";
+import { useIsFetching } from "@tanstack/react-query";
+import { LoaderCircle, Moon, Search, Sun } from "lucide-react";
 import { useCommandPalette } from "../../../../Commands/commands";
 import { CommandExternalLink } from "../../../../Commands/components/CommandExternalLink";
 import { CommandLink } from "../../../../Commands/components/CommandLink";
@@ -13,6 +14,7 @@ export const SiteNavbar = () => {
   const { pathname } = useLocation();
   const { toggle } = useCommandPalette();
   const { theme, toggleTheme } = useTheme();
+  const isFetching = useIsFetching() > 0;
   const isApplePlatform =
     typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(navigator.platform);
   const commandShortcut = isApplePlatform ? "⌘ K" : "Ctrl K";
@@ -57,6 +59,7 @@ export const SiteNavbar = () => {
       </div>
       <div className="navbar__actions">
         <CommandLink to="/blog">Blog</CommandLink>
+        <CommandLink to="/experiments">Experiments</CommandLink>
         <CommandExternalLink
           href={resumeUrl}
           target="_blank"
@@ -88,14 +91,25 @@ export const SiteNavbar = () => {
               aria-pressed={theme === "dark"}
               onClick={toggleTheme}
             >
-              {theme === "light" ? (
+              {isFetching ? (
+                <LoaderCircle
+                  className="navbar__loading-icon"
+                  size={17}
+                  strokeWidth={2}
+                  aria-hidden="true"
+                />
+              ) : theme === "light" ? (
                 <Moon size={17} strokeWidth={2} aria-hidden="true" />
               ) : (
                 <Sun size={17} strokeWidth={2} aria-hidden="true" />
               )}
             </button>
           </TooltipTrigger>
-          <TooltipContent>Switch to {nextTheme} mode</TooltipContent>
+          <TooltipContent>
+            {isFetching
+              ? `Loading data · switch to ${nextTheme} mode`
+              : `Switch to ${nextTheme} mode`}
+          </TooltipContent>
         </Tooltip>
       </div>
     </nav>

@@ -65,6 +65,14 @@
   cursor: pointer;
 }
 
+.detail-section--collapsible:not([open]) {
+  padding-bottom: 28px;
+}
+
+.detail-section--collapsible:not([open]) > .detail-section-heading {
+  margin-bottom: 0;
+}
+
 .detail-section--collapsible > .detail-section-heading::before {
   display: inline-block;
   width: 1em;

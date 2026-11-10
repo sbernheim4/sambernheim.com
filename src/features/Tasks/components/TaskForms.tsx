@@ -42,7 +42,11 @@ export const TaskEditPage = ({
       onActiveTabChange={onActiveTabChange}
       actions={save.actions}
       onCancel={() => {
-        return navigate({ to: "/form-demo/tasks/$taskId", params: { taskId: id }, search: {} });
+        return navigate({
+          to: "/experiments/workspace/tasks/$taskId",
+          params: { taskId: id },
+          search: {},
+        });
       }}
     >
       <FormEditor.Title>Edit Task</FormEditor.Title>
@@ -62,6 +66,7 @@ export const TaskEditPage = ({
       <FormEditor.OrchestratorStatus />
 
       <FormEditor.Actions />
+      <FormEditor.Undo />
     </FormEditor.Provider>
   );
 };
@@ -87,7 +92,7 @@ export const TaskCreatePage = ({
       onActiveTabChange={onActiveTabChange}
       actions={save.actions}
       onCancel={() => {
-        return navigate({ to: "/form-demo/tasks", search: {} });
+        return navigate({ to: "/experiments/workspace/tasks", search: {} });
       }}
       saveLabel="Create task"
       preventSaveWithoutChanges={false}
@@ -107,6 +112,7 @@ export const TaskCreatePage = ({
       <FormEditor.OrchestratorProgress />
       <FormEditor.OrchestratorStatus />
       <FormEditor.Actions />
+      <FormEditor.Undo />
     </FormEditor.Provider>
   );
 };

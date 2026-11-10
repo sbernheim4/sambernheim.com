@@ -30,7 +30,7 @@ export const TaskDetail = ({ id }: { id: string }) => {
   }
 
   return (
-    <DetailLayout title={task.data.name} editTo={`/form-demo/tasks/${id}/edit`}>
+    <DetailLayout title={task.data.name} editTo={`/experiments/workspace/tasks/${id}/edit`}>
       <DetailView
         tabs={[
           {
@@ -84,7 +84,10 @@ export const TaskDetail = ({ id }: { id: string }) => {
                 <ChildList>
                   {processes.data?.map((process) => {
                     return (
-                      <Link key={process.id} href={`/form-demo/processes/${process.id}`}>
+                      <Link
+                        key={process.id}
+                        href={`/experiments/workspace/processes/${process.id}`}
+                      >
                         <Span>{process.name}</Span>
                         <Span className="relationship-meta">{process.command}</Span>
                       </Link>

@@ -65,10 +65,18 @@ export const useThreadEditForms = (id: string) => {
         return;
       }
 
-      return navigate({ to: "/form-demo/threads/$threadId", params: { threadId: id }, search: {} });
+      return navigate({
+        to: "/experiments/workspace/threads/$threadId",
+        params: { threadId: id },
+        search: {},
+      });
     },
     onProgressClose: () => {
-      return navigate({ to: "/form-demo/threads/$threadId", params: { threadId: id }, search: {} });
+      return navigate({
+        to: "/experiments/workspace/threads/$threadId",
+        params: { threadId: id },
+        search: {},
+      });
     },
   });
 

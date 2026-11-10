@@ -43,7 +43,7 @@ export const ProcessEditPage = ({
       actions={save.actions}
       onCancel={() => {
         return navigate({
-          to: "/form-demo/processes/$processId",
+          to: "/experiments/workspace/processes/$processId",
           params: { processId: id },
           search: {},
         });
@@ -69,6 +69,7 @@ export const ProcessEditPage = ({
       <FormEditor.OrchestratorStatus />
 
       <FormEditor.Actions />
+      <FormEditor.Undo />
     </FormEditor.Provider>
   );
 };
@@ -94,7 +95,7 @@ export const ProcessCreatePage = ({
       onActiveTabChange={onActiveTabChange}
       actions={save.actions}
       onCancel={() => {
-        return navigate({ to: "/form-demo/processes", search: {} });
+        return navigate({ to: "/experiments/workspace/processes", search: {} });
       }}
       saveLabel="Create process"
       preventSaveWithoutChanges={false}
@@ -114,6 +115,7 @@ export const ProcessCreatePage = ({
       <FormEditor.OrchestratorProgress />
       <FormEditor.OrchestratorStatus />
       <FormEditor.Actions />
+      <FormEditor.Undo />
     </FormEditor.Provider>
   );
 };

@@ -242,6 +242,9 @@ export const useTyMonacoSession = ({
       }
 
       sessionRef.current = session;
+      // The editor stays usable while WASM loads. Analyze the latest text,
+      // including any edits made since initialization started.
+      updateTyFile(session, toVirtualSource(model.getValue()));
       const disposeProviders = registerTyProviders(
         monaco,
         sessionRef,
@@ -261,6 +264,9 @@ export const useTyMonacoSession = ({
       });
       runDiagnostics();
     } catch (error) {
+      if (mountToken !== mountTokenRef.current) {
+        return;
+      }
       setTyState({
         status: "error",
         version: null,

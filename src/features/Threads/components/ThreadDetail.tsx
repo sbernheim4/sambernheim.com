@@ -32,7 +32,7 @@ export const ThreadDetail = ({ id }: { id: string }) => {
   });
 
   return (
-    <DetailLayout title={thread.data.name} editTo={`/form-demo/threads/${id}/edit`}>
+    <DetailLayout title={thread.data.name} editTo={`/experiments/workspace/threads/${id}/edit`}>
       <DetailView
         tabs={[
           {
@@ -85,7 +85,9 @@ export const ThreadDetail = ({ id }: { id: string }) => {
             children: (
               <Section className="details">
                 {process ? (
-                  <Link href={`/form-demo/processes/${process.id}`}>{process.name}</Link>
+                  <Link href={`/experiments/workspace/processes/${process.id}`}>
+                    {process.name}
+                  </Link>
                 ) : (
                   <strong>{thread.data.processId}</strong>
                 )}

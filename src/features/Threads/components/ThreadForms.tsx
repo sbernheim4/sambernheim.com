@@ -43,7 +43,7 @@ export const ThreadEditPage = ({
       actions={save.actions}
       onCancel={() => {
         return navigate({
-          to: "/form-demo/threads/$threadId",
+          to: "/experiments/workspace/threads/$threadId",
           params: { threadId: id },
           search: {},
         });
@@ -66,6 +66,7 @@ export const ThreadEditPage = ({
       <FormEditor.OrchestratorStatus />
 
       <FormEditor.Actions />
+      <FormEditor.Undo />
     </FormEditor.Provider>
   );
 };
@@ -91,7 +92,7 @@ export const ThreadCreatePage = ({
       onActiveTabChange={onActiveTabChange}
       actions={save.actions}
       onCancel={() => {
-        return navigate({ to: "/form-demo/threads", search: {} });
+        return navigate({ to: "/experiments/workspace/threads", search: {} });
       }}
       saveLabel="Create thread"
       preventSaveWithoutChanges={false}
@@ -111,6 +112,7 @@ export const ThreadCreatePage = ({
       <FormEditor.OrchestratorProgress />
       <FormEditor.OrchestratorStatus />
       <FormEditor.Actions />
+      <FormEditor.Undo />
     </FormEditor.Provider>
   );
 };

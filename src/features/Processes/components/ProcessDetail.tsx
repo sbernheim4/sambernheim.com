@@ -36,7 +36,7 @@ export const ProcessDetail = ({ id }: { id: string }) => {
   });
 
   return (
-    <DetailLayout title={process.data.name} editTo={`/form-demo/processes/${id}/edit`}>
+    <DetailLayout title={process.data.name} editTo={`/experiments/workspace/processes/${id}/edit`}>
       <DetailView
         tabs={[
           {
@@ -53,7 +53,9 @@ export const ProcessDetail = ({ id }: { id: string }) => {
                       value: task ? (
                         <>
                           {process.data.taskId}{" "}
-                          <Link href={`/form-demo/tasks/${task.id}`}>({task.name})</Link>
+                          <Link href={`/experiments/workspace/tasks/${task.id}`}>
+                            ({task.name})
+                          </Link>
                         </>
                       ) : (
                         process.data.taskId
@@ -100,7 +102,7 @@ export const ProcessDetail = ({ id }: { id: string }) => {
                 <ChildList>
                   {threads.data?.map((thread) => {
                     return (
-                      <Link key={thread.id} href={`/form-demo/threads/${thread.id}`}>
+                      <Link key={thread.id} href={`/experiments/workspace/threads/${thread.id}`}>
                         <Span>{thread.name}</Span>
                         <Span className="relationship-meta">{thread.entryPoint}</Span>
                       </Link>

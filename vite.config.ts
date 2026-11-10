@@ -20,19 +20,30 @@ const highlighter = createHighlighter({
 });
 
 export default defineConfig(({ mode }) => {
+  const articleMdx = mdx({
+    remarkPlugins: [remarkFrontmatter, [remarkMdxFrontmatter, { name: "meta" }]],
+    rehypePlugins: [[rehypeHighlightCodeBlocks, { highlighter }]],
+  });
   return {
     server: {
       port: 3000,
     },
     resolve: {
-      alias: aliases,
+      alias: [...(mode === "tui" ? [] : [{ find: /^ink$/, replacement: "ink-web" }]), ...aliases],
     },
     plugins: [
       ...(mode === "tui" ? [] : [cloudflare({ viteEnvironment: { name: "ssr" } })]),
-      mdx({
-        remarkPlugins: [remarkFrontmatter, [remarkMdxFrontmatter, { name: "meta" }]],
-        rehypePlugins: [[rehypeHighlightCodeBlocks, { highlighter }]],
-      }),
+      {
+        ...articleMdx,
+        transform(source, id) {
+          // MDX's own filter strips queries. Preserve Vite's raw source exports
+          // so the embedded TUI can compile articles with its Ink components.
+          if (/[?&]raw(?:&|$)/.test(id)) {
+            return;
+          }
+          return articleMdx.transform(source, id);
+        },
+      },
       tanstackStart({
         srcDirectory: "src",
       }),

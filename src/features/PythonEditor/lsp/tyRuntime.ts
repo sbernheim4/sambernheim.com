@@ -5,6 +5,7 @@ type TyModule = typeof import("ty_wasm") & {
     Info: unknown;
   };
 };
+import tyWasmUrl from "ty_wasm/ty_wasm_bg.wasm?url";
 
 export type TyState =
   | {
@@ -62,7 +63,7 @@ const initializeTy = (): Promise<TyModule> => {
   if (tyInitPromise == null) {
     tyInitPromise = import("ty_wasm").then(async (module) => {
       const ty = module as TyModule;
-      await ty.default();
+      await ty.default(tyWasmUrl);
       ty.initLogging?.(ty.LogLevel?.Info);
       return ty;
     });

@@ -1,0 +1,20 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { ProcessCreatePage } from "@features/Processes/components/ProcessForms";
+
+const ProcessCreateRoute = () => {
+  const { tab } = Route.useSearch();
+  const navigate = Route.useNavigate();
+
+  return (
+    <ProcessCreatePage
+      activeTab={tab === "profile" ? "profile" : "entity"}
+      onActiveTabChange={(nextTab) => {
+        return navigate({ search: { tab: nextTab } });
+      }}
+    />
+  );
+};
+
+export const Route = createFileRoute("/experiments/workspace/processes/create")({
+  component: ProcessCreateRoute,
+});

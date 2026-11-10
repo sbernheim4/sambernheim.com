@@ -29,7 +29,7 @@
   --border-color: var(--color-border);
   --line-color: color-mix(in srgb, var(--home-panel), var(--home-foreground) 60%);
   font-family: "Lato";
-  position: sticky;
+  position: static;
   opacity: 0;
   top: 0;
   color: var(--foreground-color);
@@ -146,6 +146,22 @@
   background: transparent;
   color: var(--foreground-color);
   cursor: pointer;
+}
+
+.navbar__loading-icon {
+  animation: navbar-loading-spin 0.9s linear infinite;
+}
+
+@keyframes navbar-loading-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navbar__loading-icon {
+    animation-duration: 2.5s;
+  }
 }
 
 .navbar__theme-button:hover {

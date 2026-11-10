@@ -38,10 +38,18 @@ export const useTaskCreateForms = () => {
       if (progressDelayRef.current > 0) {
         return;
       }
-      return navigate({ to: "/form-demo/tasks/$taskId", params: { taskId }, search: {} });
+      return navigate({
+        to: "/experiments/workspace/tasks/$taskId",
+        params: { taskId },
+        search: {},
+      });
     },
     onProgressClose: () => {
-      return navigate({ to: "/form-demo/tasks/$taskId", params: { taskId }, search: {} });
+      return navigate({
+        to: "/experiments/workspace/tasks/$taskId",
+        params: { taskId },
+        search: {},
+      });
     },
   });
   progressDelayRef.current = save.orchestratorProgress.progressDelayMs;

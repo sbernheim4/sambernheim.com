@@ -3,7 +3,11 @@ import { TuiMenu, type TuiMenuItem } from "./TuiMenu";
 
 const destinations: TuiMenuItem[] = [
   { label: "Blog", path: "/blog", description: "Articles on software and engineering" },
-  { label: "Form Demo", path: "/form-demo", description: "Tasks, processes, and threads" },
+  {
+    label: "Workspace",
+    path: "/experiments/workspace",
+    description: "Tasks, processes, and threads",
+  },
 ];
 
 export const Home = () => {

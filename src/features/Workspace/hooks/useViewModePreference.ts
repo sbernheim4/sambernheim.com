@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 export type ViewMode = "tabs" | "page" | "sidebar";
-const key = "form-demo:view-mode";
+const key = "workspace:view-mode";
 const readMode = (): ViewMode => {
   if (typeof window === "undefined") {
     return "tabs";

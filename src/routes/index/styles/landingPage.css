@@ -68,6 +68,9 @@
 }
 
 .landing__links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
   color: var(--home-foreground);
   font-family: "Lato", sans-serif;
   font-weight: 700;
@@ -79,10 +82,6 @@
 .landing__links a:hover {
   color: var(--home-accent);
   border-color: var(--home-accent);
-}
-
-.landing__links span {
-  margin-left: 0.35rem;
 }
 
 .landing__mark {

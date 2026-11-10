@@ -65,10 +65,18 @@ export const useTaskEditForms = (id: string) => {
         return;
       }
 
-      return navigate({ to: "/form-demo/tasks/$taskId", params: { taskId: id }, search: {} });
+      return navigate({
+        to: "/experiments/workspace/tasks/$taskId",
+        params: { taskId: id },
+        search: {},
+      });
     },
     onProgressClose: () => {
-      return navigate({ to: "/form-demo/tasks/$taskId", params: { taskId: id }, search: {} });
+      return navigate({
+        to: "/experiments/workspace/tasks/$taskId",
+        params: { taskId: id },
+        search: {},
+      });
     },
   });
 

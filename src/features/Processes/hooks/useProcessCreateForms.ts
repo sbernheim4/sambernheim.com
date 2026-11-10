@@ -38,10 +38,18 @@ export const useProcessCreateForms = () => {
       if (progressDelayRef.current > 0) {
         return;
       }
-      return navigate({ to: "/form-demo/processes/$processId", params: { processId }, search: {} });
+      return navigate({
+        to: "/experiments/workspace/processes/$processId",
+        params: { processId },
+        search: {},
+      });
     },
     onProgressClose: () => {
-      return navigate({ to: "/form-demo/processes/$processId", params: { processId }, search: {} });
+      return navigate({
+        to: "/experiments/workspace/processes/$processId",
+        params: { processId },
+        search: {},
+      });
     },
   });
   progressDelayRef.current = save.orchestratorProgress.progressDelayMs;

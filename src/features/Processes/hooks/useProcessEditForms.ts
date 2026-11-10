@@ -57,14 +57,14 @@ export const useProcessEditForms = (id: string) => {
       }
 
       return navigate({
-        to: "/form-demo/processes/$processId",
+        to: "/experiments/workspace/processes/$processId",
         params: { processId: id },
         search: {},
       });
     },
     onProgressClose: () => {
       return navigate({
-        to: "/form-demo/processes/$processId",
+        to: "/experiments/workspace/processes/$processId",
         params: { processId: id },
         search: {},
       });

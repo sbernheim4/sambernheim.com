@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 import { createRootRoute, HeadContent, Outlet, Scripts, useLocation } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { CycleableDateTimeProvider } from "@/features";
-import { GlobalQueryLoader } from "@/features";
 import { TooltipProvider } from "@/features";
 import { CommandPalette, CommandPaletteProvider, useCommandAction } from "@/features";
 import { ThemeProvider, useTheme } from "@/features";
@@ -25,7 +24,6 @@ const RootComponent = () => {
         <ThemeProvider>
           <CycleableDateTimeProvider>
             <TooltipProvider>
-              <GlobalQueryLoading />
               <CommandPalette />
               <ThemeCommandAction />
               <SiteNavigation />
@@ -36,12 +34,6 @@ const RootComponent = () => {
       </CommandPaletteProvider>
     </QueryClientProvider>
   );
-};
-
-const GlobalQueryLoading = () => {
-  const { pathname } = useLocation();
-
-  return pathname.startsWith("/blog") ? null : <GlobalQueryLoader />;
 };
 
 const ThemeCommandAction = () => {
@@ -61,7 +53,8 @@ const ThemeCommandAction = () => {
 
 const SiteNavigation = () => {
   const { pathname } = useLocation();
-  const showNavbar = pathname === "/" || pathname.startsWith("/blog");
+  const showNavbar =
+    pathname === "/" || pathname.startsWith("/blog") || pathname.startsWith("/experiments");
 
   return showNavbar ? <SiteNavbar /> : null;
 };

@@ -1,0 +1,214 @@
+.forms-playground-guide {
+  padding: 1.2rem 1.5rem;
+  border-left: 3px solid var(--color-primary);
+  background: var(--color-surface-muted);
+  margin-bottom: 1.5rem;
+}
+.forms-playground-guide p {
+  margin: 0.5rem 0;
+}
+.forms-playground-guide small {
+  color: var(--color-text-secondary);
+}
+.forms-playground-fields,
+.forms-playground-results {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+.forms-playground-fields {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+.forms-playground-card {
+  min-width: 0;
+  padding: 1.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.65rem;
+  background: var(--color-surface);
+}
+.forms-playground-card h2 {
+  font-size: 1.25rem;
+  margin: 0.4rem 0 0.75rem;
+}
+.forms-playground-card p {
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+.forms-playground-label {
+  font: 0.72rem monospace;
+  letter-spacing: 0.08em;
+  color: var(--color-primary);
+}
+.forms-playground .app-field {
+  display: grid;
+  gap: 0.4rem;
+  margin-top: 1rem;
+}
+.forms-playground .app-field input,
+.forms-playground .app-select-trigger {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.35rem;
+  background: var(--color-background);
+  color: var(--color-text);
+  font: inherit;
+}
+.forms-playground .app-radio-group {
+  border: 0;
+  padding: 0;
+  margin: 1rem 0 0;
+}
+.forms-playground .app-radio-group legend {
+  margin-bottom: 0.4rem;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+}
+.forms-playground .app-radio-group [role="radiogroup"] {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 4px;
+  border: 0;
+  border-radius: 8px;
+  box-shadow: inset 0 0 0 1px var(--color-border);
+  overflow: hidden;
+  background: var(--color-surface-muted);
+}
+.forms-playground .app-radio-option {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+.forms-playground .app-radio-item {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+.forms-playground .app-radio-option > span {
+  padding: 8px 12px;
+  border-radius: 5px;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  font-weight: 650;
+}
+.forms-playground .app-radio-item:focus-visible + .app-radio-indicator + span {
+  outline: 2px solid var(--color-focus);
+}
+.forms-playground .app-radio-group [role="radiogroup"] {
+  display: flex;
+  width: 100%;
+  gap: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  box-shadow: inset 0 0 0 1px var(--color-border);
+  overflow: hidden;
+  background: transparent;
+}
+.forms-playground .app-radio-option {
+  flex: 1 1 0;
+}
+.forms-playground .app-radio-option > span {
+  display: flex;
+  flex: 1;
+  align-self: stretch;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  text-align: center;
+}
+.forms-playground .app-radio-option:first-child > span {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.forms-playground .app-radio-option:last-child > span {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.forms-playground .app-radio-option {
+  border-color: transparent;
+  border-radius: 0;
+  background: transparent;
+  padding: 0;
+}
+.forms-playground .app-radio-option:has(.app-radio-item[data-state="checked"]) {
+  border-color: transparent;
+  background: transparent;
+  color: var(--color-text);
+}
+.forms-playground .app-radio-option:has(.app-radio-item[data-state="checked"]) > span {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  box-shadow: 0 1px 4px var(--color-shadow-subtle);
+}
+.forms-playground .app-select-trigger {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.forms-playground-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem 0;
+}
+.forms-playground-controls > div {
+  display: flex;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+.forms-playground-controls button {
+  padding: 0.7rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.35rem;
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+  font: inherit;
+}
+.forms-playground-controls button[type="submit"] {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  border-color: var(--color-primary);
+}
+.forms-playground-controls button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+.forms-playground-status {
+  margin: 0 0 1.5rem;
+  color: var(--color-text-secondary);
+}
+.forms-playground-results pre {
+  overflow: auto;
+  font-size: 0.8rem;
+  line-height: 1.6;
+}
+.forms-playground-results ol {
+  padding-left: 1.25rem;
+  font: 0.85rem/1.7 monospace;
+  overflow-wrap: anywhere;
+}
+.forms-playground-empty {
+  font-style: italic;
+}
+.forms-playground .form-error {
+  color: var(--color-danger);
+}
+@media (max-width: 720px) {
+  .forms-playground-fields,
+  .forms-playground-results {
+    grid-template-columns: 1fr;
+  }
+  .forms-playground-card {
+    padding: 1.1rem;
+  }
+}

@@ -10,13 +10,13 @@ export const ProcessList = () => {
       name: item.name,
       status: item.status,
       summary: item.command,
-      href: `/form-demo/processes/${item.id}`,
+      href: `/experiments/workspace/processes/${item.id}`,
     };
   });
   return (
     <EntityList
       title="Processes"
-      createHref="/form-demo/processes/create"
+      createHref="/experiments/workspace/processes/create"
       createLabel="Create process"
       data={data}
       loading={query.isPending}
