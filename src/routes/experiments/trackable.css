@@ -1,0 +1,163 @@
+.trackable-experiment .playground-heading code,
+.trackable-panel code {
+  font-family: "SFMono-Regular", Consolas, monospace;
+}
+.trackable-experiment .playground-heading a {
+  color: var(--color-primary);
+  text-underline-offset: 3px;
+}
+.trackable-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+.trackable-panel {
+  min-width: 0;
+  padding: 24px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-surface);
+}
+.trackable-panel h2 {
+  margin: 0 0 18px;
+  font-size: 22px;
+}
+.trackable-panel h3 {
+  margin: 20px 0 10px;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  font-weight: 700;
+}
+.trackable-panel p {
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+.trackable-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  min-height: 74px;
+  align-content: flex-start;
+  padding: 14px;
+  border-radius: 7px;
+  background: var(--color-surface-muted);
+}
+.trackable-steps code {
+  color: var(--color-text);
+  font-size: 13px;
+}
+.trackable-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin: 0 0 16px;
+}
+.trackable-actions button {
+  padding: 10px 13px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+  font: inherit;
+}
+.trackable-actions button:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+.trackable-actions .trackable-execute {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: var(--color-background);
+}
+.trackable-actions .trackable-execute:hover {
+  color: var(--color-background);
+  filter: brightness(1.12);
+}
+.trackable-custom-event {
+  display: grid;
+  gap: 10px;
+  margin: 12px 0 16px;
+}
+.trackable-custom-event label {
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  font-weight: 700;
+}
+.trackable-custom-event textarea {
+  width: 100%;
+  resize: vertical;
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-background);
+  color: var(--color-text);
+  font:
+    13px/1.5 "SFMono-Regular",
+    Consolas,
+    monospace;
+}
+.trackable-custom-event textarea:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+.trackable-custom-event textarea[aria-invalid="true"] {
+  border-color: var(--color-danger);
+}
+.trackable-custom-event small {
+  color: var(--color-text-muted);
+}
+.trackable-custom-event small[role="alert"] {
+  color: var(--color-danger);
+}
+.trackable-finish-actions {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--color-border);
+}
+.trackable-value {
+  display: grid;
+  gap: 6px;
+  padding: 16px;
+  border-radius: 7px;
+  background: var(--color-surface-muted);
+}
+.trackable-value span {
+  color: var(--color-text-secondary);
+  font-size: 13px;
+}
+.trackable-value strong {
+  color: var(--color-primary);
+  font-size: 42px;
+  font-variant-numeric: tabular-nums;
+}
+.trackable-event-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-left: 20px;
+}
+.trackable-event-list li {
+  padding-left: 4px;
+  color: var(--color-text);
+}
+.trackable-event-list pre {
+  overflow-x: auto;
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+  font:
+    12px/1.5 "SFMono-Regular",
+    Consolas,
+    monospace;
+}
+.trackable-execute-result {
+  margin: 14px 0 0;
+}
+@media (max-width: 760px) {
+  .trackable-grid {
+    grid-template-columns: 1fr;
+  }
+}

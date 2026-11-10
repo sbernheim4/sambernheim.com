@@ -9,6 +9,7 @@ const PlaygroundLayout = () => {
         <CommandLink to="/experiments" activeOptions={{ exact: true }}>
           All experiments
         </CommandLink>
+        <CommandLink to="/experiments/trackable">Trackable</CommandLink>
         <CommandLink to="/experiments/terminal">Terminal</CommandLink>
         <CommandLink to="/experiments/python-editor">Python editor</CommandLink>
         <CommandLink to="/experiments/workspace">Workspace</CommandLink>

@@ -4,9 +4,28 @@ import { CommandLink } from "@/features";
 
 const experiments = [
   {
+    to: "/experiments/trackable",
+    image: "trackable",
+    number: "01",
+    title: "Using the Trackable Monad",
+    category: "MAP / FLATMAP / EXECUTE",
+    description:
+      "An interactive version of my monad article. Transform a wrapped value, collect analytics events, and emit them when you execute the chain.",
+    preview: (
+      <div className="preview-trackable">
+        <span>Trackable.of(2)</span>
+        <strong>2 → 5 → 10 → 15</strong>
+        <code>.map(addThree)</code>
+        <code>.map(double)</code>
+        <code>.flatMap(addFiveAndTrack)</code>
+        <small>execute() → 15</small>
+      </div>
+    ),
+  },
+  {
     to: "/experiments/terminal",
     image: "terminal",
-    number: "01",
+    number: "02",
     title: "The site, in a terminal",
     category: "THE SITE / IN A TERMINAL",
     description:
@@ -30,7 +49,7 @@ const experiments = [
   {
     to: "/experiments/python-editor",
     image: "python-editor",
-    number: "02",
+    number: "03",
     title: "A Python LSP in the browser",
     category: "MONACO / CLIENT-SIDE LSP / TY",
     description:
@@ -51,7 +70,7 @@ const experiments = [
   {
     to: "/experiments/workspace",
     image: "workspace",
-    number: "03",
+    number: "04",
     title: "A demo application showing all the experiments working together",
     category: "EXAMPLE APPLICATION",
     description:
@@ -75,7 +94,7 @@ const experiments = [
   {
     to: "/experiments/forms",
     image: "forms",
-    number: "04",
+    number: "05",
     title: "Multiple forms, multiple endpoints",
     category: "FORMS / VALIDATION / UNDO",
     description:
@@ -96,7 +115,7 @@ const experiments = [
   {
     to: "/experiments/views",
     image: "views",
-    number: "05",
+    number: "06",
     title: "The same details, three ways",
     category: "YOUR LAYOUT / YOUR PREFERENCE",
     description:
@@ -133,7 +152,7 @@ const experiments = [
   {
     to: "/experiments/dates",
     image: "dates",
-    number: "06",
+    number: "07",
     title: "Dates, your way",
     category: "UTC / LOCAL / RELATIVE",
     description:
@@ -160,7 +179,7 @@ const experiments = [
   {
     to: "/experiments/global-loader",
     image: "loader",
-    number: "07",
+    number: "08",
     title: "Global query loader",
     category: "QUERY STATE / FEEDBACK",
     description: "A small indicator appears while any query is fetching, then gets out of the way.",
@@ -173,7 +192,7 @@ const experiments = [
   {
     to: "/experiments/command-palette",
     image: "commands",
-    number: "08",
+    number: "09",
     title: "A command palette that builds itself",
     category: "COMMANDS / DISCOVERABILITY",
     description:

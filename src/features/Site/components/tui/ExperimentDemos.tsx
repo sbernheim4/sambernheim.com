@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Box, Text } from "ink";
 import { TuiCycleableDateTime } from "@features/Dates/components/tui/CycleableDate";
 import { useCommandAction } from "@features/Commands/commands";
+import { useTrackableDemo } from "@features/Playground/useTrackableDemo";
 import { DetailView } from "@features/Workspace/components/tui/DetailView/DetailView";
 import { useTuiInput } from "@features/Workspace/components/tui/Primitives/InputMode";
 import { TuiMenu } from "./TuiMenu";
@@ -165,6 +166,48 @@ export const CommandPaletteExperiment = () => {
       <Text>Counter: {count}</Text>
       <Text>Open the TUI command palette with ff to find and run the counter actions.</Text>
       <Text dimColor>These actions register while this screen is rendered.</Text>
+    </Box>
+  );
+};
+
+export const TrackableExperiment = () => {
+  const demo = useTrackableDemo();
+  useTuiInput((input) => {
+    if (input === "a") {
+      demo.mapAddThree();
+    } else if (input === "d") {
+      demo.mapDouble();
+    } else if (input === "m") {
+      demo.flatMapAddFive({ source: "tui" });
+    } else if (input === "n") {
+      demo.flatMapAddRandom({ source: "tui" });
+    } else if (input === "e") {
+      demo.execute();
+    } else if (input === "r") {
+      demo.reset();
+    }
+  });
+  return (
+    <Box flexDirection="column" marginTop={1}>
+      <Text bold color="cyan">
+        Using the Trackable Monad
+      </Text>
+      <Text>map changes the value; flatMap adds another Trackable’s events.</Text>
+      <Text>Current value: {demo.current.getValue()}</Text>
+      <Text>Queued events: {demo.current.getAnalyticsEvents().length}</Text>
+      <Text>Chain: {demo.steps.join("")}</Text>
+      <Box flexDirection="column" marginTop={1}>
+        <Text>a map +3 · d map ×2</Text>
+        <Text>m flatMap +5 · n flatMap +random</Text>
+        <Text>e execute · r reset</Text>
+      </Box>
+      <Box flexDirection="column" marginTop={1}>
+        <Text>Returned value: {demo.lastResult ?? "—"}</Text>
+        <Text>Events emitted: {demo.emitted.length}</Text>
+        {demo.emitted.map((event, index) => {
+          return <Text key={index}>• {JSON.stringify(event)}</Text>;
+        })}
+      </Box>
     </Box>
   );
 };

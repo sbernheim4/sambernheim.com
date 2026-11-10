@@ -193,6 +193,31 @@ body:has(.playground-shell) {
 .preview-workspace small {
   color: var(--color-text-muted);
 }
+.playground-preview--trackable {
+  background: color-mix(in srgb, var(--color-primary) 9%, var(--color-surface));
+}
+.preview-trackable {
+  display: grid;
+  gap: 8px;
+  width: min(100%, 360px);
+  padding: 20px;
+  border: 1px solid var(--color-border);
+  border-radius: 9px;
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+.preview-trackable > span,
+.preview-trackable small {
+  color: var(--color-text-muted);
+  font-size: 12px;
+}
+.preview-trackable strong {
+  color: var(--color-primary);
+  font-size: 20px;
+}
+.preview-trackable code {
+  font-size: 12px;
+}
 .preview-views {
   width: 100%;
   max-width: 370px;

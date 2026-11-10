@@ -269,6 +269,8 @@ To enable this behavior requires a more formal abstratction than the functions w
 
 ## Building a Trackable Class
 
+Try the [interactive Trackable experiment](/experiments/trackable) to step through `map`, `flatMap`, and executing the event queue.
+
 To enable the described behavior we need a better abstraction beyond `withTracking`.
 
 We already have a pseudo special type - objects with a `__trackingInfo` property - and we want to add something like this `.then` method, even if we're not quite sure how it should work yet. We're also storing some stateful information, the value returned by these functions and their associated analytics events from each additional function invocation. We can formalize these relationships and capabilties in a class.

@@ -4,11 +4,17 @@ import {
   DatesExperiment,
   FormsExperiment,
   GlobalLoaderExperiment,
+  TrackableExperiment,
   ViewsExperiment,
 } from "./ExperimentDemos";
 import { TuiMenu, type TuiMenuItem } from "./TuiMenu";
 
 export const experiments: readonly TuiMenuItem[] = [
+  {
+    label: "Trackable",
+    path: "/experiments/trackable",
+    description: "Map values, merge events, and execute the chain",
+  },
   {
     label: "Terminal",
     path: "/experiments/terminal",
@@ -81,6 +87,9 @@ export const ExperimentDetail = ({ slug }: { slug: string }) => {
   }
   if (slug === "command-palette") {
     return <CommandPaletteExperiment />;
+  }
+  if (slug === "trackable") {
+    return <TrackableExperiment />;
   }
   return (
     <Box flexDirection="column" marginTop={1}>
