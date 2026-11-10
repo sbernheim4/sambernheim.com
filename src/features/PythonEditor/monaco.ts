@@ -7,7 +7,7 @@ import "monaco-editor/editor/contrib/parameterHints/browser/parameterHints.js";
 import "monaco-editor/editor/contrib/inlayHints/browser/inlayHintsContribution.js";
 import "monaco-editor/editor/contrib/documentSymbols/browser/documentSymbols.js";
 
-if (typeof self !== "undefined") {
+if (typeof self !== "undefined" && !self.MonacoEnvironment) {
   self.MonacoEnvironment = {
     getWorker: () => {
       return new Worker(

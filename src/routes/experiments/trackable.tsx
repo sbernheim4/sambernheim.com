@@ -1,24 +1,215 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useRef, useState, type ComponentType } from "react";
+import type { editor } from "monaco-editor";
 import { CommandButton, CommandLink } from "@/features";
-import type { TrackingEvent } from "@features/Playground/Trackable";
-import { useTrackableDemo } from "@features/Playground/useTrackableDemo";
+import { buildTrackableSource, trackableExamples } from "@features/Playground/trackableExamples";
 import "./trackable.css";
 
+type RunnerResponse =
+  | { type: "ready"; value: unknown; queued: readonly unknown[] }
+  | { type: "executed"; value: unknown; queued: readonly unknown[]; emitted: readonly unknown[] }
+  | { type: "error"; message: string };
+
+type RunState = {
+  phase: "idle" | "compiling" | "running" | "executing" | "executed" | "error";
+  value: unknown;
+  queued: readonly unknown[];
+  emitted: readonly unknown[];
+  message: string;
+};
+
+const initialState: RunState = {
+  phase: "idle",
+  value: null,
+  queued: [],
+  emitted: [],
+  message: "Run the code to inspect its value and events.",
+};
+
+const formatOutput = (value: unknown) => {
+  if (typeof value === "string") {
+    return value;
+  }
+  try {
+    return JSON.stringify(value, null, 2) ?? String(value);
+  } catch {
+    return String(value);
+  }
+};
+
 const TrackableExperiment = () => {
-  const demo = useTrackableDemo();
-  const [customEvent, setCustomEvent] = useState(
-    '{\n  "type": "button_click",\n  "source": "trackable_demo",\n  "details": { "label": "Try it" }\n}',
-  );
-  const [eventError, setEventError] = useState("");
-  const runFlatMap = (operation: (eventData: TrackingEvent) => void) => {
-    try {
-      operation(JSON.parse(customEvent));
-      setEventError("");
-    } catch {
-      setEventError("Enter valid JSON to add this event.");
+  const [CodeEditor, setCodeEditor] = useState<ComponentType<{
+    value: string;
+    onChange: (value: string) => void;
+    onDiagnostics: (markers: editor.IMarker[]) => void;
+    onMount: (instance: editor.IStandaloneCodeEditor) => void;
+  }> | null>(null);
+  const [selectedId, setSelectedId] = useState(trackableExamples[0].id);
+  const [source, setSource] = useState(() => {
+    return buildTrackableSource(trackableExamples[0]);
+  });
+  const [state, setState] = useState<RunState>(initialState);
+  const [diagnostics, setDiagnostics] = useState<editor.IMarker[]>([]);
+  const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
+  const workerRef = useRef<Worker | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const runIdRef = useRef(0);
+
+  const clearTimeoutRef = () => {
+    if (timeoutRef.current !== null) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
     }
   };
+  const stopWorker = () => {
+    runIdRef.current += 1;
+    workerRef.current?.terminate();
+    workerRef.current = null;
+    clearTimeoutRef();
+  };
+  useEffect(() => {
+    let active = true;
+    if (!import.meta.env.SSR) {
+      void import("@features/Playground/TrackableCodeEditor").then((module) => {
+        if (active) {
+          setCodeEditor(() => {
+            return module.TrackableCodeEditor;
+          });
+        }
+      });
+    }
+    return () => {
+      active = false;
+      stopWorker();
+    };
+  }, []);
+
+  const changeSource = (nextSource: string) => {
+    stopWorker();
+    setSource(nextSource);
+    setState(initialState);
+    setDiagnostics([]);
+  };
+  const changeExample = (id: string) => {
+    const example = trackableExamples.find((item) => {
+      return item.id === id;
+    });
+    if (!example) {
+      return;
+    }
+    setSelectedId(id);
+    changeSource(buildTrackableSource(example));
+    requestAnimationFrame(() => {
+      const instance = editorRef.current;
+      const model = instance?.getModel();
+      const match = model?.findMatches("function createChain", false, false, false, null, true)[0];
+      if (match) {
+        instance?.revealLineNearTop(match.range.startLineNumber);
+      }
+    });
+  };
+  const armTimeout = (worker: Worker, runId: number) => {
+    clearTimeoutRef();
+    timeoutRef.current = setTimeout(() => {
+      if (runIdRef.current !== runId) {
+        return;
+      }
+      worker.terminate();
+      workerRef.current = null;
+      setState((previous) => {
+        return {
+          ...previous,
+          phase: "error",
+          message: "The code took too long to run. Check for an infinite loop and try again.",
+        };
+      });
+    }, 3000);
+  };
+  const runCode = async () => {
+    if (import.meta.env.SSR) {
+      return;
+    }
+    const model = editorRef.current?.getModel();
+    if (!model) {
+      setState({ ...initialState, phase: "error", message: "The editor is still loading." });
+      return;
+    }
+    stopWorker();
+    const runId = runIdRef.current;
+    setState({ ...initialState, phase: "compiling", message: "Checking TypeScript…" });
+    try {
+      const { compileTrackableSource } = await import("@features/Playground/trackableMonaco");
+      const { code, diagnostics } = await compileTrackableSource(model);
+      if (runIdRef.current !== runId) {
+        return;
+      }
+      if (diagnostics.length) {
+        setState({ ...initialState, phase: "error", message: diagnostics.join("\n") });
+        return;
+      }
+      const worker = new Worker(
+        new URL("../../features/Playground/trackableRunner.worker.ts", import.meta.url),
+        { type: "module" },
+      );
+      workerRef.current = worker;
+      worker.onmessage = (event: MessageEvent<RunnerResponse>) => {
+        if (runIdRef.current !== runId) {
+          return;
+        }
+        clearTimeoutRef();
+        const response = event.data;
+        if (response.type === "error") {
+          stopWorker();
+          setState({ ...initialState, phase: "error", message: response.message });
+        } else if (response.type === "ready") {
+          setState({
+            phase: "executing",
+            value: response.value,
+            queued: response.queued,
+            emitted: [],
+            message: "Executing the chain and emitting its events…",
+          });
+          armTimeout(worker, runId);
+          worker.postMessage({ type: "execute" });
+        } else {
+          setState({
+            phase: "executed",
+            value: response.value,
+            queued: response.queued,
+            emitted: response.emitted,
+            message: `Execute returned ${formatOutput(response.value)} and emitted ${response.emitted.length} event${response.emitted.length === 1 ? "" : "s"}.`,
+          });
+        }
+      };
+      worker.onerror = () => {
+        if (runIdRef.current !== runId) {
+          return;
+        }
+        stopWorker();
+        setState({
+          ...initialState,
+          phase: "error",
+          message: "The code could not run in the browser worker.",
+        });
+      };
+      setState({ ...initialState, phase: "running", message: "Running code…" });
+      armTimeout(worker, runId);
+      worker.postMessage({ type: "prepare", code });
+    } catch (error) {
+      if (runIdRef.current !== runId) {
+        return;
+      }
+      setState({
+        ...initialState,
+        phase: "error",
+        message: error instanceof Error ? error.message : String(error),
+      });
+    }
+  };
+  const selectedExample = trackableExamples.find((item) => {
+    return item.id === selectedId;
+  });
+  const hasResult = state.phase === "executing" || state.phase === "executed";
   return (
     <section className="playground-page trackable-experiment">
       <header className="playground-heading">
@@ -28,133 +219,140 @@ const TrackableExperiment = () => {
           <CommandLink to="/blog/$slug" params={{ slug: "building-a-monad" }}>
             article on building a monad
           </CommandLink>
-          . Use
-          <code> map</code> to change its value while keeping the queued analytics events. Use
-          <code> flatMap</code> when the next function returns another Trackable, then execute the
-          chain to emit its events to the log and return the value.
+          . Use <code>map</code> to change its value while keeping queued analytics events. Use{" "}
+          <code>flatMap</code> when the next function returns another Trackable. Pick an example,
+          edit the TypeScript, then run it to see the value and events.
         </p>
       </header>
-
       <div className="trackable-grid">
-        <section className="trackable-panel" aria-labelledby="trackable-steps-heading">
-          <h2 id="trackable-steps-heading">Build a chain</h2>
-          <div className="trackable-steps" aria-label="Current chain">
-            {demo.steps.map((step, index) => {
-              return <code key={`${index}-${step}`}>{step}</code>;
-            })}
-          </div>
-          <h3>Transform the value</h3>
-          <div className="trackable-actions">
-            <CommandButton
-              type="button"
-              command={{ group: "Trackable demo" }}
-              onClick={demo.mapAddThree}
-            >
-              map: add 3
-            </CommandButton>
-            <CommandButton
-              type="button"
-              command={{ group: "Trackable demo" }}
-              onClick={demo.mapDouble}
-            >
-              map: double
-            </CommandButton>
-          </div>
-          <h3>Add an event with flatMap</h3>
-          <div className="trackable-custom-event">
-            <label htmlFor="trackable-event-json">Event data for flatMap (JSON)</label>
-            <textarea
-              id="trackable-event-json"
-              value={customEvent}
-              rows={6}
-              spellCheck={false}
-              aria-invalid={Boolean(eventError)}
-              aria-describedby={eventError ? "trackable-event-error" : undefined}
+        <section
+          className="trackable-panel trackable-code-panel"
+          aria-labelledby="trackable-code-heading"
+        >
+          <h2 id="trackable-code-heading">Build a chain</h2>
+          <div className="trackable-example-picker">
+            <label htmlFor="trackable-example">Example</label>
+            <select
+              id="trackable-example"
+              value={selectedId}
               onChange={(event) => {
-                setCustomEvent(event.target.value);
-                setEventError("");
+                return changeExample(event.target.value);
               }}
-            />
-            {eventError && (
-              <small id="trackable-event-error" role="alert">
-                {eventError}
-              </small>
+            >
+              {trackableExamples.map((example) => {
+                return (
+                  <option key={example.id} value={example.id}>
+                    {example.label}
+                  </option>
+                );
+              })}
+            </select>
+          </div>
+          <p className="trackable-example-description">{selectedExample?.description}</p>
+          <p className="trackable-editor-hint">
+            Hover over a method to inspect its types. Edit the chain, helpers, or event data, then
+            run the code.
+          </p>
+          <div className="trackable-editor">
+            {CodeEditor ? (
+              <CodeEditor
+                value={source}
+                onChange={changeSource}
+                onDiagnostics={setDiagnostics}
+                onMount={(instance) => {
+                  editorRef.current = instance;
+                }}
+              />
+            ) : (
+              <p className="trackable-editor-loading" role="status">
+                Loading TypeScript editor…
+              </p>
             )}
-            <small>Both flatMap actions include this JSON in the event they create.</small>
           </div>
-          <div className="trackable-actions">
+          <div className="trackable-diagnostics" aria-label="TypeScript diagnostics">
+            <h3>Diagnostics <span>{diagnostics.length}</span></h3>
+            {diagnostics.length ? (
+              <ul>
+                {diagnostics.map((marker, index) => {
+                  return (
+                    <li key={`${marker.code ?? "diagnostic"}-${marker.startLineNumber}-${index}`}>
+                      <button type="button" onClick={() => {
+                        editorRef.current?.revealLineInCenter(marker.startLineNumber);
+                        editorRef.current?.setPosition({
+                          lineNumber: marker.startLineNumber,
+                          column: marker.startColumn,
+                        });
+                        editorRef.current?.focus();
+                      }}>
+                        <span>{marker.startLineNumber}:{marker.startColumn}</span>
+                        {marker.message}
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : (
+              <p>No TypeScript issues reported.</p>
+            )}
+          </div>
+          <div className="trackable-actions trackable-run-actions">
             <CommandButton
               type="button"
+              className="trackable-primary-action"
               command={{ group: "Trackable demo" }}
+              disabled={
+                !CodeEditor ||
+                state.phase === "compiling" ||
+                state.phase === "running" ||
+                state.phase === "executing"
+              }
               onClick={() => {
-                runFlatMap(demo.flatMapAddFive);
+                return void runCode();
               }}
             >
-              flatMap: add 5 + event
-            </CommandButton>
-            <CommandButton
-              type="button"
-              command={{ group: "Trackable demo" }}
-              onClick={() => {
-                runFlatMap(demo.flatMapAddRandom);
-              }}
-            >
-              flatMap: add random + event
-            </CommandButton>
-          </div>
-          <div className="trackable-actions trackable-finish-actions">
-            <CommandButton
-              type="button"
-              className="trackable-execute"
-              command={{ group: "Trackable demo" }}
-              onClick={demo.execute}
-            >
-              Execute chain
-            </CommandButton>
-            <CommandButton type="button" command={{ group: "Trackable demo" }} onClick={demo.reset}>
-              Reset
+              Run code
             </CommandButton>
           </div>
         </section>
-
-        <section className="trackable-panel" aria-labelledby="trackable-value-heading">
+        <section
+          className="trackable-panel trackable-results-panel"
+          aria-labelledby="trackable-value-heading"
+        >
           <h2 id="trackable-value-heading">Trackable state</h2>
-          <div className="trackable-value" aria-live="polite">
-            <span>Wrapped value</span>
-            <strong>{demo.current.getValue()}</strong>
-          </div>
-          {demo.lastResult !== null && (
-            <p className="trackable-execute-result" role="status">
-              Execute returned {demo.lastResult} and emitted {demo.emitted.length} event
-              {demo.emitted.length === 1 ? "" : "s"}.
-            </p>
-          )}
-          <h3>Queued events ({demo.current.getAnalyticsEvents().length})</h3>
-          <ol className="trackable-event-list">
-            {demo.current.getAnalyticsEvents().map((event, index) => {
-              return (
-                <li key={index}>
-                  <pre>{JSON.stringify(event, null, 2)}</pre>
-                </li>
-              );
-            })}
-          </ol>
-          {demo.current.getAnalyticsEvents().length === 0 && (
-            <p>No events queued yet. Try a flatMap action.</p>
-          )}
-          <h3>Emitted events ({demo.emitted.length})</h3>
-          {demo.emitted.length ? (
-            <ol className="trackable-event-list" aria-live="polite">
-              {demo.emitted.map((event, index) => {
-                return (
-                  <li key={index}>
-                    <pre>{JSON.stringify(event, null, 2)}</pre>
-                  </li>
-                );
-              })}
-            </ol>
-          ) : (
-            <p>No events emitted yet.</p>
+          <p
+            className={`trackable-status${state.phase === "error" ? " trackable-status-error" : ""}`}
+            role="status"
+          >
+            {state.message}
+          </p>
+          {hasResult && (
+            <>
+              <div className="trackable-value" aria-live="polite">
+                <span>Wrapped value</span>
+                {typeof state.value === "object" && state.value !== null ? (
+                  <pre>{formatOutput(state.value)}</pre>
+                ) : (
+                  <strong>{formatOutput(state.value)}</strong>
+                )}
+              </div>
+              <p>The chain queued {state.queued.length} events.</p>
+              <h3>Emitted events ({state.emitted.length})</h3>
+              {state.emitted.length ? (
+                <ol className="trackable-event-list" aria-live="polite">
+                  {state.emitted.map((event, index) => {
+                    return (
+                      <li key={index}>
+                        <pre>{formatOutput(event)}</pre>
+                      </li>
+                    );
+                  })}
+                </ol>
+              ) : (
+                <p>
+                  {state.phase === "executing" ? "Emitting events…" : "No events in this chain."}
+                </p>
+              )}
+            </>
           )}
         </section>
       </div>
