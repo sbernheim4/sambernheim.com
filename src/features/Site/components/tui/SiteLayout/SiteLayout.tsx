@@ -17,12 +17,13 @@ export const SiteLayout = ({
   return (
     <Box
       flexDirection="column"
+      paddingX={2}
       paddingY={1}
       width="100%"
       height={stdout.rows ?? 24}
       overflow="hidden"
     >
-      <Box flexDirection="column" width={width} alignSelf="center">
+      <Box flexDirection="column" width={width}>
         <Text bold color="cyan">
           Samuel Bernheim · Site TUI
         </Text>

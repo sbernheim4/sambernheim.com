@@ -55,9 +55,6 @@ const TerminalPage = () => {
           libraries stay the same—including TanStack Query, Router, and Form. Browse the site with
           the keyboard controls below.
         </p>
-        <p className="views-playground-note terminal-playground-note">
-          Browser support is still iffy. This works best in a real terminal.
-        </p>
       </header>
       <div className="playground-terminal-frame">
         <div className="playground-terminal-bar">
