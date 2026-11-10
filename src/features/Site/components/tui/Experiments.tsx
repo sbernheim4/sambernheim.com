@@ -20,14 +20,14 @@ export const experiments: readonly TuiMenuItem[] = [
     description: "A browser editor with a client-side language server",
   },
   {
+    label: "Workspace application",
+    path: "/experiments/workspace",
+    description: "Forms, loader, palette, dates, and views together",
+  },
+  {
     label: "Multiple forms",
     path: "/experiments/forms",
     description: "Validation, dependent saves, cache updates, and undo",
-  },
-  {
-    label: "Workspace application",
-    path: "/experiments/workspace",
-    description: "A connected app composed from the form and display tools",
   },
   {
     label: "Display options",

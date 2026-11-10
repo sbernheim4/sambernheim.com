@@ -49,9 +49,33 @@ const experiments = [
     ),
   },
   {
+    to: "/experiments/workspace",
+    image: "workspace",
+    number: "03",
+    title: "A demo application showing all the experiments working together",
+    category: "EXAMPLE APPLICATION",
+    description:
+      "An example application using the form system, command palette, cycleable dates, global loading indicator, swappable view mechanism and the rest.",
+    preview: (
+      <div className="preview-workspace">
+        <strong>Workspace</strong>
+        <span>Tasks · Processes · Threads</span>
+        <div>
+          Prepare release notes <small>Task</small>
+        </div>
+        <div>
+          Website refresh <small>Process</small>
+        </div>
+        <div>
+          Review deployment <small>Thread</small>
+        </div>
+      </div>
+    ),
+  },
+  {
     to: "/experiments/forms",
     image: "forms",
-    number: "03",
+    number: "04",
     title: "Multiple forms, multiple endpoints",
     category: "FORMS / VALIDATION / UNDO",
     description:
@@ -66,30 +90,6 @@ const experiments = [
           Choose a session <span>⌄</span>
         </div>
         <footer>Validate → Save → Undo</footer>
-      </div>
-    ),
-  },
-  {
-    to: "/experiments/workspace",
-    image: "workspace",
-    number: "04",
-    title: "Form features, working together",
-    category: "TASKS / PROCESSES / THREADS",
-    description:
-      "A connected workspace composed from query-backed forms, validation, ordered dependent saves, cache updates, undo, and flexible detail views.",
-    preview: (
-      <div className="preview-workspace">
-        <strong>Workspace</strong>
-        <span>Tasks · Processes · Threads</span>
-        <div>
-          Prepare release notes <small>Task</small>
-        </div>
-        <div>
-          Website refresh <small>Process</small>
-        </div>
-        <div>
-          Review deployment <small>Thread</small>
-        </div>
       </div>
     ),
   },

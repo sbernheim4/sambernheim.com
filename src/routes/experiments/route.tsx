@@ -11,8 +11,8 @@ const PlaygroundLayout = () => {
         </CommandLink>
         <CommandLink to="/experiments/terminal">Terminal</CommandLink>
         <CommandLink to="/experiments/python-editor">Python editor</CommandLink>
-        <CommandLink to="/experiments/forms">Forms</CommandLink>
         <CommandLink to="/experiments/workspace">Workspace</CommandLink>
+        <CommandLink to="/experiments/forms">Forms</CommandLink>
         <CommandLink to="/experiments/views">Choose your layout</CommandLink>
         <CommandLink to="/experiments/dates">Cycleable dates</CommandLink>
         <CommandLink to="/experiments/global-loader">Global loader</CommandLink>
