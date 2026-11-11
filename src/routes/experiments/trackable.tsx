@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type ComponentType } from "react";
 import type { editor } from "monaco-editor";
 import { CommandButton, CommandLink } from "@/features";
 import { buildTrackableSource, trackableExamples } from "@features/Playground/trackableExamples";
+import { Diagnostics } from "@features/Editor/Diagnostics";
 import "./trackable.css";
 
 // Start removes these function bodies and their imports from the server build.
@@ -186,7 +187,7 @@ const TrackableExperiment = () => {
             value: response.value,
             queued: response.queued,
             emitted: response.emitted,
-            message: `Execute returned ${formatOutput(response.value)} and emitted ${response.emitted.length} event${response.emitted.length === 1 ? "" : "s"}.`,
+            message: "Run complete.",
           });
         }
       };
@@ -278,39 +279,31 @@ const TrackableExperiment = () => {
               </p>
             )}
           </div>
-          <div className="trackable-diagnostics" aria-label="TypeScript diagnostics">
-            <h3>
-              Diagnostics <span>{diagnostics.length}</span>
-            </h3>
-            {diagnostics.length ? (
-              <ul>
-                {diagnostics.map((marker, index) => {
-                  return (
-                    <li key={`${marker.code ?? "diagnostic"}-${marker.startLineNumber}-${index}`}>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          editorRef.current?.revealLineInCenter(marker.startLineNumber);
-                          editorRef.current?.setPosition({
-                            lineNumber: marker.startLineNumber,
-                            column: marker.startColumn,
-                          });
-                          editorRef.current?.focus();
-                        }}
-                      >
-                        <span>
-                          {marker.startLineNumber}:{marker.startColumn}
-                        </span>
-                        {marker.message}
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
-            ) : (
-              <p>No TypeScript issues reported.</p>
-            )}
-          </div>
+          <Diagnostics
+            diagnostics={diagnostics.map((marker) => {
+              return {
+                marker,
+                code: typeof marker.code === "object" ? marker.code.value : marker.code,
+                severity:
+                  marker.severity === 8
+                    ? ("error" as const)
+                    : marker.severity === 4
+                      ? ("warning" as const)
+                      : ("info" as const),
+                startLineNumber: marker.startLineNumber,
+                startColumn: marker.startColumn,
+                message: marker.message,
+              };
+            })}
+            onSelect={({ marker }) => {
+              editorRef.current?.revealLineInCenter(marker.startLineNumber);
+              editorRef.current?.setPosition({
+                lineNumber: marker.startLineNumber,
+                column: marker.startColumn,
+              });
+              editorRef.current?.focus();
+            }}
+          />
           <div className="trackable-actions trackable-run-actions">
             <CommandButton
               type="button"
@@ -335,30 +328,48 @@ const TrackableExperiment = () => {
           aria-labelledby="trackable-value-heading"
         >
           <h2 id="trackable-value-heading">Trackable state</h2>
-          <p
-            className={`trackable-status${state.phase === "error" ? " trackable-status-error" : ""}`}
-            role="status"
-          >
-            {state.message}
-          </p>
+          {state.phase !== "executed" && (
+            <p
+              className={`trackable-status${state.phase === "error" ? " trackable-status-error" : ""}`}
+              role="status"
+            >
+              {state.message}
+            </p>
+          )}
           {hasResult && (
             <>
               <div className="trackable-value" aria-live="polite">
-                <span>Wrapped value</span>
+                <span>Returned value</span>
                 {typeof state.value === "object" && state.value !== null ? (
-                  <pre>{formatOutput(state.value)}</pre>
+                  <details className="trackable-object-value">
+                    <summary>View object</summary>
+                    <pre>{formatOutput(state.value)}</pre>
+                  </details>
                 ) : (
                   <strong>{formatOutput(state.value)}</strong>
                 )}
               </div>
-              <p>The chain queued {state.queued.length} events.</p>
               <h3>Emitted events ({state.emitted.length})</h3>
               {state.emitted.length ? (
                 <ol className="trackable-event-list" aria-live="polite">
                   {state.emitted.map((event, index) => {
                     return (
                       <li key={index}>
-                        <pre>{formatOutput(event)}</pre>
+                        <details>
+                          <summary>
+                            <span className="trackable-event-index">{index + 1}</span>
+                            <span>
+                              {typeof event === "object" &&
+                              event !== null &&
+                              "functionName" in event &&
+                              typeof event.functionName === "string"
+                                ? event.functionName
+                                : "Event " + (index + 1)}
+                            </span>
+                            <small>View JSON</small>
+                          </summary>
+                          <pre>{formatOutput(event)}</pre>
+                        </details>
                       </li>
                     );
                   })}

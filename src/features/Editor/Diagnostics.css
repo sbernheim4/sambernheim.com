@@ -1,0 +1,24 @@
+.editor-diagnostics {
+  margin-block: 16px;
+  --color-surface-inverse: var(--color-background);
+  --color-surface-inverse-raised: var(--color-surface);
+  --color-border-inverse: var(--color-border);
+  --color-text-inverse: var(--color-text);
+  --color-text-inverse-muted: var(--color-text-muted);
+}
+.editor-diagnostics .diagnostics-header h2 {
+  margin: 0;
+  font-size: 12px;
+}
+.editor-diagnostics .diagnostics-empty {
+  margin: 7px 0 0;
+  color: var(--color-text-muted);
+  font-size: 12px;
+}
+.editor-diagnostics .diagnostic-button {
+  flex-wrap: wrap;
+  overflow-wrap: anywhere;
+}
+.editor-diagnostics .diagnostics-list code {
+  margin-left: 0;
+}

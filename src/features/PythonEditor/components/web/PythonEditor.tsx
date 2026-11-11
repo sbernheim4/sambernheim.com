@@ -1,4 +1,5 @@
 import Editor from "@monaco-editor/react";
+import { Diagnostics as EditorDiagnostics } from "@features/Editor/Diagnostics";
 import { createContext, useContext, type ReactNode } from "react";
 import { useTheme } from "../../../Theme/ThemeProvider";
 import {
@@ -76,42 +77,12 @@ const EditorPane = () => {
 const Diagnostics = () => {
   const { diagnostics, revealDiagnostic, tyState } = useEditorContext();
   return (
-    <section className="diagnostics-panel" aria-label="Diagnostics">
-      <div className="diagnostics-header">
-        <h2>Diagnostics</h2>
-        <span>{diagnostics.length}</span>
-      </div>
-      {diagnostics.length === 0 ? (
-        <p className="diagnostics-empty" role={tyState.status === "error" ? "alert" : "status"}>
-          {tyState.status === "ready" ? "No issues reported." : tyState.message}
-        </p>
-      ) : (
-        <ul className="diagnostics-list">
-          {diagnostics.map((diagnostic, index) => {
-            return (
-              <li key={`${diagnostic.code}-${diagnostic.startLineNumber}-${index}`}>
-                <button
-                  type="button"
-                  className="diagnostic-button"
-                  onClick={() => {
-                    return revealDiagnostic(diagnostic);
-                  }}
-                >
-                  <span className={`diagnostic-severity ${diagnostic.severity}`}>
-                    {diagnostic.severity}
-                  </span>
-                  <span className="diagnostic-location">
-                    {diagnostic.startLineNumber}:{diagnostic.startColumn}
-                  </span>
-                  <span>{diagnostic.message}</span>
-                  <code>{diagnostic.code}</code>
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-      )}
-    </section>
+    <EditorDiagnostics
+      diagnostics={diagnostics}
+      onSelect={revealDiagnostic}
+      emptyMessage={tyState.status === "ready" ? "No issues reported." : tyState.message}
+      error={tyState.status === "error"}
+    />
   );
 };
 const Toolbar = () => {
