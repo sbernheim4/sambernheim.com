@@ -1,9 +1,19 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { createClientOnlyFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState, type ComponentType } from "react";
 import type { editor } from "monaco-editor";
 import { CommandButton, CommandLink } from "@/features";
 import { buildTrackableSource, trackableExamples } from "@features/Playground/trackableExamples";
 import "./trackable.css";
+
+// Start removes these function bodies and their imports from the server build.
+const loadCodeEditor = createClientOnlyFn(() => {
+  return import("@features/Playground/TrackableCodeEditor");
+});
+const compileSource = createClientOnlyFn(async (model: editor.ITextModel) => {
+  const { compileTrackableSource } = await import("@features/Playground/trackableMonaco");
+  return compileTrackableSource(model);
+});
 
 type RunnerResponse =
   | { type: "ready"; value: unknown; queued: readonly unknown[] }
@@ -70,7 +80,7 @@ const TrackableExperiment = () => {
   useEffect(() => {
     let active = true;
     if (!import.meta.env.SSR) {
-      void import("@features/Playground/TrackableCodeEditor").then((module) => {
+      void loadCodeEditor().then((module) => {
         if (active) {
           setCodeEditor(() => {
             return module.TrackableCodeEditor;
@@ -138,8 +148,7 @@ const TrackableExperiment = () => {
     const runId = runIdRef.current;
     setState({ ...initialState, phase: "compiling", message: "Checking TypeScript…" });
     try {
-      const { compileTrackableSource } = await import("@features/Playground/trackableMonaco");
-      const { code, diagnostics } = await compileTrackableSource(model);
+      const { code, diagnostics } = await compileSource(model);
       if (runIdRef.current !== runId) {
         return;
       }
@@ -270,21 +279,28 @@ const TrackableExperiment = () => {
             )}
           </div>
           <div className="trackable-diagnostics" aria-label="TypeScript diagnostics">
-            <h3>Diagnostics <span>{diagnostics.length}</span></h3>
+            <h3>
+              Diagnostics <span>{diagnostics.length}</span>
+            </h3>
             {diagnostics.length ? (
               <ul>
                 {diagnostics.map((marker, index) => {
                   return (
                     <li key={`${marker.code ?? "diagnostic"}-${marker.startLineNumber}-${index}`}>
-                      <button type="button" onClick={() => {
-                        editorRef.current?.revealLineInCenter(marker.startLineNumber);
-                        editorRef.current?.setPosition({
-                          lineNumber: marker.startLineNumber,
-                          column: marker.startColumn,
-                        });
-                        editorRef.current?.focus();
-                      }}>
-                        <span>{marker.startLineNumber}:{marker.startColumn}</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          editorRef.current?.revealLineInCenter(marker.startLineNumber);
+                          editorRef.current?.setPosition({
+                            lineNumber: marker.startLineNumber,
+                            column: marker.startColumn,
+                          });
+                          editorRef.current?.focus();
+                        }}
+                      >
+                        <span>
+                          {marker.startLineNumber}:{marker.startColumn}
+                        </span>
                         {marker.message}
                       </button>
                     </li>
