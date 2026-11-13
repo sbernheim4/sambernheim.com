@@ -1,11 +1,8 @@
 import { useTuiInput } from "@features/Workspace/components/tui/Primitives/InputMode";
 import { Text } from "ink";
-import { useState } from "react";
-export type ViewMode = "tabs" | "page";
-export const useViewModePreference = () => {
-  const [mode, updateMode] = useState<ViewMode>("page");
-  return { mode, updateMode };
-};
+import type { ViewMode } from "../../../hooks/useViewModePreference";
+export { useViewModePreference } from "../../../hooks/useViewModePreference";
+export type { ViewMode } from "../../../hooks/useViewModePreference";
 export const ViewModePicker = ({
   mode,
   onChange,
@@ -13,6 +10,7 @@ export const ViewModePicker = ({
   mode: ViewMode;
   onChange: (mode: ViewMode) => void;
 }) => {
+  const visibleMode = mode === "page" ? "page" : "tabs";
   useTuiInput((input) => {
     if (input === "1") {
       onChange("tabs");
@@ -20,5 +18,5 @@ export const ViewModePicker = ({
       onChange("page");
     }
   });
-  return <Text dimColor>View: {mode} · 1 tabs · 2 full page</Text>;
+  return <Text dimColor>View: {visibleMode} · 1 tabs · 2 full page</Text>;
 };

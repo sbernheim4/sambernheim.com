@@ -46,6 +46,9 @@ export default defineConfig(({ mode }) => {
       },
       tanstackStart({
         srcDirectory: "src",
+        router: {
+          routeFileIgnorePattern: "^ComponentLibrary$",
+        },
       }),
       viteReact(),
     ],

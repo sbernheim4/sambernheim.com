@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, type ComponentType } from "react";
 import type { editor } from "monaco-editor";
 import { CommandButton, CommandLink } from "@/features";
 import { buildTrackableSource, trackableExamples } from "@features/Playground/trackableExamples";
-import { Diagnostics } from "@features/Editor/Diagnostics";
+import { Diagnostics } from "@features/CodeEditor";
 import "./trackable.css";
 
 // Start removes these function bodies and their imports from the server build.

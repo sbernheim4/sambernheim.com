@@ -18,9 +18,14 @@ import { tuiFieldPrimitives } from "./features/Forms/components/fields/tui";
 import { FieldFocusProvider } from "./features/Forms/components/fields/tui/FieldFocus";
 import { FormEditorRendererContext } from "./features/Forms/components/editor/renderer";
 import { tuiFormEditorRenderer } from "./features/Forms/components/editor/tui";
-import { CommandPaletteProvider } from "./features/Commands/commands";
-import { TuiCommandPalette } from "./features/Commands/components/tui/CommandPalette";
-import { TuiNavigationCommands } from "./features/Commands/components/tui/NavigationCommands";
+import {
+  CommandPaletteProvider,
+  useCommandActions,
+  useCommandPalette,
+  useCommandPaletteModel,
+} from "./features/CommandPalette/model";
+import { CommandPalette } from "./features/CommandPalette/components/tui/CommandPalette";
+import { NavigationCommands } from "./features/CommandPalette/components/tui/NavigationCommands";
 import type { TuiArticle } from "./features/Site/components/tui/articleData";
 import { Home } from "./features/Site/components/tui/Home";
 import { ExperimentDetail, Experiments } from "./features/Site/components/tui/Experiments";
@@ -31,7 +36,7 @@ import { ThreadList } from "./features/Threads/components/ThreadList";
 import { ProcessDetail } from "./features/Processes/components/ProcessDetail";
 import { TaskDetail } from "./features/Tasks/components/TaskDetail";
 import { ThreadDetail } from "./features/Threads/components/ThreadDetail";
-import { TuiGlobalQueryLoader } from "./features/UI/components/tui/GlobalQueryLoader";
+import { GlobalQueryLoader } from "./features/GlobalQueryLoader/components/tui/GlobalQueryLoader";
 import { ProcessCreatePage, ProcessEditPage } from "./features/Processes/components/ProcessForms";
 import { TaskCreatePage, TaskEditPage } from "./features/Tasks/components/TaskForms";
 import { ThreadCreatePage, ThreadEditPage } from "./features/Threads/components/ThreadForms";
@@ -110,7 +115,10 @@ const TuiScreen = ({ route, articles }: { route: TuiRoute; articles: TuiArticle[
   const navigate = useTuiNavigate();
   const [lastKey, setLastKey] = useState("");
   const [inputMode, setInputMode] = useState<TuiInputMode>("normal");
-  const [paletteOpen, setPaletteOpen] = useState(false);
+  const paletteState = useCommandPalette();
+  const paletteActions = useCommandActions();
+  const paletteModel = useCommandPaletteModel(paletteActions, paletteState, true);
+  const paletteOpen = paletteState.open;
   const [helpOpen, setHelpOpen] = useState(false);
   const navigateTo = (path: string) => {
     void navigate({ to: path as "/" });
@@ -135,7 +143,7 @@ const TuiScreen = ({ route, articles }: { route: TuiRoute; articles: TuiArticle[
       (key.ctrl && input === "k") ||
       (!isForm && inputMode === "normal" && input === "f" && lastKey === "f")
     ) {
-      setPaletteOpen(true);
+      paletteState.toggle();
       setInputMode("insert");
       setLastKey("");
       return;
@@ -177,9 +185,9 @@ const TuiScreen = ({ route, articles }: { route: TuiRoute; articles: TuiArticle[
       helpOpen={helpOpen}
     >
       <TuiWorkspaceNavigation onNavigate={navigateTo}>
-        <TuiNavigationCommands route={route} />
+        <NavigationCommands route={route} />
         <SiteLayout pathname={pathname} maxWidth={route.page === "article" ? 88 : undefined}>
-          <TuiGlobalQueryLoader />
+          <GlobalQueryLoader />
           <Box flexDirection="column" display={paletteOpen ? "none" : "flex"}>
             {route.page === "home" ? (
               <Home />
@@ -221,14 +229,7 @@ const TuiScreen = ({ route, articles }: { route: TuiRoute; articles: TuiArticle[
               </Text>
             )}
           </Box>
-          {paletteOpen && (
-            <TuiCommandPalette
-              onClose={() => {
-                setPaletteOpen(false);
-                setInputMode("normal");
-              }}
-            />
-          )}
+          <CommandPalette model={paletteModel} />
           {helpOpen && (
             <Box
               position="absolute"

@@ -1,19 +1,17 @@
 import { useIsFetching, useQuery } from "@tanstack/react-query";
-import {
-  differenceInCalendarDays,
-  differenceInMonths,
-  differenceInYears,
-  format,
-  formatDistanceToNow,
-  isValid,
-} from "date-fns";
 import { Box, Text } from "ink";
-import { useEffect, useState, type ReactNode } from "react";
-import { useAutomaticCommandAction } from "@features/Commands/commands";
+import { useState, type ReactNode } from "react";
+import { useAutomaticCommandAction } from "@features/CommandPalette/model";
+import { formatCycleableDateTime, parseCycleableDate } from "@features/Dates/format";
 import {
+  cycleableDateTimeModes,
+  getNextCycleableDateTimeMode,
+  resolveCycleableDateTimeMode,
   useCycleableDateTimeMode,
   type CycleableDateTimeMode,
 } from "@features/Dates/hooks/useCycleableDateTimeMode";
+import { useCycleableDateModel } from "@features/Dates/hooks/useCycleableDateModel";
+import { useRelativeDateRefresh } from "@features/Dates/hooks/useRelativeDateRefresh";
 import { useArticleControl } from "./ArticleFocus";
 
 const ArticleControl = ({
@@ -53,126 +51,37 @@ const ArticleControl = ({
   );
 };
 
-const useRelativeRefresh = (relative: boolean, interval: number) => {
-  const [, refresh] = useState(0);
-  useEffect(() => {
-    if (!relative) {
-      return;
-    }
-    const timer = setInterval(() => {
-      refresh((current) => {
-        return current + 1;
-      });
-    }, interval);
-    return () => {
-      clearInterval(timer);
-    };
-  }, [relative, interval]);
-};
-
-const parseDate = (value: Date | string | number) => {
-  if (typeof value === "string") {
-    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
-    if (match) {
-      return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
-    }
-  }
-  return value instanceof Date ? value : new Date(value);
-};
-
-const formatRelativeDate = (date: Date) => {
-  const now = new Date();
-  const days = differenceInCalendarDays(now, date);
-  if (days === 0) {
-    return "Today";
-  }
-  if (days === 1) {
-    return "Yesterday";
-  }
-  if (days === -1) {
-    return "Tomorrow";
-  }
-  if (days > 1 && days < 30) {
-    return `${days} days ago`;
-  }
-  if (days < -1 && days > -30) {
-    return `in ${Math.abs(days)} days`;
-  }
-  const months = differenceInMonths(now, date);
-  if (months >= 1 && months < 12) {
-    return `${months} ${months === 1 ? "month" : "months"} ago`;
-  }
-  if (months <= -1 && months > -12) {
-    const absoluteMonths = Math.abs(months);
-    return `in ${absoluteMonths} ${absoluteMonths === 1 ? "month" : "months"}`;
-  }
-  const years = differenceInYears(now, date);
-  if (years >= 1) {
-    return `${years} ${years === 1 ? "year" : "years"} ago`;
-  }
-  if (years <= -1) {
-    const absoluteYears = Math.abs(years);
-    return `in ${absoluteYears} ${absoluteYears === 1 ? "year" : "years"}`;
-  }
-  return `${days} days ago`;
-};
-
 const CycleableDate = ({ value }: { value: Date | string | number; className?: string }) => {
-  const { mode, setMode } = useCycleableDateTimeMode();
-  const relative = mode === "relative";
-  useRelativeRefresh(relative, 60_000);
-  const date = parseDate(value);
-  const text = !isValid(date)
-    ? "Invalid date"
-    : relative
-      ? formatRelativeDate(date)
-      : format(date, "PP");
+  const { text, formatLabel, cycleMode } = useCycleableDateModel(value);
   return (
-    <ArticleControl
-      label={`Cycle date format: ${text}`}
-      onActivate={() => {
-        setMode?.(relative ? "utc" : "relative");
-      }}
-    >
-      {text} [{relative ? "Relative" : "Date"}]
+    <ArticleControl label={`Cycle date format: ${text}`} onActivate={cycleMode}>
+      {text} [{formatLabel}]
     </ArticleControl>
   );
 };
 
-const dateTimeModes: readonly CycleableDateTimeMode[] = ["utc", "relative", "local"];
-
 const CycleableDateTime = ({
   value,
-  modes = dateTimeModes,
+  modes = cycleableDateTimeModes,
 }: {
   value?: Date | string | number;
   className?: string;
   modes?: readonly CycleableDateTimeMode[];
 }) => {
   const { mode: contextMode, setMode } = useCycleableDateTimeMode();
-  const mode = modes.includes(contextMode) ? contextMode : (modes[0] ?? "utc");
+  const mode = resolveCycleableDateTimeMode(contextMode, modes);
   // The introductory article example omits a value; keep its timestamp stable.
   const [defaultDate] = useState(() => {
     return new Date();
   });
-  const date = value === undefined ? defaultDate : parseDate(value);
-  useRelativeRefresh(mode === "relative", 30_000);
-  const text = !isValid(date)
-    ? "Invalid date"
-    : mode === "relative"
-      ? formatDistanceToNow(date, { addSuffix: true })
-      : mode === "local"
-        ? format(date, "PPpp")
-        : new Intl.DateTimeFormat(undefined, {
-            dateStyle: "medium",
-            timeStyle: "medium",
-            timeZone: "UTC",
-          }).format(date);
+  const date = value === undefined ? defaultDate : parseCycleableDate(value);
+  useRelativeDateRefresh(mode === "relative", 30_000);
+  const text = formatCycleableDateTime(date, mode);
   return (
     <ArticleControl
       label={`Cycle date/time format: ${text}`}
       onActivate={() => {
-        setMode?.(modes[(modes.indexOf(mode) + 1) % modes.length] ?? "utc");
+        setMode?.(getNextCycleableDateTimeMode(mode, modes));
       }}
     >
       {text} [{mode === "utc" ? "UTC" : mode === "relative" ? "Relative" : "Local"}]

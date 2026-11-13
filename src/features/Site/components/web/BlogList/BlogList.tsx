@@ -1,6 +1,5 @@
 import "./BlogList.css";
 import { CommandLink as Link, CycleableDate } from "@/features";
-import { parseDateOnly } from "@/utils";
 import type { BlogListView } from "../../BlogList";
 export const WebBlogList: BlogListView = ({ articles }) => {
   return (
@@ -14,10 +13,7 @@ export const WebBlogList: BlogListView = ({ articles }) => {
                 <p>{article.description}</p>
               </Link>
               {article.publishedAt && (
-                <CycleableDate
-                  value={parseDateOnly(article.publishedAt)}
-                  className="article-date"
-                />
+                <CycleableDate value={article.publishedAt} className="article-date" />
               )}
             </div>
           );

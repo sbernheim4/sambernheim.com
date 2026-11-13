@@ -11,14 +11,9 @@ import { TuiMenu, type TuiMenuItem } from "./TuiMenu";
 
 export const experiments: readonly TuiMenuItem[] = [
   {
-    label: "Trackable",
-    path: "/experiments/trackable",
-    description: "Map values, merge events, and execute the chain",
-  },
-  {
-    label: "Terminal",
-    path: "/experiments/terminal",
-    description: "One app rendered for web and terminal",
+    label: "Workspace",
+    path: "/experiments/workspace",
+    description: "Forms, loader, palette, dates, and views together",
   },
   {
     label: "Python editor",
@@ -26,17 +21,32 @@ export const experiments: readonly TuiMenuItem[] = [
     description: "A browser editor with a client-side language server",
   },
   {
-    label: "Workspace application",
-    path: "/experiments/workspace",
-    description: "Forms, loader, palette, dates, and views together",
+    label: "Terminal",
+    path: "/experiments/terminal",
+    description: "One app rendered for web and terminal",
   },
   {
-    label: "Multiple forms",
+    label: "Components",
+    path: "/experiments/components",
+    description: "Web and TUI component examples with shareable routes",
+  },
+  {
+    label: "Forms",
     path: "/experiments/forms",
     description: "Validation, dependent saves, cache updates, and undo",
   },
   {
-    label: "Display options",
+    label: "Command palette",
+    path: "/experiments/command-palette",
+    description: "Actions register as the interface renders",
+  },
+  {
+    label: "Trackable",
+    path: "/experiments/trackable",
+    description: "Map values, merge events, and execute the chain",
+  },
+  {
+    label: "Choose your layout",
     path: "/experiments/views",
     description: "Tabs, sidebar, or full-page details",
   },
@@ -49,11 +59,6 @@ export const experiments: readonly TuiMenuItem[] = [
     label: "Global loader",
     path: "/experiments/global-loader",
     description: "A site-wide indicator for query activity",
-  },
-  {
-    label: "Command palette",
-    path: "/experiments/command-palette",
-    description: "Actions register as the interface renders",
   },
 ];
 
@@ -101,8 +106,8 @@ export const ExperimentDetail = ({ slug }: { slug: string }) => {
           ? "You’re already using the terminal version of the site. It shares the app’s hooks, business logic, and TanStack libraries."
           : (experiment?.description ?? "Explore this experiment on the website.")}
       </Text>
-      {slug === "python-editor" && (
-        <Text dimColor>The Monaco editor and browser language server run in the web version.</Text>
+      {(slug === "python-editor" || slug === "components") && (
+        <Text dimColor>This editor example runs in the web version.</Text>
       )}
       <TuiMenu
         items={[

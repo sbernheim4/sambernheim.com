@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Box, Text } from "ink";
-import { TuiCycleableDateTime } from "@features/Dates/components/tui/CycleableDate";
-import { useCommandAction } from "@features/Commands/commands";
+import { CycleableDateTime } from "@features/Dates/components/tui/CycleableDateTime";
+import { useCommandAction } from "@features/CommandPalette/model";
 import { useTrackableDemo } from "@features/Playground/useTrackableDemo";
 import { DetailView } from "@features/Workspace/components/tui/DetailView/DetailView";
 import { useTuiInput } from "@features/Workspace/components/tui/Primitives/InputMode";
@@ -28,7 +28,7 @@ export const DatesExperiment = () => {
           return (
             <Box key={example.label} justifyContent="space-between" width="100%">
               <Text>{example.label}</Text>
-              <TuiCycleableDateTime value={example.date} />
+              <CycleableDateTime value={example.date} />
             </Box>
           );
         })}

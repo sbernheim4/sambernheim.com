@@ -1,6 +1,7 @@
 import { Box, Text } from "ink";
 import { useTuiWorkspaceNavigation } from "@features/Workspace/components/tui/Primitives/Navigation";
-import { EntityTable } from "@features/EntityTable/components/tui/EntityTable";
+import { Table } from "@features/Table/components/tui/Table";
+import { useTableModel } from "@features/Table/model";
 import type { BlogListView } from "../../BlogList";
 export const TuiBlogList: BlogListView = ({ articles }) => {
   const navigate = useTuiWorkspaceNavigation();
@@ -14,12 +15,12 @@ export const TuiBlogList: BlogListView = ({ articles }) => {
       publishedAt: article.publishedAt,
     };
   });
+  const model = useTableModel(data, { variant: "articles" });
   return (
     <Box flexDirection="column" marginTop={1}>
       <Text bold>BLOG ARTICLES</Text>
-      <EntityTable
-        variant="articles"
-        data={data}
+      <Table
+        model={model}
         onSelect={(article) => {
           return navigate(article.href);
         }}

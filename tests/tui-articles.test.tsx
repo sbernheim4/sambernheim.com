@@ -9,7 +9,7 @@ import { compileArticleMarkdown } from "../src/features/Site/components/tui/Arti
 import { loadTuiArticles } from "../src/features/Site/components/tui/articles";
 import { publishedArticleFiles } from "../src/features/Site/articleCatalog";
 import { CycleableDateTimeProvider } from "../src/features/Dates/hooks/useCycleableDateTimeMode";
-import { CommandPaletteProvider } from "../src/features/Commands/commands";
+import { CommandPaletteProvider } from "../src/features/CommandPalette/model";
 import { TuiInputModeProvider } from "../src/features/Workspace/components/tui/Primitives/InputMode";
 
 const cleanups: (() => void)[] = [];

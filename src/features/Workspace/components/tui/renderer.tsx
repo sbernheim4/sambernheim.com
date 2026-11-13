@@ -8,7 +8,7 @@ import { EntityList } from "./EntityList/EntityList";
 import { DetailLayout, Loading, Missing, Status } from "./Layout/Layout";
 import { DetailView } from "./DetailView/DetailView";
 import { ChildList, DetailProperties, ProfileSummary } from "./DetailHelpers/DetailHelpers";
-import { TuiCycleableDateTime } from "@features/Dates/components/tui/CycleableDate";
+import { CycleableDateTime } from "@features/Dates/components/tui/CycleableDateTime";
 export { TuiWorkspaceNavigation };
 export const tuiWorkspaceRenderer: WorkspaceRenderer = {
   Section,
@@ -22,7 +22,7 @@ export const tuiWorkspaceRenderer: WorkspaceRenderer = {
   Status,
   Loading,
   Missing,
-  DateTime: TuiCycleableDateTime,
+  DateTime: CycleableDateTime,
   Number: ({ value }) => {
     return <Text>{value.toLocaleString()}</Text>;
   },
