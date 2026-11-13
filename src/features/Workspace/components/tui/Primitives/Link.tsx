@@ -7,7 +7,7 @@ import {
   getCommandLabel,
   useAutomaticCommandAction,
   type CommandOverride,
-} from "@features/Commands/commands";
+} from "@features/CommandPalette/model";
 
 const RegistryContext = createContext(true);
 export const LinkNavigation = ({ children }: { children: ReactNode }) => {

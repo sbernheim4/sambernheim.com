@@ -3,18 +3,31 @@ import userEvent from "@testing-library/user-event";
 import type { ReactNode } from "react";
 import { describe, expect, test, vi } from "vitest";
 import {
-  CommandPalette,
   CommandPaletteProvider,
   useCommandAction,
-} from "../src/features/Commands/commands";
-import { SegmentedTabs } from "../src/features/UI/components/SegmentedTabs";
-import { CommandButton } from "../src/features/Commands/components/CommandButton";
+  useCommandActions,
+  useCommandPalette,
+  useCommandPaletteModel,
+} from "../src/features/CommandPalette/model";
+import { CommandPalette } from "../src/features/CommandPalette/components/web/CommandPalette";
+import { SegmentedTabs } from "../src/features/UI/components/web/SegmentedTabs";
+import { CommandButton } from "../src/features/CommandPalette/components/web/CommandButton";
 
-const renderWithCommands = (children: ReactNode) => {
+const renderWithCommandPalette = (children: ReactNode) => {
+  const PaletteHost = ({ children: hostChildren }: { children: ReactNode }) => {
+    const actions = useCommandActions();
+    const state = useCommandPalette();
+    const model = useCommandPaletteModel(actions, state, true);
+    return (
+      <>
+        {hostChildren}
+        <CommandPalette model={model} />
+      </>
+    );
+  };
   return render(
     <CommandPaletteProvider>
-      {children}
-      <CommandPalette />
+      <PaletteHost>{children}</PaletteHost>
     </CommandPaletteProvider>,
   );
 };
@@ -22,7 +35,7 @@ const renderWithCommands = (children: ReactNode) => {
 describe("command palette", () => {
   test("automatically registers segmented tabs and activates them", async () => {
     const user = userEvent.setup();
-    renderWithCommands(
+    renderWithCommandPalette(
       <SegmentedTabs
         tabs={[
           { value: "one", label: "One", children: <p>First</p> },
@@ -41,7 +54,7 @@ describe("command palette", () => {
 
   test("supports explicit opt-out", async () => {
     const user = userEvent.setup();
-    renderWithCommands(
+    renderWithCommandPalette(
       <SegmentedTabs
         tabs={[{ value: "one", label: "Private tab", children: <p>First</p>, command: false }]}
       />,
@@ -60,7 +73,7 @@ describe("command palette", () => {
       return null;
     };
 
-    renderWithCommands(<CustomAction />);
+    renderWithCommandPalette(<CustomAction />);
     await user.keyboard("{Control>}k{/Control}");
     await user.click(screen.getByRole("option", { name: "Run test action" }));
 
@@ -70,7 +83,7 @@ describe("command palette", () => {
   test("automatically registers buttons and supports button opt-out", async () => {
     const user = userEvent.setup();
     const execute = vi.fn();
-    renderWithCommands(
+    renderWithCommandPalette(
       <>
         <CommandButton onClick={execute}>Run button</CommandButton>
         <CommandButton command={false}>Hidden button</CommandButton>

@@ -1,4 +1,6 @@
 import type { ReactNode } from "react";
+import type { ComponentType } from "react";
+import type { CommandOverride } from "@features/CommandPalette/model";
 import type { FormEditorActionState, FormEditorController } from "../../hooks/useFormEditorContext";
 
 export type FormEditorProviderProps = {
@@ -24,4 +26,18 @@ export type FormEditorProviderProps = {
 export type FormEditorRegionProps = {
   children: ReactNode;
   className?: string;
+};
+
+export type FormEditorActionsProps = {
+  saveCommand?: CommandOverride;
+  cancelCommand?: CommandOverride;
+};
+
+export type FormEditorTabProps = { name: string; label?: string; children: ReactNode };
+
+export type FormEditorTabTriggerProps = {
+  name: string;
+  label: string;
+  icon?: ComponentType<{ className?: string }>;
+  disabled?: boolean;
 };

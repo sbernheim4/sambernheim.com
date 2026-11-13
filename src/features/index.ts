@@ -1,7 +1,8 @@
-export * from "./Commands/commands";
-export { CommandButton } from "./Commands/components/CommandButton";
-export { CommandExternalLink } from "./Commands/components/CommandExternalLink";
-export { CommandLink } from "./Commands/components/CommandLink";
+export * from "./CommandPalette/model";
+export { CommandPalette } from "./CommandPalette/components/web/CommandPalette";
+export { CommandButton } from "./CommandPalette/components/web/CommandButton";
+export { CommandExternalLink } from "./CommandPalette/components/web/CommandExternalLink";
+export { CommandLink } from "./CommandPalette/components/web/CommandLink";
 export * from "./Dates";
 export * from "./ExecutionProfiles/api";
 export * from "./ExecutionProfiles/model";
@@ -29,9 +30,9 @@ export * from "./Threads/components/ThreadFields";
 export * from "./Threads/hooks/useThreadCreateForms";
 export * from "./Threads/hooks/useThreadEditForms";
 export * from "./Threads/hooks/useThreads";
-export * from "./UI/components/GlobalQueryLoader";
-export * from "./UI/components/Number";
-export * from "./UI/components/SegmentedTabs";
+export { GlobalQueryLoader } from "./GlobalQueryLoader/components/web/GlobalQueryLoader";
+export * from "./UI/components/web/Number";
+export * from "./UI/components/web/SegmentedTabs";
 export {
   Tooltip,
   TooltipContent,

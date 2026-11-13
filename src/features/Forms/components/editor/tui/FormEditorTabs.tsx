@@ -1,8 +1,7 @@
 import { useTuiInput } from "@features/Workspace/components/tui/Primitives/InputMode";
 import { Box, Text } from "ink";
 import type { FormEditorRegionProps } from "../formTypes";
-import type { FormEditorTabProps } from "../FormEditorTab";
-import type { FormEditorTabTriggerProps } from "../FormEditorTabTrigger";
+import type { FormEditorTabProps, FormEditorTabTriggerProps } from "../formTypes";
 import { useFormEditorContext } from "../../../hooks/useFormEditorContext";
 import { useFieldFocus } from "../../fields/tui/FieldFocus";
 

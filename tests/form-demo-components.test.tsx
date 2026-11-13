@@ -2,17 +2,17 @@ import assert from "node:assert/strict";
 import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { expect, test } from "vitest";
-import { DetailTabs } from "../src/routes/experiments/workspace/components/-DetailTabs";
-import { DetailView } from "../src/routes/experiments/workspace/components/-DetailView";
+import { DetailTabs } from "../src/features/Workspace/components/web/DetailTabs/DetailTabs";
+import { DetailView } from "../src/features/Workspace/components/web/DetailView/DetailView";
 import {
   ChildList,
   DetailProperties,
-} from "../src/routes/experiments/workspace/components/-DetailHelpers";
-import { Loading, Missing, Status } from "../src/routes/experiments/workspace/components/-Layout";
+} from "../src/features/Workspace/components/web/DetailHelpers/DetailHelpers";
+import { Loading, Missing, Status } from "../src/features/Workspace/components/web/Layout/Layout";
 import {
   ViewModePicker,
   useViewModePreference,
-} from "../src/routes/experiments/workspace/components/-ViewModePreference";
+} from "../src/features/Workspace/components/web/ViewModePreference/ViewModePreference";
 import { profileToForm } from "../src/features/ExecutionProfiles/components/ExecutionProfileFields";
 import { processToForm } from "../src/features/Processes/components/ProcessFields";
 import { taskToForm } from "../src/features/Tasks/components/TaskFields";

@@ -3,10 +3,15 @@ import { createRootRoute, HeadContent, Outlet, Scripts, useLocation } from "@tan
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { CycleableDateTimeProvider } from "@/features";
 import { TooltipProvider } from "@/features";
-import { CommandPalette, CommandPaletteProvider, useCommandAction } from "@/features";
+import { CommandPaletteProvider, useCommandAction } from "@/features";
+import { CommandPalette } from "@/features/CommandPalette/components/web/CommandPalette";
+import {
+  useCommandActions,
+  useCommandPalette,
+  useCommandPaletteModel,
+} from "@/features/CommandPalette/model";
 import { ThemeProvider, useTheme } from "@/features";
 import { SiteNavbar } from "@/features";
-import "@/features/Commands/commands.css";
 
 import "../styles.css";
 
@@ -24,7 +29,7 @@ const RootComponent = () => {
         <ThemeProvider>
           <CycleableDateTimeProvider>
             <TooltipProvider>
-              <CommandPalette />
+              <SiteCommandPalette />
               <ThemeCommandAction />
               <SiteNavigation />
               <Outlet />
@@ -34,6 +39,13 @@ const RootComponent = () => {
       </CommandPaletteProvider>
     </QueryClientProvider>
   );
+};
+
+const SiteCommandPalette = () => {
+  const actions = useCommandActions();
+  const state = useCommandPalette();
+  const model = useCommandPaletteModel(actions, state, true);
+  return <CommandPalette model={model} />;
 };
 
 const ThemeCommandAction = () => {

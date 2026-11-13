@@ -1,15 +1,19 @@
 import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { CommandButton, CommandPalette, useCommandPalette } from "@/features";
+import { CommandButton, useCommandPalette } from "@/features";
+import { CommandPalette } from "@/features/CommandPalette/components/web/CommandPalette";
+import { useCommandActions, useCommandPaletteModel } from "@/features/CommandPalette/model";
 
 const CommandPaletteExperiment = () => {
   const [count, setCount] = useState(0);
   const [noteVisible, setNoteVisible] = useState(true);
-  const { setQuery } = useCommandPalette();
+  const paletteState = useCommandPalette();
+  const actions = useCommandActions();
+  const commandModel = useCommandPaletteModel(actions, paletteState);
 
   useEffect(() => {
-    setQuery("counter");
-  }, [setQuery]);
+    commandModel.setQuery("counter");
+  }, [commandModel.setQuery]);
   return (
     <section className="playground-page">
       <header className="playground-heading">
@@ -98,7 +102,7 @@ const CommandPaletteExperiment = () => {
           </section>
         </div>
         <aside aria-label="Command palette">
-          <CommandPalette mode="inline" />
+          <CommandPalette mode="inline" model={commandModel} />
         </aside>
       </div>
     </section>

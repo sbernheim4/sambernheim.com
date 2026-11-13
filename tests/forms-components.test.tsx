@@ -4,7 +4,7 @@ import { expect, test } from "vitest";
 import { FormEditor } from "../src/features/Forms/components";
 import { CycleableDateTime } from "../src/features/Dates/components";
 import { CycleableDateTimeProvider } from "../src/features/Dates";
-import { Number as FormattedNumber } from "../src/features/UI/components/Number";
+import { Number as FormattedNumber } from "../src/features/UI/components/web/Number";
 import { TooltipProvider } from "../src/features/UI/components/ui/tooltip";
 
 test("FormEditor tabs hide inactive content and page mode shows every section", () => {
@@ -132,7 +132,7 @@ test("CycleableDateTime titles each display mode", async () => {
   render(
     <TooltipProvider>
       <CycleableDateTimeProvider>
-        <CycleableDateTime value="2026-09-22T12:00:00.000Z" />
+        <CycleableDateTime value={new Date("2026-09-22T12:00:00.000Z")} />
       </CycleableDateTimeProvider>
     </TooltipProvider>,
   );

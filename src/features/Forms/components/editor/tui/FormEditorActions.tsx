@@ -1,9 +1,9 @@
 import { useTuiInput } from "@features/Workspace/components/tui/Primitives/InputMode";
-import { useAutomaticCommandAction } from "@features/Commands/commands";
+import { useAutomaticCommandAction } from "@features/CommandPalette/model";
 import { Box, Text } from "ink";
 import { useFormEditorContext } from "../../../hooks/useFormEditorContext";
 import { useFieldFocus } from "../../fields/tui/FieldFocus";
-import type { FormEditorActionsProps } from "../FormEditorActions";
+import type { FormEditorActionsProps } from "../formTypes";
 
 const StepDelayControl = ({
   run,

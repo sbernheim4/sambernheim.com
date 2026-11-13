@@ -3,9 +3,21 @@ import { Box, Text, type BoxProps, type DOMElement } from "ink";
 import type { ReactNode } from "react";
 import { useArticleControl } from "../ArticleFocus";
 import { useTuiWorkspaceNavigation } from "@features/Workspace/components/tui/Primitives/Navigation";
-import { useAutomaticCommandAction } from "@features/Commands/commands";
+import { useAutomaticCommandAction } from "@features/CommandPalette/model";
 
 const LinkAnchor = createContext<RefObject<DOMElement | null> | null>(null);
+
+const useArticleLinkAnchor = (
+  ref: RefObject<DOMElement | null>,
+  anchor: RefObject<DOMElement | null> | null,
+) => {
+  useEffect(() => {
+    ref.current = anchor?.current ?? null;
+    return () => {
+      ref.current = null;
+    };
+  }, [anchor, ref]);
+};
 
 // Ink Text has no ref. Inline links register against their enclosing layout box
 // so the viewer can scroll to the paragraph without inserting a Box into Text.
@@ -37,12 +49,7 @@ export const InternalLink = ({ children, href }: { children?: ReactNode; href: s
       navigate(href);
     },
   });
-  useEffect(() => {
-    ref.current = anchor?.current ?? null;
-    return () => {
-      ref.current = null;
-    };
-  }, [anchor, ref]);
+  useArticleLinkAnchor(ref, anchor);
   return (
     <Text color="blue" underline inverse={focused}>
       {children}

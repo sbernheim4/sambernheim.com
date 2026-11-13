@@ -64,6 +64,12 @@ const getPathname = () => {
   return tuiHistory.location.pathname;
 };
 
+const usePersistTuiPathname = (pathname: string) => {
+  useEffect(() => {
+    pathnameState.__siteTuiPathname = pathname;
+  }, [pathname]);
+};
+
 const resolveRoute = (pathname: string): TuiRoute => {
   if (pathname === "/") {
     return { page: "home" };
@@ -115,9 +121,7 @@ export const TuiRouterProvider = ({
   renderRoute: (route: TuiRoute) => ReactNode;
 }) => {
   const pathname = useSyncExternalStore(subscribe, getPathname, getPathname);
-  useEffect(() => {
-    pathnameState.__siteTuiPathname = pathname;
-  }, [pathname]);
+  usePersistTuiPathname(pathname);
   return (
     <RouterContextProvider router={tuiRouter}>
       <PathnameContext.Provider value={pathname}>

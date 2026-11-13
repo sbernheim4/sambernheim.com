@@ -1,0 +1,293 @@
+.component-library-layout {
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  gap: 36px;
+  align-items: start;
+}
+.component-library-sidebar {
+  position: sticky;
+  top: 24px;
+  display: grid;
+  gap: 12px;
+}
+.component-library-sidebar label {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+.component-library-sidebar input {
+  width: 100%;
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+.component-library-sidebar h2 {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-text-muted);
+  margin: 22px 0 8px;
+}
+.component-library-sidebar nav a {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+  padding: 10px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font-size: 13px;
+  text-decoration: none;
+}
+.component-library-sidebar nav a[aria-current] {
+  background: var(--color-surface-muted);
+  color: var(--color-primary);
+}
+.component-library-sidebar small {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  margin-top: 14px;
+}
+.component-library-content {
+  min-width: 0;
+}
+.component-library-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.component-library-title h2 {
+  font-size: 30px;
+  letter-spacing: -0.035em;
+  margin: 8px 0;
+}
+.component-library-title button {
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 5px;
+  padding: 8px 10px;
+  cursor: pointer;
+  font-size: 12px;
+}
+.component-library-description {
+  color: var(--color-text-secondary);
+  line-height: 1.7;
+  margin: 12px 0 24px;
+}
+.component-library-previews {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.component-library-preview {
+  min-width: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--color-surface);
+}
+.component-library-preview > header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-border);
+}
+.component-library-preview h3 {
+  font-size: 13px;
+  margin: 0;
+}
+.component-library-preview header span {
+  color: var(--color-text-muted);
+  font-size: 11px;
+}
+.component-library-web {
+  min-height: 200px;
+  padding: 24px 16px;
+}
+.component-library-web .app-field {
+  width: 100%;
+}
+.component-library-web .detail-section {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.component-library-terminal {
+  height: 200px;
+  background: #151a20;
+  color: #e6e8eb;
+  padding: 10px 6px;
+  overflow: hidden;
+}
+.component-library-terminal .ink-terminal-box {
+  max-width: 100%;
+}
+.component-library-preview > p {
+  margin: 0;
+  padding: 14px 16px;
+  border-top: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  line-height: 1.65;
+}
+.component-library-note {
+  margin: 20px 0 32px;
+  border-left: 2px solid var(--color-primary);
+  padding: 8px 14px;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  line-height: 1.7;
+}
+.component-library-docs h3 {
+  font-size: 18px;
+  margin: 26px 0 12px;
+}
+.component-library-docs p {
+  color: var(--color-text-secondary);
+  line-height: 1.7;
+  font-size: 14px;
+}
+.component-library-docs pre {
+  padding: 18px;
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  overflow-x: auto;
+  font-size: 12px;
+  line-height: 1.8;
+  margin: 14px 0;
+}
+.component-library-docs summary {
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+.component-library-table {
+  overflow-x: auto;
+}
+.component-library-table table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 12px;
+}
+.component-library-table th,
+.component-library-table td {
+  border-bottom: 1px solid var(--color-border);
+  padding: 12px 10px;
+  vertical-align: top;
+  line-height: 1.6;
+}
+.component-library-table td {
+  color: var(--color-text-secondary);
+}
+.component-library-footer {
+  color: var(--color-text-muted);
+  font-size: 12px;
+  margin-top: 24px;
+}
+.component-library button:focus-visible,
+.component-library input:focus-visible,
+.component-library summary:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 3px;
+}
+.component-library-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+@media (max-width: 1000px) {
+  .component-library-previews {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 680px) {
+  .component-library-layout {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .component-library-sidebar {
+    position: static;
+  }
+  .component-library-sidebar nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .component-library-sidebar nav > div {
+    flex: 1;
+    min-width: 130px;
+  }
+  .component-library-title {
+    align-items: start;
+  }
+}
+.component-library-previews--large .component-library-terminal {
+  height: 385px;
+}
+.component-library-previews--large .component-library-web {
+  min-height: 385px;
+}
+.component-library-previews--commands .component-library-terminal {
+  height: 480px;
+}
+.component-library-previews--commands .component-library-web {
+  min-height: 480px;
+}
+.component-library-previews--commands .xterm-viewport {
+  scrollbar-width: none;
+}
+.component-library-previews--commands .xterm-viewport::-webkit-scrollbar {
+  display: none;
+}
+.component-library-web .command-palette-inline {
+  width: 100%;
+}
+.component-library-web .data-table {
+  min-width: 0;
+}
+.component-library-web:has(.data-table-scroll) {
+  padding-top: 0;
+}
+.component-library-web .data-table-scroll {
+  margin-top: 0;
+}
+.component-library-web .data-table-name:is(button) {
+  background: transparent;
+  border: 0;
+  color: var(--color-primary);
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  padding: 0;
+}
+.component-library-web .data-table tr[data-selected] {
+  background: var(--color-surface-muted);
+  outline: 1px solid var(--color-primary);
+  outline-offset: -1px;
+}
+
+.playground-shell:has(.component-library) {
+  max-width: 1480px;
+  padding-inline: 20px;
+}
+@media (max-width: 680px) {
+  .playground-shell:has(.component-library) {
+    padding-inline: 16px;
+  }
+}

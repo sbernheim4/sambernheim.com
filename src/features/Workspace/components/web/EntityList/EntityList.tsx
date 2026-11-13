@@ -1,5 +1,6 @@
 import { CommandLink } from "@/features";
-import { EntityTable } from "@features/EntityTable/components/web/EntityTable";
+import { useTableModel } from "@features/Table/model";
+import { Table } from "@features/Table/components/web/Table";
 import type { WorkspaceRenderer } from "../../renderer";
 export const EntityList: WorkspaceRenderer["EntityList"] = ({
   title,
@@ -8,6 +9,7 @@ export const EntityList: WorkspaceRenderer["EntityList"] = ({
   data,
   loading,
 }) => {
+  const model = useTableModel(data);
   return (
     <>
       <div className="heading">
@@ -16,7 +18,7 @@ export const EntityList: WorkspaceRenderer["EntityList"] = ({
           {createLabel}
         </CommandLink>
       </div>
-      {loading ? <p>Loading...</p> : <EntityTable data={data} />}
+      {loading ? <p>Loading...</p> : <Table model={model} />}
     </>
   );
 };

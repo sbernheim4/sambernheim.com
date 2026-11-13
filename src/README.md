@@ -15,7 +15,7 @@ src/
 │   ├── Dates/
 │   │   ├── components/          # Cycleable date and date-time displays
 │   │   └── hooks/               # Date display mode context
-│   ├── Commands/                # Command palette and command-aware controls
+│   ├── CommandPalette/                # Command palette and command-aware controls
 │   ├── ExecutionProfiles/
 │   ├── Processes/
 │   ├── Tasks/

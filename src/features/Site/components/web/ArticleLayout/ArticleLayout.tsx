@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 import { CycleableDate } from "@/features";
-import { parseDateOnly } from "@/utils";
 import "./ArticleLayout.css";
 import "./ArticlePage.css";
 
@@ -18,7 +17,7 @@ export const ArticleLayout = ({
       <header className="article-header">
         <h1>{title}</h1>
         <p className="article-published">
-          Published on: <CycleableDate value={parseDateOnly(publishedAt)} />
+          Published on: <CycleableDate value={publishedAt} />
         </p>
       </header>
       {children}

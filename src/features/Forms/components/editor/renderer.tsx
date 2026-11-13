@@ -1,21 +1,21 @@
 import { createContext, useContext, type ReactNode } from "react";
 import { ViewModePicker } from "../../../Workspace/components/web/ViewModePreference/ViewModePreference";
-import { FormEditorActions } from "./FormEditorActions";
-import { FormEditorContent, FormEditorDraftBanner } from "./FormEditorContent";
-import { FormEditorError } from "./FormEditorError";
-import { FormEditorHeader } from "./FormEditorHeader";
-import { FormEditorLayout } from "./FormEditorLayout";
-import { FormEditorMain } from "./FormEditorMain";
+import { FormEditorActions } from "./web/FormEditorActions";
+import { FormEditorContent, FormEditorDraftBanner } from "./web/FormEditorContent";
+import { FormEditorError } from "./web/FormEditorError";
+import { FormEditorHeader } from "./web/FormEditorHeader";
+import { FormEditorLayout } from "./web/FormEditorLayout";
+import { FormEditorMain } from "./web/FormEditorMain";
 import {
   FormEditorOrchestratorProgress,
   FormEditorOrchestratorStatus,
-} from "./FormEditorOrchestratorProgress";
-import { FormEditorProvider } from "./FormEditorProvider";
-import { FormEditorTab } from "./FormEditorTab";
-import { FormEditorTabList } from "./FormEditorTabList";
-import { FormEditorTabTrigger } from "./FormEditorTabTrigger";
-import { FormEditorTools } from "./FormEditorTools";
-import { FormEditorUndo } from "./FormEditorUndo";
+} from "./web/FormEditorOrchestratorProgress";
+import { FormEditorProvider } from "./web/FormEditorProvider";
+import { FormEditorTab } from "./web/FormEditorTab";
+import { FormEditorTabList } from "./web/FormEditorTabList";
+import { FormEditorTabTrigger } from "./web/FormEditorTabTrigger";
+import { FormEditorTools } from "./web/FormEditorTools";
+import { FormEditorUndo } from "./web/FormEditorUndo";
 
 const Title = ({ children }: { children: ReactNode }) => {
   return (

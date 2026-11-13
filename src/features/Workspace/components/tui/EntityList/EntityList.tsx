@@ -1,7 +1,8 @@
 import { useTuiInput } from "@features/Workspace/components/tui/Primitives/InputMode";
-import { useAutomaticCommandAction } from "@features/Commands/commands";
+import { useAutomaticCommandAction } from "@features/CommandPalette/model";
 import { Box, Text } from "ink";
-import { EntityTable } from "@features/EntityTable/components/tui/EntityTable";
+import { Table } from "@features/Table/components/tui/Table";
+import { useTableModel } from "@features/Table/model";
 import { useTuiWorkspaceNavigation } from "../Primitives/Navigation";
 import { useTuiInputMode } from "../Primitives/InputMode";
 import type { WorkspaceRenderer } from "../../renderer";
@@ -12,6 +13,7 @@ export const EntityList: WorkspaceRenderer["EntityList"] = ({
   data,
   loading,
 }) => {
+  const model = useTableModel(data);
   const navigate = useTuiWorkspaceNavigation();
   const { mode } = useTuiInputMode();
   useAutomaticCommandAction({
@@ -34,8 +36,8 @@ export const EntityList: WorkspaceRenderer["EntityList"] = ({
       {loading ? (
         <Text dimColor>Loading…</Text>
       ) : (
-        <EntityTable
-          data={data}
+        <Table
+          model={model}
           onSelect={(row) => {
             return navigate(row.href);
           }}

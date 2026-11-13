@@ -22,6 +22,7 @@ export const Shell = ({ children }: { children: ReactNode }) => {
             className="theme-switcher"
             aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
             aria-pressed={theme === "dark"}
+            command={false}
             onClick={toggleTheme}
           >
             {theme === "light" ? (

@@ -1,5 +1,5 @@
 import { createContext, useContext, type ComponentType, type ReactNode } from "react";
-import type { EntityTableRecord } from "@features/EntityTable/model";
+import type { TableRecord } from "@features/Table/model";
 
 export type DetailTab = { value: string; label: string; children: ReactNode };
 export type WorkspaceRenderer = {
@@ -20,7 +20,7 @@ export type WorkspaceRenderer = {
     title: string;
     createHref: string;
     createLabel: string;
-    data: EntityTableRecord[];
+    data: TableRecord[];
     loading: boolean;
   }>;
 };
