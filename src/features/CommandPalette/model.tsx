@@ -1,6 +1,7 @@
 /* oxlint-disable arrow-body-style, curly */
 
 import {
+  useCallback,
   createContext,
   useContext,
   useEffect,
@@ -256,10 +257,13 @@ export const useCommandPaletteModel = (
   const [running, setRunning] = useState(false);
   const runningRef = useRef(false);
   const selected = Math.max(0, Math.min(state.selected, results.length - 1));
-  const setQuery = (query: string) => {
-    state.setQuery(query);
-    state.setSelected(0);
-  };
+  const setQuery = useCallback(
+    (query: string) => {
+      state.setQuery(query);
+      state.setSelected(0);
+    },
+    [state.setQuery, state.setSelected],
+  );
   const setSelected: CommandPaletteState["setSelected"] = (next) => {
     const index = typeof next === "function" ? next(selected) : next;
     state.setSelected(Math.max(0, Math.min(index, results.length - 1)));

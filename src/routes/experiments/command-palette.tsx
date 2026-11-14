@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { CommandButton, useCommandPalette } from "@/features";
 import { CommandPalette } from "@/features/CommandPalette/components/web/CommandPalette";
@@ -10,9 +10,16 @@ const CommandPaletteExperiment = () => {
   const paletteState = useCommandPalette();
   const actions = useCommandActions();
   const commandModel = useCommandPaletteModel(actions, paletteState);
+  const queryRef = useRef(commandModel.query);
+  queryRef.current = commandModel.query;
 
   useEffect(() => {
     commandModel.setQuery("counter");
+    return () => {
+      if (queryRef.current === "counter") {
+        commandModel.setQuery("");
+      }
+    };
   }, [commandModel.setQuery]);
   return (
     <section className="playground-page">

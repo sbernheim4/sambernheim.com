@@ -1,6 +1,6 @@
 import { Outlet, createFileRoute } from "@tanstack/react-router";
 import { CommandLink } from "@/features";
-import { experiments } from "./experiments-data";
+import { experiments } from "@/features/Site/experimentsData";
 import "./experiments.css";
 
 const PlaygroundLayout = () => {

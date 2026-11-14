@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ArrowUpRight } from "lucide-react";
 import { CommandLink } from "@/features";
-import { experiments } from "./experiments-data";
+import { experiments } from "@/features/Site/experimentsData";
 
 const PlaygroundIndex = () => {
   return (

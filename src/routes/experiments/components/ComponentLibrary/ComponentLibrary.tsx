@@ -28,8 +28,9 @@ export const ComponentLibrary = ({ children }: { children?: ReactNode }) => {
         <p>
           One shared model drives both web and TUI renderers. The two views are in sync. Reset
           examples to return both to their starting values. Explore components that work in both web
-          and TUI environments. The same libraries, hooks, functions, data, state, and types drive both;
-          only the rendering component changes. This includes Tanstack libraries like Query, Table, Router etc.
+          and TUI environments. The same libraries, hooks, functions, data, state, and types drive
+          both; only the rendering component changes. This includes Tanstack libraries like Query,
+          Table, Router etc.
         </p>
       </header>
       <div className="component-library-layout">
@@ -74,9 +75,7 @@ export const ComponentLibrary = ({ children }: { children?: ReactNode }) => {
           </nav>
           <small>{catalog.length} components · React DOM + Ink</small>
         </aside>
-        <div className="component-library-content">
-          {children ?? <Outlet />}
-        </div>
+        <div className="component-library-content">{children ?? <Outlet />}</div>
       </div>
     </section>
   );

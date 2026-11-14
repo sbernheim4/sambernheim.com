@@ -42,6 +42,23 @@
   z-index: 2;
 }
 
+.navbar--home {
+  display: grid;
+  grid-template-columns: auto minmax(4rem, 1fr) auto;
+  column-gap: 24px;
+  padding-inline: 28px;
+}
+
+.navbar--home #main,
+.navbar--home .navbar__line-container,
+.navbar--home .navbar__actions {
+  margin: 0;
+}
+
+.navbar--home .navbar__line-container {
+  width: 100%;
+}
+
 .navbar--article {
   position: fixed;
   inset: 0 0 auto;
@@ -88,6 +105,11 @@
   color: var(--foreground-color);
   text-decoration: none;
 }
+
+.navbar--home #main {
+  margin: 15px 0;
+}
+
 .navbar #main:hover {
   color: var(--line-color);
 }

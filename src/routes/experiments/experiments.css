@@ -1,6 +1,6 @@
 .playground-shell,
 body:has(.playground-shell) {
-  background-color: var(--color-background);
+  background-color: var(--home-background);
   color: var(--color-text);
 }
 
