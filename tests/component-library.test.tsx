@@ -1,15 +1,27 @@
-import type { ComponentProps } from "react";
+import type { ComponentProps, ReactNode } from "react";
 import { act, render, screen, fireEvent, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import {
+  createMemoryHistory,
+  createRootRoute,
+  createRoute,
+  createRouter,
+  Outlet,
+  RouterProvider,
+  useParams,
+} from "@tanstack/react-router";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import type { ExampleProps } from "../src/routes/experiments/components/ComponentLibrary/useExampleState";
 import { TooltipProvider } from "../src/features/UI/components/ui/tooltip";
 import { ComponentLibrary } from "../src/routes/experiments/components/ComponentLibrary/ComponentLibrary";
+import { ComponentExample } from "../src/routes/experiments/components/ComponentLibrary/ComponentExample";
+import type { ComponentId } from "../src/routes/experiments/components/ComponentLibrary/catalog";
 import { CommandPaletteProvider, useCommandAction } from "../src/features/CommandPalette/model";
 import { useState } from "react";
 
 const PaletteFixture = () => {
   const [counter, setCounter] = useState(0);
+  const { component } = useParams({ strict: false });
   useCommandAction({
     id: "test:increment",
     label: "Increment counter",
@@ -42,19 +54,51 @@ const PaletteFixture = () => {
   return (
     <>
       <output>Counter: {counter}</output>
-      <ComponentLibrary selected="text" />
+      <ComponentExample key={component} selected={component as ComponentId} />
     </>
   );
 };
 
-const renderLibraryWithPaletteFixture = () => {
+const RoutedExample = () => {
+  const { component } = useParams({ strict: false });
+  return <ComponentExample key={component} selected={component as ComponentId} />;
+};
+
+const renderComponentLibrary = (page: () => ReactNode = RoutedExample) => {
+  const rootRoute = createRootRoute({
+    component: () => {
+      return <Outlet />;
+    },
+  });
+  const layoutRoute = createRoute({
+    getParentRoute: () => {
+      return rootRoute;
+    },
+    path: "/experiments/components",
+    component: ComponentLibrary,
+  });
+  const exampleRoute = createRoute({
+    getParentRoute: () => {
+      return layoutRoute;
+    },
+    path: "/$component",
+    component: page,
+  });
+  const router = createRouter({
+    routeTree: rootRoute.addChildren([layoutRoute.addChildren([exampleRoute])]),
+    history: createMemoryHistory({ initialEntries: ["/experiments/components/text"] }),
+  });
   return render(
     <TooltipProvider>
       <CommandPaletteProvider>
-        <PaletteFixture />
+        <RouterProvider router={router} />
       </CommandPaletteProvider>
     </TooltipProvider>,
   );
+};
+
+const renderLibraryWithPaletteFixture = () => {
+  return renderComponentLibrary(PaletteFixture);
 };
 
 // Keep the real DOM renderers while observing the model boundary. This catches
@@ -222,18 +266,14 @@ Object.defineProperty(document, "fonts", {
 
 test("edits real form fields and resets both preview lifecycles", async () => {
   const user = userEvent.setup();
-  render(
-    <TooltipProvider>
-      <ComponentLibrary selected="text" />
-    </TooltipProvider>,
-  );
+  renderComponentLibrary();
   expect(await screen.findByTestId("terminal-example")).toHaveTextContent("text");
   await user.clear(screen.getByLabelText("Title"));
   await user.type(screen.getByLabelText("Title"), "A different project");
   expect(screen.getByLabelText("Title")).toHaveValue("A different project");
   await user.click(screen.getByRole("button", { name: "Reset examples" }));
   expect(screen.getByLabelText("Title")).toHaveValue("Website refresh");
-  await user.click(screen.getByRole("button", { name: "Radio group" }));
+  await user.click(screen.getByRole("link", { name: "Radio group" }));
   await user.click(screen.getByRole("radio", { name: "Complete" }));
   expect(screen.getByRole("radio", { name: "Complete" })).toBeChecked();
   expect(screen.getByTestId("terminal-example")).toHaveTextContent("radio");
@@ -242,15 +282,11 @@ test("edits real form fields and resets both preview lifecycles", async () => {
 
 test("filters catalog navigation, handles no matches, and changes paired examples", async () => {
   const user = userEvent.setup();
-  render(
-    <TooltipProvider>
-      <ComponentLibrary selected="text" />
-    </TooltipProvider>,
-  );
+  renderComponentLibrary();
   await screen.findByTestId("terminal-example");
   await user.type(screen.getByLabelText("Find a component"), "Detail tabs");
-  expect(screen.queryByRole("button", { name: "Text field" })).not.toBeInTheDocument();
-  await user.click(screen.getByRole("button", { name: "Detail tabs" }));
+  expect(screen.queryByRole("link", { name: "Text field" })).not.toBeInTheDocument();
+  await user.click(screen.getByRole("link", { name: "Detail tabs" }));
   expect(screen.getByTestId("terminal-example")).toHaveTextContent("tabs");
   await user.click(screen.getByRole("tab", { name: "Activity" }));
   expect(screen.getByRole("tabpanel")).toHaveTextContent("Added a release task.");
@@ -260,11 +296,7 @@ test("filters catalog navigation, handles no matches, and changes paired example
 });
 
 test("Tab exits the terminal preview to a visible control", async () => {
-  render(
-    <TooltipProvider>
-      <ComponentLibrary selected="text" />
-    </TooltipProvider>,
-  );
+  renderComponentLibrary();
   const terminal = await screen.findByTestId("terminal-example");
   fireEvent.keyDown(terminal, { key: "Tab" });
   expect(screen.getByRole("button", { name: "Reset examples" })).toHaveFocus();
@@ -272,11 +304,7 @@ test("Tab exits the terminal preview to a visible control", async () => {
 
 test("shares form values in both directions for every field example", async () => {
   const user = userEvent.setup();
-  render(
-    <TooltipProvider>
-      <ComponentLibrary selected="text" />
-    </TooltipProvider>,
-  );
+  renderComponentLibrary();
   await screen.findByTestId("terminal-example");
   await user.clear(screen.getByLabelText("Title"));
   await user.type(screen.getByLabelText("Title"), "From web");
@@ -284,7 +312,7 @@ test("shares form values in both directions for every field example", async () =
   await user.click(screen.getByRole("button", { name: "Terminal edit title" }));
   expect(screen.getByLabelText("Title")).toHaveValue("From terminal");
   for (const name of ["Select", "Radio group", "Autocomplete"]) {
-    await user.click(screen.getByRole("button", { name }));
+    await user.click(screen.getByRole("link", { name }));
     if (name === "Select") {
       fireEvent.change(
         screen.getByRole("combobox", { name: "Status" }).parentElement!.querySelector("select")!,
@@ -312,18 +340,14 @@ test("shares form values in both directions for every field example", async () =
 
 test("shares tab, disclosure, and date mode in both directions", async () => {
   const user = userEvent.setup();
-  render(
-    <TooltipProvider>
-      <ComponentLibrary selected="text" />
-    </TooltipProvider>,
-  );
+  renderComponentLibrary();
   await screen.findByTestId("terminal-example");
-  await user.click(screen.getByRole("button", { name: "Detail tabs" }));
+  await user.click(screen.getByRole("link", { name: "Detail tabs" }));
   await user.click(screen.getByRole("tab", { name: "Activity" }));
   expect(screen.getByLabelText("Terminal tab")).toHaveTextContent("activity");
   await user.click(screen.getByRole("button", { name: "Terminal overview" }));
   expect(screen.getByRole("tab", { name: "Overview" })).toHaveAttribute("aria-selected", "true");
-  await user.click(screen.getByRole("button", { name: "Detail section" }));
+  await user.click(screen.getByRole("link", { name: "Detail section" }));
   const disclosure = screen.getByText("Project details").closest("details")!;
   disclosure.open = false;
   fireEvent(disclosure, new Event("toggle"));
@@ -332,7 +356,7 @@ test("shares tab, disclosure, and date mode in both directions", async () => {
   });
   await user.click(screen.getByRole("button", { name: "Terminal toggle" }));
   expect(disclosure).toHaveAttribute("open");
-  await user.click(screen.getByRole("button", { name: "Cycleable date & time" }));
+  await user.click(screen.getByRole("link", { name: "Cycleable date & time" }));
   await user.click(screen.getByRole("button", { name: /Format: UTC/ }));
   expect(screen.getByLabelText("Terminal date mode")).toHaveTextContent("relative");
   await user.click(screen.getByRole("button", { name: "Terminal local" }));
@@ -348,8 +372,8 @@ test("command palette shares search, selection, actions, and reset", async () =>
   const user = userEvent.setup();
   renderLibraryWithPaletteFixture();
   await screen.findByTestId("terminal-example");
-  await user.click(screen.getByRole("button", { name: "Command palette" }));
-  await user.type(screen.getByLabelText("Search commands"), "Increment");
+  await user.click(screen.getByRole("link", { name: "Command palette" }));
+  await user.type(await screen.findByLabelText("Search commands"), "Increment");
   expect(screen.getByLabelText("Terminal command query")).toHaveTextContent("Increment");
   await user.keyboard("{Enter}");
   expect(screen.getByText("Counter: 1")).toBeVisible();
@@ -367,13 +391,9 @@ test("command palette shares search, selection, actions, and reset", async () =>
 
 test("table shares filtering, sorting, and selection by record ID", async () => {
   const user = userEvent.setup();
-  render(
-    <TooltipProvider>
-      <ComponentLibrary selected="text" />
-    </TooltipProvider>,
-  );
+  renderComponentLibrary();
   await screen.findByTestId("terminal-example");
-  await user.click(screen.getByRole("button", { name: "Table" }));
+  await user.click(screen.getByRole("link", { name: "Table" }));
   await user.click(screen.getByRole("button", { name: "Release notes" }));
   expect(screen.getByLabelText("Terminal row selection")).toHaveTextContent("release");
   await user.click(screen.getByRole("button", { name: "Name" }));
@@ -404,7 +424,8 @@ test("both palette renderers receive the exact same model, results, and executio
   const user = userEvent.setup();
   renderLibraryWithPaletteFixture();
   await screen.findByTestId("terminal-example");
-  await user.click(screen.getByRole("button", { name: "Command palette" }));
+  await user.click(screen.getByRole("link", { name: "Command palette" }));
+  await screen.findByLabelText("Search commands");
   const expectSharedPalette = () => {
     const terminal = renderedModels.terminal.mock.lastCall![0] as ExampleProps;
     const web = renderedModels.command.mock.lastCall![0] as ExampleProps["commandModel"];
@@ -427,13 +448,9 @@ test("both palette renderers receive the exact same model, results, and executio
 
 test("both table renderers receive one model and one TanStack table instance", async () => {
   const user = userEvent.setup();
-  render(
-    <TooltipProvider>
-      <ComponentLibrary selected="text" />
-    </TooltipProvider>,
-  );
+  renderComponentLibrary();
   await screen.findByTestId("terminal-example");
-  await user.click(screen.getByRole("button", { name: "Table" }));
+  await user.click(screen.getByRole("link", { name: "Table" }));
   const expectSharedTable = () => {
     const terminal = renderedModels.terminal.mock.lastCall![0] as ExampleProps;
     const web = renderedModels.table.mock.lastCall![0] as ExampleProps["tableModel"];
@@ -458,13 +475,9 @@ test("both table renderers receive one model and one TanStack table instance", a
 
 test("column filters share the table model, combine with global search, and reset together", async () => {
   const user = userEvent.setup();
-  render(
-    <TooltipProvider>
-      <ComponentLibrary selected="text" />
-    </TooltipProvider>,
-  );
+  renderComponentLibrary();
   await screen.findByTestId("terminal-example");
-  await user.click(screen.getByRole("button", { name: "Table" }));
+  await user.click(screen.getByRole("link", { name: "Table" }));
   const expectSharedRows = (ids: string[]) => {
     const terminal = renderedModels.terminal.mock.lastCall![0] as ExampleProps;
     const web = renderedModels.table.mock.lastCall![0] as ExampleProps["tableModel"];

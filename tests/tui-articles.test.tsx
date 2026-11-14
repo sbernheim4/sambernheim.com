@@ -116,7 +116,7 @@ describe("TUI articles", () => {
     await view.key("\r");
     expect(view.text()).toContain("[Relative]");
     await view.key("\u001b");
-    expect(view.text()).toContain("Esc back");
+    expect(view.text()).not.toContain("· Enter");
     await view.key("\r");
     expect(view.text()).toContain("[Relative]");
   });

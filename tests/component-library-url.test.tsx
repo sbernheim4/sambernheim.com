@@ -65,7 +65,7 @@ const mount = async (url: string) => {
     getParentRoute: () => {
       return layoutRoute;
     },
-    path: "/experiments/components/$component",
+    path: "/$component",
   };
   const exampleRoute = ComponentExampleRoute.update(exampleOptions);
   const history = createMemoryHistory({ initialEntries: [url] });
